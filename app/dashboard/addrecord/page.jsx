@@ -6,12 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSession } from "next-auth/react";
 
 export default function PatientForm() {
     const [patientId] = useState(() => {
         const randomNum = Math.floor(Math.random() * 1000);
         return `P${randomNum.toString().padStart(3, '0')}`;
     });
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        console.log("Session user:", session?.user);
+    }, [session]);
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -64,12 +70,7 @@ export default function PatientForm() {
         tirzepatideUnit: 'mg',
         providerNote: ''
     });
-    const [userType, setUserType] = useState('')
 
-    useEffect(() => {
-        const storedUserType = localStorage.getItem('userType')
-        if (storedUserType) setUserType(storedUserType)
-    }, [])
     const [images, setImages] = useState([
         { file: null, preview: null },
         { file: null, preview: null },
@@ -641,7 +642,7 @@ export default function PatientForm() {
 
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
 
-                    {(userType === 'admin' || userType === 'clinician') && (
+                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">
                             <Label htmlFor="approvalStatus">Approval Status</Label>
                             <Select
@@ -672,18 +673,12 @@ export default function PatientForm() {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="0.25">0.25</SelectItem>
-                                    <SelectItem value="0.50">0.50</SelectItem>
-                                    <SelectItem value="1.00">1.00</SelectItem>
-                                    <SelectItem value="1.7">1.7</SelectItem>
-                                    <SelectItem value="2.00">2.00</SelectItem>
-                                    <SelectItem value="2.5">2.5</SelectItem>
-                                    <SelectItem value="4.00">4.00</SelectItem>
-                                    <SelectItem value="6.80">6.80</SelectItem>
-                                    <SelectItem value="10.00">10.00</SelectItem>
-                                    <SelectItem value="15.00">15.00</SelectItem>
-                                    <SelectItem value="20.00">20.00</SelectItem>
-                                    <SelectItem value="25.00">25.00</SelectItem>
+                                    <SelectItem value="0.25">0.25 mg</SelectItem>
+                                    <SelectItem value="0.50">0.50 mg</SelectItem>
+                                    <SelectItem value="1.0">1 mg</SelectItem>
+                                    <SelectItem value="1.7">1.7 mg</SelectItem>
+                                    <SelectItem value="2.0">2.0 mg</SelectItem>
+                                    <SelectItem value="2.5">2.5 mg</SelectItem>
                                 </SelectContent>
 
                             </Select>
@@ -695,12 +690,14 @@ export default function PatientForm() {
                                     <SelectValue placeholder="Unit" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="mg">mg</SelectItem>
-                                    <SelectItem value="mg/ml">mg/mL</SelectItem>
-                                    <SelectItem value="mg/2ml">mg/2mL</SelectItem>
-                                    <SelectItem value="mg/3ml">mg/3mL</SelectItem>
-                                    <SelectItem value="mg/4ml">mg/4mL</SelectItem>
-                                    <SelectItem value="mg/5ml">mg/5mL</SelectItem>
+                                    <SelectItem value="1.00 mg/2mL">1.00 mg/2mL</SelectItem>
+                                    <SelectItem value="2.00 mg/2mL">2.00 mg/2mL</SelectItem>
+                                    <SelectItem value="4.00 mg/2mL">4.00 mg/2mL</SelectItem>
+                                    <SelectItem value="6.80 mg/2mL">6.80 mg/2mL</SelectItem>
+                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
+                                    <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
+                                    <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
+                                    <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -718,12 +715,12 @@ export default function PatientForm() {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="10.00">10.00</SelectItem>
-                                    <SelectItem value="20.00">20.00</SelectItem>
-                                    <SelectItem value="30.00">30.00</SelectItem>
-                                    <SelectItem value="40.00">40.00</SelectItem>
-                                    <SelectItem value="50.00">50.00</SelectItem>
-                                    <SelectItem value="60.00">60.00</SelectItem>
+                                    <SelectItem value="2.5">2.5mg</SelectItem>
+                                    <SelectItem value="4.5">4.5mg</SelectItem>
+                                    <SelectItem value="6.5">6.5mg</SelectItem>
+                                    <SelectItem value="9.0">9.0mg</SelectItem>
+                                    <SelectItem value="11.5">11.5mg</SelectItem>
+                                    <SelectItem value="13.5">13.5mg</SelectItem>
                                 </SelectContent>
                             </Select>
 
@@ -735,7 +732,12 @@ export default function PatientForm() {
                                     <SelectValue placeholder="Unit" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="mg/2ml">mg/2mL</SelectItem>
+                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
+                                    <SelectItem value="20.00 mg/2mL">20.00 mg/2mL</SelectItem>
+                                    <SelectItem value="30.00 mg/2mL">30.00 mg/2mL</SelectItem>
+                                    <SelectItem value="40.00 mg/2mL">40.00 mg/2mL</SelectItem>
+                                    <SelectItem value="50.00 mg/2mL">50.00 mg/2mL</SelectItem>
+                                    <SelectItem value="60.00 mg/2mL">60.00 mg/2mL</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

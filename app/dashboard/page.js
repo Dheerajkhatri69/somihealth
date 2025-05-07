@@ -46,9 +46,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
-    const [userType, setUserType] = useState('')
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        console.log("dashboard Session user:", session?.user);
+    }, [session]);
+
     const [selectedEmail, setSelectedEmail] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedPatients, setSelectedPatients] = useState([]);
@@ -57,10 +63,6 @@ export default function Dashboard() {
     const [selectAll, setSelectAll] = useState(false);
     const checkboxRef = useRef(null);
 
-    useEffect(() => {
-        const storedUserType = localStorage.getItem('userType')
-        if (storedUserType) setUserType(storedUserType)
-    }, [])
 
     useEffect(() => {
         if (selectedPatients.length > 0) {
@@ -342,12 +344,12 @@ export default function Dashboard() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {(userType === 'admin' || userType === 'technician') && (
+                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                     <ClinicianDropdown selectedPatients={selectedPatients} />
                 )}
             </div>
 
-            {userType === 'admin' && (
+            {session?.user?.accounttype === 'A' && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
                     <div className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer">
                         <span className="text-sm font-medium">All Patients</span>
@@ -475,7 +477,7 @@ export default function Dashboard() {
                             {/* Provider Info */}
                             <TableHead>Provider Comments</TableHead>
 
-                            {(userType === 'admin' || userType === 'clinician') && (
+                            {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                 <TableHead>Status</TableHead>
                             )}
                             <TableHead>Out Come</TableHead>
@@ -593,7 +595,7 @@ export default function Dashboard() {
 
                                 <TableCell>{patient.providerComments}</TableCell>
 
-                                {(userType === 'admin' || userType === 'clinician') && (
+                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                     <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
                                 )}
                                 <TableCell className={`${patient.approvalStatus === "approved" ||
@@ -607,13 +609,13 @@ export default function Dashboard() {
                                         : "Open"}
                                 </TableCell>
                                 <TableCell>{patient.providerNote}</TableCell>
-                                <TableCell className={`sticky right-0 bg-white ${userType === 'admin' ? 'flex flex-col gap-2' : ''}`}>
+                                <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
                                     <Link href={`/dashboard/${patient.patientId}`}>
                                         <Button variant="outline" size="sm">
                                             Update
                                         </Button>
                                     </Link>
-                                    {userType === 'admin' && (
+                                    {session?.user?.accounttype === 'A' && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                 <Button variant="destructive" size="sm">
@@ -662,10 +664,10 @@ export default function Dashboard() {
                 <Link href="/dashboard/addrecord">
                     <Button ><Plus /> Add Patient</Button>
                 </Link>
-                {(userType === 'admin' || userType === 'clinician') && (
+                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <AlertDialogTrigger asChild>
-                            <Button  disabled={!selectedPatients.length}>
+                            <Button disabled={!selectedPatients.length}>
                                 Send Email
                             </Button>
                         </AlertDialogTrigger>
