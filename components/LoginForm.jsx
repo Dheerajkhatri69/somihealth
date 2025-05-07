@@ -1,68 +1,149 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useRouter } from 'next/navigation';
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { Loader2 } from "lucide-react"; // Add this import
+
+const formSchema = z.object({
+  id: z.string()
+    .min(4, "ID must be at least 4 characters")
+    .regex(/^[A-Za-z0-9]+$/, "Only letters and numbers are allowed")
+    .trim(),
+  password: z.string()
+    .min(6, "Password must be at least 6 characters")
+    .trim(),
+});
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
   const router = useRouter();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      id: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  async function onSubmit(values) {
+    setIsLoading(true);
     try {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+      const res = await signIn('credentials', {
+        id: values.id,
+        password: values.password,
+        redirect: false, // Disable automatic redirect
       });
 
-      if (res.error) {
-        setError("Invalid Credentials");
-        return;
+      if (res?.error) {
+        // Handle specific error messages
+        const errorMessage = res.error.includes("Invalid password") 
+          ? "Invalid password" 
+          : "Invalid ID";
+        setMessage(errorMessage);
+        setIsDialogOpen(true);
+      } else {
+        // Successful login - redirect to dashboard
+        router.push("/dashboard");
       }
-
-      router.replace("dashboard");
     } catch (error) {
-      console.log(error);
+      console.error("Unexpected error:", error);
+      setMessage("An unexpected error occurred. Please try again later.");
+      setIsDialogOpen(true);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400">
-        <h1 className="text-xl font-bold my-4">Login</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl text-secondary font-bold text-center">
+            Welcome Back
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ID</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your ID"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            type="text"
-            placeholder="Email"
-          />
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            placeholder="Password"
-          />
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
-            Login
-          </button>
-          {error && (
-            <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
-              {error}
-            </div>
-          )}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <Link className="text-sm mt-3 text-right" href={"/register"}>
-            Don't have an account? <span className="underline">Register</span>
-          </Link>
-        </form>
-      </div>
+              <Button type="submit" className="w-full">
+                {isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+
+              <Separator className="my-6" />
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent className="rounded-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign in</AlertDialogTitle>
+            <AlertDialogDescription>{message}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Close</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
