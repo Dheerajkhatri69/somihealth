@@ -6,10 +6,51 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { patients } from "../../../public/patientsdata";
-
+import { UploadButton } from "@/utils/uploadthing";
+import { useSession } from "next-auth/react";
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import { useRouter } from "next/navigation";
 export default function PatientUpdateForm({ params }) {
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        // console.log("dashboard Session user:", session?.user);
+    }, [session]);
+
+    const [patients, setPatients] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPatients = async () => {
+            try {
+                const res = await fetch("/api/patients");
+                const data = await res.json();
+
+                if (data.success) {
+                    setPatients(data.result); // from your API response
+                } else {
+                    console.error("Error fetching patients:", data.result.message);
+                }
+            } catch (err) {
+                console.error("Fetch failed:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPatients();
+    }, []);
+
     const [formData, setFormData] = useState({
+        authid: '',
         firstName: '',
         lastName: '',
         dob: '',
@@ -55,39 +96,42 @@ export default function PatientUpdateForm({ params }) {
         medicine: '',
         approvalStatus: '',
         semaglutideDose: '',
-        semaglutideUnit: 'mg',
+        semaglutideUnit: '',
         tirzepatideDose: '',
-        tirzepatideUnit: 'mg',
-        providerNote: ''
+        tirzepatideUnit: '',
+        providerNote: '',
+        createTimeDate: '',
+        closetickets: false,
+        Reasonclosetickets: '',
     });
-    const [userType, setUserType] = useState('');
     const [images, setImages] = useState([
         { file: null, preview: null },
         { file: null, preview: null },
         { file: null, preview: null },
     ]);
-
     useEffect(() => {
-        const patient = patients.find(p => p.patientId === params.patientId);
+        const patient = patients.find(p => p.authid === params.patientId);
         if (patient) {
-            setFormData(prev => ({
-                ...prev,
-                ...patient,
-                semaglutideUnit: patient.semaglutideUnit || 'mg',
-                tirzepatideUnit: patient.tirzepatideUnit || 'mg'
-            }));
+            setFormData(prev => ({ ...prev, ...patient }));
 
+            // Initialize images array with exactly 3 slots
             if (patient.images) {
-                setImages(patient.images.map(img => ({
-                    preview: img.preview,
-                    file: img.file ? new File([], img.file.name, { type: img.file.type }) : null
-                })));
+                // Create array with existing images (up to 3)
+                const initialImages = patient.images.slice(0, 3).map(img => ({
+                    preview: img,
+                    file: null
+                }));
+                // Fill remaining slots with empty objects
+                while (initialImages.length < 3) {
+                    initialImages.push({ file: null, preview: null });
+                }
+                setImages(initialImages);
+            } else {
+                // Reset to 3 empty slots if no images
+                setImages(Array(3).fill({ file: null, preview: null }));
             }
         }
-
-        const storedUserType = localStorage.getItem('userType');
-        if (storedUserType) setUserType(storedUserType);
-    }, [params.patientId]);
+    }, [patients, params.patientId]);
 
     const handleInputChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -105,28 +149,76 @@ export default function PatientUpdateForm({ params }) {
         }
     };
 
-    const removeImage = (index) => {
-        setImages(prev => prev.map((img, i) => i === index ? { file: null, preview: null } : img));
+    const handleImageUpload = (index, url) => {
+        setImages(prev =>
+            prev.map((img, i) =>
+                i === index ? { file: null, preview: url } : img
+            )
+        );
     };
 
-    const handleSubmit = (e) => {
+    // const removeImage = (index) => {
+    //     setImages(prev => prev.map((img, i) => i === index ? { file: null, preview: null } : img));
+    // };
+    const removeImage = (index) => {
+        setImages(prev =>
+            prev.map((img, i) =>
+                i === index ? { file: null, preview: null } : img
+            )
+        );
+    };
+
+    const router = useRouter();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [messageHead, setMessageHead] = useState("");
+    const [message, setMessage] = useState("");
+    const [isSuccess, setIsSuccess] = useState(false);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const imageUrls = images
+            .filter(img => img.preview)
+            .map(img => img.preview);
+
         const submissionData = {
             ...formData,
-            images: images.map(img => ({
-                preview: img.preview,
-                file: img.file ? {
-                    name: img.file.name,
-                    type: img.file.type,
-                    size: img.file.size
-                } : null
-            }))
+            images: imageUrls
         };
-        console.log('Updated Patient Data:', submissionData);
+
+        try {
+            const res = await fetch("/api/patients", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(submissionData),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                setMessageHead("Success");
+                setMessage("Patient updated successfully!");
+                setIsSuccess(true);
+                setIsDialogOpen(true);
+            } else {
+                setMessageHead("Error");
+                setMessage(data.result.message || "Failed to update patient");
+                setIsSuccess(false);
+                setIsDialogOpen(true);
+            }
+        } catch (err) {
+            setMessageHead("Error");
+            setMessage("Failed to update patient. Please try again.");
+            setIsSuccess(false);
+            setIsDialogOpen(true);
+            console.error("Request failed:", err);
+        }
     };
 
-    if (!formData.patientId) {
-        return <div className="p-4 text-red-500">Patient not found</div>;
+    if (!formData.authid) {
+        return <div className="p-4 text-yellow-500">loading..</div>;
     }
 
     return (
@@ -136,7 +228,7 @@ export default function PatientUpdateForm({ params }) {
                     <h2 className="text-2xl font-semibold">Updating {formData.firstName} {formData.lastName}</h2>
                     <div className="space-y-2">
                         <Label>Patient ID</Label>
-                        <Input value={formData.patientId} readOnly className="font-mono w-32" />
+                        <Input value={formData.authid} readOnly className="font-mono w-32" />
                     </div>
                 </div>
 
@@ -607,56 +699,54 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Image Upload Section */}
-                <h3 className="text-sm font-semibold">Upload Images</h3>
-                <div className="grid grid-cols-3 gap-4">
+                {/* Image Upload Section */}
+                <h3 className="text-sm font-semibold">Upload Images (Max 3)</h3>
+                <div className="flex justify-between flex-wrap items-center gap-4">
                     {images.map((image, index) => (
-                        <div key={index} className="relative group">
-                            <label className="block w-full aspect-square border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={(e) => handleImageChange(index, e)}
-                                />
-                                {image.preview ? (
+                        <div key={index} className="relative group w-[200px] h-[200px]">
+                            {image.preview ? (
+                                <>
                                     <img
                                         src={image.preview}
                                         alt={`Preview ${index + 1}`}
                                         className="w-full h-full object-cover rounded-lg"
                                     />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                        <span>Click to upload</span>
-                                    </div>
-                                )}
-                            </label>
-                            {image.preview && (
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(index)}
-                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    aria-label="Remove image"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-4 w-4"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(index)}
+                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
                                     >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
-                                </button>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </button>
+                                </>
+                            ) : (
+                                <UploadButton
+                                    endpoint="imageUploader"
+                                    onClientUploadComplete={(res) => {
+                                        if (res?.[0]?.url) {
+                                            handleImageUpload(index, res[0].url);
+                                        }
+                                    }}
+                                    className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
+                                // className="w-full h-full ut-button:bg-secondary ut-button:text-primary ut-button:hover:bg-secondary/80"
+                                />
                             )}
                         </div>
                     ))}
                 </div>
-
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    {(userType === 'admin' || userType === 'clinician') && (
+                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">
                             <Label htmlFor="approvalStatus">Approval Status</Label>
                             <Select
@@ -776,6 +866,31 @@ export default function PatientUpdateForm({ params }) {
                     Update Patient
                 </Button>
             </form>
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <AlertDialogContent className="rounded-md">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{messageHead}</AlertDialogTitle>
+                        <AlertDialogDescription>{message}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        {/* Stay on page button */}
+                        <AlertDialogCancel>
+                            {isSuccess ? "Continue Editing" : "Cancel"}
+                        </AlertDialogCancel>
+
+                        {/* Redirect button (only show for success) */}
+                        {isSuccess && (
+                            <Button
+                                onClick={() => router.push("/dashboard")}
+                                className="bg-primary hover:bg-primary-dark"
+                            >
+                                Return to Dashboard
+                            </Button>
+                        )}
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     );
 }

@@ -31,7 +31,7 @@ export function AppSidebar() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    console.log("Session user:", session?.user);
+    // console.log("Session user:", session?.user);
   }, [session]);
   
   return (

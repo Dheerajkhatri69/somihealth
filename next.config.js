@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+    images: {
+    domains: ['utfs.io'], // Add the external domain here
+  },
+  reactStrictMode: false,
+};
 
-module.exports = nextConfig
+export default nextConfig;

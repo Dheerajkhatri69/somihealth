@@ -7,75 +7,83 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSession } from "next-auth/react";
-
+import { UploadButton } from "@/utils/uploadthing";
+import { useRouter } from "next/navigation";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 export default function PatientForm() {
-    const [patientId] = useState(() => {
-        const randomNum = Math.floor(Math.random() * 1000);
-        return `P${randomNum.toString().padStart(3, '0')}`;
-    });
     const { data: session } = useSession();
 
     useEffect(() => {
         console.log("Session user:", session?.user);
     }, [session]);
-
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        dob: '',
-        height: '',
-        email: '',
-        sex: '',
-        weight: '',
-        phone: '',
-        glp1: '',
-        bmi: '',
-        address1: '',
-        address2: '',
-        city: '',
-        state: '',
-        zip: '',
-        bloodPressure: '',
-        heartRate: '',
-        takingMedication: '',
-        medicineAllergy: '',
-        allergyList: '',
-        majorSurgeries: '',
-        bariatricSurgery: '',
-        thyroidCancerHistory: '',
-        surgeryList: '',
-        disqualifiers: '',
-        diagnosis: '',
-        startingWeight: '',
-        currentWeight: '',
-        goalWeight: '',
-        weightChange12m: '',
-        weightLossPrograms: '',
-        weightLossMeds12m: '',
-        glpTaken: '',
-        glpRecentInjection: '',
-        semaglutideLastDose: '',
-        semaglutideRequestedDose: '',
-        tirzepetideLastDose: '',
-        tirzepetideRequestedDose: '',
-        tirzepetidePlanPurchased: '',
-        tirzepetideVial: '',
-        tirzepetideDosingSchedule: '',
-        providerComments: '',
-        medicine: '',
-        approvalStatus: '',
-        semaglutideDose: '',
-        semaglutideUnit: 'mg',
-        tirzepatideDose: '',
-        tirzepatideUnit: 'mg',
-        providerNote: ''
+    const [formData, setFormData] = useState(() => {
+        const randomNum = Math.floor(Math.random() * 100000); // Generates number between 0-99999
+        return {
+            authid: `P${randomNum.toString().padStart(5, '0')}`, // Ensures 5 digits after P
+            firstName: '',
+            lastName: '',
+            dob: '',
+            height: '',
+            email: '',
+            sex: '',
+            weight: '',
+            phone: '',
+            glp1: '',
+            bmi: '',
+            address1: '',
+            address2: '',
+            city: '',
+            state: '',
+            zip: '',
+            bloodPressure: '',
+            heartRate: '',
+            takingMedication: '',
+            medicineAllergy: '',
+            allergyList: '',
+            majorSurgeries: '',
+            bariatricSurgery: '',
+            thyroidCancerHistory: '',
+            surgeryList: '',
+            disqualifiers: '',
+            diagnosis: '',
+            startingWeight: '',
+            currentWeight: '',
+            goalWeight: '',
+            weightChange12m: '',
+            weightLossPrograms: '',
+            weightLossMeds12m: '',
+            glpTaken: '',
+            glpRecentInjection: '',
+            semaglutideLastDose: '',
+            semaglutideRequestedDose: '',
+            tirzepetideLastDose: '',
+            tirzepetideRequestedDose: '',
+            tirzepetidePlanPurchased: '',
+            tirzepetideVial: '',
+            tirzepetideDosingSchedule: '',
+            providerComments: '',
+            medicine: '',
+            approvalStatus: '',
+            semaglutideDose: '',
+            semaglutideUnit: '',
+            tirzepatideDose: '',
+            tirzepatideUnit: '',
+            providerNote: '',
+            createTimeDate: '',
+            closetickets: false,
+            Reasonclosetickets: '',
+        };
     });
+    const [images, setImages] = useState(Array(3).fill(''));
 
-    const [images, setImages] = useState([
-        { file: null, preview: null },
-        { file: null, preview: null },
-        { file: null, preview: null },
-    ]);
+    const handleImageUpload = (index, url) => {
+        setImages(prev => prev.map((img, i) => i === index ? url : img));
+    };
+
+    const removeImage = (index) => {
+        setImages(prev => prev.map((img, i) => i === index ? '' : img));
+    };
+
 
     const handleInputChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -84,35 +92,86 @@ export default function PatientForm() {
     const handleSelectChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+    const router = useRouter();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [messageHead, setMessageHead] = useState("");
+    const [message, setMessage] = useState("");
+    const [isSuccess, setIsSuccess] = useState(false);
 
-    const handleImageChange = (index, e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const preview = URL.createObjectURL(file);
-            setImages(prev => prev.map((img, i) => i === index ? { file, preview } : img));
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const submissionData = {
+            ...formData,
+            createTimeDate: new Date().toISOString(),
+            images: images.filter(url => url !== '')
+        };
+
+        try {
+            const response = await fetch('/api/patients', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(submissionData),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setMessageHead("Success");
+                setMessage("Patient created successfully!");
+                setIsSuccess(true);
+                setIsDialogOpen(true);
+                // Optional: Reset form here if needed
+            } else {
+                setMessageHead("Error");
+                setMessage(data.result.message || "Failed to create patient");
+                setIsSuccess(false);
+                setIsDialogOpen(true);
+            }
+        } catch (error) {
+            setMessageHead("Error");
+            setMessage("An unexpected error occurred.");
+            setIsSuccess(false);
+            setIsDialogOpen(true);
+            console.error('Failed to submit:', error);
         }
     };
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
 
-    const removeImage = (index) => {
-        setImages(prev => prev.map((img, i) => i === index ? { file: null, preview: null } : img));
-    };
+    //     const submissionData = {
+    //         ...formData,
+    //         createTimeDate: new Date().toISOString(), // <-- set current timestamp here
+    //         images: images.filter(url => url !== '')
+    //     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const submissionData = {
-            patientId,
-            ...formData,
-            images: images.map(img => ({
-                preview: img.preview,
-                file: img.file ? {
-                    name: img.file.name,
-                    type: img.file.type,
-                    size: img.file.size
-                } : null
-            }))
-        };
-        console.log('Patient Data:', submissionData);
-    };
+    //     console.log('Patient Data:', submissionData);
+
+    //     try {
+    //         const response = await fetch('/api/patients', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(submissionData),
+    //         });
+
+    //         const data = await response.json();
+
+    //         if (data.success) {
+    //             alert('Patient created successfully!');
+    //             // Optional: reset form or redirect
+    //         } else {
+    //             alert('Error: ' + data.result.message);
+    //         }
+    //     } catch (error) {
+    //         console.error('Failed to submit:', error);
+    //         alert('An unexpected error occurred.');
+    //     }
+    // };
+
 
     return (
         <div className="mb-4 p-4">
@@ -120,8 +179,16 @@ export default function PatientForm() {
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-semibold">Patient Registration</h2>
                     <div className="space-y-2">
-                        <Label>Patient ID</Label>
-                        <Input value={patientId} readOnly className="font-mono w-32" />
+                        <Label>Auth ID</Label>
+                        <Input
+                            id="authId"
+                            name="authid"
+                            type="text"
+                            value={formData.authid}
+                            onChange={handleInputChange}
+                            className="font-mono w-32"
+                            readOnly
+                        />
                     </div>
                 </div>
 
@@ -593,53 +660,50 @@ export default function PatientForm() {
 
                 {/* Image Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Images</h3>
-                <div className="grid grid-cols-3 gap-4">
-                    {images.map((image, index) => (
+                <div className="flex justify-between flex-wrap items-center gap-4">
+                    {images.map((imageUrl, index) => (
                         <div key={index} className="relative group">
-                            <label className="block w-full aspect-square border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={(e) => handleImageChange(index, e)}
-                                />
-                                {image.preview ? (
+                            {imageUrl ? (
+                                <>
                                     <img
-                                        src={image.preview}
+                                        src={imageUrl}
                                         alt={`Preview ${index + 1}`}
-                                        className="w-full h-full object-cover rounded-lg"
+                                        className="w-full h-48 object-cover rounded-lg"
                                     />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                        <span>Click to upload</span>
-                                    </div>
-                                )}
-                            </label>
-                            {image.preview && (
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(index)}
-                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    aria-label="Remove image"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-4 w-4"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(index)}
+                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
                                     >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
-                                </button>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </button>
+                                </>
+                            ) : (
+                                <UploadButton
+                                    endpoint="imageUploader"
+                                    onClientUploadComplete={(res) => {
+                                        if (res && res.length > 0) {
+                                            handleImageUpload(index, res[0].url);
+                                        }
+                                    }}
+                                    className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
+
+                                />
                             )}
                         </div>
                     ))}
                 </div>
-
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
@@ -764,6 +828,32 @@ export default function PatientForm() {
                     Submit
                 </Button>
             </form>
+
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <AlertDialogContent className="rounded-md">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{messageHead}</AlertDialogTitle>
+                        <AlertDialogDescription>{message}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        {/* Stay on page button */}
+                        <AlertDialogCancel>
+                            {isSuccess ? "Add another" : "Cancel"}
+                        </AlertDialogCancel>
+
+                        {/* Redirect button (only show for success) */}
+                        {isSuccess && (
+                            <Button
+                                onClick={() => router.push("/dashboard")}
+                                className="bg-primary hover:bg-primary-dark"
+                            >
+                                Return to Dashboard
+                            </Button>
+                        )}
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     );
 }

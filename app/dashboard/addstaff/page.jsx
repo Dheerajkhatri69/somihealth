@@ -30,13 +30,17 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Delete } from "lucide-react";
+import toast from "react-hot-toast";
+import EditUserDialog from "@/components/updateStaff";
 
 const formSchema = z.object({
     staffType: z.enum(["T", "C"], {
         required_error: "Please select a staff type",
     }),
     staffNumber: z.string()
-        .length(3, "Must be 3 digits")
+        .length(5, "Must be 5 digits")
         .regex(/^\d+$/, "Must be numeric"),
     fullName: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
@@ -48,38 +52,41 @@ export default function StaffForm() {
     const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
-        async function fetchStaff() {
-            try {
-                const response = await fetch("/api/users");
-                const result = await response.json();
-                const data = result.result;
-                if (Array.isArray(data)) {
-                    const formattedData = data
-                        .filter((user) => user.accounttype !== "A") // Filter out admins
-                        .map((user) => ({
-                            staffId: user.id,
-                            fullName: user.fullname,
-                            email: user.email,
-                            staffType:
-                                user.accounttype === "T"
-                                    ? "Technician"
-                                    : user.accounttype === "C"
-                                    ? "Clinician"
-                                    : "Unknown", // No need to map "A" as it's filtered out
-                            password: user.password, // Ideally, do NOT expose plain passwords
-                        }));
-                    setStaff(formattedData);
-                } else {
-                    console.error("Invalid data format from server:", data.result);
-                }
-            } catch (error) {
-                console.error("Failed to fetch staff:", error);
-            }
-        }
-    
         fetchStaff();
     }, []);
-    
+
+    async function fetchStaff() {
+        try {
+            const response = await fetch("/api/users");
+            const result = await response.json();
+            const data = result.result;
+            if (Array.isArray(data)) {
+                const formattedData = data
+                    .filter((user) => user.accounttype !== "A") // Filter out admins
+                    .map((user) => ({
+                        id: user._id,
+                        staffId: user.id,
+                        fullName: user.fullname,
+                        email: user.email,
+                        password: user.password,
+                        staffType:
+                            user.accounttype === "T"
+                                ? "Technician"
+                                : user.accounttype === "C"
+                                    ? "Clinician"
+                                    : "Unknown",
+                    }));
+                setStaff(formattedData);
+            } else {
+                console.error("Invalid data format from server:", data.result);
+                toast.error("Failed to load staff data");
+            }
+        } catch (error) {
+            console.error("Failed to fetch staff:", error);
+            toast.error("Failed to load staff data");
+        }
+    }
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -94,7 +101,7 @@ export default function StaffForm() {
     const handleEdit = (staffId) => {
         const staffMember = staff.find(m => m.staffId === staffId);
         if (staffMember) {
-            setEditingId(staffId);
+            setEditingId(staffMember.id);
             form.reset({
                 staffType: staffMember.staffType[0],
                 staffNumber: staffMember.staffId.slice(1),
@@ -105,13 +112,87 @@ export default function StaffForm() {
         }
     };
 
-    const handleDelete = (staffId) => {
-        setStaff(staff.filter(m => m.staffId !== staffId));
-        if (editingId === staffId) {
-            setEditingId(null);
-            form.reset();
+    const handleDeleteUser = async (id) => {
+        try {
+            const response = await fetch('/api/users', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ _id: id })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                toast.success("User deleted successfully");
+                // Refresh the staff list
+                await fetchStaff();
+                // Reset form if editing the deleted user
+                if (editingId === id) {
+                    setEditingId(null);
+                    form.reset();
+                }
+            } else {
+                toast.error(result.result.message || "Failed to delete user");
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            toast.error("Failed to delete user");
         }
     };
+
+    const handleUpdateUser = async (values) => {
+        const id = `${values.staffType}${values.staffNumber}`;
+        const staffMember = {
+            _id: editingId,
+            id,
+            fullname: values.fullName,
+            email: values.email,
+            accounttype: values.staffType,
+            password: values.password
+        };
+
+        try {
+            const response = await fetch('/api/users', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(staffMember),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                toast.success("User updated successfully");
+                await fetchStaff();
+                setEditingId(null);
+                form.reset();
+            } else {
+                toast.error(result.result.message || "Update failed");
+            }
+        } catch (err) {
+            console.error("Update error:", err);
+            toast.error("Failed to update user");
+        }
+    };
+    const [staffType, setStaffType] = useState("");
+    const [staffNumber, setStaffNumber] = useState(""); // assumes id is like "T001"
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState(""); // Only update if filled
+    const handleUpdate = () => {
+        const updatedData = {
+            id: staffType + staffNumber,
+            fullname: fullName,
+            email: email,
+            accounttype: staffType,
+            password: password, // Only update if filled
+        };
+
+        console.log("Updated User Data:", updatedData);
+        toast.success("User updated successfully");
+
+    };
+
 
     async function onSubmit(values) {
         const id = `${values.staffType}${values.staffNumber}`;
@@ -152,11 +233,8 @@ export default function StaffForm() {
 
         setEditingId(null);
     }
-
-
     return (
         <div className="p-4 space-y-8">
-
             <Card className="p-6 w-full mx-auto">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-wrap gap-4 items-end">
@@ -190,8 +268,8 @@ export default function StaffForm() {
                                         <FormLabel>Staff Number</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="001"
-                                                maxLength={3}
+                                                placeholder="00001"
+                                                maxLength={5}
                                                 pattern="[0-9]*"
                                                 {...field}
                                             />
@@ -248,12 +326,11 @@ export default function StaffForm() {
                             )}
                         />
                         <div className="flex gap-2">
-                            {!editingId && (
+                            {!editingId ? (
                                 <Button type="submit">
                                     Add Staff
                                 </Button>
-                            )}
-                            {editingId && (
+                            ) : (
                                 <>
                                     <Button type="submit">
                                         Update Staff
@@ -288,34 +365,47 @@ export default function StaffForm() {
                     </TableHeader>
                     <TableBody>
                         {staff.map((staffMember) => (
-                            <TableRow key={staffMember.staffId}>
+
+                            <TableRow key={staffMember.id}>
                                 <TableCell className="font-medium">{staffMember.staffId}</TableCell>
                                 <TableCell>{staffMember.fullName}</TableCell>
                                 <TableCell>{staffMember.email}</TableCell>
                                 <TableCell>{staffMember.staffType}</TableCell>
                                 <TableCell>{staffMember.password}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleEdit(staffMember.staffId)}
-                                    >
-                                        Update
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDelete(staffMember.staffId)}
-                                    >
-                                        Delete
-                                    </Button>
+                                <TableCell className="text-right flex justify-end space-x-2">
+                                    <EditUserDialog staffMember={staffMember}/>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" size="sm">
+                                                <Delete className="mr-2 h-4 w-4" />
+                                                Delete
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This will permanently delete the user.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() => handleDeleteUser(staffMember.id)}
+                                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                >
+                                                    Delete Permanently
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </TableCell>
                             </TableRow>
+
                         ))}
                     </TableBody>
                 </Table>
             </div>
-
         </div>
     );
 }
