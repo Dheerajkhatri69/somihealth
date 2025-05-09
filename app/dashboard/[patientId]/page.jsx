@@ -18,6 +18,7 @@ import {
     AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { Eye, Fullscreen, X } from "lucide-react";
 export default function PatientUpdateForm({ params }) {
     const { data: session } = useSession();
 
@@ -216,6 +217,7 @@ export default function PatientUpdateForm({ params }) {
             console.error("Request failed:", err);
         }
     };
+    const [selectedImage, setSelectedImage] = useState(null);
 
     if (!formData.authid) {
         return <div className="p-4 text-yellow-500">loading..</div>;
@@ -711,23 +713,21 @@ export default function PatientUpdateForm({ params }) {
                                         alt={`Preview ${index + 1}`}
                                         className="w-full h-full object-cover rounded-lg"
                                     />
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedImage(image.preview)}
+                                        className="absolute top-2 left-2  bg-black/50 text-white p-1 rounded-full"
+                                    >
+                                        <Fullscreen className="h-5 w-5" />
+                                    </button>
+
                                     <button
                                         type="button"
                                         onClick={() => removeImage(index)}
                                         className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-4 w-4"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                                        <X className="h-5 w-5" />
                                     </button>
                                 </>
                             ) : (
@@ -891,6 +891,21 @@ export default function PatientUpdateForm({ params }) {
                 </AlertDialogContent>
             </AlertDialog>
 
+            <AlertDialog open={!!selectedImage} onOpenChange={(isOpen) => !isOpen && setSelectedImage(null)}>
+                <AlertDialogContent className="max-w-[80vw]">
+                    <AlertDialogHeader>
+                        <div className="flex-1 max-h-[70vh] flex justify-center">
+                            <img src={selectedImage} alt="Preview"
+                                className="max-h-full max-w-full object-contain rounded-lg"
+                            />
+                        </div>
+
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setSelectedImage(null)}>Close</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

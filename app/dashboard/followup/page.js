@@ -51,7 +51,7 @@ import toast from "react-hot-toast";
 import { EmailDialog } from "@/components/emailDialog";
 import TimeSensitiveCell from "@/components/timer";
 
-export default function Dashboard() {
+export default function FollowUp() {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -61,7 +61,7 @@ export default function Dashboard() {
         const fetchPatients = async () => {
             try {
                 // Fetch all patients first
-                const patientsRes = await fetch("/api/patients");
+                const patientsRes = await fetch("/api/followup");
                 const patientsData = await patientsRes.json();
 
                 if (!patientsData.success) {
@@ -299,16 +299,6 @@ export default function Dashboard() {
                         <DropdownMenuLabel>All Filters</DropdownMenuLabel>
                         <DropdownMenuSeparator />
 
-                        {/* Date of Birth Filter */}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium px-2">Date of Birth</label>
-                            <input
-                                type="date"
-                                value={dobFilter}
-                                onChange={(e) => setDobFilter(e.target.value)}
-                                className="w-full p-1 border rounded"
-                            />
-                        </div>
                         {/* status Filter */}
                         <div className="space-y-1">
                             <label className="text-sm font-medium px-2">Status</label>
@@ -427,9 +417,9 @@ export default function Dashboard() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                     <ClinicianDropdown selectedPatients={selectedPatients} />
-                )}
+                )} */}
             </div>
 
             {session?.user?.accounttype === 'A' && (
@@ -523,31 +513,10 @@ export default function Dashboard() {
                                 <TableHead>Zip</TableHead>
 
                                 {/* Medical Information */}
-                                <TableHead>Blood Pressure</TableHead>
-                                <TableHead>Heart Rate</TableHead>
                                 <TableHead>GLP-1 Preference</TableHead>
-                                <TableHead>Taking Medication</TableHead>
-                                <TableHead>Medicine Allergy</TableHead>
-                                <TableHead>Allergy List</TableHead>
-                                <TableHead>Major Surgeries</TableHead>
-                                <TableHead>Bariatric Surgery</TableHead>
-                                <TableHead>Thyroid Cancer History</TableHead>
-                                <TableHead>Surgery List</TableHead>
-                                <TableHead>Disqualifiers</TableHead>
-                                <TableHead>Diagnosis</TableHead>
 
                                 {/* Weight Management */}
-                                <TableHead>Starting Weight</TableHead>
-                                <TableHead>Current Weight</TableHead>
-                                <TableHead>Goal Weight</TableHead>
-                                <TableHead>12m Weight Change</TableHead>
-                                <TableHead>Weight Loss Programs</TableHead>
-                                <TableHead>Weight Loss Meds (12m)</TableHead>
-
                                 {/* GLP-1 */}
-                                <TableHead>GLP-1 Taken</TableHead>
-                                <TableHead>Last Injection</TableHead>
-
                                 <TableHead>Medicine</TableHead>
                                 <TableHead className="w-[40px]">Images</TableHead>
                                 {/* Semaglutide */}
@@ -555,18 +524,24 @@ export default function Dashboard() {
 
                                 {/* Tirzepatide */}
                                 <TableHead>Tirzepatide Dose</TableHead>
-                                <TableHead>Plan Purchased</TableHead>
-                                <TableHead>Vial</TableHead>
-                                <TableHead>Dosing Schedule</TableHead>
 
-                                {/* Provider Info */}
-                                <TableHead>Provider Comments</TableHead>
 
-                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                                    <TableHead>Status</TableHead>
-                                )}
-                                <TableHead>Out Come</TableHead>
-                                <TableHead>Provider Note</TableHead>
+                                {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && ( */}
+                                <TableHead>Status</TableHead>
+                                {/* )} */}
+
+                                {/* Add these new headers after existing ones */}
+                                <TableHead>Follow-Up/Refills</TableHead>
+                                <TableHead>GLP-1 Approval (6mo)</TableHead>
+                                <TableHead>Current Weight</TableHead>
+                                <TableHead>Current GLP-1 Med</TableHead>
+                                <TableHead>Side Effects</TableHead>
+                                <TableHead>Side Effect List</TableHead>
+                                <TableHead>Med Satisfaction</TableHead>
+                                <TableHead>Switch Med</TableHead>
+                                <TableHead>Continue Dose</TableHead>
+                                <TableHead>Increase Dose</TableHead>
+                                <TableHead>Patient Statement</TableHead>
 
                                 <TableHead className="sticky right-0 bg-secondary text-white">Actions</TableHead>
                             </TableRow>
@@ -590,21 +565,7 @@ export default function Dashboard() {
                                             className="h-4 w-4"
                                         />
                                     </TableCell>
-                                    <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete}/>
-                                    {/* <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
-                                        <div className="relative">
-                                            {patient.authid}
-
-                                            {patient.approvalStatus === "" && (
-                                                <div className="absolute  -top-5 -right-1 group">
-                                                    <Timer className="cursor-pointer text-secondary-foreground rounded-full text-sm" />
-                                                    <div className="absolute -top-6 -right-5 hidden group-hover:block bg-black/50 text-white text-xs px-2 py-1 rounded z-50 whitespace-nowrap">
-                                                        {patient.createTimeDate}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </TableCell> */}
+                                    <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete} />
 
                                     <TableCell className="sticky left-[115px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}
@@ -614,7 +575,9 @@ export default function Dashboard() {
                                     </TableCell>
 
                                     {/* Patient Data */}
-                                    <TableCell>{patient.dob}</TableCell>
+                                    <TableCell>
+                                        {patient.dob?.split('T')[0]}
+                                    </TableCell>
                                     <TableCell>{patient.sex}</TableCell>
                                     <TableCell>{patient.height}</TableCell>
                                     <TableCell>{patient.weight}</TableCell>
@@ -627,28 +590,7 @@ export default function Dashboard() {
                                     <TableCell>{patient.state}</TableCell>
                                     <TableCell>{patient.zip}</TableCell>
 
-                                    <TableCell>{patient.bloodPressure}</TableCell>
-                                    <TableCell>{patient.heartRate}</TableCell>
                                     <TableCell>{patient.glp1}</TableCell>
-                                    <TableCell>{patient.takingMedication}</TableCell>
-                                    <TableCell>{patient.medicineAllergy}</TableCell>
-                                    <TableCell>{patient.allergyList}</TableCell>
-                                    <TableCell>{patient.majorSurgeries}</TableCell>
-                                    <TableCell>{patient.bariatricSurgery}</TableCell>
-                                    <TableCell>{patient.thyroidCancerHistory}</TableCell>
-                                    <TableCell>{patient.surgeryList}</TableCell>
-                                    <TableCell>{patient.disqualifiers}</TableCell>
-                                    <TableCell>{patient.diagnosis}</TableCell>
-
-                                    <TableCell>{patient.startingWeight}</TableCell>
-                                    <TableCell>{patient.currentWeight}</TableCell>
-                                    <TableCell>{patient.goalWeight}</TableCell>
-                                    <TableCell>{patient.weightChange12m}</TableCell>
-                                    <TableCell>{patient.weightLossPrograms}</TableCell>
-                                    <TableCell>{patient.weightLossMeds12m}</TableCell>
-
-                                    <TableCell>{patient.glpTaken}</TableCell>
-                                    <TableCell>{patient.glpRecentInjection}</TableCell>
 
                                     <TableCell>{patient.medicine}</TableCell>
                                     <TableCell className="w-[200px] max-h-20">
@@ -675,26 +617,23 @@ export default function Dashboard() {
                                     <TableCell>
                                         {patient.tirzepatideDose}{" unit: "}{patient.tirzepatideUnit}
                                     </TableCell>
-                                    <TableCell>{patient.tirzepetidePlanPurchased}</TableCell>
-                                    <TableCell>{patient.tirzepetideVial}</TableCell>
-                                    <TableCell>{patient.tirzepetideDosingSchedule}</TableCell>
 
-                                    <TableCell>{patient.providerComments}</TableCell>
+                                    {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && ( */}
+                                    <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
+                                    {/* )} */}
 
-                                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                                        <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
-                                    )}
-                                    <TableCell className={`${patient.approvalStatus === "approved" ||
-                                        patient.approvalStatus === "denied"
-                                        ? "text-red-500"
-                                        : "text-green-500"
-                                        }`}>
-                                        {patient.approvalStatus === "approved" ||
-                                            patient.approvalStatus === "denied"
-                                            ? "Closed"
-                                            : "Open"}
-                                    </TableCell>
-                                    <TableCell>{patient.providerNote}</TableCell>
+                                    <TableCell>{patient.followUpRefills ? "Yes" : "No"}</TableCell>
+                                    <TableCell>{patient.glp1ApprovalLast6Months}</TableCell>
+                                    <TableCell>{patient.currentWeight}</TableCell>
+                                    <TableCell>{patient.currentGlp1Medication}</TableCell>
+                                    <TableCell>{patient.anySideEffects}</TableCell>
+                                    <TableCell className="max-w-[200px] truncate">{patient.listSideEffects}</TableCell>
+                                    <TableCell>{patient.happyWithMedication}</TableCell>
+                                    <TableCell>{patient.switchMedication}</TableCell>
+                                    <TableCell>{patient.continueDosage}</TableCell>
+                                    <TableCell>{patient.increaseDosage}</TableCell>
+                                    <TableCell className="max-w-[250px] truncate">{patient.patientStatement}</TableCell>
+
                                     <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
                                         <Link href={`/dashboard/${patient.authid}`}>
                                             <Button variant="outline" size="sm">
@@ -748,12 +687,12 @@ export default function Dashboard() {
 
             {/* Add Patient Button */}
             <div className="flex justify-start items-center gap-4 mt-4">
-                <Link href="/dashboard/addrecord">
-                    <Button ><Plus /> Add Patient</Button>
+                <Link href="/dashboard/addfollowup">
+                    <Button ><Plus /> Follow Up</Button>
                 </Link>
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                    <EmailDialog  selectedPatients={selectedPatients}  selectedEmail={selectedEmail} />
-                )}
+                {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && ( */}
+                <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} />
+                {/* )} */}
             </div>
             <AlertDialog
                 open={!!selectedImageInfo}

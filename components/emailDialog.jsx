@@ -21,6 +21,7 @@ import {
     SelectItem
 } from "@/components/ui/select";
 import toast from "react-hot-toast";
+import emailjs from "emailjs-com";
 
 const preDefinedMessages = [
     {
@@ -40,44 +41,48 @@ export const EmailDialog = ({ selectedPatients, selectedEmail }) => {
     const [selectedMessage, setSelectedMessage] = useState("");
     const [isSending, setIsSending] = useState(false);
 
+
+    // Add your EmailJS credentials here
+    const SERVICE_ID = "service_zice66h";
+    const TEMPLATE_ID = "template_0eby6om";
+    const PUBLIC_KEY = "811fNuzzHWaT8iM0o";
+
     const handleSendEmail = async (message) => {
-        console.log("Sending email to:", message);
-        // if (!message.trim()) {
-        //     toast.error("Please enter a message");
-        //     return;
-        // }
+        if (!selectedEmail || !message) {
+            toast.error("Email and message are required.");
+            return;
+        }
 
-        // setIsSending(true);
-        // try {
-        //     const response = await fetch('/api/send-email', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({
-        //             to: selectedEmail, // Patient's email
-        //             cc: 'recruitment@yourdomain.com', // Your recruitment email
-        //             subject: 'Message from Your Healthcare Provider',
-        //             text: message,
-        //             html: `<p>${message.replace(/\n/g, '<br>')}</p>`, // Convert newlines to <br> for HTML email
-        //         }),
-        //     });
+        setIsSending(true);
 
-        //     const data = await response.json();
+        const templateParams = {
+            to_email: selectedEmail,     // patient's email
+            name: "Somi Health",         // or pass dynamic sender name
+            time: new Date().toLocaleString(), // optional, for {{time}}
+            message: selectedMessage,    // textarea message
+            title: "Patient Communication", // or dynamic title
+            email: "your-reply@email.com" // optional, shown in reply-to
+        };
 
-        //     if (data.success) {
-        //         toast.success("Email sent successfully to patient and recruitment");
-        //         setIsDialogOpen(false);
-        //     } else {
-        //         toast.error(data.message || "Failed to send email");
-        //     }
-        // } catch (error) {
-        //     console.error("Error sending email:", error);
-        //     toast.error("Failed to send email");
-        // } finally {
-        //     setIsSending(false);
-        // }
+
+        try {
+            const res = await emailjs.send(
+                SERVICE_ID,
+                TEMPLATE_ID,
+                templateParams,
+                PUBLIC_KEY
+            );
+            console.log("Email sent:", res.status, res.text);
+            toast.success("Email sent successfully!");
+            setIsDialogOpen(false);
+        } catch (error) {
+            console.error("Email sending error:", error);
+            toast.error("Failed to send email.");
+        } finally {
+            setIsSending(false);
+        }
     };
+
 
     return (
         <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -91,7 +96,7 @@ export const EmailDialog = ({ selectedPatients, selectedEmail }) => {
                     <AlertDialogTitle>Send Patient Email</AlertDialogTitle>
                     <AlertDialogDescription>
                         <Input value={selectedEmail} readOnly className="my-2" />
-                        
+
                         <Select
                             value={selectedTemplate}
                             onValueChange={(value) => {
@@ -122,7 +127,7 @@ export const EmailDialog = ({ selectedPatients, selectedEmail }) => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction 
+                    <AlertDialogAction
                         onClick={() => handleSendEmail(selectedMessage)}
                         disabled={isSending}
                     >

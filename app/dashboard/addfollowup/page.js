@@ -11,7 +11,7 @@ import { UploadButton } from "@/utils/uploadthing";
 import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
-export default function PatientForm() {
+export default function FollowUpForm() {
     const { data: session } = useSession();
 
     useEffect(() => {
@@ -20,7 +20,7 @@ export default function PatientForm() {
     const [formData, setFormData] = useState(() => {
         const randomNum = Math.floor(Math.random() * 100000); // Generates number between 0-99999
         return {
-            authid: `P${randomNum.toString().padStart(5, '0')}`, // Ensures 5 digits after P
+            authid: '', // Ensures 5 digits after P
             firstName: '',
             lastName: '',
             dob: '',
@@ -36,46 +36,112 @@ export default function PatientForm() {
             city: '',
             state: '',
             zip: '',
-            bloodPressure: '',
-            heartRate: '',
-            takingMedication: '',
-            medicineAllergy: '',
-            allergyList: '',
-            majorSurgeries: '',
-            bariatricSurgery: '',
-            thyroidCancerHistory: '',
-            surgeryList: '',
-            disqualifiers: '',
-            diagnosis: '',
-            startingWeight: '',
-            currentWeight: '',
-            goalWeight: '',
-            weightChange12m: '',
-            weightLossPrograms: '',
-            weightLossMeds12m: '',
-            glpTaken: '',
-            glpRecentInjection: '',
-            semaglutideLastDose: '',
-            semaglutideRequestedDose: '',
-            tirzepetideLastDose: '',
-            tirzepetideRequestedDose: '',
-            tirzepetidePlanPurchased: '',
-            tirzepetideVial: '',
-            tirzepetideDosingSchedule: '',
-            providerComments: '',
             medicine: '',
             approvalStatus: '',
             semaglutideDose: '',
             semaglutideUnit: '',
             tirzepatideDose: '',
             tirzepatideUnit: '',
-            providerNote: '',
             createTimeDate: '',
+
+            followUpRefills: false,
+            initialAuthId: '',
+            glp1ApprovalLast6Months: '',
+            currentWeight: '',
+            currentGlp1Medication: '',
+            anySideEffects: '',
+            listSideEffects: '',
+            happyWithMedication: '',
+            switchMedication: '',
+            continueDosage: '',
+            increaseDosage: '',
+            patientStatement: '',
+
             closetickets: false,
             Reasonclosetickets: '',
         };
     });
     const [images, setImages] = useState(Array(3).fill(''));
+    // Add this state
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState('');
+
+    // Add this function
+    const handleSearch = async () => {
+        if (!formData.initialAuthId) return;
+
+        setSearchLoading(true);
+        setSearchError('');
+
+        try {
+            // 1. Get original patient data
+            const patientResponse = await fetch(`/api/patient/${formData.initialAuthId}`);
+            const patientData = await patientResponse.json();
+
+            if (!patientData.success || !patientData.patient) {
+                throw new Error(patientData.error || 'Patient not found');
+            }
+
+            // 2. Get follow-up count
+            const countResponse = await fetch(`/api/followup/count/${formData.initialAuthId}`);
+            const countData = await countResponse.json();
+
+            if (!countData.success) {
+                throw new Error('Failed to check existing follow-ups');
+            }
+
+            // 3. Calculate next follow-up number
+            const followUpCount = countData.count;
+            let newAuthId = 0;
+
+            if (followUpCount > 0) {
+                newAuthId = `${formData.initialAuthId}-${followUpCount}`;
+            } else {
+                newAuthId = formData.initialAuthId;
+            }
+
+            // 4. Update form data
+            setFormData(prev => ({
+                ...prev,
+                initialAuthId: formData.initialAuthId,
+                authid: newAuthId,
+                firstName: patientData.patient.firstName || '',
+                lastName: patientData.patient.lastName || '',
+                dob: patientData.patient.dob || '',
+                height: patientData.patient.height || '',
+                email: patientData.patient.email || '',
+                sex: patientData.patient.sex || '',
+                weight: patientData.patient.weight || '',
+                phone: patientData.patient.phone || '',
+                glp1: patientData.patient.glp1 || '',
+                bmi: patientData.patient.bmi || '',
+                address1: patientData.patient.address1 || '',
+                address2: patientData.patient.address2 || '',
+                city: patientData.patient.city || '',
+                state: patientData.patient.state || '',
+                zip: patientData.patient.zip || '',
+                medicine: patientData.patient.medicine || '',
+                approvalStatus: patientData.patient.approvalStatus || '',
+                semaglutideDose: patientData.patient.semaglutideDose || '',
+                semaglutideUnit: patientData.patient.semaglutideUnit || '',
+                tirzepatideDose: patientData.patient.tirzepatideDose || '',
+                tirzepatideUnit: patientData.patient.tirzepatideUnit || '',
+            }));
+
+            // Handle images
+            const dbImages = patientData.patient.images || [];
+            setImages(prev => [
+                ...dbImages.slice(0, 3),
+                ...Array(3 - dbImages.length).fill('')
+            ]);
+
+        } catch (error) {
+            setSearchError(error.message);
+            console.error('Search error:', error);
+        } finally {
+            setSearchLoading(false);
+        }
+    };
 
     const handleImageUpload = (index, url) => {
         setImages(prev => prev.map((img, i) => i === index ? url : img));
@@ -109,7 +175,10 @@ export default function PatientForm() {
         };
 
         try {
-            const response = await fetch('/api/patients', {
+            setSearchLoading(true); // Reuse loading state for submission
+            setIsDialogOpen(false); // Close any existing dialogs
+
+            const response = await fetch('/api/followup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -119,24 +188,72 @@ export default function PatientForm() {
 
             const data = await response.json();
 
-            if (data.success) {
-                setMessageHead("Success");
-                setMessage("Patient created successfully!");
-                setIsSuccess(true);
-                setIsDialogOpen(true);
-                // Optional: Reset form here if needed
-            } else {
-                setMessageHead("Error");
-                setMessage(data.result.message || "Failed to create patient");
-                setIsSuccess(false);
-                setIsDialogOpen(true);
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to submit follow-up');
             }
+
+            // Success handling
+            setMessageHead("Success 🎉");
+            setMessage("Follow-up record created successfully!");
+            setIsSuccess(true);
+            setIsDialogOpen(true);
+
+            // Reset form while preserving initial Auth ID
+            const randomNum = Math.floor(Math.random() * 100000);
+            setFormData({
+                authid: `P${randomNum.toString().padStart(5, '0')}`,
+                firstName: '',
+                lastName: '',
+                dob: '',
+                height: '',
+                email: '',
+                sex: '',
+                weight: '',
+                phone: '',
+                glp1: '',
+                bmi: '',
+                address1: '',
+                address2: '',
+                city: '',
+                state: '',
+                zip: '',
+                medicine: '',
+                approvalStatus: '',
+                semaglutideDose: '',
+                semaglutideUnit: '',
+                tirzepatideDose: '',
+                tirzepatideUnit: '',
+                createTimeDate: '',
+                closetickets: false,
+                Reasonclosetickets: '',
+                // Preserve initial Auth ID for potential new follow-ups
+                initialAuthId: formData.initialAuthId,
+                // Reset follow-up specific fields
+                followUpRefills: false,
+                glp1ApprovalLast6Months: '',
+                currentWeight: '',
+                currentGlp1Medication: '',
+                anySideEffects: '',
+                listSideEffects: '',
+                happyWithMedication: '',
+                switchMedication: '',
+                continueDosage: '',
+                increaseDosage: '',
+                patientStatement: ''
+            });
+
+            // Clear images
+            setImages(Array(3).fill(''));
+
         } catch (error) {
-            setMessageHead("Error");
-            setMessage("An unexpected error occurred.");
+            // Error handling
+            setMessageHead("Error ❌");
+            setMessage(error.message || 'An error occurred while submitting the form.');
             setIsSuccess(false);
             setIsDialogOpen(true);
-            console.error('Failed to submit:', error);
+            console.error('Submission error:', error);
+        } finally {
+            setSearchLoading(false);
         }
     };
     const [selectedImage, setSelectedImage] = useState(null);
@@ -144,19 +261,49 @@ export default function PatientForm() {
     return (
         <div className="mb-4 p-4">
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold">Patient Registration</h2>
-                    <div className="space-y-2">
-                        <Label>Auth ID</Label>
-                        <Input
-                            id="authId"
-                            name="authid"
-                            type="text"
-                            value={formData.authid}
-                            onChange={handleInputChange}
-                            className="font-mono w-32"
-                            readOnly
+                <div className="mb-6">
+                    <h2 className="text-2xl font-semibold mb-4">Follow Up</h2>
+                    <div className="flex items-center space-x-2 mb-4">
+                        <input
+                            type="checkbox"
+                            id="followUpRefills"
+                            checked={formData.followUpRefills}
+                            onChange={(e) => setFormData(prev => ({ ...prev, followUpRefills: e.target.checked }))}
+                            className="h-4 w-4"
                         />
+                        <Label htmlFor="followUpRefills">Follow up/Refills</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="space-y-2 flex-1">
+                            <Label>Initial Intake Auth ID</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    name="initialAuthId"
+                                    value={formData.initialAuthId}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter initial Auth ID"
+                                />
+                                <Button
+                                    type="button"
+                                    onClick={handleSearch}
+                                    disabled={searchLoading}
+                                >
+                                    {searchLoading ? 'Searching...' : 'Search'}
+                                </Button>
+                            </div>
+                            {searchError && (
+                                <p className="text-red-500 text-sm">{searchError}</p>
+                            )}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>New Auth ID</Label>
+                            <Input
+                                name="authid"
+                                value={formData.authid}
+                                className="font-mono w-32"
+                                readOnly
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -312,301 +459,6 @@ export default function PatientForm() {
                             />
                         </div>
                     ))}
-                </div>
-
-                {/* Vitals Section */}
-                <h3 className="text-sm font-semibold">Vitals</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2">
-                        <Label htmlFor="bloodPressure">Blood Pressure</Label>
-                        <Input
-                            id="bloodPressure"
-                            name="bloodPressure"
-                            value={formData.bloodPressure}
-                            onChange={handleInputChange}
-                            placeholder="e.g. 120/80"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="heartRate">Heart Rate</Label>
-                        <Input
-                            id="heartRate"
-                            name="heartRate"
-                            value={formData.heartRate}
-                            onChange={handleInputChange}
-                            placeholder="e.g. 72 bpm"
-                        />
-                    </div>
-                </div>
-
-                {/* Medical History Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    {['takingMedication', 'medicineAllergy', 'majorSurgeries', 'bariatricSurgery', 'thyroidCancerHistory'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'takingMedication' ? 'Taking Medication' :
-                                    field === 'medicineAllergy' ? 'Medicine Allergy' :
-                                        field === 'majorSurgeries' ? 'Major Surgeries' :
-                                            field === 'bariatricSurgery' ? 'Bariatric Surgery (last 18 months)' :
-                                                'Family History of Thyroid Cancer'}
-                            </Label>
-                            <Select
-                                value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
-                            >
-                                <SelectTrigger id={field} className="w-full">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="yes">Yes</SelectItem>
-                                    <SelectItem value="no">No</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    ))}
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="allergyList">Allergy List</Label>
-                        <Textarea
-                            id="allergyList"
-                            name="allergyList"
-                            value={formData.allergyList}
-                            onChange={handleInputChange}
-                            placeholder="List known allergies..."
-                        />
-                    </div>
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="surgeryList">Surgery List</Label>
-                        <Textarea
-                            id="surgeryList"
-                            name="surgeryList"
-                            value={formData.surgeryList}
-                            onChange={handleInputChange}
-                            placeholder="List of major surgeries..."
-                        />
-                    </div>
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="disqualifiers">Disqualifiers</Label>
-                        <Textarea
-                            id="disqualifiers"
-                            name="disqualifiers"
-                            value={formData.disqualifiers}
-                            onChange={handleInputChange}
-                            placeholder="Mention any disqualifiers..."
-                        />
-                    </div>
-                </div>
-
-                {/* Diagnosis Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="diagnosis">Diagnosis</Label>
-                        <Textarea
-                            id="diagnosis"
-                            name="diagnosis"
-                            value={formData.diagnosis}
-                            onChange={handleInputChange}
-                            placeholder="Enter patient diagnosis, symptoms, or relevant notes..."
-                        />
-                    </div>
-                </div>
-
-                {/* Weight Progress Section */}
-                <h3 className="text-sm font-semibold">Weight Progress</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    {['startingWeight', 'currentWeight', 'goalWeight', 'weightChange12m'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'startingWeight' ? 'Starting Weight (lbs)' :
-                                    field === 'currentWeight' ? 'Current Weight (lbs)' :
-                                        field === 'goalWeight' ? 'Goal Weight (lbs)' :
-                                            '12-Month Weight Change (lbs)'}
-                            </Label>
-                            <Input
-                                id={field}
-                                name={field}
-                                value={formData[field]}
-                                onChange={handleInputChange}
-                                placeholder={
-                                    field === 'startingWeight' ? 'e.g. 240' :
-                                        field === 'currentWeight' ? 'e.g. 214' :
-                                            field === 'goalWeight' ? 'e.g. 180' : 'e.g. -26, +10, etc.'
-                                }
-                            />
-                        </div>
-                    ))}
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="weightLossPrograms">Weight Loss Programs</Label>
-                        <Textarea
-                            id="weightLossPrograms"
-                            name="weightLossPrograms"
-                            value={formData.weightLossPrograms}
-                            onChange={handleInputChange}
-                            placeholder="List any previous or current weight loss programs..."
-                        />
-                    </div>
-                </div>
-
-                {/* Weight Loss Medication Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="weightLossMeds12m">Weight Loss Medication (Last 12 Months)</Label>
-                        <Textarea
-                            id="weightLossMeds12m"
-                            name="weightLossMeds12m"
-                            value={formData.weightLossMeds12m}
-                            onChange={handleInputChange}
-                            placeholder="List any weight loss medications taken in the past 12 months..."
-                        />
-                    </div>
-                </div>
-
-                {/* GLP-1 Section */}
-                <h3 className="text-sm font-semibold">GLP-1</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2">
-                        <Label htmlFor="glpTaken">GLP-1 Taken</Label>
-                        <Select
-                            value={formData.glpTaken}
-                            onValueChange={(value) => handleSelectChange('glpTaken', value)}
-                        >
-                            <SelectTrigger id="glpTaken" className="w-full">
-                                <SelectValue placeholder="Select option" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="yes">Yes</SelectItem>
-                                <SelectItem value="no">No</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="glpRecentInjection">Last Injection &lt; 2 Weeks Ago</Label>
-                        <Select
-                            value={formData.glpRecentInjection}
-                            onValueChange={(value) => handleSelectChange('glpRecentInjection', value)}
-                        >
-                            <SelectTrigger id="glpRecentInjection" className="w-full">
-                                <SelectValue placeholder="Select option" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="yes">Yes</SelectItem>
-                                <SelectItem value="no">No</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
-                {/* Semaglutide Section */}
-                <h3 className="text-sm font-semibold">Semaglutide</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    {['semaglutideLastDose', 'semaglutideRequestedDose'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'semaglutideLastDose' ? 'Last Dose' : 'Requested Dose'}
-                            </Label>
-                            <Select
-                                value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
-                            >
-                                <SelectTrigger id={field} className="w-full">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="dose1">Dose 1</SelectItem>
-                                    <SelectItem value="dose2">Dose 2</SelectItem>
-                                    <SelectItem value="dose3">Dose 3</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Tirzepatide Section */}
-                <h3 className="text-sm font-semibold">Tirzepetide</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    {['tirzepetideLastDose', 'tirzepetideRequestedDose'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'tirzepetideLastDose' ? 'Last Dose' : 'Requested Dose'}
-                            </Label>
-                            <Select
-                                value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
-                            >
-                                <SelectTrigger id={field} className="w-full">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="dose1">Dose 1</SelectItem>
-                                    <SelectItem value="dose2">Dose 2</SelectItem>
-                                    <SelectItem value="dose3">Dose 3</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Tirzepatide Details Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    {['tirzepetidePlanPurchased', 'tirzepetideVial', 'tirzepetideDosingSchedule'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'tirzepetidePlanPurchased' ? 'Plan Purchased' :
-                                    field === 'tirzepetideVial' ? 'Vial' : 'Dosing Schedule'}
-                            </Label>
-                            <Select
-                                value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
-                            >
-                                <SelectTrigger id={field} className="w-full">
-                                    <SelectValue placeholder={
-                                        field === 'tirzepetideDosingSchedule' ?
-                                            'Select dosing schedule' : 'Select option'
-                                    } />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {field === 'tirzepetideDosingSchedule' ? (
-                                        <>
-                                            <SelectItem value="weekly">Weekly</SelectItem>
-                                            <SelectItem value="biweekly">Biweekly</SelectItem>
-                                            <SelectItem value="monthly">Monthly</SelectItem>
-                                        </>
-                                    ) : field === 'tirzepetideVial' ? (
-                                        <>
-                                            <SelectItem value="vial1">Vial 1</SelectItem>
-                                            <SelectItem value="vial2">Vial 2</SelectItem>
-                                            <SelectItem value="vial3">Vial 3</SelectItem>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <SelectItem value="plan1">Plan 1</SelectItem>
-                                            <SelectItem value="plan2">Plan 2</SelectItem>
-                                            <SelectItem value="plan3">Plan 3</SelectItem>
-                                        </>
-                                    )}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Comments Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2">
-                        <Label htmlFor="providerComments">Enter your questions or comments</Label>
-                        <textarea
-                            id="providerComments"
-                            name="providerComments"
-                            className="w-full p-4 border rounded-md shadow-sm"
-                            rows="4"
-                            value={formData.providerComments}
-                            onChange={handleInputChange}
-                            placeholder="Write your questions or comments here..."
-                        />
-                    </div>
                 </div>
 
                 {/* Medication Selection */}
@@ -775,22 +627,148 @@ export default function PatientForm() {
                     </div>
                 </div>
 
-                {/* Provider Note Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2">
-                        <Label htmlFor="providerNote">Provider Note</Label>
-                        <textarea
-                            id="providerNote"
-                            name="providerNote"
-                            className="w-full p-4 border rounded-md shadow-sm"
-                            rows="4"
-                            value={formData.providerNote}
-                            onChange={handleInputChange}
-                            placeholder="Enter any notes or comments here..."
-                        />
-                    </div>
+                {/* Add these to the Basic Information grid */}
+                <div className="space-y-2">
+                    <Label htmlFor="currentWeight">Current Weight (lbs)</Label>
+                    <Input
+                        id="currentWeight"
+                        name="currentWeight"
+                        value={formData.currentWeight}
+                        onChange={handleInputChange}
+                        placeholder="Current weight"
+                    />
                 </div>
 
+                <div className="space-y-2">
+                    <Label htmlFor="glp1ApprovalLast6Months">GLP-1 Approval (Last 6mo)</Label>
+                    <Input
+                        id="glp1ApprovalLast6Months"
+                        name="glp1ApprovalLast6Months"
+                        value={formData.glp1ApprovalLast6Months}
+                        onChange={handleInputChange}
+                        placeholder="Approval status"
+                    />
+                </div>
+
+
+                {/* Current Medication Section */}
+                <h3 className="text-sm font-semibold">Current Medication Details</h3>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                    <div className="space-y-2">
+                        <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
+                        <Input
+                            id="currentGlp1Medication"
+                            name="currentGlp1Medication"
+                            value={formData.currentGlp1Medication}
+                            onChange={handleInputChange}
+                            placeholder="Current medication"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Side Effects Experienced</Label>
+                        <Select
+                            value={formData.anySideEffects}
+                            onValueChange={(value) => handleSelectChange('anySideEffects', value)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Any side effects?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {formData.anySideEffects === 'Yes' && (
+                        <div className="space-y-2">
+                            <Label htmlFor="listSideEffects">List Side Effects</Label>
+                            <Textarea
+                                id="listSideEffects"
+                                name="listSideEffects"
+                                value={formData.listSideEffects}
+                                onChange={handleInputChange}
+                                placeholder="Describe side effects"
+                            />
+                        </div>
+                    )}
+
+                    <div className="space-y-2">
+                        <Label>Happy with Medication?</Label>
+                        <Select
+                            value={formData.happyWithMedication}
+                            onValueChange={(value) => handleSelectChange('happyWithMedication', value)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select satisfaction" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Switch Medication?</Label>
+                        <Select
+                            value={formData.switchMedication}
+                            onValueChange={(value) => handleSelectChange('switchMedication', value)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Consider switching?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Continue Dosage?</Label>
+                        <Select
+                            value={formData.continueDosage}
+                            onValueChange={(value) => handleSelectChange('continueDosage', value)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Continue current dose?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Increase Dosage?</Label>
+                        <Select
+                            value={formData.increaseDosage}
+                            onValueChange={(value) => handleSelectChange('increaseDosage', value)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Increase dose?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="patientStatement">Patient Statement</Label>
+                    <Textarea
+                        id="patientStatement"
+                        name="patientStatement"
+                        value={formData.patientStatement}
+                        onChange={handleInputChange}
+                        placeholder="Patient's comments or statements"
+                        className="min-h-[100px]"
+                    />
+                </div>
                 <Button type="submit" className="w-full">
                     Submit
                 </Button>

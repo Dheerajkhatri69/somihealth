@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from "react"
-import { Calendar, Home, Inbox, Plus, Search, Settings, Trash } from "lucide-react"
+import { Calendar, Home, Inbox, Plus, Search, Settings, Trash, UserRoundPlus } from "lucide-react"
 import { useSession } from "next-auth/react"
 import {
   Sidebar,
@@ -25,6 +25,11 @@ const items = [
     url: "/dashboard",
     icon: Inbox,
   },
+  {
+    title: "Follow up",
+    url: "/dashboard/followup",
+    icon: UserRoundPlus ,
+  },
 ]
 
 export function AppSidebar() {
@@ -45,9 +50,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild >
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon size={20}/>
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -57,7 +62,7 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <a href="/dashboard/closetickets">
-                      <Trash />
+                      <Trash size={20}/>
                       <span>Close tickets</span>
                     </a>
                   </SidebarMenuButton>
