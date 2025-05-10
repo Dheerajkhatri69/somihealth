@@ -50,11 +50,12 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { EmailDialog } from "@/components/emailDialog";
 import TimeSensitiveCell from "@/components/timer";
+import { useRouter } from "next/navigation";
 
 export default function FollowUp() {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const router = useRouter();
     const { data: session } = useSession();
 
     useEffect(() => {
@@ -108,7 +109,7 @@ export default function FollowUp() {
     }, [session]); // Add session to dependency array
 
     useEffect(() => {
-        console.log("dashboard Session user:", session?.user?.accounttype);
+        // console.log("dashboard Session user:", session?.user?.accounttype);
     }, [session]);
 
     const [selectedEmail, setSelectedEmail] = useState('');
@@ -214,37 +215,37 @@ export default function FollowUp() {
         setSelectAll(checked);
     };
 
-    const handleDelete = async (authid, reason) => {
+    const handleDelete = async (authid) => {
         try {
-            const res = await fetch("/api/patients", {
-                method: "PUT",
+            const response = await fetch(`/api/followup`, {
+                method: 'DELETE',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    authid,
-                    closetickets: true,
-                    Reasonclosetickets: reason,
-                }),
+                body: JSON.stringify({ authids: [authid] }),
             });
 
-            const data = await res.json();
+            const data = await response.json();
 
-            if (data.success) {
-                toast.success("Patient moved to Closed Tickets");
-
-                // Remove from table UI immediately
-                setPatients(prev =>
-                    prev.filter(patient => patient.authid !== authid)
-                );
-            } else {
-                toast.error(data.result.message || "Failed to close ticket");
+            if (!response.ok || !data.success) {
+                throw new Error(data.result || 'Failed to delete follow-up');
             }
-        } catch (err) {
-            toast.error("Error: " + err.message);
+
+            toast.success("Follow-up deleted successfully!", {
+                description: "The follow-up record has been permanently removed.",
+            });
+            setPatients(prev =>
+                prev.filter(patient => patient.authid !== authid)
+            );
+            // Redirect after deletion
+            // setTimeout(() => router.push("/dashboard/followup"), 2000);
+
+        } catch (error) {
+            toast.error("Deletion failed", {
+                description: error.message || 'Failed to delete follow-up record',
+            });
         }
     };
-
     const [selectedMessage, setSelectedMessage] = useState('');
     const [selectedTemplate, setSelectedTemplate] = useState('');
 
@@ -565,7 +566,10 @@ export default function FollowUp() {
                                             className="h-4 w-4"
                                         />
                                     </TableCell>
-                                    <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete} />
+                                    {/* <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete} /> */}
+                                    <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
+                                        {patient.authid}
+                                    </TableCell>
 
                                     <TableCell className="sticky left-[115px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}
@@ -635,7 +639,7 @@ export default function FollowUp() {
                                     <TableCell className="max-w-[250px] truncate">{patient.patientStatement}</TableCell>
 
                                     <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
-                                        <Link href={`/dashboard/${patient.authid}`}>
+                                        <Link href={`/dashboard/followup/${patient.authid}`}>
                                             <Button variant="outline" size="sm">
                                                 Update
                                             </Button>
@@ -651,27 +655,18 @@ export default function FollowUp() {
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            This patient record will be moved to the <strong>Closed Tickets</strong> section. You can access it later from there.
+                                                            This action cannot be undone. This will permanently delete the selected patients from our servers.
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
 
-                                                    {/* Reason Input */}
-                                                    <div className="mt-4">
-                                                        <label className="block text-sm font-medium mb-1">Reason for Closing</label>
-                                                        <Textarea
-                                                            placeholder="Enter reason..."
-                                                            value={deleteReason}
-                                                            onChange={(e) => setDeleteReason(e.target.value)}
-                                                        />
-                                                    </div>
 
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                         <AlertDialogAction
-                                                            onClick={() => handleDelete(patient.authid, deleteReason)}
+                                                            onClick={() => handleDelete(patient.authid)}
                                                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                                         >
-                                                            Move to Closed Tickets
+                                                            Delete Permanently
                                                         </AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
