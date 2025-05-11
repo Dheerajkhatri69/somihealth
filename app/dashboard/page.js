@@ -119,15 +119,22 @@ export default function Dashboard() {
     const [selectAll, setSelectAll] = useState(false);
     const checkboxRef = useRef(null);
 
+    const [selectedPatientData, setSelectedPatientData] = useState(null);
 
     useEffect(() => {
         if (selectedPatients.length > 0) {
             const selectedPatient = patients.find(p => p.authid === selectedPatients[0]);
-            setSelectedEmail(selectedPatient?.email || '');
+
+            if (selectedPatient) {
+                setSelectedEmail(selectedPatient.email || '');
+                setSelectedPatientData(selectedPatient); // store full patient info
+            }
         } else {
             setSelectedEmail('');
+            setSelectedPatientData(null);
         }
-    }, [selectedPatients]);
+    }, [selectedPatients, patients]);
+
     const [deleteReason, setDeleteReason] = useState("");
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -546,7 +553,7 @@ export default function Dashboard() {
 
                                 {/* GLP-1 */}
                                 <TableHead>GLP-1 Taken</TableHead>
-                                <TableHead>Last Injection</TableHead>
+                                <TableHead>Date of last Injection</TableHead>
 
                                 <TableHead>Medicine</TableHead>
                                 <TableHead className="w-[40px]">Images</TableHead>
@@ -590,7 +597,7 @@ export default function Dashboard() {
                                             className="h-4 w-4"
                                         />
                                     </TableCell>
-                                    <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete}/>
+                                    <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete} />
                                     {/* <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
                                         <div className="relative">
                                             {patient.authid}
@@ -752,7 +759,7 @@ export default function Dashboard() {
                     <Button ><Plus /> Add Patient</Button>
                 </Link>
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                    <EmailDialog  selectedPatients={selectedPatients}  selectedEmail={selectedEmail} />
+                    <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} selectedPatientData={selectedPatientData}/>
                 )}
             </div>
             <AlertDialog

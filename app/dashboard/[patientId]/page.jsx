@@ -557,6 +557,18 @@ export default function PatientUpdateForm({ params }) {
                         </Select>
                     </div>
                     <div className="space-y-2">
+                        <Label htmlFor="glpRecentInjection">Date of last Injection</Label>
+                        <Input
+                            type="date"
+                            id="glpRecentInjection"
+                            name="glpRecentInjection"
+                            value={formData.glpRecentInjection}
+                            onChange={handleInputChange}
+                            max={new Date().toISOString().split('T')[0]}
+                            className="w-full"
+                        />
+                    </div>
+                    {/* <div className="space-y-2">
                         <Label htmlFor="glpRecentInjection">Last Injection &lt; 2 Weeks Ago</Label>
                         <Select
                             value={formData.glpRecentInjection}
@@ -570,7 +582,7 @@ export default function PatientUpdateForm({ params }) {
                                 <SelectItem value="no">No</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Semaglutide Section */}
@@ -735,7 +747,7 @@ export default function PatientUpdateForm({ params }) {
                                     endpoint="imageUploader"
                                     onClientUploadComplete={(res) => {
                                         if (res?.[0]?.url) {
-                                            handleImageUpload(index, res[0].url);
+                                            handleImageUpload(index, res[0].ufsUrl);
                                         }
                                     }}
                                     className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"

@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from "react"
-import { Calendar, Home, Inbox, Plus, Search, Settings, Trash, UserRoundPlus } from "lucide-react"
+import { Calendar, History, Home, Inbox, Plus, Search, Settings, Trash, UserRoundPlus } from "lucide-react"
 import { useSession } from "next-auth/react"
 import {
   Sidebar,
@@ -59,6 +59,15 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
               {session?.user?.accounttype === 'A' && (
+                <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <a href="/dashboard/emailhistorytable">
+                      <History size={20}/>
+                      <span>Email History</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <a href="/dashboard/closetickets">
@@ -67,6 +76,7 @@ export function AppSidebar() {
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                </>
               )}
             </SidebarMenu>
           </SidebarGroupContent>

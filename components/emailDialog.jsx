@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import toast from "react-hot-toast";
 import emailjs from "emailjs-com";
+import { useSession } from 'next-auth/react';
 
 const preDefinedMessages = [
     {
@@ -35,12 +36,12 @@ const preDefinedMessages = [
     // Add more templates as needed
 ];
 
-export const EmailDialog = ({ selectedPatients, selectedEmail }) => {
+export const EmailDialog = ({ selectedPatients, selectedEmail, selectedPatientData }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState("");
     const [selectedMessage, setSelectedMessage] = useState("");
     const [isSending, setIsSending] = useState(false);
-
+    const { data: session } = useSession();
 
     // Add your EmailJS credentials here
     const SERVICE_ID = "service_zice66h";
@@ -56,7 +57,8 @@ export const EmailDialog = ({ selectedPatients, selectedEmail }) => {
         setIsSending(true);
 
         const templateParams = {
-            to_email: selectedEmail,     // patient's email
+            to_email: `${selectedEmail}, dheerajkum838@gmail.com`,
+            // to_email: selectedEmail,     // patient's email
             name: "Somi Health",         // or pass dynamic sender name
             time: new Date().toLocaleString(), // optional, for {{time}}
             message: selectedMessage,    // textarea message
@@ -75,6 +77,26 @@ export const EmailDialog = ({ selectedPatients, selectedEmail }) => {
             console.log("Email sent:", res.status, res.text);
             toast.success("Email sent successfully!");
             setIsDialogOpen(false);
+
+
+            //creating email history
+            await fetch("/api/emailhis", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    pid: selectedPatientData.authid,         // make sure this is defined
+                    pname: selectedPatientData.firstName+" "+selectedPatientData.lastName, // or however you store patient info
+                    cid: session?.user?.id,          // from session
+                    cname: session?.user?.fullname,  // from session
+                    email: selectedEmail,
+                    date: new Date().toISOString(),
+                    message: message  // or any format you prefer
+                }),
+            });
+
+
         } catch (error) {
             console.error("Email sending error:", error);
             toast.error("Failed to send email.");

@@ -513,7 +513,7 @@ export default function FollowUpForm() {
                                     endpoint="imageUploader"
                                     onClientUploadComplete={(res) => {
                                         if (res && res.length > 0) {
-                                            handleImageUpload(index, res[0].url);
+                                            handleImageUpload(index, res[0].ufsUrl);
                                         }
                                     }}
                                     className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"

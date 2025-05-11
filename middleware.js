@@ -7,7 +7,7 @@ export default withAuth(
     const url = req.nextUrl.pathname;
 
     // Restrict Clinician and Technician from accessing certain routes
-    const restrictedPaths = ["/dashboard/addstaff", "/dashboard/closetickets"];
+    const restrictedPaths = ["/dashboard/addstaff", "/dashboard/closetickets","/dashboard/emailhistorytable"];
 
     if (
       restrictedPaths.includes(url) &&

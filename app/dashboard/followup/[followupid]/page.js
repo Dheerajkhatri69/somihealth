@@ -426,11 +426,12 @@ export default function UpdateFollowUp({ params }) {
                                     onClientUploadComplete={(res) => {
                                         if (res?.[0]?.url) {
                                             const newImages = [...images];
-                                            newImages[index] = res[0].url;
+                                            newImages[index] = res[0].ufsUrl;
                                             setImages(newImages);
                                         }
                                     }}
-                                    className="w-full h-full ut-button:bg-transparent ut-button:text-primary ut-button:hover:bg-secondary ut-button:border-2 ut-button:border-dashed ut-button:border-primary"
+                                         className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
+                               
                                 />
                             )}
                         </div>

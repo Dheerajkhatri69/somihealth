@@ -482,7 +482,20 @@ export default function PatientForm() {
                             </SelectContent>
                         </Select>
                     </div>
+
                     <div className="space-y-2">
+                        <Label htmlFor="glpRecentInjection">Date of last Injection</Label>
+                        <Input
+                            type="date"
+                            id="glpRecentInjection"
+                            name="glpRecentInjection"
+                            value={formData.glpRecentInjection}
+                            onChange={handleInputChange}
+                            max={new Date().toISOString().split('T')[0]}
+                            className="w-full"
+                        />
+                    </div>
+                    {/* <div className="space-y-2">
                         <Label htmlFor="glpRecentInjection">Last Injection &lt; 2 Weeks Ago</Label>
                         <Select
                             value={formData.glpRecentInjection}
@@ -496,7 +509,7 @@ export default function PatientForm() {
                                 <SelectItem value="no">No</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Semaglutide Section */}
