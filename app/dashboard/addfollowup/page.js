@@ -11,6 +11,7 @@ import { UploadButton } from "@/utils/uploadthing";
 import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
+import { upload } from "@imagekit/next";
 export default function FollowUpForm() {
     const { data: session } = useSession();
 
@@ -61,7 +62,7 @@ export default function FollowUpForm() {
             Reasonclosetickets: '',
         };
     });
-    const [images, setImages] = useState(Array(3).fill(''));
+    // const [images, setImages] = useState(Array(3).fill(''));
     // Add this state
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchError, setSearchError] = useState('');
@@ -147,9 +148,9 @@ export default function FollowUpForm() {
         setImages(prev => prev.map((img, i) => i === index ? url : img));
     };
 
-    const removeImage = (index) => {
-        setImages(prev => prev.map((img, i) => i === index ? '' : img));
-    };
+    // const removeImage = (index) => {
+    //     setImages(prev => prev.map((img, i) => i === index ? '' : img));
+    // };
 
 
     const handleInputChange = (e) => {
@@ -256,8 +257,39 @@ export default function FollowUpForm() {
             setSearchLoading(false);
         }
     };
+    const [images, setImages] = useState([null]); // Pre-fill with one slot
     const [selectedImage, setSelectedImage] = useState(null);
 
+    const handleFileChange = async (e, index) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const authRes = await fetch("/api/upload-auth");
+            const { signature, expire, token, publicKey } = await authRes.json();
+
+            const res = await upload({
+                file,
+                fileName: file.name,
+                publicKey,
+                signature,
+                expire,
+                token,
+            });
+
+            const updatedImages = [...images];
+            updatedImages[index] = res.url;
+            setImages(updatedImages);
+        } catch (error) {
+            console.error("ImageKit upload error:", error);
+        }
+    };
+
+    const removeImage = (index) => {
+        const updatedImages = [...images];
+        updatedImages[index] = null;
+        setImages(updatedImages);
+    };
     return (
         <div className="mb-4 p-4">
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
@@ -482,7 +514,7 @@ export default function FollowUpForm() {
                 <h3 className="text-sm font-semibold">Upload Images</h3>
                 <div className="flex justify-between flex-wrap items-center gap-4">
                     {images.map((imageUrl, index) => (
-                        <div key={index} className="relative group">
+                        <div key={index} className="relative group w-[200px] h-48">
                             {imageUrl ? (
                                 <>
                                     <img
@@ -494,11 +526,10 @@ export default function FollowUpForm() {
                                     <button
                                         type="button"
                                         onClick={() => setSelectedImage(imageUrl)}
-                                        className="absolute top-2 left-2  bg-black/50 text-white p-1 rounded-full"
+                                        className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-full"
                                     >
                                         <Fullscreen className="h-5 w-5" />
                                     </button>
-
 
                                     <button
                                         type="button"
@@ -509,15 +540,11 @@ export default function FollowUpForm() {
                                     </button>
                                 </>
                             ) : (
-                                <UploadButton
-                                    endpoint="imageUploader"
-                                    onClientUploadComplete={(res) => {
-                                        if (res && res.length > 0) {
-                                            handleImageUpload(index, res[0].ufsUrl);
-                                        }
-                                    }}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleFileChange(e, index)}
                                     className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
-
                                 />
                             )}
                         </div>

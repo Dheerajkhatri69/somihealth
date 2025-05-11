@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,16 @@ import { UploadButton } from "@/utils/uploadthing";
 import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
+
+
+import {
+    ImageKitAbortError,
+    ImageKitInvalidRequestError,
+    ImageKitServerError,
+    ImageKitUploadNetworkError,
+    upload,
+} from "@imagekit/next";
+
 export default function PatientForm() {
     const { data: session } = useSession();
 
@@ -77,6 +87,50 @@ export default function PatientForm() {
     });
     const [images, setImages] = useState(Array(3).fill(''));
 
+    const fileInputRef = useRef(null);
+    const uploadingIndexRef = useRef(null);
+
+    const authenticator = async () => {
+        const res = await fetch("/api/upload-auth");
+        const data = await res.json();
+        return data;
+    };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const { signature, expire, token, publicKey } = await authenticator();
+
+            const res = await upload({
+                file,
+                fileName: file.name,
+                signature,
+                expire,
+                token,
+                publicKey,
+                onProgress: (evt) => {
+                    // Optionally handle progress
+                    console.log("Upload progress:", (evt.loaded / evt.total) * 100);
+                },
+                abortSignal: new AbortController().signal,
+            });
+
+            const imageUrl = res.url;
+            handleImageUpload(uploadingIndexRef.current, imageUrl); // update image slot
+
+        } catch (error) {
+            console.error("ImageKit upload error:", error);
+        } finally {
+            e.target.value = null; // Reset input
+        }
+    };
+
+    const triggerFileInput = (index) => {
+        uploadingIndexRef.current = index;
+        fileInputRef.current.click();
+    };
     const handleImageUpload = (index, url) => {
         setImages(prev => prev.map((img, i) => i === index ? url : img));
     };
@@ -643,13 +697,13 @@ export default function PatientForm() {
                 <h3 className="text-sm font-semibold">Upload Images</h3>
                 <div className="flex justify-between flex-wrap items-center gap-4">
                     {images.map((imageUrl, index) => (
-                        <div key={index} className="relative group">
+                        <div key={index} className="relative group w-[200px] h-48">
                             {imageUrl ? (
                                 <>
                                     <img
                                         src={imageUrl}
                                         alt={`Preview ${index + 1}`}
-                                        className="w-full h-48 object-cover rounded-lg"
+                                        className="w-full h-full object-cover rounded-lg"
                                     />
                                     <button
                                         type="button"
@@ -667,19 +721,23 @@ export default function PatientForm() {
                                     </button>
                                 </>
                             ) : (
-                                <UploadButton
-                                    endpoint="imageUploader"
-                                    onClientUploadComplete={(res) => {
-                                        if (res && res.length > 0) {
-                                            // Changed from res[0].url to res[0].ufsUrl
-                                            handleImageUpload(index, res[0].ufsUrl);
-                                        }
-                                    }}
-                                    className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
-                                />
+                                <button
+                                    type="button"
+                                    onClick={() => triggerFileInput(index)}
+                                    className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
+                                >
+                                    Upload Image
+                                </button>
                             )}
                         </div>
                     ))}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                    />
                 </div>
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
 

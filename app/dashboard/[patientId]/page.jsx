@@ -19,6 +19,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import { Eye, Fullscreen, X } from "lucide-react";
+
+import {
+    ImageKitAbortError,
+    ImageKitInvalidRequestError,
+    ImageKitServerError,
+    ImageKitUploadNetworkError,
+    upload,
+} from "@imagekit/next";
+
 export default function PatientUpdateForm({ params }) {
     const { data: session } = useSession();
 
@@ -110,6 +119,36 @@ export default function PatientUpdateForm({ params }) {
         { file: null, preview: null },
         { file: null, preview: null },
     ]);
+
+    const handleImageKitUpload = async (event, index) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const authRes = await fetch("/api/upload-auth");
+            const { signature, expire, token, publicKey } = await authRes.json();
+
+            const res = await upload({
+                file,
+                fileName: file.name,
+                publicKey,
+                signature,
+                expire,
+                token,
+            });
+
+            const uploadedUrl = res.url;
+
+            const updatedImages = [...images];
+            updatedImages[index] = {
+                preview: uploadedUrl,
+            };
+            setImages(updatedImages);
+        } catch (error) {
+            console.error("ImageKit upload error:", error);
+        }
+    };
+
     useEffect(() => {
         const patient = patients.find(p => p.authid === params.patientId);
         if (patient) {
@@ -717,7 +756,7 @@ export default function PatientUpdateForm({ params }) {
                 <h3 className="text-sm font-semibold">Upload Images (Max 3)</h3>
                 <div className="flex justify-between flex-wrap items-center gap-4">
                     {images.map((image, index) => (
-                        <div key={index} className="relative group w-[200px] h-[200px]">
+                        <div key={index} className="relative group w-[200px] h-48">
                             {image.preview ? (
                                 <>
                                     <img
@@ -725,15 +764,13 @@ export default function PatientUpdateForm({ params }) {
                                         alt={`Preview ${index + 1}`}
                                         className="w-full h-full object-cover rounded-lg"
                                     />
-
                                     <button
                                         type="button"
                                         onClick={() => setSelectedImage(image.preview)}
-                                        className="absolute top-2 left-2  bg-black/50 text-white p-1 rounded-full"
+                                        className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-full"
                                     >
                                         <Fullscreen className="h-5 w-5" />
                                     </button>
-
                                     <button
                                         type="button"
                                         onClick={() => removeImage(index)}
@@ -743,20 +780,17 @@ export default function PatientUpdateForm({ params }) {
                                     </button>
                                 </>
                             ) : (
-                                <UploadButton
-                                    endpoint="imageUploader"
-                                    onClientUploadComplete={(res) => {
-                                        if (res?.[0]?.url) {
-                                            handleImageUpload(index, res[0].ufsUrl);
-                                        }
-                                    }}
-                                    className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
-                                // className="w-full h-full ut-button:bg-secondary ut-button:text-primary ut-button:hover:bg-secondary/80"
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleImageKitUpload(e, index)}
+                                    className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
                                 />
                             )}
                         </div>
                     ))}
                 </div>
+
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">

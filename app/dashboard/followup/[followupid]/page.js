@@ -11,6 +11,7 @@ import { UploadButton } from "@/utils/uploadthing";
 import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
+import { upload } from "@imagekit/next";
 export default function UpdateFollowUp({ params }) {
     const { data: session } = useSession();
 
@@ -60,7 +61,7 @@ export default function UpdateFollowUp({ params }) {
             Reasonclosetickets: '',
         };
     });
-    const [images, setImages] = useState(Array(3).fill(null));
+    // const [images, setImages] = useState(Array(3).fill(null));
     // Add this state
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchError, setSearchError] = useState('');
@@ -104,9 +105,9 @@ export default function UpdateFollowUp({ params }) {
     const handleImageUpload = (index, url) => {
         setImages(prev => prev.map((img, i) => i === index ? url : img));
     };
-    const removeImage = (index) => {
-        setImages(prev => prev.map((img, i) => i === index ? null : img));
-    };
+    // const removeImage = (index) => {
+    //     setImages(prev => prev.map((img, i) => i === index ? null : img));
+    // };
 
 
     const handleInputChange = (e) => {
@@ -163,8 +164,40 @@ export default function UpdateFollowUp({ params }) {
         }
     };
 
+    // const [selectedImage, setSelectedImage] = useState(null);
+    const [images, setImages] = useState([null]); // You can pre-fill more slots if needed
     const [selectedImage, setSelectedImage] = useState(null);
 
+    const handleFileChange = async (e, index) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const authRes = await fetch("/api/upload-auth");
+            const { signature, expire, token, publicKey } = await authRes.json();
+
+            const res = await upload({
+                file,
+                fileName: file.name,
+                publicKey,
+                signature,
+                expire,
+                token,
+            });
+
+            const newImages = [...images];
+            newImages[index] = res.url;
+            setImages(newImages);
+        } catch (error) {
+            console.error("ImageKit upload error:", error);
+        }
+    };
+
+    const removeImage = (index) => {
+        const updatedImages = [...images];
+        updatedImages[index] = null;
+        setImages(updatedImages);
+    };
     return (
         <div className="mb-4 p-4">
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
@@ -397,7 +430,7 @@ export default function UpdateFollowUp({ params }) {
                                         alt={`Preview ${index + 1}`}
                                         className="w-full h-full object-cover rounded-lg"
                                         onError={(e) => {
-                                            e.target.style.display = 'none';
+                                            e.target.style.display = "none";
                                             const newImages = [...images];
                                             newImages[index] = null;
                                             setImages(newImages);
@@ -421,17 +454,11 @@ export default function UpdateFollowUp({ params }) {
                                     </div>
                                 </>
                             ) : (
-                                <UploadButton
-                                    endpoint="imageUploader"
-                                    onClientUploadComplete={(res) => {
-                                        if (res?.[0]?.url) {
-                                            const newImages = [...images];
-                                            newImages[index] = res[0].ufsUrl;
-                                            setImages(newImages);
-                                        }
-                                    }}
-                                         className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
-                               
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleFileChange(e, index)}
+                                    className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
                                 />
                             )}
                         </div>
@@ -657,9 +684,7 @@ export default function UpdateFollowUp({ params }) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         {/* Stay on page button */}
-                        <AlertDialogCancel>
-                            {isSuccess ? "Add another" : "Cancel"}
-                        </AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
 
                         {/* Redirect button (only show for success) */}
                         {isSuccess && (

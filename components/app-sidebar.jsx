@@ -28,7 +28,7 @@ const items = [
   {
     title: "Follow up",
     url: "/dashboard/followup",
-    icon: UserRoundPlus ,
+    icon: UserRoundPlus,
   },
 ]
 
@@ -38,7 +38,7 @@ export function AppSidebar() {
   useEffect(() => {
     // console.log("Session user:", session?.user);
   }, [session]);
-  
+
   return (
     <Sidebar>
       <SidebarContent className="bg-secondary text-white">
@@ -52,32 +52,35 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild >
                     <a href={item.url}>
-                      <item.icon size={20}/>
+                      <item.icon size={20} />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              {session?.user?.accounttype === 'A' && (
-                <>
+              {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <a href="/dashboard/emailhistorytable">
-                      <History size={20}/>
+                      <History size={20} />
                       <span>Email History</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+              )}
+
+              {session?.user?.accounttype === 'A' && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <a href="/dashboard/closetickets">
-                      <Trash size={20}/>
+                      <Trash size={20} />
                       <span>Close tickets</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                </>
+
               )}
+ 
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

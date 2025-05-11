@@ -1,72 +1,107 @@
-'use client'
-import { useState } from 'react';
-import Image from 'next/image';
+"use client";
 
-export default function MyUploadComponent() {
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [imageUrl, setImageUrl] = useState(null);
-    const [errorMessage, setErrorMessage] = useState(null);
+import {
+    ImageKitAbortError,
+    ImageKitInvalidRequestError,
+    ImageKitServerError,
+    ImageKitUploadNetworkError,
+    upload,
+} from "@imagekit/next";
+import { useRef, useState } from "react";
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        setSelectedFile(file);
-        if (file) {
-            const url = URL.createObjectURL(file);
-            setImageUrl(url);
+const UploadExample = () => {
+    const [progress, setProgress] = useState(0);
+    const [imageUrl, setImageUrl] = useState(""); // ← store uploaded image URL
+    const fileInputRef = useRef(null);
+    const abortController = new AbortController();
+
+    const authenticator = async () => {
+        try {
+            const response = await fetch("/api/upload-auth");
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Request failed with status ${response.status}: ${errorText}`);
+            }
+
+            const data = await response.json();
+            const { signature, expire, token, publicKey } = data;
+            return { signature, expire, token, publicKey };
+        } catch (error) {
+            console.error("Authentication error:", error);
+            throw new Error("Authentication request failed");
         }
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
-        if (!selectedFile) {
-            setErrorMessage('Please select a file first');
+    const handleUpload = async () => {
+        const fileInput = fileInputRef.current;
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            alert("Please select a file to upload");
             return;
         }
 
+        const file = fileInput.files[0];
+
+        let authParams;
         try {
-            const formData = new FormData();
-            formData.append('file', selectedFile);
+            authParams = await authenticator();
+        } catch (authError) {
+            console.error("Failed to authenticate for upload:", authError);
+            return;
+        }
 
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
+        const { signature, expire, token, publicKey } = authParams;
+
+        try {
+            const uploadResponse = await upload({
+                expire,
+                token,
+                signature,
+                publicKey,
+                file,
+                fileName: file.name,
+                onProgress: (event) => {
+                    setProgress((event.loaded / event.total) * 100);
+                },
+                abortSignal: abortController.signal,
             });
+            console.log("Upload response:", uploadResponse);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Upload failed');
-            }
-
-            const result = await response.json();
-            setImageUrl(result.imageUrl);
-            setErrorMessage(null);
+            // Store the uploaded image URL
+            setImageUrl(uploadResponse.url);
 
         } catch (error) {
-            console.error('Upload error:', error);
-            setErrorMessage(error.message || 'Failed to upload file');
+            if (error instanceof ImageKitAbortError) {
+                console.error("Upload aborted:", error.reason);
+            } else if (error instanceof ImageKitInvalidRequestError) {
+                console.error("Invalid request:", error.message);
+            } else if (error instanceof ImageKitUploadNetworkError) {
+                console.error("Network error:", error.message);
+            } else if (error instanceof ImageKitServerError) {
+                console.error("Server error:", error.message);
+            } else {
+                console.error("Upload error:", error);
+            }
         }
     };
-    return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <input type="file" onChange={handleFileChange} />
-                <button type="submit">Upload</button>
-            </form>
 
+    return (
+        <>
+            <input type="file" ref={fileInputRef} />
+            <button type="button" onClick={handleUpload}>
+                Upload file
+            </button>
+            <br />
+            Upload progress: <progress value={progress} max={100}></progress>
+
+            {/* Show the image if available */}
             {imageUrl && (
-                <div>
-                    <p>Uploaded Image Preview:</p>
-                    <Image
-                        src={imageUrl}
-                        alt="Uploaded Image Preview"
-                        width={200}
-                        height={200}
-                    />
+                <div style={{ marginTop: "1rem" }}>
+                    <p>Uploaded Image:</p>
+                    <img src={imageUrl} alt="Uploaded" style={{ maxWidth: "300px", borderRadius: "8px" }} />
                 </div>
             )}
-
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-        </div>
+        </>
     );
-}
+};
+
+export default UploadExample;

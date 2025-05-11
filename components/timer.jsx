@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Bot, Timer } from "lucide-react";
 import { TableCell } from "./ui/table";
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 function TimeSensitiveCell({ patient, onDeletePatient }) {
     const { data: session } = useSession();
