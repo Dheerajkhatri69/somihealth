@@ -664,98 +664,59 @@ export default function FollowUpForm() {
                             placeholder="Current medication"
                         />
                     </div>
-
                     <div className="space-y-2">
-                        <Label>Side Effects Experienced</Label>
-                        <Select
+                        <Label htmlFor="anySideEffects">Side Effects Experienced</Label>
+                        <Input
+                            id="anySideEffects"
+                            name="anySideEffects"
                             value={formData.anySideEffects}
-                            onValueChange={(value) => handleSelectChange('anySideEffects', value)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Any side effects?" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            onChange={handleInputChange}
+                            placeholder="Any side effects?"
+                        />
                     </div>
 
-                    {formData.anySideEffects === 'Yes' && (
-                        <div className="space-y-2">
-                            <Label htmlFor="listSideEffects">List Side Effects</Label>
-                            <Textarea
-                                id="listSideEffects"
-                                name="listSideEffects"
-                                value={formData.listSideEffects}
-                                onChange={handleInputChange}
-                                placeholder="Describe side effects"
-                            />
-                        </div>
-                    )}
-
                     <div className="space-y-2">
-                        <Label>Happy with Medication?</Label>
-                        <Select
+                        <Label htmlFor="happyWithMedication">Happy with Medication?</Label>
+                        <Input
+                            id="happyWithMedication"
+                            name="happyWithMedication"
                             value={formData.happyWithMedication}
-                            onValueChange={(value) => handleSelectChange('happyWithMedication', value)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select satisfaction" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            onChange={handleInputChange}
+                            placeholder="Are you satisfied with the medication?"
+                        />
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Switch Medication?</Label>
-                        <Select
+                        <Label htmlFor="switchMedication">Switch Medication?</Label>
+                        <Input
+                            id="switchMedication"
+                            name="switchMedication"
                             value={formData.switchMedication}
-                            onValueChange={(value) => handleSelectChange('switchMedication', value)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Consider switching?" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            onChange={handleInputChange}
+                            placeholder="Consider switching medication?"
+                        />
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Continue Dosage?</Label>
-                        <Select
+                        <Label htmlFor="continueDosage">Continue Dosage?</Label>
+                        <Input
+                            id="continueDosage"
+                            name="continueDosage"
                             value={formData.continueDosage}
-                            onValueChange={(value) => handleSelectChange('continueDosage', value)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Continue current dose?" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            onChange={handleInputChange}
+                            placeholder="Continue current dose?"
+                        />
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Increase Dosage?</Label>
-                        <Select
+                        <Label htmlFor="increaseDosage">Increase Dosage?</Label>
+                        <Input
+                            id="increaseDosage"
+                            name="increaseDosage"
                             value={formData.increaseDosage}
-                            onValueChange={(value) => handleSelectChange('increaseDosage', value)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Increase dose?" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            onChange={handleInputChange}
+                            placeholder="Increase dose?"
+                        />
                     </div>
                 </div>
                 <div className="space-y-2">

@@ -537,7 +537,7 @@ export default function FollowUp() {
                                 <TableHead>Current Weight</TableHead>
                                 <TableHead>Current GLP-1 Med</TableHead>
                                 <TableHead>Side Effects</TableHead>
-                                <TableHead>Side Effect List</TableHead>
+                                {/* <TableHead>Side Effect List</TableHead> */}
                                 <TableHead>Med Satisfaction</TableHead>
                                 <TableHead>Switch Med</TableHead>
                                 <TableHead>Continue Dose</TableHead>
@@ -631,7 +631,7 @@ export default function FollowUp() {
                                     <TableCell>{patient.currentWeight}</TableCell>
                                     <TableCell>{patient.currentGlp1Medication}</TableCell>
                                     <TableCell>{patient.anySideEffects}</TableCell>
-                                    <TableCell className="max-w-[200px] truncate">{patient.listSideEffects}</TableCell>
+                                    {/* <TableCell className="max-w-[200px] truncate">{patient.listSideEffects}</TableCell> */}
                                     <TableCell>{patient.happyWithMedication}</TableCell>
                                     <TableCell>{patient.switchMedication}</TableCell>
                                     <TableCell>{patient.continueDosage}</TableCell>
