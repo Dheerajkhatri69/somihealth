@@ -638,16 +638,13 @@ export default function PatientForm() {
                                         alt={`Preview ${index + 1}`}
                                         className="w-full h-48 object-cover rounded-lg"
                                     />
-
                                     <button
                                         type="button"
                                         onClick={() => setSelectedImage(imageUrl)}
-                                        className="absolute top-2 left-2  bg-black/50 text-white p-1 rounded-full"
+                                        className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-full"
                                     >
                                         <Fullscreen className="h-5 w-5" />
                                     </button>
-
-
                                     <button
                                         type="button"
                                         onClick={() => removeImage(index)}
@@ -661,11 +658,11 @@ export default function PatientForm() {
                                     endpoint="imageUploader"
                                     onClientUploadComplete={(res) => {
                                         if (res && res.length > 0) {
-                                            handleImageUpload(index, res[0].url);
+                                            // Changed from res[0].url to res[0].ufsUrl
+                                            handleImageUpload(index, res[0].ufsUrl);
                                         }
                                     }}
                                     className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
-
                                 />
                             )}
                         </div>
