@@ -174,24 +174,22 @@ export default function PatientForm() {
             token: auth.token,
         };
     };
-
     const handleFileChange = async (e, index) => {
         const file = e.target.files[0];
         if (!file) return;
 
         try {
-            // Fetch fresh auth parameters for EACH upload
             const authRes = await fetch('/api/imagekit-auth');
             const authData = await authRes.json();
 
             const res = await upload({
                 file,
-                fileName: `${Date.now()}_${file.name}`, // Add timestamp for uniqueness
-                publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || 'public_HY7YY/rIWqQyH/VxGRhxOdOfE0g=',
+                fileName: `${Date.now()}_${file.name}`,
+                publicKey: authData.publicKey,
                 signature: authData.signature,
                 expire: authData.expire,
                 token: authData.token,
-                useUniqueFileName: true // Ensure unique filenames
+                useUniqueFileName: true
             });
 
             const newImages = [...images];
@@ -199,7 +197,7 @@ export default function PatientForm() {
             setImages(newImages);
         } catch (error) {
             console.error("Upload error:", error);
-            alert('Failed to upload image. Please try again.');
+            alert('Upload failed: ' + error.message);
         }
     };
 
