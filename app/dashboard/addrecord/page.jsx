@@ -26,7 +26,7 @@ export default function PatientForm() {
     const { data: session } = useSession();
 
     useEffect(() => {
-        console.log("Session user:", session?.user);
+        // console.log("Session user:", session?.user);
     }, [session]);
     const [formData, setFormData] = useState(() => {
         const randomNum = Math.floor(Math.random() * 100000); // Generates number between 0-99999

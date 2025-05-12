@@ -12,7 +12,7 @@ const imagekit = new ImageKit({
 
 export async function GET() {
   try {
-    const token = uuidv4();
+    const token = `${uuidv4()}-${Date.now()}`; // Hybrid unique token
     const timestamp = Math.floor(Date.now() / 1000);
 
     console.log("Token:", token);
