@@ -17,7 +17,7 @@ export default function FollowUpForm() {
     const { data: session } = useSession();
 
     useEffect(() => {
-        console.log("Session user:", session?.user);
+        // console.log("Session user:", session?.user);
     }, [session]);
     const [formData, setFormData] = useState(() => {
         const randomNum = Math.floor(Math.random() * 100000); // Generates number between 0-99999
@@ -625,6 +625,7 @@ export default function FollowUpForm() {
                                         alt={`Preview ${index + 1}`}
                                         width={200}
                                         height={192}
+                                        unoptimized={true}
                                         className="w-full h-full object-cover rounded-lg"
                                     />
                                     <button

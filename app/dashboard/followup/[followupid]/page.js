@@ -17,7 +17,7 @@ export default function UpdateFollowUp({ params }) {
     const { data: session } = useSession();
 
     useEffect(() => {
-        console.log("Session user:", session?.user);
+        // console.log("Session user:", session?.user);
     }, [session]);
     const [formData, setFormData] = useState(() => {
         return {
@@ -435,6 +435,7 @@ export default function UpdateFollowUp({ params }) {
                                         alt={`Preview ${index + 1}`}
                                         width={200}
                                         height={192}
+                                        unoptimized={true}
                                         className="w-full h-full object-cover rounded-lg"
                                         onError={() => {
                                             const newImages = [...images];

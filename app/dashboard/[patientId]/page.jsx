@@ -767,6 +767,7 @@ export default function PatientUpdateForm({ params }) {
                                         alt={`Preview ${index + 1}`}
                                         width={200}
                                         height={192} // h-48 is 192px
+                                        unoptimized={true}
                                         className="object-cover rounded-lg"
                                     />
                                     <button
