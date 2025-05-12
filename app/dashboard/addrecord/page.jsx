@@ -187,7 +187,7 @@ export default function PatientForm() {
             const res = await upload({
                 file,
                 fileName: `${Date.now()}_${file.name}`, // Add timestamp for uniqueness
-                publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY,
+                publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || 'public_HY7YY/rIWqQyH/VxGRhxOdOfE0g=',
                 signature: authData.signature,
                 expire: authData.expire,
                 token: authData.token,
