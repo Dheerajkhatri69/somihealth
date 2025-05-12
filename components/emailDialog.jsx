@@ -44,9 +44,9 @@ export const EmailDialog = ({ selectedPatients, selectedEmail, selectedPatientDa
     const { data: session } = useSession();
 
     // Add your EmailJS credentials here
-    const SERVICE_ID = "service_zice66h";
-    const TEMPLATE_ID = "template_0eby6om";
-    const PUBLIC_KEY = "811fNuzzHWaT8iM0o";
+    const SERVICE_ID = "service_3p1q3ip" ;
+    const TEMPLATE_ID = "template_33dgxbh";
+    const PUBLIC_KEY = "JQNcCq1z7OUSglvd9";
 
     const handleSendEmail = async (message) => {
         if (!selectedEmail || !message) {
