@@ -447,9 +447,9 @@ export default function UpdateFollowUp({ params }) {
                                         <button
                                             type="button"
                                             onClick={() => setSelectedImage(imageUrl)}
-                                            className="p-1 rounded-full bg-black/50 text-white hover:bg-black/70"
+                                            className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-full"
                                         >
-                                            <Eye className="h-4 w-4" />
+                                            <Fullscreen className="h-5 w-5" />
                                         </button>
                                         <button
                                             type="button"

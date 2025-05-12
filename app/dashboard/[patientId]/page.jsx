@@ -964,6 +964,7 @@ export default function PatientUpdateForm({ params }) {
                                     width={1200}
                                     height={800}
                                     className="max-h-full max-w-full object-contain rounded-lg"
+                                    unoptimized
                                 />
                             )}
                         </div>
