@@ -179,12 +179,17 @@ export default function PatientForm() {
         if (!file) return;
 
         try {
-            const authRes = await fetch('/api/imagekit-auth');
+            // Force fresh request with cache-busting
+            const authRes = await fetch(`/api/imagekit-auth?t=${Date.now()}`);
+
+            if (!authRes.ok) throw new Error('Auth failed: ' + await authRes.text());
+
             const authData = await authRes.json();
+            console.log('Auth Data:', authData); // Debug log
 
             const res = await upload({
                 file,
-                fileName: `${Date.now()}_${file.name}`,
+                fileName: `${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi, '_')}`,
                 publicKey: authData.publicKey,
                 signature: authData.signature,
                 expire: authData.expire,
@@ -192,12 +197,17 @@ export default function PatientForm() {
                 useUniqueFileName: true
             });
 
-            const newImages = [...images];
-            newImages[index] = res.url;
-            setImages(newImages);
+            setImages(prev => {
+                const newImages = [...prev];
+                newImages[index] = res.url;
+                return newImages;
+            });
         } catch (error) {
-            console.error("Upload error:", error);
-            alert('Upload failed: ' + error.message);
+            console.error("Upload Error:", {
+                error: error.message,
+                stack: error.stack
+            });
+            alert(`Upload Failed: ${error.message}`);
         }
     };
 
