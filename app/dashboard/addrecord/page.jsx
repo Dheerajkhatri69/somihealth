@@ -90,11 +90,11 @@ export default function PatientForm() {
     const fileInputRef = useRef(null);
     const uploadingIndexRef = useRef(null);
 
-    // const authenticator = async () => {
-    //     const res = await fetch("/api/upload-auth");
-    //     const data = await res.json();
-    //     return data;
-    // };
+    const authenticator = async () => {
+        const res = await fetch("/api/upload-auth");
+        const data = await res.json();
+        return data;
+    };
 
 
     const handleImageUpload = (index, url) => {
@@ -163,54 +163,34 @@ export default function PatientForm() {
     const triggerFileInput = (index) => {
         fileInputRefs.current[index].click();
     };
-    const authenticator = async () => {
-        const res = await fetch('/api/imagekit-auth');
-        const auth = await res.json();
 
-        return {
-            publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || 'public_HY7YY/rIWqQyH/VxGRhxOdOfE0g=', // fallback if needed
-            signature: auth.signature,
-            expire: auth.expire,
-            token: auth.token,
-        };
-    };
     const handleFileChange = async (e, index) => {
         const file = e.target.files[0];
         if (!file) return;
 
         try {
-            // Force fresh request with cache-busting
-            const authRes = await fetch(`/api/imagekit-auth?t=${Date.now()}`);
+            // Get authentication parameters from your API
+            const authData = await authenticator();
 
-            if (!authRes.ok) throw new Error('Auth failed: ' + await authRes.text());
-
-            const authData = await authRes.json();
-            console.log('Auth Data:', authData); // Debug log
-
+            // Use ImageKit's upload method
             const res = await upload({
                 file,
-                fileName: `${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi, '_')}`,
+                fileName: file.name,
                 publicKey: authData.publicKey,
                 signature: authData.signature,
                 expire: authData.expire,
                 token: authData.token,
-                useUniqueFileName: true
+                useUniqueFileName: false // Set to true if you want unique filenames
             });
 
-            setImages(prev => {
-                const newImages = [...prev];
-                newImages[index] = res.url;
-                return newImages;
-            });
+            const newImages = [...images];
+            newImages[index] = res.url;
+            setImages(newImages);
         } catch (error) {
-            console.error("Upload Error:", {
-                error: error.message,
-                stack: error.stack
-            });
-            alert(`Upload Failed: ${error.message}`);
+            console.error("Upload error:", error);
+            alert('Failed to upload image. Please try again.');
         }
     };
-
     const removeImage = (index) => {
         const newImages = [...images];
         newImages[index] = null;

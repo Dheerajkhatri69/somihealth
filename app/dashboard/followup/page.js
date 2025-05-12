@@ -51,6 +51,8 @@ import toast from "react-hot-toast";
 import { EmailDialog } from "@/components/emailDialog";
 import TimeSensitiveCell from "@/components/timer";
 import { useRouter } from "next/navigation";
+import { FollowupClinicianDropdown } from "@/components/followupClinicianDropdown";
+import FollowupShowAssig from "@/components/followupshowassign";
 
 export default function FollowUp() {
     const [patients, setPatients] = useState([]);
@@ -76,7 +78,7 @@ export default function FollowUp() {
                 // If user is a clinician, filter only their assigned patients
                 if (session?.user?.accounttype === 'C') {
                     // Fetch all assignments
-                    const assigningRes = await fetch("/api/assigning");
+                    const assigningRes = await fetch("/api/followupassig");
                     const assigningData = await assigningRes.json();
 
                     if (assigningData.success) {
@@ -418,9 +420,9 @@ export default function FollowUp() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
-                    <ClinicianDropdown selectedPatients={selectedPatients} />
-                )} */}
+                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                    <FollowupClinicianDropdown selectedPatients={selectedPatients} />
+                )}
             </div>
 
             {session?.user?.accounttype === 'A' && (
@@ -567,9 +569,10 @@ export default function FollowUp() {
                                         />
                                     </TableCell>
                                     {/* <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete} /> */}
-                                    <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
+                                    {/* <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
                                         {patient.authid}
-                                    </TableCell>
+                                    </TableCell> */}
+                                    <FollowupShowAssig patient={patient} />
 
                                     <TableCell className="sticky left-[115px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}

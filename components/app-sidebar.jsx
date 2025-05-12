@@ -1,7 +1,8 @@
 'use client'
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Calendar, History, Home, Inbox, Plus, Search, Settings, Trash, UserRoundPlus } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -26,14 +27,15 @@ const items = [
     icon: Inbox,
   },
   {
-    title: "Follow up",
+    title: "Follow up",
     url: "/dashboard/followup",
     icon: UserRoundPlus,
   },
 ]
 
 export function AppSidebar() {
-  const { data: session } = useSession();
+  const { data: session } = useSession()
+  const pathname = usePathname() // 🔹 Get current route
 
   useEffect(() => {
     // console.log("Session user:", session?.user);
@@ -48,19 +50,29 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild >
-                    <a href={item.url}>
-                      <item.icon size={20} />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const isActive = pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={isActive ? 'bg-white text-black' : ''}
+                    >
+                      <a href={item.url}>
+                        <item.icon size={20} />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+
               {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    className={pathname === "/dashboard/emailhistorytable" ? "bg-white text-black" : ""}
+                  >
                     <a href="/dashboard/emailhistorytable">
                       <History size={20} />
                       <span>Email History</span>
@@ -71,25 +83,28 @@ export function AppSidebar() {
 
               {session?.user?.accounttype === 'A' && (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    className={pathname === "/dashboard/closetickets" ? "bg-white text-black" : ""}
+                  >
                     <a href="/dashboard/closetickets">
                       <Trash size={20} />
                       <span>Close tickets</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-
               )}
- 
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Only show Add Staff button for admin users (role A) */}
       {session?.user?.accounttype === 'A' && (
         <SidebarFooter className="bg-secondary">
-          <SidebarMenuButton asChild className="bg-white">
+          <SidebarMenuButton
+            asChild
+            className={pathname === "/dashboard/addstaff" ? "bg-white text-black" : "text-white"}
+          >
             <a href="/dashboard/addstaff">
               <Plus />
               <span>Add Staff</span>

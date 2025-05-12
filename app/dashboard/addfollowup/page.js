@@ -261,6 +261,8 @@ export default function FollowUpForm() {
 
     const [selectedImage, setSelectedImage] = useState(null); // Add this line
     const [images, setImages] = useState([null]);
+    const maxImages = 3;
+    const paddedImages = [...images, ...Array(maxImages - images.length).fill(null)];
 
     const handleFileChange = async (e, index) => {
         const file = e.target.files?.[0];
@@ -315,6 +317,12 @@ export default function FollowUpForm() {
                                     name="initialAuthId"
                                     value={formData.initialAuthId}
                                     onChange={handleInputChange}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault(); // Prevent form submission
+                                            handleSearch();     // Trigger search instead
+                                        }
+                                    }}
                                     placeholder="Enter initial Auth ID"
                                 />
                                 <Button
@@ -511,12 +519,104 @@ export default function FollowUpForm() {
                         </SelectContent>
                     </Select>
                 </div>
+                {/* Add these to the Basic Information grid */}
+                <div className="space-y-2">
+                    <Label htmlFor="currentWeight">Current Weight (lbs)</Label>
+                    <Input
+                        id="currentWeight"
+                        name="currentWeight"
+                        value={formData.currentWeight}
+                        onChange={handleInputChange}
+                        placeholder="Current weight"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="glp1ApprovalLast6Months">GLP-1 Approval (Last 6mo)</Label>
+                    <Input
+                        id="glp1ApprovalLast6Months"
+                        name="glp1ApprovalLast6Months"
+                        value={formData.glp1ApprovalLast6Months}
+                        onChange={handleInputChange}
+                        placeholder="Approval status"
+                    />
+                </div>
+
+
+                {/* Current Medication Section */}
+                <h3 className="text-sm font-semibold">Current Medication Details</h3>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                    <div className="space-y-2">
+                        <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
+                        <Input
+                            id="currentGlp1Medication"
+                            name="currentGlp1Medication"
+                            value={formData.currentGlp1Medication}
+                            onChange={handleInputChange}
+                            placeholder="Current medication"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="anySideEffects">Side Effects Experienced</Label>
+                        <Input
+                            id="anySideEffects"
+                            name="anySideEffects"
+                            value={formData.anySideEffects}
+                            onChange={handleInputChange}
+                            placeholder="Any side effects?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="happyWithMedication">Happy with Medication?</Label>
+                        <Input
+                            id="happyWithMedication"
+                            name="happyWithMedication"
+                            value={formData.happyWithMedication}
+                            onChange={handleInputChange}
+                            placeholder="Are you satisfied with the medication?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="switchMedication">Switch Medication?</Label>
+                        <Input
+                            id="switchMedication"
+                            name="switchMedication"
+                            value={formData.switchMedication}
+                            onChange={handleInputChange}
+                            placeholder="Consider switching medication?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="continueDosage">Continue Dosage?</Label>
+                        <Input
+                            id="continueDosage"
+                            name="continueDosage"
+                            value={formData.continueDosage}
+                            onChange={handleInputChange}
+                            placeholder="Continue current dose?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="increaseDosage">Increase Dosage?</Label>
+                        <Input
+                            id="increaseDosage"
+                            name="increaseDosage"
+                            value={formData.increaseDosage}
+                            onChange={handleInputChange}
+                            placeholder="Increase dose?"
+                        />
+                    </div>
+                </div>
 
                 {/* Image Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Images</h3>
 
                 <div className="flex justify-between flex-wrap items-center gap-4">
-                    {images.map((imageUrl, index) => (
+                    {paddedImages.map((imageUrl, index) => (
                         <div key={index} className="relative group w-[200px] h-48">
                             {imageUrl ? (
                                 <>
@@ -543,25 +643,24 @@ export default function FollowUpForm() {
                                     </button>
                                 </>
                             ) : (
-                                <>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const input = document.createElement('input');
-                                            input.type = 'file';
-                                            input.accept = 'image/*';
-                                            input.onchange = (e) => handleFileChange(e, index);
-                                            input.click();
-                                        }}
-                                        className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
-                                    >
-                                        Upload Image
-                                    </button>
-                                </>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const input = document.createElement('input');
+                                        input.type = 'file';
+                                        input.accept = 'image/*';
+                                        input.onchange = (e) => handleFileChange(e, index);
+                                        input.click();
+                                    }}
+                                    className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
+                                >
+                                    Upload Image
+                                </button>
                             )}
                         </div>
                     ))}
                 </div>
+
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
@@ -666,98 +765,6 @@ export default function FollowUpForm() {
                     </div>
                 </div>
 
-                {/* Add these to the Basic Information grid */}
-                <div className="space-y-2">
-                    <Label htmlFor="currentWeight">Current Weight (lbs)</Label>
-                    <Input
-                        id="currentWeight"
-                        name="currentWeight"
-                        value={formData.currentWeight}
-                        onChange={handleInputChange}
-                        placeholder="Current weight"
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="glp1ApprovalLast6Months">GLP-1 Approval (Last 6mo)</Label>
-                    <Input
-                        id="glp1ApprovalLast6Months"
-                        name="glp1ApprovalLast6Months"
-                        value={formData.glp1ApprovalLast6Months}
-                        onChange={handleInputChange}
-                        placeholder="Approval status"
-                    />
-                </div>
-
-
-                {/* Current Medication Section */}
-                <h3 className="text-sm font-semibold">Current Medication Details</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2">
-                        <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
-                        <Input
-                            id="currentGlp1Medication"
-                            name="currentGlp1Medication"
-                            value={formData.currentGlp1Medication}
-                            onChange={handleInputChange}
-                            placeholder="Current medication"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="anySideEffects">Side Effects Experienced</Label>
-                        <Input
-                            id="anySideEffects"
-                            name="anySideEffects"
-                            value={formData.anySideEffects}
-                            onChange={handleInputChange}
-                            placeholder="Any side effects?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="happyWithMedication">Happy with Medication?</Label>
-                        <Input
-                            id="happyWithMedication"
-                            name="happyWithMedication"
-                            value={formData.happyWithMedication}
-                            onChange={handleInputChange}
-                            placeholder="Are you satisfied with the medication?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="switchMedication">Switch Medication?</Label>
-                        <Input
-                            id="switchMedication"
-                            name="switchMedication"
-                            value={formData.switchMedication}
-                            onChange={handleInputChange}
-                            placeholder="Consider switching medication?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="continueDosage">Continue Dosage?</Label>
-                        <Input
-                            id="continueDosage"
-                            name="continueDosage"
-                            value={formData.continueDosage}
-                            onChange={handleInputChange}
-                            placeholder="Continue current dose?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="increaseDosage">Increase Dosage?</Label>
-                        <Input
-                            id="increaseDosage"
-                            name="increaseDosage"
-                            value={formData.increaseDosage}
-                            onChange={handleInputChange}
-                            placeholder="Increase dose?"
-                        />
-                    </div>
-                </div>
                 <div className="space-y-2">
                     <Label htmlFor="patientStatement">Patient Statement</Label>
                     <Textarea

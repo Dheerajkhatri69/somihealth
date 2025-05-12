@@ -1,4 +1,3 @@
-// api/imagekit-auth/route.js
 import ImageKit from "imagekit";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,13 +9,19 @@ const imagekit = new ImageKit({
 
 export async function GET() {
   try {
-    const token = uuidv4();
-    const { signature, expire } = imagekit.getAuthenticationParameters({ token });
+    const token = uuidv4(); // This generates a proper v4 UUID string
+    const timestamp = Math.floor(Date.now() / 1000);
+    
+    const { signature, expire } = imagekit.getAuthenticationParameters({
+      token,
+      timestamp
+    });
 
     return new Response(JSON.stringify({
       signature,
-      token, // Direct UUID string
+      token, // This is already a string
       expire,
+      timestamp,
       publicKey: process.env.IMAGEKIT_PUBLIC_KEY
     }), {
       headers: {
@@ -25,8 +30,12 @@ export async function GET() {
       }
     });
   } catch (error) {
+    console.error("ImageKit auth error:", error);
     return new Response(
-      JSON.stringify({ error: 'Authentication failed', details: error.message }),
+      JSON.stringify({ 
+        error: 'Authentication failed', 
+        details: error.message 
+      }),
       { status: 500 }
     );
   }
