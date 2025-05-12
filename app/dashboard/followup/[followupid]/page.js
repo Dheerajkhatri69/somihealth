@@ -443,22 +443,20 @@ export default function UpdateFollowUp({ params }) {
                                             setImages(newImages);
                                         }}
                                     />
-                                    <div className="absolute top-2 right-2 flex gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedImage(imageUrl)}
-                                            className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-full"
-                                        >
-                                            <Fullscreen className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeImage(index)}
-                                            className="p-1 rounded-full bg-red-500 text-white hover:bg-red-600"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </button>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedImage(imageUrl)}
+                                        className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-full"
+                                    >
+                                        <Fullscreen className="h-5 w-5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(index)}
+                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </button>
                                 </>
                             ) : (
                                 <div className="relative w-full h-full">
