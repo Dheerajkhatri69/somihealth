@@ -759,7 +759,7 @@ export default function Dashboard() {
                     <Button ><Plus /> Add Patient</Button>
                 </Link>
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                    <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} selectedPatientData={selectedPatientData}/>
+                    <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} selectedPatientData={selectedPatientData} />
                 )}
             </div>
             <AlertDialog
