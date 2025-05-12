@@ -1,5 +1,6 @@
 import ImageKit from "imagekit";
 import { v4 as uuidv4 } from 'uuid';
+import { randomBytes } from 'crypto';
 
 const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
@@ -9,7 +10,8 @@ const imagekit = new ImageKit({
 
 export async function GET() {
   try {
-    const token = uuidv4()+Math.floor(Math.random() * 100000); // This generates a proper v4 UUID string
+    const randomNum = parseInt(randomBytes(4).toString('hex'), 16);
+    const token = `${uuidv4()}-${randomNum}-${Date.now()}`;
     const timestamp = Math.floor(Date.now() / 1000);
     
     const { signature, expire } = imagekit.getAuthenticationParameters({
@@ -19,14 +21,16 @@ export async function GET() {
 
     return new Response(JSON.stringify({
       signature,
-      token, // This is already a string
+      token,
       expire,
       timestamp,
       publicKey: process.env.IMAGEKIT_PUBLIC_KEY
     }), {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     });
   } catch (error) {
