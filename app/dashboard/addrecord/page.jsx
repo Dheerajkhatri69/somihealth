@@ -708,6 +708,7 @@ export default function PatientForm() {
                                         width={200}
                                         height={192}
                                         className="w-full h-full object-cover rounded-lg"
+                                        unoptimized={true}
                                         onError={(e) => {
                                             e.target.style.display = 'none';
                                         }}
