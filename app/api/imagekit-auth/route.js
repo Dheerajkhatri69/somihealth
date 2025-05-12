@@ -9,7 +9,7 @@ const imagekit = new ImageKit({
 
 export async function GET() {
   try {
-    const token = uuidv4(); // This generates a proper v4 UUID string
+    const token = uuidv4()+Math.floor(Math.random() * 100000); // This generates a proper v4 UUID string
     const timestamp = Math.floor(Date.now() / 1000);
     
     const { signature, expire } = imagekit.getAuthenticationParameters({
