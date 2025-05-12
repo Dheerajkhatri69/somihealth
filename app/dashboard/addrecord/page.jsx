@@ -115,14 +115,14 @@ export default function PatientForm() {
     const [messageHead, setMessageHead] = useState("");
     const [message, setMessage] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
-
+    const [images, setImages] = useState([null, null, null]); // This is correct as you have it
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        const filteredImages = images.filter(url => url !== null && url !== '');
         const submissionData = {
             ...formData,
             createTimeDate: new Date().toISOString(),
-            images: images.filter(url => url !== '')
+            images: filteredImages
         };
 
         try {
@@ -157,7 +157,6 @@ export default function PatientForm() {
         }
     };
     const [selectedImage, setSelectedImage] = useState(null); // Add this line
-    const [images, setImages] = useState([null, null, null]);
     const fileInputRefs = useRef([]);
 
     const triggerFileInput = (index) => {
@@ -193,10 +192,9 @@ export default function PatientForm() {
     };
     const removeImage = (index) => {
         const newImages = [...images];
-        newImages[index] = null;
+        newImages[index] = null; // Set to null instead of empty string
         setImages(newImages);
     };
-
     return (
         <div className="mb-4 p-4">
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
