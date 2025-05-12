@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
 import { upload } from "@imagekit/next";
+import Image from "next/image";
 export default function UpdateFollowUp({ params }) {
     const { data: session } = useSession();
 
@@ -163,10 +164,10 @@ export default function UpdateFollowUp({ params }) {
             setSearchLoading(false);
         }
     };
+    const [selectedImage, setSelectedImage] = useState(null); // Should be first
+    const [images, setImages] = useState([null]);
+    // ... other state declarations ...
 
-    // const [selectedImage, setSelectedImage] = useState(null);
-    const [images, setImages] = useState([null]); // You can pre-fill more slots if needed
-    const [selectedImage, setSelectedImage] = useState(null);
 
     const handleFileChange = async (e, index) => {
         const file = e.target.files?.[0];
@@ -198,6 +199,10 @@ export default function UpdateFollowUp({ params }) {
         updatedImages[index] = null;
         setImages(updatedImages);
     };
+    if (!formData.authid) {
+        return <div className="p-4 text-yellow-500">loading..</div>;
+    }
+
     return (
         <div className="mb-4 p-4">
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
@@ -425,12 +430,13 @@ export default function UpdateFollowUp({ params }) {
                         <div key={index} className="relative group w-[200px] h-48">
                             {imageUrl ? (
                                 <>
-                                    <img
+                                    <Image
                                         src={imageUrl}
                                         alt={`Preview ${index + 1}`}
+                                        width={200}
+                                        height={192}
                                         className="w-full h-full object-cover rounded-lg"
-                                        onError={(e) => {
-                                            e.target.style.display = "none";
+                                        onError={() => {
                                             const newImages = [...images];
                                             newImages[index] = null;
                                             setImages(newImages);
@@ -454,16 +460,27 @@ export default function UpdateFollowUp({ params }) {
                                     </div>
                                 </>
                             ) : (
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => handleFileChange(e, index)}
-                                    className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
-                                />
+                                <div className="relative w-full h-full">
+                                    <button
+                                        type="button"
+                                        onClick={() => document.getElementById(`file-input-${index}`).click()}
+                                        className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
+                                    >
+                                        Upload Image
+                                    </button>
+                                    <input
+                                        id={`file-input-${index}`}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileChange(e, index)}
+                                        className="hidden"
+                                    />
+                                </div>
                             )}
                         </div>
                     ))}
                 </div>
+
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
@@ -698,19 +715,26 @@ export default function UpdateFollowUp({ params }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-
             <AlertDialog open={!!selectedImage} onOpenChange={(isOpen) => !isOpen && setSelectedImage(null)}>
                 <AlertDialogContent className="max-w-[80vw]">
                     <AlertDialogHeader>
                         <div className="flex-1 max-h-[70vh] flex justify-center">
-                            <img src={selectedImage} alt="Preview"
-                                className="max-h-full max-w-full object-contain rounded-lg"
-                            />
+                            {selectedImage && (
+                                <Image
+                                    src={selectedImage}
+                                    alt="Preview"
+                                    width={1200}
+                                    height={800}
+                                    className="max-h-full max-w-full object-contain rounded-lg"
+                                    unoptimized // Add if using external image URLs
+                                />
+                            )}
                         </div>
-
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setSelectedImage(null)}>Close</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setSelectedImage(null)}>
+                            Close
+                        </AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

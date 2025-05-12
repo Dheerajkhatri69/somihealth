@@ -27,6 +27,7 @@ import {
     ImageKitUploadNetworkError,
     upload,
 } from "@imagekit/next";
+import Image from "next/image";
 
 export default function PatientUpdateForm({ params }) {
     const { data: session } = useSession();
@@ -256,6 +257,8 @@ export default function PatientUpdateForm({ params }) {
             console.error("Request failed:", err);
         }
     };
+  
+    // Before any early returns
     const [selectedImage, setSelectedImage] = useState(null);
 
     if (!formData.authid) {
@@ -757,12 +760,14 @@ export default function PatientUpdateForm({ params }) {
                 <div className="flex justify-between flex-wrap items-center gap-4">
                     {images.map((image, index) => (
                         <div key={index} className="relative group w-[200px] h-48">
-                            {image.preview ? (
+                            {image?.preview ? (
                                 <>
-                                    <img
+                                    <Image
                                         src={image.preview}
                                         alt={`Preview ${index + 1}`}
-                                        className="w-full h-full object-cover rounded-lg"
+                                        width={200}
+                                        height={192} // h-48 is 192px
+                                        className="object-cover rounded-lg"
                                     />
                                     <button
                                         type="button"
@@ -780,12 +785,22 @@ export default function PatientUpdateForm({ params }) {
                                     </button>
                                 </>
                             ) : (
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => handleImageKitUpload(e, index)}
-                                    className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
-                                />
+                                <div className="relative w-full h-full">
+                                    <button
+                                        type="button"
+                                        onClick={() => document.getElementById(`file-input-${index}`).click()}
+                                        className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
+                                    >
+                                        Upload Image
+                                    </button>
+                                    <input
+                                        id={`file-input-${index}`}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => handleImageKitUpload(e, index)}
+                                        className="hidden"
+                                    />
+                                </div>
                             )}
                         </div>
                     ))}
@@ -941,14 +956,21 @@ export default function PatientUpdateForm({ params }) {
                 <AlertDialogContent className="max-w-[80vw]">
                     <AlertDialogHeader>
                         <div className="flex-1 max-h-[70vh] flex justify-center">
-                            <img src={selectedImage} alt="Preview"
-                                className="max-h-full max-w-full object-contain rounded-lg"
-                            />
+                            {selectedImage && (
+                                <Image
+                                    src={selectedImage}
+                                    alt="Preview"
+                                    width={1200}
+                                    height={800}
+                                    className="max-h-full max-w-full object-contain rounded-lg"
+                                />
+                            )}
                         </div>
-
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setSelectedImage(null)}>Close</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setSelectedImage(null)}>
+                            Close
+                        </AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
 import { upload } from "@imagekit/next";
+import Image from "next/image";
 export default function FollowUpForm() {
     const { data: session } = useSession();
 
@@ -257,8 +258,9 @@ export default function FollowUpForm() {
             setSearchLoading(false);
         }
     };
-    const [images, setImages] = useState([null]); // Pre-fill with one slot
-    const [selectedImage, setSelectedImage] = useState(null);
+
+    const [selectedImage, setSelectedImage] = useState(null); // Add this line
+    const [images, setImages] = useState([null]);
 
     const handleFileChange = async (e, index) => {
         const file = e.target.files?.[0];
@@ -512,17 +514,19 @@ export default function FollowUpForm() {
 
                 {/* Image Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Images</h3>
+
                 <div className="flex justify-between flex-wrap items-center gap-4">
                     {images.map((imageUrl, index) => (
                         <div key={index} className="relative group w-[200px] h-48">
                             {imageUrl ? (
                                 <>
-                                    <img
+                                    <Image
                                         src={imageUrl}
                                         alt={`Preview ${index + 1}`}
-                                        className="w-full h-48 object-cover rounded-lg"
+                                        width={200}
+                                        height={192}
+                                        className="w-full h-full object-cover rounded-lg"
                                     />
-
                                     <button
                                         type="button"
                                         onClick={() => setSelectedImage(imageUrl)}
@@ -530,7 +534,6 @@ export default function FollowUpForm() {
                                     >
                                         <Fullscreen className="h-5 w-5" />
                                     </button>
-
                                     <button
                                         type="button"
                                         onClick={() => removeImage(index)}
@@ -540,12 +543,21 @@ export default function FollowUpForm() {
                                     </button>
                                 </>
                             ) : (
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => handleFileChange(e, index)}
-                                    className="w-[200px] text-sm px-4 py-3 font-bold bg-secondary border border-black rounded-lg focus:outline-none focus:border-purple-400"
-                                />
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const input = document.createElement('input');
+                                            input.type = 'file';
+                                            input.accept = 'image/*';
+                                            input.onchange = (e) => handleFileChange(e, index);
+                                            input.click();
+                                        }}
+                                        className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
+                                    >
+                                        Upload Image
+                                    </button>
+                                </>
                             )}
                         </div>
                     ))}
@@ -791,11 +803,16 @@ export default function FollowUpForm() {
                 <AlertDialogContent className="max-w-[80vw]">
                     <AlertDialogHeader>
                         <div className="flex-1 max-h-[70vh] flex justify-center">
-                            <img src={selectedImage} alt="Preview"
-                                className="max-h-full max-w-full object-contain rounded-lg"
-                            />
+                            {selectedImage && (
+                                <Image
+                                    src={selectedImage}
+                                    alt="Preview"
+                                    width={1200}
+                                    height={800}
+                                    className="max-h-full max-w-full object-contain rounded-lg"
+                                />
+                            )}
                         </div>
-
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setSelectedImage(null)}>Close</AlertDialogCancel>

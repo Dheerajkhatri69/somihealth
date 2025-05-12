@@ -20,6 +20,7 @@ import {
     ImageKitUploadNetworkError,
     upload,
 } from "@imagekit/next";
+import Image from "next/image";
 
 export default function PatientForm() {
     const { data: session } = useSession();
@@ -85,7 +86,6 @@ export default function PatientForm() {
             Reasonclosetickets: '',
         };
     });
-    const [images, setImages] = useState(Array(3).fill(''));
 
     const fileInputRef = useRef(null);
     const uploadingIndexRef = useRef(null);
@@ -96,48 +96,11 @@ export default function PatientForm() {
         return data;
     };
 
-    const handleFileChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
 
-        try {
-            const { signature, expire, token, publicKey } = await authenticator();
-
-            const res = await upload({
-                file,
-                fileName: file.name,
-                signature,
-                expire,
-                token,
-                publicKey,
-                onProgress: (evt) => {
-                    // Optionally handle progress
-                    console.log("Upload progress:", (evt.loaded / evt.total) * 100);
-                },
-                abortSignal: new AbortController().signal,
-            });
-
-            const imageUrl = res.url;
-            handleImageUpload(uploadingIndexRef.current, imageUrl); // update image slot
-
-        } catch (error) {
-            console.error("ImageKit upload error:", error);
-        } finally {
-            e.target.value = null; // Reset input
-        }
-    };
-
-    const triggerFileInput = (index) => {
-        uploadingIndexRef.current = index;
-        fileInputRef.current.click();
-    };
     const handleImageUpload = (index, url) => {
         setImages(prev => prev.map((img, i) => i === index ? url : img));
     };
 
-    const removeImage = (index) => {
-        setImages(prev => prev.map((img, i) => i === index ? '' : img));
-    };
 
 
     const handleInputChange = (e) => {
@@ -193,7 +156,46 @@ export default function PatientForm() {
             console.error('Failed to submit:', error);
         }
     };
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null); // Add this line
+    const [images, setImages] = useState([null, null, null]);
+    const fileInputRefs = useRef([]);
+
+    const triggerFileInput = (index) => {
+        fileInputRefs.current[index].click();
+    };
+
+    const handleFileChange = async (e, index) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            // Get authentication parameters from your API
+            const authData = await authenticator();
+
+            // Use ImageKit's upload method
+            const res = await upload({
+                file,
+                fileName: file.name,
+                publicKey: authData.publicKey,
+                signature: authData.signature,
+                expire: authData.expire,
+                token: authData.token,
+                useUniqueFileName: false // Set to true if you want unique filenames
+            });
+
+            const newImages = [...images];
+            newImages[index] = res.url;
+            setImages(newImages);
+        } catch (error) {
+            console.error("Upload error:", error);
+            alert('Failed to upload image. Please try again.');
+        }
+    };
+    const removeImage = (index) => {
+        const newImages = [...images];
+        newImages[index] = null;
+        setImages(newImages);
+    };
 
     return (
         <div className="mb-4 p-4">
@@ -696,15 +698,24 @@ export default function PatientForm() {
                 {/* Image Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Images</h3>
                 <div className="flex justify-between flex-wrap items-center gap-4">
+                    {/* In your image upload section */}
+
                     {images.map((imageUrl, index) => (
                         <div key={index} className="relative group w-[200px] h-48">
                             {imageUrl ? (
                                 <>
-                                    <img
+                                    <Image
                                         src={imageUrl}
                                         alt={`Preview ${index + 1}`}
+                                        width={200}
+                                        height={192}
                                         className="w-full h-full object-cover rounded-lg"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                        }}
                                     />
+                                    {/* ... buttons ... */}
+
                                     <button
                                         type="button"
                                         onClick={() => setSelectedImage(imageUrl)}
@@ -721,23 +732,32 @@ export default function PatientForm() {
                                     </button>
                                 </>
                             ) : (
-                                <button
-                                    type="button"
-                                    onClick={() => triggerFileInput(index)}
-                                    className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
-                                >
-                                    Upload Image
-                                </button>
+                                <div className="relative w-full h-full">
+                                    <button
+                                        type="button"
+                                        onClick={() => triggerFileInput(index)}
+                                        className="w-full h-full text-sm px-4 py-3 font-bold bg-secondary border border-black text-white rounded-lg focus:outline-none focus:border-purple-400"
+                                    >
+                                        Upload Image
+                                    </button>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        ref={(el) => (fileInputRefs.current[index] = el)}
+                                        onChange={(e) => handleFileChange(e, index)}
+                                        className="hidden"
+                                    />
+                                </div>
                             )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={(el) => (fileInputRefs.current[index] = el)}
+                                onChange={(e) => handleFileChange(e, index)}
+                                style={{ display: "none" }}
+                            />
                         </div>
                     ))}
-                    <input
-                        type="file"
-                        accept="image/*"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        style={{ display: "none" }}
-                    />
                 </div>
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
 
@@ -893,11 +913,16 @@ export default function PatientForm() {
                 <AlertDialogContent className="max-w-[80vw]">
                     <AlertDialogHeader>
                         <div className="flex-1 max-h-[70vh] flex justify-center">
-                            <img src={selectedImage} alt="Preview"
-                                className="max-h-full max-w-full object-contain rounded-lg"
-                            />
+                            {selectedImage && (
+                                <Image
+                                    src={selectedImage}
+                                    alt="Preview"
+                                    width={1200}
+                                    height={800}
+                                    className="max-h-full max-w-full object-contain rounded-lg"
+                                />
+                            )}
                         </div>
-
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setSelectedImage(null)}>Close</AlertDialogCancel>
