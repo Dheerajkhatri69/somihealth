@@ -90,11 +90,11 @@ export default function PatientForm() {
     const fileInputRef = useRef(null);
     const uploadingIndexRef = useRef(null);
 
-    const authenticator = async () => {
-        const res = await fetch("/api/upload-auth");
-        const data = await res.json();
-        return data;
-    };
+    // const authenticator = async () => {
+    //     const res = await fetch("/api/upload-auth");
+    //     const data = await res.json();
+    //     return data;
+    // };
 
 
     const handleImageUpload = (index, url) => {
@@ -163,6 +163,18 @@ export default function PatientForm() {
     const triggerFileInput = (index) => {
         fileInputRefs.current[index].click();
     };
+    const authenticator = async () => {
+        const res = await fetch('/api/imagekit-auth');
+        const auth = await res.json();
+
+        return {
+            publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || 'public_HY7YY/rIWqQyH/VxGRhxOdOfE0g=', // fallback if needed
+            signature: auth.signature,
+            expire: auth.expire,
+            token: auth.token,
+        };
+    };
+
 
     const handleFileChange = async (e, index) => {
         const file = e.target.files[0];
