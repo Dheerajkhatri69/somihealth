@@ -50,12 +50,18 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { EmailDialog } from "@/components/emailDialog";
 import TimeSensitiveCell from "@/components/timer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const [Cloading, setCLoading] = useState(true);
+    const [Tloading, setTLoading] = useState(true);
+    const [ticketFilter, setTicketFilter] = useState('all'); // 'all' or 'assigned'
     const { data: session } = useSession();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
 
     useEffect(() => {
         const fetchPatients = async () => {
@@ -73,26 +79,46 @@ export default function Dashboard() {
                 let activePatients = patientsData.result.filter(patient => patient.closetickets === false);
 
                 // If user is a clinician, filter only their assigned patients
+                // For clinicians, apply additional filtering based on ticketFilter state
                 if (session?.user?.accounttype === 'C') {
-                    // Fetch all assignments
                     const assigningRes = await fetch("/api/assigning");
                     const assigningData = await assigningRes.json();
 
                     if (assigningData.success) {
-                        // Filter assignments for this clinician
                         const clinicianAssignments = assigningData.result.filter(
                             assignment => assignment.cid === session.user.id
                         );
-
-                        // Get list of patient IDs assigned to this clinician
                         const assignedPids = clinicianAssignments.map(item => item.pid);
 
-                        // Filter patients to only those assigned to this clinician
-                        activePatients = activePatients.filter(patient =>
-                            assignedPids.includes(patient.authid)
-                        );
+                        if (ticketFilter === 'assigned') {
+                            activePatients = activePatients.filter(patient =>
+                                assignedPids.includes(patient.authid)
+                            );
+                        }
+                        setCLoading(false);
                     } else {
                         console.error("Error fetching assignments:", assigningData.result.message);
+                    }
+                }
+                // If user is a technician, filter only patients they created
+                else if (session?.user?.accounttype === 'T') {
+                    const creatorRes = await fetch("/api/creatorofp");
+                    const creatorData = await creatorRes.json();
+
+                    if (creatorData.success) {
+                        // Filter creator records for this technician
+                        const technicianCreations = creatorData.result.filter(
+                            record => record.tid === session.user.id
+                        );
+                        // Get list of patient IDs created by this technician
+                        const createdPids = technicianCreations.map(item => item.pid);
+                        // Filter patients to only those created by this technician
+                        activePatients = activePatients.filter(patient =>
+                            createdPids.includes(patient.authid)
+                        );
+                        setTLoading(false);
+                    } else {
+                        console.error("Error fetching creator records:", creatorData.result.message);
                     }
                 }
 
@@ -105,7 +131,7 @@ export default function Dashboard() {
         };
 
         fetchPatients();
-    }, [session]); // Add session to dependency array
+    }, [session, ticketFilter]); // Add session to dependency array
 
     useEffect(() => {
         console.log("dashboard Session user:", session?.user?.accounttype);
@@ -151,7 +177,7 @@ export default function Dashboard() {
     const [semaglutideUnitFilter, setSemaglutideUnitFilter] = useState('all');
     const [tirzepatideDoseOnly, setTirzepatideDoseOnly] = useState('all');
     const [tirzepatideUnitFilter, setTirzepatideUnitFilter] = useState('all');
-
+    const [createDateFilter, setCreateDateFilter] = useState("");
     const [selectedImageInfo, setSelectedImageInfo] = useState(null);
 
     const [selectedStatus, setSelectedStatus] = useState('all');
@@ -187,9 +213,9 @@ export default function Dashboard() {
             (tirzepatideUnitFilter === 'all' || patient.tirzepatideUnit === tirzepatideUnitFilter)
         );
 
-
+        const createDateMatch = createDateFilter ? patient.createTimeDate.split('T')[0] === createDateFilter : true;
         return emailMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
-            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch;
+            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch;
     });
 
     const statusCounts = getStatusCounts(filteredPatients);
@@ -270,12 +296,96 @@ export default function Dashboard() {
             content: 'Dear Patient,\n\nYour prescription refill has been approved...'
         }
     ];
+    const totalPages = Math.ceil(filteredPatients.length / rowsPerPage);
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRows = filteredPatients.slice(indexOfFirstRow, indexOfLastRow);
+    if (session?.user?.accounttype === 'C' && Cloading) {
+        return (
+            <div className="overflow-x-auto p-4 space-y-4">
+                <div className="flex flex-wrap gap-2 mb-4">
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[180px]" />
+                </div>
+                <div className="rounded-md border bg-background/50">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                {[...Array(10)].map((_, i) => (
+                                    <TableHead key={i}>
+                                        <Skeleton className="h-6 w-full" />
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {[...Array(5)].map((_, i) => (
+                                <TableRow key={i}>
+                                    {[...Array(10)].map((_, j) => (
+                                        <TableCell key={j}>
+                                            <Skeleton className="h-4 w-full" />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        );
+    } else if (session?.user?.accounttype === 'T' && Tloading) {
+        return (
+            <div className="overflow-x-auto p-4 space-y-4">
+                <div className="flex flex-wrap gap-2 mb-4">
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[180px]" />
+                </div>
+                <div className="rounded-md border bg-background/50">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                {[...Array(10)].map((_, i) => (
+                                    <TableHead key={i}>
+                                        <Skeleton className="h-6 w-full" />
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {[...Array(5)].map((_, i) => (
+                                <TableRow key={i}>
+                                    {[...Array(10)].map((_, j) => (
+                                        <TableCell key={j}>
+                                            <Skeleton className="h-4 w-full" />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        );
+    }
     return (
         <div className="overflow-x-auto p-4">
             <div className="flex flex-wrap gap-2 mb-4">
+                {session?.user?.accounttype === 'C' && (
+                    <Select value={ticketFilter} onValueChange={setTicketFilter}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Filter Tickets" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="assigned">My Assigned Tickets</SelectItem>
+                            <SelectItem value="all">All Tickets</SelectItem>
+                        </SelectContent>
+                    </Select>
+                )}
                 <Input
                     placeholder="Filter Patient Id..."
-                    className="max-w-sm"
+                    className="max-w-xs"
                     value={pIdFilter}
                     onChange={(e) => setPIdFilter(e.target.value)}
                 />
@@ -296,12 +406,29 @@ export default function Dashboard() {
                         <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                 </Select>
-
+                <div className="flex flex-nowrap items-center gap-2 rounded-md justify-center">
+                    {/* <label className="text-sm font-medium px-2 whitespace-nowrap">Created Date</label> */}
+                    <input
+                        type="date"
+                        value={createDateFilter}
+                        onChange={(e) => setCreateDateFilter(e.target.value)}
+                        className="w-full border rounded bg-secondary text-white border-none  h-9"
+                    />
+                    <Button className="bg-secondary hover:bg-secondary-foreground h-full"
+                        type="button"
+                        onClick={() => setCreateDateFilter("")}
+                    >
+                        Clear
+                    </Button>
+                </div>
                 <DropdownMenu>
-                    <DropdownMenuTrigger className='text-white bg-secondary px-2 rounded-sm hover:bg-secondary-foreground duration-200 flex justify-center items-center gap-1'>
-                        Filters
-                        <ArrowDownNarrowWide />
+                    <DropdownMenuTrigger
+                        className="flex items-center justify-between gap-2 px-4 py-2 w-40 h-9 text-white bg-secondary border border-border rounded-md hover:bg-secondary-foreground transition"
+                    >
+                        <span>Filters</span>
+                        <ArrowDownNarrowWide className="w-4 h-4" />
                     </DropdownMenuTrigger>
+
                     <DropdownMenuContent className="w-64 p-2 space-y-2 h-[300px]">
                         <DropdownMenuLabel>All Filters</DropdownMenuLabel>
                         <DropdownMenuSeparator />
@@ -331,6 +458,7 @@ export default function Dashboard() {
                                 </SelectContent>
                             </Select>
                         </div>
+
                         {/* City Filter */}
                         <div className="space-y-1">
                             <label className="text-sm font-medium px-2">City</label>
@@ -405,11 +533,11 @@ export default function Dashboard() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="2.5">2.5mg</SelectItem>
-                                        <SelectItem value="4.5">4.5mg</SelectItem>
-                                        <SelectItem value="6.5">6.5mg</SelectItem>
-                                        <SelectItem value="9.0">9.0mg</SelectItem>
-                                        <SelectItem value="11.5">11.5mg</SelectItem>
+                                        <SelectItem value="2.25">2.25mg</SelectItem>
+                                        <SelectItem value="4.50">4.50mg</SelectItem>
+                                        <SelectItem value="6.75">6.75mg</SelectItem>
+                                        <SelectItem value="9.00">9.00mg</SelectItem>
+                                        <SelectItem value="11.25">11.25mg</SelectItem>
                                         <SelectItem value="13.5">13.5mg</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -485,7 +613,30 @@ export default function Dashboard() {
 
             <div className="rounded-md border bg-background/50">
                 {loading ? (
-                    <p>Loading patients...</p>
+                    <div className="rounded-md border bg-background/50">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    {[...Array(10)].map((_, i) => (
+                                        <TableHead key={i}>
+                                            <Skeleton className="h-8 w-full" />
+                                        </TableHead>
+                                    ))}
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {[...Array(5)].map((_, i) => (
+                                    <TableRow key={i}>
+                                        {[...Array(10)].map((_, j) => (
+                                            <TableCell key={j}>
+                                                <Skeleton className="h-6 w-full" />
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 ) : (
                     <Table className="min-w-full">
                         <TableHeader>
@@ -515,45 +666,46 @@ export default function Dashboard() {
                                 </TableHead>
 
                                 {/* Updated table headers */}
+                                <TableHead>Date</TableHead>
                                 <TableHead>DOB</TableHead>
                                 <TableHead>Sex</TableHead>
-                                <TableHead>Height</TableHead>
-                                <TableHead>Weight (lbs)</TableHead>
+                                {/* <TableHead>Height</TableHead> */}
+                                {/* <TableHead>Weight (lbs)</TableHead> */}
                                 <TableHead>BMI</TableHead>
                                 <TableHead>Email</TableHead>
-                                <TableHead>Phone</TableHead>
+                                <TableHead >Phone</TableHead>
 
                                 {/* Address */}
-                                <TableHead>Address</TableHead>
+                                {/* <TableHead>Address</TableHead>
                                 <TableHead>City</TableHead>
                                 <TableHead>State</TableHead>
-                                <TableHead>Zip</TableHead>
+                                <TableHead>Zip</TableHead> */}
 
                                 {/* Medical Information */}
-                                <TableHead>Blood Pressure</TableHead>
-                                <TableHead>Heart Rate</TableHead>
-                                <TableHead>GLP-1 Preference</TableHead>
-                                <TableHead>Taking Medication</TableHead>
-                                <TableHead>Medicine Allergy</TableHead>
+                                {/* <TableHead>Blood Pressure</TableHead>
+                                <TableHead>Heart Rate</TableHead> */}
+                                <TableHead className="whitespace-nowrap">GLP-1 Preference</TableHead>
+                                {/* <TableHead>Taking Medication</TableHead> */}
+                                {/* <TableHead>Medicine Allergy</TableHead>
                                 <TableHead>Allergy List</TableHead>
                                 <TableHead>Major Surgeries</TableHead>
                                 <TableHead>Bariatric Surgery</TableHead>
                                 <TableHead>Thyroid Cancer History</TableHead>
                                 <TableHead>Surgery List</TableHead>
-                                <TableHead>Disqualifiers</TableHead>
+                                <TableHead>Disqualifiers</TableHead> */}
                                 <TableHead>Diagnosis</TableHead>
 
                                 {/* Weight Management */}
-                                <TableHead>Starting Weight</TableHead>
+                                {/* <TableHead>Starting Weight</TableHead>
                                 <TableHead>Current Weight</TableHead>
                                 <TableHead>Goal Weight</TableHead>
                                 <TableHead>12m Weight Change</TableHead>
                                 <TableHead>Weight Loss Programs</TableHead>
-                                <TableHead>Weight Loss Meds (12m)</TableHead>
+                                <TableHead>Weight Loss Meds (12m)</TableHead> */}
 
                                 {/* GLP-1 */}
-                                <TableHead>GLP-1 Taken</TableHead>
-                                <TableHead>Date of last Injection</TableHead>
+                                {/* <TableHead>GLP-1 Taken</TableHead>
+                                <TableHead>Date of last Injection</TableHead> */}
 
                                 <TableHead>Medicine</TableHead>
                                 <TableHead className="w-[40px]">Images</TableHead>
@@ -562,24 +714,26 @@ export default function Dashboard() {
 
                                 {/* Tirzepatide */}
                                 <TableHead>Tirzepatide Dose</TableHead>
-                                <TableHead>Plan Purchased</TableHead>
+                                {/* <TableHead>Plan Purchased</TableHead>
                                 <TableHead>Vial</TableHead>
-                                <TableHead>Dosing Schedule</TableHead>
+                                <TableHead>Dosing Schedule</TableHead> */}
 
                                 {/* Provider Info */}
-                                <TableHead>Provider Comments</TableHead>
+                                {/* <TableHead>Provider Comments</TableHead> */}
 
                                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                                    <TableHead>Status</TableHead>
+                                    <>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Out Come</TableHead>
+                                    </>
                                 )}
-                                <TableHead>Out Come</TableHead>
-                                <TableHead>Provider Note</TableHead>
+                                {/* <TableHead>Provider Note</TableHead> */}
 
                                 <TableHead className="sticky right-0 bg-secondary text-white">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredPatients.map((patient) => (
+                            {currentRows.map((patient) => (
                                 <TableRow key={patient.authid} >
                                     {/* Sticky columns */}
                                     <TableCell className="sticky w-[55px] left-0 z-10 bg-white">
@@ -597,7 +751,7 @@ export default function Dashboard() {
                                             className="h-4 w-4"
                                         />
                                     </TableCell>
-                                    <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete} />
+                                    <TimeSensitiveCell patient={patient} />
                                     {/* <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
                                         <div className="relative">
                                             {patient.authid}
@@ -621,41 +775,42 @@ export default function Dashboard() {
                                     </TableCell>
 
                                     {/* Patient Data */}
-                                    <TableCell>{patient.dob}</TableCell>
+                                    <TableCell className="whitespace-nowrap">{patient.createTimeDate.split('T')[0]}</TableCell>
+                                    <TableCell className="whitespace-nowrap">{patient.dob}</TableCell>
                                     <TableCell>{patient.sex}</TableCell>
-                                    <TableCell>{patient.height}</TableCell>
-                                    <TableCell>{patient.weight}</TableCell>
+                                    {/* <TableCell>{patient.height}</TableCell> */}
+                                    {/* <TableCell>{patient.weight}</TableCell> */}
                                     <TableCell>{patient.bmi}</TableCell>
                                     <TableCell>{patient.email}</TableCell>
-                                    <TableCell>{patient.phone}</TableCell>
+                                    <TableCell className="whitespace-nowrap">{patient.phone}</TableCell>
 
-                                    <TableCell>{patient.address1}</TableCell>
+                                    {/* <TableCell>{patient.address1}</TableCell>
                                     <TableCell>{patient.city}</TableCell>
                                     <TableCell>{patient.state}</TableCell>
-                                    <TableCell>{patient.zip}</TableCell>
+                                    <TableCell>{patient.zip}</TableCell> */}
 
-                                    <TableCell>{patient.bloodPressure}</TableCell>
-                                    <TableCell>{patient.heartRate}</TableCell>
+                                    {/* <TableCell>{patient.bloodPressure}</TableCell>
+                                    <TableCell>{patient.heartRate}</TableCell> */}
                                     <TableCell>{patient.glp1}</TableCell>
-                                    <TableCell>{patient.takingMedication}</TableCell>
-                                    <TableCell>{patient.medicineAllergy}</TableCell>
+                                    {/* <TableCell>{patient.takingMedication}</TableCell> */}
+                                    {/* <TableCell>{patient.medicineAllergy}</TableCell>
                                     <TableCell>{patient.allergyList}</TableCell>
                                     <TableCell>{patient.majorSurgeries}</TableCell>
                                     <TableCell>{patient.bariatricSurgery}</TableCell>
                                     <TableCell>{patient.thyroidCancerHistory}</TableCell>
                                     <TableCell>{patient.surgeryList}</TableCell>
-                                    <TableCell>{patient.disqualifiers}</TableCell>
+                                    <TableCell>{patient.disqualifiers}</TableCell> */}
                                     <TableCell>{patient.diagnosis}</TableCell>
 
-                                    <TableCell>{patient.startingWeight}</TableCell>
+                                    {/* <TableCell>{patient.startingWeight}</TableCell>
                                     <TableCell>{patient.currentWeight}</TableCell>
                                     <TableCell>{patient.goalWeight}</TableCell>
                                     <TableCell>{patient.weightChange12m}</TableCell>
                                     <TableCell>{patient.weightLossPrograms}</TableCell>
-                                    <TableCell>{patient.weightLossMeds12m}</TableCell>
+                                    <TableCell>{patient.weightLossMeds12m}</TableCell> */}
 
-                                    <TableCell>{patient.glpTaken}</TableCell>
-                                    <TableCell>{patient.glpRecentInjection}</TableCell>
+                                    {/* <TableCell>{patient.glpTaken}</TableCell>
+                                    <TableCell>{patient.glpRecentInjection}</TableCell> */}
 
                                     <TableCell>{patient.medicine}</TableCell>
                                     <TableCell className="w-[200px] max-h-20">
@@ -675,37 +830,50 @@ export default function Dashboard() {
                                         </div>
                                     </TableCell>
 
-                                    <TableCell>
+                                    <TableCell className="whitespace-nowrap">
                                         {patient.semaglutideDose}{" unit: "}{patient.semaglutideUnit}
                                     </TableCell>
 
-                                    <TableCell>
+                                    <TableCell className="whitespace-nowrap">
                                         {patient.tirzepatideDose}{" unit: "}{patient.tirzepatideUnit}
                                     </TableCell>
-                                    <TableCell>{patient.tirzepetidePlanPurchased}</TableCell>
+                                    {/* <TableCell>{patient.tirzepetidePlanPurchased}</TableCell>
                                     <TableCell>{patient.tirzepetideVial}</TableCell>
                                     <TableCell>{patient.tirzepetideDosingSchedule}</TableCell>
 
-                                    <TableCell>{patient.providerComments}</TableCell>
+                                    <TableCell>{patient.providerComments}</TableCell> */}
 
                                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                                        <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
+                                        <>
+                                            <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
+
+                                            <TableCell>
+                                                <Badge
+                                                    className={
+                                                        [
+                                                            "px-3 py-1 text-sm rounded-md",
+                                                            patient.approvalStatus === "approved" ||
+                                                                patient.approvalStatus === "pending" ||
+                                                                patient.approvalStatus === "request a call"
+                                                                ? "bg-green-100 text-green-700 hover:bg-green-100"
+                                                                : "bg-red-100 text-red-700 hover:bg-red-100"
+                                                        ].join(" ")
+                                                    }
+                                                >
+                                                    {["approved", "denied", "disqualified", "closed"].includes(patient.approvalStatus)
+                                                        ? "Closed"
+                                                        : "Open"}
+                                                </Badge>
+                                            </TableCell>
+
+                                        </>
                                     )}
-                                    <TableCell className={`${patient.approvalStatus === "approved" ||
-                                        patient.approvalStatus === "denied"
-                                        ? "text-red-500"
-                                        : "text-green-500"
-                                        }`}>
-                                        {patient.approvalStatus === "approved" ||
-                                            patient.approvalStatus === "denied"
-                                            ? "Closed"
-                                            : "Open"}
-                                    </TableCell>
-                                    <TableCell>{patient.providerNote}</TableCell>
+
+                                    {/* <TableCell>{patient.providerNote}</TableCell> */}
                                     <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
                                         <Link href={`/dashboard/${patient.authid}`}>
                                             <Button variant="outline" size="sm">
-                                                Update
+                                                {session?.user?.accounttype === 'C' ? 'Submit' : 'Update'}
                                             </Button>
                                         </Link>
                                         {session?.user?.accounttype === 'A' && (
@@ -752,12 +920,38 @@ export default function Dashboard() {
                     </Table>
                 )}
             </div>
+            <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="flex-1 text-sm text-muted-foreground">
+                    Showing {indexOfFirstRow + 1}-{Math.min(indexOfLastRow, filteredPatients.length)} of{" "}
+                    {filteredPatients.length} patients
+                </div>
+                <div className="space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages || totalPages === 0}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </div>
 
             {/* Add Patient Button */}
             <div className="flex justify-start items-center gap-4 mt-4">
-                <Link href="/dashboard/addrecord">
-                    <Button ><Plus /> Add Patient</Button>
-                </Link>
+                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                    <Link href="/dashboard/addrecord">
+                        <Button ><Plus /> Add Patient</Button>
+                    </Link>
+                )}
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                     <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} selectedPatientData={selectedPatientData} />
                 )}

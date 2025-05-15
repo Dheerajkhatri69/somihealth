@@ -12,7 +12,7 @@ export async function GET(request, { params }) {
         }
 
         const patient = await Patient.findOne({ authid: params.authid });
-        
+
         if (!patient) {
             return NextResponse.json(
                 { success: false, error: "Patient not found" },
@@ -47,6 +47,8 @@ export async function GET(request, { params }) {
                 tirzepatideUnit: patient.tirzepatideUnit,
                 createTimeDate: patient.createTimeDate,
                 images: patient.images,
+                file1: patient.file1,
+                file2: patient.file2,
             }
         });
 

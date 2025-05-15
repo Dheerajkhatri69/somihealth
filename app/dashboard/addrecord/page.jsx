@@ -21,13 +21,19 @@ import {
     upload,
 } from "@imagekit/next";
 import Image from "next/image";
-
+import UploadFile from "@/components/FileUpload";
+// import UploadFile from './UploadFile'; // Adjust the path as needed
 export default function PatientForm() {
     const { data: session } = useSession();
 
     useEffect(() => {
-        // console.log("Session user:", session?.user);
+        // console.log("Session user:", session?.user?.fullname);
     }, [session]);
+
+    const [fileUrls, setFileUrls] = useState({
+        file1: '',
+        file2: ''
+    });
     const [formData, setFormData] = useState(() => {
         const randomNum = Math.floor(Math.random() * 100000); // Generates number between 0-99999
         return {
@@ -51,6 +57,7 @@ export default function PatientForm() {
             heartRate: '',
             takingMedication: '',
             medicineAllergy: '',
+            listAllMedication: '',
             allergyList: '',
             majorSurgeries: '',
             bariatricSurgery: '',
@@ -84,6 +91,8 @@ export default function PatientForm() {
             createTimeDate: '',
             closetickets: false,
             Reasonclosetickets: '',
+            file1: '',
+            file2: '',
         };
     });
 
@@ -122,11 +131,14 @@ export default function PatientForm() {
         const submissionData = {
             ...formData,
             createTimeDate: new Date().toISOString(),
-            images: filteredImages
+            images: filteredImages,
+            file1: fileUrls.file1,
+            file2: fileUrls.file2
         };
 
         try {
-            const response = await fetch('/api/patients', {
+            // First create the patient
+            const patientResponse = await fetch('/api/patients', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -134,9 +146,33 @@ export default function PatientForm() {
                 body: JSON.stringify(submissionData),
             });
 
-            const data = await response.json();
+            const patientData = await patientResponse.json();
 
-            if (data.success) {
+            if (patientData.success) {
+                // If user is a technician, create the creator-patient relationship
+                if (session?.user?.accounttype === 'T') {
+                    const creatorData = {
+                        pid: submissionData.authid, // Patient ID
+                        tid: session.user.id,       // Technician ID
+                        tname: session.user.fullname // Technician Name
+                    };
+
+                    const creatorResponse = await fetch('/api/creatorofp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(creatorData),
+                    });
+
+                    const creatorResult = await creatorResponse.json();
+
+                    if (!creatorResult.success) {
+                        console.error('Failed to create creator relationship:', creatorResult.message);
+                        // You might want to handle this case differently
+                    }
+                }
+
                 setMessageHead("Success");
                 setMessage("Patient created successfully!");
                 setIsSuccess(true);
@@ -144,7 +180,7 @@ export default function PatientForm() {
                 // Optional: Reset form here if needed
             } else {
                 setMessageHead("Error");
-                setMessage(data.result.message || "Failed to create patient");
+                setMessage(patientData.result.message || "Failed to create patient");
                 setIsSuccess(false);
                 setIsDialogOpen(true);
             }
@@ -238,7 +274,7 @@ export default function PatientForm() {
                 </div>
 
                 <h3 className="text-sm font-semibold">Basic information</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
                         <Label htmlFor="dob">DOB</Label>
                         <Input
@@ -343,7 +379,7 @@ export default function PatientForm() {
 
                 {/* Address Section */}
                 <h3 className="text-sm font-semibold">Address</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -370,7 +406,7 @@ export default function PatientForm() {
 
                 {/* Vitals Section */}
                 <h3 className="text-sm font-semibold">Vitals</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
                     <div className="space-y-2">
                         <Label htmlFor="bloodPressure">Blood Pressure</Label>
                         <Input
@@ -394,7 +430,7 @@ export default function PatientForm() {
                 </div>
 
                 {/* Medical History Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7] ">
                     {['takingMedication', 'medicineAllergy', 'majorSurgeries', 'bariatricSurgery', 'thyroidCancerHistory'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -419,6 +455,16 @@ export default function PatientForm() {
                         </div>
                     ))}
 
+                    <div className="space-y-2 col-span-full">
+                        <Label htmlFor="listAllMedication">List All Medication</Label>
+                        <Textarea
+                            id="listAllMedication"
+                            name="listAllMedication"
+                            value={formData.listAllMedication}
+                            onChange={handleInputChange}
+                            placeholder="List known medication..."
+                        />
+                    </div>
                     <div className="space-y-2 col-span-full">
                         <Label htmlFor="allergyList">Allergy List</Label>
                         <Textarea
@@ -454,7 +500,7 @@ export default function PatientForm() {
                 </div>
 
                 {/* Diagnosis Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2] ">
                     <div className="space-y-2 col-span-full">
                         <Label htmlFor="diagnosis">Diagnosis</Label>
                         <Textarea
@@ -469,7 +515,7 @@ export default function PatientForm() {
 
                 {/* Weight Progress Section */}
                 <h3 className="text-sm font-semibold">Weight Progress</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
                     {['startingWeight', 'currentWeight', 'goalWeight', 'weightChange12m'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -505,7 +551,7 @@ export default function PatientForm() {
                 </div>
 
                 {/* Weight Loss Medication Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fff7ed]">
                     <div className="space-y-2 col-span-full">
                         <Label htmlFor="weightLossMeds12m">Weight Loss Medication (Last 12 Months)</Label>
                         <Textarea
@@ -520,22 +566,18 @@ export default function PatientForm() {
 
                 {/* GLP-1 Section */}
                 <h3 className="text-sm font-semibold">GLP-1</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
                     <div className="space-y-2">
                         <Label htmlFor="glpTaken">GLP-1 Taken</Label>
-                        <Select
+                        <Input
+                            id="glpTaken"
+                            type="text"
                             value={formData.glpTaken}
-                            onValueChange={(value) => handleSelectChange('glpTaken', value)}
-                        >
-                            <SelectTrigger id="glpTaken" className="w-full">
-                                <SelectValue placeholder="Select option" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="yes">Yes</SelectItem>
-                                <SelectItem value="no">No</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            onChange={(e) => handleSelectChange('glpTaken', e.target.value)}
+                            placeholder="Enter value"
+                        />
                     </div>
+
 
                     <div className="space-y-2">
                         <Label htmlFor="glpRecentInjection">Date of last Injection</Label>
@@ -549,121 +591,88 @@ export default function PatientForm() {
                             className="w-full"
                         />
                     </div>
-                    {/* <div className="space-y-2">
-                        <Label htmlFor="glpRecentInjection">Last Injection &lt; 2 Weeks Ago</Label>
-                        <Select
-                            value={formData.glpRecentInjection}
-                            onValueChange={(value) => handleSelectChange('glpRecentInjection', value)}
-                        >
-                            <SelectTrigger id="glpRecentInjection" className="w-full">
-                                <SelectValue placeholder="Select option" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="yes">Yes</SelectItem>
-                                <SelectItem value="no">No</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div> */}
                 </div>
 
                 {/* Semaglutide Section */}
                 <h3 className="text-sm font-semibold">Semaglutide</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#ffe4e6]">
                     {['semaglutideLastDose', 'semaglutideRequestedDose'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
                                 {field === 'semaglutideLastDose' ? 'Last Dose' : 'Requested Dose'}
                             </Label>
-                            <Select
+                            <Input
+                                id={field}
+                                type="text"
                                 value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
-                            >
-                                <SelectTrigger id={field} className="w-full">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="dose1">Dose 1</SelectItem>
-                                    <SelectItem value="dose2">Dose 2</SelectItem>
-                                    <SelectItem value="dose3">Dose 3</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                onChange={(e) => handleSelectChange(field, e.target.value)}
+                                placeholder="Enter dose"
+                            />
                         </div>
                     ))}
                 </div>
 
+
                 {/* Tirzepatide Section */}
                 <h3 className="text-sm font-semibold">Tirzepetide</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                     {['tirzepetideLastDose', 'tirzepetideRequestedDose'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
                                 {field === 'tirzepetideLastDose' ? 'Last Dose' : 'Requested Dose'}
                             </Label>
-                            <Select
+                            <Input
+                                id={field}
+                                type="text"
                                 value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
-                            >
-                                <SelectTrigger id={field} className="w-full">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="dose1">Dose 1</SelectItem>
-                                    <SelectItem value="dose2">Dose 2</SelectItem>
-                                    <SelectItem value="dose3">Dose 3</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                onChange={(e) => handleSelectChange(field, e.target.value)}
+                                placeholder="Enter dose"
+                            />
                         </div>
                     ))}
                 </div>
 
+
                 {/* Tirzepatide Details Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                     {['tirzepetidePlanPurchased', 'tirzepetideVial', 'tirzepetideDosingSchedule'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
                                 {field === 'tirzepetidePlanPurchased' ? 'Plan Purchased' :
                                     field === 'tirzepetideVial' ? 'Vial' : 'Dosing Schedule'}
                             </Label>
-                            <Select
-                                value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
-                            >
-                                <SelectTrigger id={field} className="w-full">
-                                    <SelectValue placeholder={
-                                        field === 'tirzepetideDosingSchedule' ?
-                                            'Select dosing schedule' : 'Select option'
-                                    } />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {field === 'tirzepetideDosingSchedule' ? (
-                                        <>
-                                            <SelectItem value="weekly">Weekly</SelectItem>
-                                            <SelectItem value="biweekly">Biweekly</SelectItem>
-                                            <SelectItem value="monthly">Monthly</SelectItem>
-                                        </>
-                                    ) : field === 'tirzepetideVial' ? (
-                                        <>
-                                            <SelectItem value="vial1">Vial 1</SelectItem>
-                                            <SelectItem value="vial2">Vial 2</SelectItem>
-                                            <SelectItem value="vial3">Vial 3</SelectItem>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <SelectItem value="plan1">Plan 1</SelectItem>
-                                            <SelectItem value="plan2">Plan 2</SelectItem>
-                                            <SelectItem value="plan3">Plan 3</SelectItem>
-                                        </>
-                                    )}
-                                </SelectContent>
-                            </Select>
+
+                            {(field === 'tirzepetidePlanPurchased' || field === 'tirzepetideVial') ? (
+                                <Input
+                                    id={field}
+                                    type="text"
+                                    value={formData[field]}
+                                    onChange={(e) => handleSelectChange(field, e.target.value)}
+                                    placeholder={`Enter ${field === 'tirzepetidePlanPurchased' ? 'plan' : 'vial'}`}
+                                />
+                            ) : (
+                                <Select
+                                    value={formData[field]}
+                                    onValueChange={(value) => handleSelectChange(field, value)}
+                                >
+                                    <SelectTrigger id={field} className="w-full">
+                                        <SelectValue placeholder="Select dosing schedule" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="weekly">Weekly</SelectItem>
+                                        <SelectItem value="biweekly">Biweekly</SelectItem>
+                                        <SelectItem value="monthly">Monthly</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            )}
                         </div>
                     ))}
                 </div>
 
                 {/* Comments Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
-                        <Label htmlFor="providerComments">Enter your questions or comments</Label>
+                        <Label htmlFor="providerComments">Enter your questions and comments</Label>
                         <textarea
                             id="providerComments"
                             name="providerComments"
@@ -758,7 +767,26 @@ export default function PatientForm() {
                         </div>
                     ))}
                 </div>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+
+                {/* File Upload Section */}
+                <h3 className="text-sm font-semibold">Upload Documents</h3>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                    <div className="space-y-2">
+                        <Label>Document 1</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => setFileUrls(prev => ({ ...prev, file1: url }))}
+                            onDelete={() => setFileUrls(prev => ({ ...prev, file1: '' }))}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Document 2</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => setFileUrls(prev => ({ ...prev, file2: url }))}
+                            onDelete={() => setFileUrls(prev => ({ ...prev, file2: '' }))}
+                        />
+                    </div>
+                </div>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6fffa]">
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">
@@ -833,11 +861,11 @@ export default function PatientForm() {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.5">2.5mg</SelectItem>
-                                    <SelectItem value="4.5">4.5mg</SelectItem>
-                                    <SelectItem value="6.5">6.5mg</SelectItem>
-                                    <SelectItem value="9.0">9.0mg</SelectItem>
-                                    <SelectItem value="11.5">11.5mg</SelectItem>
+                                    <SelectItem value="2.25">2.25mg</SelectItem>
+                                    <SelectItem value="4.50">4.50mg</SelectItem>
+                                    <SelectItem value="6.75">6.75mg</SelectItem>
+                                    <SelectItem value="9.00">9.00mg</SelectItem>
+                                    <SelectItem value="11.25">11.25mg</SelectItem>
                                     <SelectItem value="13.5">13.5mg</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -863,7 +891,7 @@ export default function PatientForm() {
                 </div>
 
                 {/* Provider Note Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
                         <Label htmlFor="providerNote">Provider Note</Label>
                         <textarea

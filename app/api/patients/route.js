@@ -61,6 +61,7 @@ export async function POST(request) {
             heartRate: body.heartRate,
             takingMedication: body.takingMedication,
             medicineAllergy: body.medicineAllergy,
+            listAllMedication: body.listAllMedication,
             allergyList: body.allergyList,
             majorSurgeries: body.majorSurgeries,
             bariatricSurgery: body.bariatricSurgery,
@@ -94,16 +95,18 @@ export async function POST(request) {
             createTimeDate: new Date().toISOString(),
             closetickets: body.closetickets || false,
             Reasonclosetickets: body.Reasonclosetickets,
-            images: body.images || []
+            images: body.images || [],
+            file1: body.file1,
+            file2: body.file2,
         });
 
         result = await newPatient.save();
     } catch (error) {
-        result = { 
-            result: "error", 
-            message: error.message.includes("duplicate key") 
-                ? "Patient with this authid already exists" 
-                : error.message 
+        result = {
+            result: "error",
+            message: error.message.includes("duplicate key")
+                ? "Patient with this authid already exists"
+                : error.message
         };
         success = false;
     }
@@ -125,7 +128,7 @@ export async function PUT(request) {
         if (!body.authid) {
             throw new Error("authid is required for update");
         }
-        
+
         const updatedPatient = await Patient.findOneAndUpdate(
             { authid: body.authid },
             {

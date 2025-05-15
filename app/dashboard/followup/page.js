@@ -53,17 +53,25 @@ import TimeSensitiveCell from "@/components/timer";
 import { useRouter } from "next/navigation";
 import { FollowupClinicianDropdown } from "@/components/followupClinicianDropdown";
 import FollowupShowAssig from "@/components/followupshowassign";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FollowUp() {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [Cloading, setCLoading] = useState(true);
+    const [Tloading, setTLoading] = useState(true);
     const router = useRouter();
     const { data: session } = useSession();
+    const [viewMode, setViewMode] = useState('all'); // 'all' or 'assigned'
+
+    // Add pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
 
     useEffect(() => {
         const fetchPatients = async () => {
             try {
-                // Fetch all patients first
+                // Fetch all followup patients first
                 const patientsRes = await fetch("/api/followup");
                 const patientsData = await patientsRes.json();
 
@@ -75,28 +83,47 @@ export default function FollowUp() {
                 // Filter active patients (closetickets === false)
                 let activePatients = patientsData.result.filter(patient => patient.closetickets === false);
 
-                // If user is a clinician, filter only their assigned patients
+                // If user is a clinician, filter based on view mode
                 if (session?.user?.accounttype === 'C') {
-                    // Fetch all assignments
-                    const assigningRes = await fetch("/api/followupassig");
-                    const assigningData = await assigningRes.json();
+                    if (viewMode === 'assigned') {
+                        const assigningRes = await fetch("/api/followupassig");
+                        const assigningData = await assigningRes.json();
 
-                    if (assigningData.success) {
-                        // Filter assignments for this clinician
-                        const clinicianAssignments = assigningData.result.filter(
-                            assignment => assignment.cid === session.user.id
+                        if (assigningData.success) {
+                            const clinicianAssignments = assigningData.result.filter(
+                                assignment => assignment.cid === session.user.id
+                            );
+                            const assignedPids = clinicianAssignments.map(item => item.pid);
+                            activePatients = activePatients.filter(patient =>
+                                assignedPids.includes(patient.authid)
+                            );
+                        } else {
+                            console.error("Error fetching assignments:", assigningData.result.message);
+                        }
+                    }
+                    setCLoading(false);
+                }
+                // If user is a technician, filter only patients they created
+                else if (session?.user?.accounttype === 'T') {
+                    const creatorRes = await fetch("/api/followupcreatorofp");
+                    const creatorData = await creatorRes.json();
+
+                    if (creatorData.success) {
+                        // Filter creator records for this technician
+                        const technicianCreations = creatorData.result.filter(
+                            record => record.tid === session.user.id
                         );
-
-                        // Get list of patient IDs assigned to this clinician
-                        const assignedPids = clinicianAssignments.map(item => item.pid);
-
-                        // Filter patients to only those assigned to this clinician
+                        // Get list of patient IDs created by this technician
+                        const createdPids = technicianCreations.map(item => item.pid);
+                        // Filter patients to only those created by this technician
                         activePatients = activePatients.filter(patient =>
-                            assignedPids.includes(patient.authid)
+                            createdPids.includes(patient.authid)
                         );
                     } else {
-                        console.error("Error fetching assignments:", assigningData.result.message);
+                        console.error("Error fetching creator records:", creatorData.result.message);
                     }
+
+                    setTLoading(false);
                 }
 
                 setPatients(activePatients);
@@ -108,7 +135,7 @@ export default function FollowUp() {
         };
 
         fetchPatients();
-    }, [session]); // Add session to dependency array
+    }, [session, viewMode]); // Add session to dependency array
 
     useEffect(() => {
         // console.log("dashboard Session user:", session?.user?.accounttype);
@@ -123,10 +150,13 @@ export default function FollowUp() {
     const checkboxRef = useRef(null);
 
 
+    const [selectedPatientData, setSelectedPatientData] = useState(null);
+
     useEffect(() => {
         if (selectedPatients.length > 0) {
             const selectedPatient = patients.find(p => p.authid === selectedPatients[0]);
             setSelectedEmail(selectedPatient?.email || '');
+            setSelectedPatientData(selectedPatient); // store full patient info
         } else {
             setSelectedEmail('');
         }
@@ -248,27 +278,94 @@ export default function FollowUp() {
             });
         }
     };
-    const [selectedMessage, setSelectedMessage] = useState('');
-    const [selectedTemplate, setSelectedTemplate] = useState('');
 
-    // Add this array of predefined messages
-    const preDefinedMessages = [
-        {
-            title: 'Appointment Reminder',
-            content: 'Dear Patient,\n\nThis is a reminder about your upcoming appointment on...'
-        },
-        {
-            title: 'Test Results',
-            content: 'Dear Patient,\n\nYour recent test results are now available...'
-        },
-        {
-            title: 'Prescription Refill',
-            content: 'Dear Patient,\n\nYour prescription refill has been approved...'
-        }
-    ];
+    const totalPages = Math.ceil(filteredPatients.length / rowsPerPage);
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRows = filteredPatients.slice(indexOfFirstRow, indexOfLastRow);
+    if (session?.user?.accounttype === 'C' && Cloading) {
+        return (
+            <div className="overflow-x-auto p-4 space-y-4">
+                <div className="flex flex-wrap gap-2 mb-4">
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[180px]" />
+                </div>
+                <div className="rounded-md border bg-background/50">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                {[...Array(10)].map((_, i) => (
+                                    <TableHead key={i}>
+                                        <Skeleton className="h-6 w-full" />
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {[...Array(5)].map((_, i) => (
+                                <TableRow key={i}>
+                                    {[...Array(10)].map((_, j) => (
+                                        <TableCell key={j}>
+                                            <Skeleton className="h-4 w-full" />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        )
+    } else if (session?.user?.accounttype === 'T' && Tloading) {
+        return (
+            <div className="overflow-x-auto p-4 space-y-4">
+                <div className="flex flex-wrap gap-2 mb-4">
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[200px]" />
+                    <Skeleton className="h-10 w-[180px]" />
+                </div>
+                <div className="rounded-md border bg-background/50">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                {[...Array(10)].map((_, i) => (
+                                    <TableHead key={i}>
+                                        <Skeleton className="h-6 w-full" />
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {[...Array(5)].map((_, i) => (
+                                <TableRow key={i}>
+                                    {[...Array(10)].map((_, j) => (
+                                        <TableCell key={j}>
+                                            <Skeleton className="h-4 w-full" />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="overflow-x-auto p-4">
             <div className="flex flex-wrap gap-2 mb-4">
+                {session?.user?.accounttype === 'C' && (
+                    <Select value={viewMode} onValueChange={setViewMode}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="View Mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="assigned">My Tickets</SelectItem>
+                            <SelectItem value="all">All Tickets</SelectItem>
+                        </SelectContent>
+                    </Select>
+                )}
                 <Input
                     placeholder="Filter Patient Id..."
                     className="max-w-sm"
@@ -294,9 +391,11 @@ export default function FollowUp() {
                 </Select>
 
                 <DropdownMenu>
-                    <DropdownMenuTrigger className='text-white bg-secondary px-2 rounded-sm hover:bg-secondary-foreground duration-200 flex justify-center items-center gap-1'>
-                        Filters
-                        <ArrowDownNarrowWide />
+                    <DropdownMenuTrigger
+                        className="flex items-center justify-between gap-2 px-4 py-2 w-40 h-9 text-white bg-secondary border border-border rounded-md hover:bg-secondary-foreground transition"
+                    >
+                        <span>Filters</span>
+                        <ArrowDownNarrowWide className="w-4 h-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-64 p-2 space-y-2 h-[300px]">
                         <DropdownMenuLabel>All Filters</DropdownMenuLabel>
@@ -391,11 +490,11 @@ export default function FollowUp() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="2.5">2.5mg</SelectItem>
-                                        <SelectItem value="4.5">4.5mg</SelectItem>
-                                        <SelectItem value="6.5">6.5mg</SelectItem>
-                                        <SelectItem value="9.0">9.0mg</SelectItem>
-                                        <SelectItem value="11.5">11.5mg</SelectItem>
+                                        <SelectItem value="2.25">2.25mg</SelectItem>
+                                        <SelectItem value="4.50">4.50mg</SelectItem>
+                                        <SelectItem value="6.75">6.75mg</SelectItem>
+                                        <SelectItem value="9.00">9.00mg</SelectItem>
+                                        <SelectItem value="11.25">11.25mg</SelectItem>
                                         <SelectItem value="13.5">13.5mg</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -471,7 +570,30 @@ export default function FollowUp() {
 
             <div className="rounded-md border bg-background/50">
                 {loading ? (
-                    <p>Loading patients...</p>
+                    <div className="rounded-md border bg-background/50">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    {[...Array(10)].map((_, i) => (
+                                        <TableHead key={i}>
+                                            <Skeleton className="h-8 w-full" />
+                                        </TableHead>
+                                    ))}
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {[...Array(5)].map((_, i) => (
+                                    <TableRow key={i}>
+                                        {[...Array(10)].map((_, j) => (
+                                            <TableCell key={j}>
+                                                <Skeleton className="h-6 w-full" />
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 ) : (
                     <Table className="min-w-full">
                         <TableHeader>
@@ -501,56 +623,59 @@ export default function FollowUp() {
                                 </TableHead>
 
                                 {/* Updated table headers */}
+                                <TableHead>Date</TableHead>
                                 <TableHead>DOB</TableHead>
                                 <TableHead>Sex</TableHead>
-                                <TableHead>Height</TableHead>
-                                <TableHead>Weight (lbs)</TableHead>
+                                {/* <TableHead>Height</TableHead>
+                                <TableHead>Weight (lbs)</TableHead> */}
                                 <TableHead>BMI</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Phone</TableHead>
 
                                 {/* Address */}
-                                <TableHead>Address</TableHead>
+                                {/* <TableHead>Address</TableHead>
                                 <TableHead>City</TableHead>
                                 <TableHead>State</TableHead>
-                                <TableHead>Zip</TableHead>
+                                <TableHead>Zip</TableHead> */}
 
                                 {/* Medical Information */}
-                                <TableHead>GLP-1 Preference</TableHead>
+                                <TableHead className="whitespace-nowrap">GLP-1 Preference</TableHead>
 
                                 {/* Weight Management */}
                                 {/* GLP-1 */}
                                 <TableHead>Medicine</TableHead>
                                 <TableHead className="w-[40px]">Images</TableHead>
                                 {/* Semaglutide */}
-                                <TableHead>Semaglutide Dose</TableHead>
+                                <TableHead className="whitespace-nowrap">Semaglutide Dose</TableHead>
 
                                 {/* Tirzepatide */}
-                                <TableHead>Tirzepatide Dose</TableHead>
+                                <TableHead className="whitespace-nowrap">Tirzepatide Dose</TableHead>
 
 
-                                {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && ( */}
-                                <TableHead>Status</TableHead>
-                                {/* )} */}
-
+                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                    <>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="whitespace-nowrap">Out Come</TableHead>
+                                    </>
+                                )}
                                 {/* Add these new headers after existing ones */}
-                                <TableHead>Follow-Up/Refills</TableHead>
-                                <TableHead>GLP-1 Approval (6mo)</TableHead>
+                                <TableHead className="whitespace-nowrap">Follow-Up/Refills</TableHead>
+                                {/* <TableHead>GLP-1 Approval (6mo)</TableHead>
                                 <TableHead>Current Weight</TableHead>
                                 <TableHead>Current GLP-1 Med</TableHead>
-                                <TableHead>Side Effects</TableHead>
+                                <TableHead>Side Effects</TableHead> */}
                                 {/* <TableHead>Side Effect List</TableHead> */}
-                                <TableHead>Med Satisfaction</TableHead>
+                                {/* <TableHead>Med Satisfaction</TableHead>
                                 <TableHead>Switch Med</TableHead>
                                 <TableHead>Continue Dose</TableHead>
                                 <TableHead>Increase Dose</TableHead>
-                                <TableHead>Patient Statement</TableHead>
+                                <TableHead>Patient Statement</TableHead> */}
 
                                 <TableHead className="sticky right-0 bg-secondary text-white">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredPatients.map((patient) => (
+                            {currentRows.map((patient) => (
                                 <TableRow key={patient.authid} >
                                     {/* Sticky columns */}
                                     <TableCell className="sticky w-[55px] left-0 z-10 bg-white">
@@ -582,20 +707,21 @@ export default function FollowUp() {
                                     </TableCell>
 
                                     {/* Patient Data */}
-                                    <TableCell>
+                                    <TableCell className="whitespace-nowrap">{patient.createTimeDate.split('T')[0]}</TableCell>
+                                    <TableCell className="whitespace-nowrap">
                                         {patient.dob?.split('T')[0]}
                                     </TableCell>
                                     <TableCell>{patient.sex}</TableCell>
-                                    <TableCell>{patient.height}</TableCell>
-                                    <TableCell>{patient.weight}</TableCell>
+                                    {/* <TableCell>{patient.height}</TableCell>
+                                    <TableCell>{patient.weight}</TableCell> */}
                                     <TableCell>{patient.bmi}</TableCell>
                                     <TableCell>{patient.email}</TableCell>
-                                    <TableCell>{patient.phone}</TableCell>
+                                    <TableCell className="whitespace-nowrap">{patient.phone}</TableCell>
 
-                                    <TableCell>{patient.address1}</TableCell>
+                                    {/* <TableCell>{patient.address1}</TableCell>
                                     <TableCell>{patient.city}</TableCell>
                                     <TableCell>{patient.state}</TableCell>
-                                    <TableCell>{patient.zip}</TableCell>
+                                    <TableCell>{patient.zip}</TableCell> */}
 
                                     <TableCell>{patient.glp1}</TableCell>
 
@@ -617,34 +743,55 @@ export default function FollowUp() {
                                         </div>
                                     </TableCell>
 
-                                    <TableCell>
+                                    <TableCell className="whitespace-nowrap">
                                         {patient.semaglutideDose}{" unit: "}{patient.semaglutideUnit}
                                     </TableCell>
 
-                                    <TableCell>
+                                    <TableCell className="whitespace-nowrap">
                                         {patient.tirzepatideDose}{" unit: "}{patient.tirzepatideUnit}
                                     </TableCell>
 
-                                    {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && ( */}
-                                    <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
-                                    {/* )} */}
+                                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                        <>
+                                            <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    className={
+                                                        [
+                                                            "px-3 py-1 text-sm rounded-md",
+                                                            patient.approvalStatus === "approved" ||
+                                                                patient.approvalStatus === "pending" ||
+                                                                patient.approvalStatus === "request a call"
+                                                                ? "bg-green-100 text-green-700 hover:bg-green-100"
+                                                                : "bg-red-100 text-red-700 hover:bg-red-100"
+                                                        ].join(" ")
+                                                    }
+                                                >
+                                                    {["approved", "denied", "disqualified", "closed"].includes(patient.approvalStatus)
+                                                        ? "Closed"
+                                                        : "Open"}
+                                                </Badge>
+                                            </TableCell>
+
+                                        </>
+                                    )}
 
                                     <TableCell>{patient.followUpRefills ? "Yes" : "No"}</TableCell>
-                                    <TableCell>{patient.glp1ApprovalLast6Months}</TableCell>
+                                    {/* <TableCell>{patient.glp1ApprovalLast6Months}</TableCell>
                                     <TableCell>{patient.currentWeight}</TableCell>
                                     <TableCell>{patient.currentGlp1Medication}</TableCell>
-                                    <TableCell>{patient.anySideEffects}</TableCell>
+                                    <TableCell>{patient.anySideEffects}</TableCell> */}
                                     {/* <TableCell className="max-w-[200px] truncate">{patient.listSideEffects}</TableCell> */}
-                                    <TableCell>{patient.happyWithMedication}</TableCell>
+                                    {/* <TableCell>{patient.happyWithMedication}</TableCell>
                                     <TableCell>{patient.switchMedication}</TableCell>
                                     <TableCell>{patient.continueDosage}</TableCell>
                                     <TableCell>{patient.increaseDosage}</TableCell>
-                                    <TableCell className="max-w-[250px] truncate">{patient.patientStatement}</TableCell>
+                                    <TableCell className="max-w-[250px] truncate">{patient.patientStatement}</TableCell> */}
 
                                     <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
                                         <Link href={`/dashboard/followup/${patient.authid}`}>
                                             <Button variant="outline" size="sm">
-                                                Update
+                                                {session?.user?.accounttype === 'C' ? 'Submit' : 'Update'}
                                             </Button>
                                         </Link>
                                         {session?.user?.accounttype === 'A' && (
@@ -682,15 +829,41 @@ export default function FollowUp() {
                     </Table>
                 )}
             </div>
-
+            {/* Add pagination controls */}
+            <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="flex-1 text-sm text-muted-foreground">
+                    Showing {indexOfFirstRow + 1}-{Math.min(indexOfLastRow, filteredPatients.length)} of{" "}
+                    {filteredPatients.length} patients
+                </div>
+                <div className="space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages || totalPages === 0}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </div>
             {/* Add Patient Button */}
             <div className="flex justify-start items-center gap-4 mt-4">
-                <Link href="/dashboard/addfollowup">
-                    <Button ><Plus /> Follow Up</Button>
-                </Link>
-                {/* {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && ( */}
-                <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} />
-                {/* )} */}
+                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                    <Link href="/dashboard/addfollowup">
+                        <Button ><Plus /> Follow Up</Button>
+                    </Link>
+                )}
+                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                    <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} selectedPatientData={selectedPatientData} />
+                )}
             </div>
             <AlertDialog
                 open={!!selectedImageInfo}

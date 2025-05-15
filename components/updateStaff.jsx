@@ -28,7 +28,7 @@ const EditUserDialog = ({ staffMember }) => {
     const handleUpdate = async () => {
         const updatedData = {
             _id: staffMember.id, // Assuming you have the _id of the user to update
-            id: staffType+staffNumber, // e.g., T0001 or C0001
+            id: staffNumber, // e.g., T0001 or C0001
             fullname: fullName,
             email: email,
             accounttype: staffType,
@@ -73,7 +73,9 @@ const EditUserDialog = ({ staffMember }) => {
                             <label className="block text-sm font-medium mb-1">Staff Type</label>
                             <Select
                                 value={staffType}
-                                onValueChange={setStaffType}>
+                                onValueChange={setStaffType}
+                                disabled={true}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
@@ -90,6 +92,8 @@ const EditUserDialog = ({ staffMember }) => {
                                 maxLength={5}
                                 pattern="[0-9]*"
                                 value={staffNumber}
+                                readOnly
+                                disabled={true}
                                 onChange={(e) => setStaffNumber(e.target.value)}
                             />
                         </div>

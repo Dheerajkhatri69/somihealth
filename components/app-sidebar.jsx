@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/sidebar"
 
 const items = [
-  {
-    title: "Data Form",
-    url: "/dashboard/addrecord",
-    icon: Home,
-  },
+  // {
+  //   title: "Data Form",
+  //   url: "/dashboard/addrecord",
+  //   icon: Home,
+  // },
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -50,6 +50,20 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              
+              {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className={pathname === "/dashboard/addrecord" ? "bg-white text-black" : ""}
+                  >
+                    <a href="/dashboard/addrecord">
+                      <Home size={20} />
+                      <span>Data Form</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
               {items.map((item) => {
                 const isActive = pathname === item.url;
                 return (
@@ -67,7 +81,7 @@ export function AppSidebar() {
                 );
               })}
 
-              {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+              {(session?.user?.accounttype === 'A') && (
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild

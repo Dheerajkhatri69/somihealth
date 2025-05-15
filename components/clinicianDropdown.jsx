@@ -116,9 +116,7 @@ export const ClinicianDropdown = ({ selectedPatients }) => {
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button
-                    variant="outline"
-                    size="medium"
-                    className="text-white bg-secondary px-2 rounded-sm hover:bg-secondary-foreground duration-200 flex justify-center items-center gap-1"
+                    className="bg-secondary hover:bg-secondary-foreground"
                 >
                     Manage Assignments
                 </Button>

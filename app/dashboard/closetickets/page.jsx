@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import toast from 'react-hot-toast';
 const Page = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatients, setSelectedPatients] = useState([]);
@@ -30,7 +31,11 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+  const [restoreMessage, setRestoreMessage] = useState(null);
 
+  // Add pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
   // Fetch patients from the API
   useEffect(() => {
     const fetchPatients = async () => {
@@ -98,10 +103,20 @@ const Page = () => {
 
       if (!response.ok) throw new Error('Failed to restore patient');
 
-      return true; // Indicate success
+      // Show success message
+      toast.success("Ticket Restored, Go to dashboard", {
+        description: "The ticket has been successfully restored.",
+      });
+      // Update the UI by removing the restored patient
+      setPatients(prev => prev.filter(p => p.authid !== authid));
+
+      return true;
     } catch (err) {
       console.error("Restore error:", err);
-      return false; // Indicate failure
+      toast.error("Failed to restore ticket", {
+        description: err.message || "An error occurred while restoring the ticket.",
+      });
+      return false;
     }
   };
 
@@ -110,26 +125,25 @@ const Page = () => {
     if (selectedPatients.length === 0) return;
 
     try {
-      // Create array of restore promises
       const restorePromises = selectedPatients.map(authid => handleRestore(authid));
-
-      // Wait for all to complete
       const results = await Promise.all(restorePromises);
-
-      // Check if all were successful
       const allSuccess = results.every(success => success);
 
       if (allSuccess) {
-        // Only update state after all API calls succeed
+        toast.success(`${selectedPatients.length} Tickets Restored`, {
+          description: "The selected tickets have been successfully restored. Go to dashboard",
+        });
         setPatients(prev => prev.filter(p => !selectedPatients.includes(p.authid)));
         setSelectedPatients([]);
         setSelectAll(false);
       }
     } catch (error) {
       console.error("Error restoring multiple patients:", error);
+      toast.error("Failed to restore tickets", {
+        description: error.message || "An error occurred while restoring the tickets.",
+      });
     }
   };
-
   const handleDelete = async (authid) => {
     try {
       const response = await fetch('/api/patients', {
@@ -175,7 +189,10 @@ const Page = () => {
       console.error("Error deleting multiple patients:", error);
     }
   };
-
+  const totalPages = Math.ceil(sortedPatients.length / rowsPerPage);
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = sortedPatients.slice(indexOfFirstRow, indexOfLastRow);
   return (
     <div className="rounded-md border bg-background/50 p-4">
       <div className="flex justify-between items-center mb-4">
@@ -230,7 +247,7 @@ const Page = () => {
       <Table className="min-w-full">
         <TableHeader>
           <TableRow>
-            <TableHead className="sticky left-0 z-10 bg-secondary text-white">
+            <TableHead className="bg-secondary text-white">
               <Checkbox
                 checked={selectAll}
                 onCheckedChange={handleSelectAll}
@@ -238,7 +255,7 @@ const Page = () => {
               />
             </TableHead>
 
-            <TableHead className="sticky left-[40px] z-10 bg-secondary text-white">
+            <TableHead className="bg-secondary text-white">
               <Button
                 variant="ghost"
                 className="p-0 text-white hover:text-white/80"
@@ -249,7 +266,7 @@ const Page = () => {
               </Button>
             </TableHead>
 
-            <TableHead className="sticky left-[160px] z-10 bg-secondary text-white">
+            <TableHead className="bg-secondary text-white">
               Name
             </TableHead>
 
@@ -266,16 +283,16 @@ const Page = () => {
 
             <TableHead>Reason Close ticket</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="sticky right-0 bg-secondary text-white">
+            <TableHead className="bg-secondary text-white">
               Actions
             </TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
-          {sortedPatients.map((patient) => (
+          {currentRows.map((patient) => (
             <TableRow key={patient.authid}>
-              <TableCell className="sticky left-0 z-10 bg-white">
+              <TableCell className="bg-white">
                 <Checkbox
                   checked={selectedPatients.includes(patient.authid)}
                   onCheckedChange={() => handleCheckboxChange(patient.authid)}
@@ -283,11 +300,11 @@ const Page = () => {
                 />
               </TableCell>
 
-              <TableCell className="sticky left-[40px] z-10 bg-white font-medium">
+              <TableCell className="bg-white font-medium">
                 {patient.authid}
               </TableCell>
 
-              <TableCell className="sticky left-[160px] z-10 bg-white">
+              <TableCell className="bg-white">
                 {`${patient.firstName} ${patient.lastName}`}
               </TableCell>
 
@@ -304,7 +321,7 @@ const Page = () => {
                 </span>
               </TableCell>
 
-              <TableCell className="sticky right-0 bg-white">
+              <TableCell className="bg-white">
                 <Button
                   variant="outline"
                   size="sm"
@@ -343,6 +360,32 @@ const Page = () => {
           ))}
         </TableBody>
       </Table>
+
+      {/* Add pagination controls */}
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          Showing {indexOfFirstRow + 1}-{Math.min(indexOfLastRow, sortedPatients.length)} of{" "}
+          {sortedPatients.length} patients
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages || totalPages === 0}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

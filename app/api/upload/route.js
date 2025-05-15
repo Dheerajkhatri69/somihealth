@@ -1,44 +1,27 @@
-import { NextResponse } from 'next/server';
-import formidable from 'formidable';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { uploadFile } from "@/lib/cloudinary";
+import { NextResponse } from "next/server";
 
-export async function POST(request) {
+export async function POST(req) {
+  const formData = await req.formData();
+  const file = formData.get("file");
+
+  if (!file) {
+    return NextResponse.json("File not found", { status: 400 });
+  }
+
   try {
-    const formData = await request.formData();
-    const file = formData.get('file');
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    if (!file) {
-      return NextResponse.json(
-        { message: 'No file uploaded' },
-        { status: 400 }
-      );
-    }
+    const res = await uploadFile(buffer, "fileUploader");
 
-    // Convert file to a usable format (Next.js/FormData handling)
-    const buffer = await file.arrayBuffer();
-    const fileName = `${Date.now()}-${file.name}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-
-    // Create dir if it doesn't exist
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    // Save file
-    await fs.writeFile(
-      path.join(uploadDir, fileName),
-      Buffer.from(buffer)
-    );
-
-    return NextResponse.json(
-      { message: 'File uploaded!', imageUrl: `/uploads/${fileName}` },
-      { status: 200 }
-    );
-
+    return NextResponse.json({
+      url: res.secure_url,
+      publicId: res.public_id,
+      format: res.format,
+    });
   } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json(
-      { message: 'Failed to upload file', error: error.message },
-      { status: 500 }
-    );
+    console.error(error);
+    return NextResponse.json("Internal server error", { status: 500 });
   }
 }

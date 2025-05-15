@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
 import { upload } from "@imagekit/next";
 import Image from "next/image";
+import UploadFile from "@/components/FileUpload";
 export default function FollowUpForm() {
     const { data: session } = useSession();
 
@@ -45,8 +46,12 @@ export default function FollowUpForm() {
             tirzepatideDose: '',
             tirzepatideUnit: '',
             createTimeDate: '',
+            file1: '',
+            file2: '',
 
-            followUpRefills: false,
+
+            followUpRefills: true,
+            needLabafter3RxFills: false,
             initialAuthId: '',
             glp1ApprovalLast6Months: '',
             currentWeight: '',
@@ -58,10 +63,15 @@ export default function FollowUpForm() {
             continueDosage: '',
             increaseDosage: '',
             patientStatement: '',
-
+            providerStatement: '',
             closetickets: false,
             Reasonclosetickets: '',
         };
+    });
+
+    const [fileUrls, setFileUrls] = useState({
+        file1: '',
+        file2: ''
     });
     // const [images, setImages] = useState(Array(3).fill(''));
     // Add this state
@@ -137,6 +147,10 @@ export default function FollowUpForm() {
                 ...Array(3 - dbImages.length).fill('')
             ]);
 
+            setFileUrls({
+                file1: patientData.patient.file1 || '',
+                file2: patientData.patient.file2 || ''
+            });
         } catch (error) {
             setSearchError(error.message);
             console.error('Search error:', error);
@@ -173,13 +187,16 @@ export default function FollowUpForm() {
         const submissionData = {
             ...formData,
             createTimeDate: new Date().toISOString(),
-            images: images.filter(url => url !== '')
+            images: images.filter(url => url !== ''),
+            file1: fileUrls.file1,
+            file2: fileUrls.file2
         };
-
+        // console.log(submissionData)
         try {
-            setSearchLoading(true); // Reuse loading state for submission
-            setIsDialogOpen(false); // Close any existing dialogs
+            setSearchLoading(true);
+            setIsDialogOpen(false);
 
+            // 1. First create the followup record
             const response = await fetch('/api/followup', {
                 method: 'POST',
                 headers: {
@@ -194,61 +211,44 @@ export default function FollowUpForm() {
                 throw new Error(data.message || 'Failed to submit follow-up');
             }
 
-            // Success handling
+            // 2. If user is technician, create creator relationship
+            if (session?.user?.accounttype === 'T') {
+                const creatorData = {
+                    pid: submissionData.authid,
+                    tid: session.user.id,
+                    tname: session.user.fullname
+                };
+
+                const creatorResponse = await fetch('/api/followupcreatorofp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(creatorData),
+                });
+
+                if (!creatorResponse.ok) {
+                    console.error('Failed to create creator relationship:', await creatorResponse.json());
+                    // Note: We don't throw error here as the followup was created successfully
+                }
+            }
+
+            // Success handling (keep your existing code)
             setMessageHead("Success 🎉");
             setMessage("Follow-up record created successfully!");
             setIsSuccess(true);
             setIsDialogOpen(true);
 
-            // Reset form while preserving initial Auth ID
+            // Reset form (keep your existing code)
             const randomNum = Math.floor(Math.random() * 100000);
             setFormData({
                 authid: `P${randomNum.toString().padStart(5, '0')}`,
-                firstName: '',
-                lastName: '',
-                dob: '',
-                height: '',
-                email: '',
-                sex: '',
-                weight: '',
-                phone: '',
-                glp1: '',
-                bmi: '',
-                address1: '',
-                address2: '',
-                city: '',
-                state: '',
-                zip: '',
-                medicine: '',
-                approvalStatus: '',
-                semaglutideDose: '',
-                semaglutideUnit: '',
-                tirzepatideDose: '',
-                tirzepatideUnit: '',
-                createTimeDate: '',
-                closetickets: false,
-                Reasonclosetickets: '',
-                // Preserve initial Auth ID for potential new follow-ups
-                initialAuthId: formData.initialAuthId,
-                // Reset follow-up specific fields
-                followUpRefills: false,
-                glp1ApprovalLast6Months: '',
-                currentWeight: '',
-                currentGlp1Medication: '',
-                anySideEffects: '',
-                listSideEffects: '',
-                happyWithMedication: '',
-                switchMedication: '',
-                continueDosage: '',
-                increaseDosage: '',
-                patientStatement: ''
+                // ... rest of your reset fields
             });
 
-            // Clear images
             setImages(Array(3).fill(''));
 
         } catch (error) {
-            // Error handling
             setMessageHead("Error ❌");
             setMessage(error.message || 'An error occurred while submitting the form.');
             setIsSuccess(false);
@@ -258,7 +258,6 @@ export default function FollowUpForm() {
             setSearchLoading(false);
         }
     };
-
     const [selectedImage, setSelectedImage] = useState(null); // Add this line
     const [images, setImages] = useState([null]);
     const maxImages = 3;
@@ -299,15 +298,28 @@ export default function FollowUpForm() {
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
                 <div className="mb-6">
                     <h2 className="text-2xl font-semibold mb-4">Follow Up</h2>
-                    <div className="flex items-center space-x-2 mb-4">
-                        <input
-                            type="checkbox"
-                            id="followUpRefills"
-                            checked={formData.followUpRefills}
-                            onChange={(e) => setFormData(prev => ({ ...prev, followUpRefills: e.target.checked }))}
-                            className="h-4 w-4"
-                        />
-                        <Label htmlFor="followUpRefills">Follow up/Refills</Label>
+
+                    <div className="flex items-center space-x-2 gap-4 mb-4">
+                        <div className="flex items-center space-x-2 mb-4">
+                            <input
+                                type="checkbox"
+                                id="followUpRefills"
+                                checked={formData.followUpRefills}
+                                onChange={(e) => setFormData(prev => ({ ...prev, followUpRefills: e.target.checked }))}
+                                className="h-4 w-4"
+                            />
+                            <Label htmlFor="followUpRefills">Follow up/Refills</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 mb-4">
+                            <input
+                                type="checkbox"
+                                id="needLabafter3RxFills"
+                                checked={formData.needLabafter3RxFills}
+                                onChange={(e) => setFormData(prev => ({ ...prev, needLabafter3RxFills: e.target.checked }))}
+                                className="h-4 w-4"
+                            />
+                            <Label htmlFor="needLabafter3RxFills">Need Lab After 3 Rx Fills</Label>
+                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="space-y-2 flex-1">
@@ -373,7 +385,7 @@ export default function FollowUpForm() {
                 </div>
 
                 <h3 className="text-sm font-semibold">Basic information</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
                         <Label htmlFor="dob">DOB</Label>
                         <Input
@@ -478,7 +490,7 @@ export default function FollowUpForm() {
 
                 {/* Address Section */}
                 <h3 className="text-sm font-semibold">Address</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -545,7 +557,7 @@ export default function FollowUpForm() {
 
                 {/* Current Medication Section */}
                 <h3 className="text-sm font-semibold">Current Medication Details</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
                     <div className="space-y-2">
                         <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
                         <Input
@@ -661,8 +673,28 @@ export default function FollowUpForm() {
                         </div>
                     ))}
                 </div>
+                {/* File Upload Section */}
+                <h3 className="text-sm font-semibold">Upload Documents</h3>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                    <div className="space-y-2">
+                        <Label>Document 1</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => setFileUrls(prev => ({ ...prev, file1: url }))}
+                            onDelete={() => setFileUrls(prev => ({ ...prev, file1: '' }))}
+                            file={fileUrls.file1}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Document 2</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => setFileUrls(prev => ({ ...prev, file2: url }))}
+                            onDelete={() => setFileUrls(prev => ({ ...prev, file2: '' }))}
+                            file={fileUrls.file2}
+                        />
+                    </div>
+                </div>
 
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">
@@ -737,11 +769,11 @@ export default function FollowUpForm() {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.5">2.5mg</SelectItem>
-                                    <SelectItem value="4.5">4.5mg</SelectItem>
-                                    <SelectItem value="6.5">6.5mg</SelectItem>
-                                    <SelectItem value="9.0">9.0mg</SelectItem>
-                                    <SelectItem value="11.5">11.5mg</SelectItem>
+                                    <SelectItem value="2.25">2.25mg</SelectItem>
+                                    <SelectItem value="4.50">4.50mg</SelectItem>
+                                    <SelectItem value="6.75">6.75mg</SelectItem>
+                                    <SelectItem value="9.00">9.00mg</SelectItem>
+                                    <SelectItem value="11.25">11.25mg</SelectItem>
                                     <SelectItem value="13.5">13.5mg</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -766,7 +798,7 @@ export default function FollowUpForm() {
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 ">
                     <Label htmlFor="patientStatement">Patient Statement</Label>
                     <Textarea
                         id="patientStatement"
@@ -797,7 +829,7 @@ export default function FollowUpForm() {
                         {/* Redirect button (only show for success) */}
                         {isSuccess && (
                             <Button
-                                onClick={() => router.push("/dashboard")}
+                                onClick={() => router.push("/dashboard/followup")}
                                 className="bg-primary hover:bg-primary-dark"
                             >
                                 Return to Dashboard
@@ -829,7 +861,7 @@ export default function FollowUpForm() {
                 </AlertDialogContent>
             </AlertDialog>
 
-            
+
         </div>
     );
 }

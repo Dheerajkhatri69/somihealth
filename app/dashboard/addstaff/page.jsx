@@ -50,7 +50,9 @@ const formSchema = z.object({
 export default function StaffForm() {
     const [staff, setStaff] = useState([]);
     const [editingId, setEditingId] = useState(null);
-
+    // Add pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
     useEffect(() => {
         fetchStaff();
     }, []);
@@ -233,6 +235,11 @@ export default function StaffForm() {
 
         setEditingId(null);
     }
+
+    const totalPages = Math.ceil(staff.length / rowsPerPage);
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRows = staff.slice(indexOfFirstRow, indexOfLastRow);
     return (
         <div className="p-4 space-y-8">
             <Card className="p-6 w-full mx-auto">
@@ -364,7 +371,7 @@ export default function StaffForm() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {staff.map((staffMember) => (
+                        {currentRows.map((staffMember) => (
 
                             <TableRow key={staffMember.id}>
                                 <TableCell className="font-medium">{staffMember.staffId}</TableCell>
@@ -373,7 +380,7 @@ export default function StaffForm() {
                                 <TableCell>{staffMember.staffType}</TableCell>
                                 <TableCell>{staffMember.password}</TableCell>
                                 <TableCell className="text-right flex justify-end space-x-2">
-                                    <EditUserDialog staffMember={staffMember}/>
+                                    <EditUserDialog staffMember={staffMember} />
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button variant="destructive" size="sm">
@@ -405,6 +412,30 @@ export default function StaffForm() {
                         ))}
                     </TableBody>
                 </Table>
+                <div className="flex items-center justify-end space-x-2 py-4">
+                    <div className="flex-1 text-sm text-muted-foreground">
+                        Showing {indexOfFirstRow + 1}-{Math.min(indexOfLastRow, staff.length)} of{" "}
+                        {staff.length} patients
+                    </div>
+                    <div className="space-x-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages || totalPages === 0}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
             </div>
         </div>
     );

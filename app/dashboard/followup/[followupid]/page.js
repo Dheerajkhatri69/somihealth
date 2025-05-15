@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
 import { upload } from "@imagekit/next";
 import Image from "next/image";
+import UploadFile from "@/components/FileUpload";
 export default function UpdateFollowUp({ params }) {
     const { data: session } = useSession();
 
@@ -44,8 +45,12 @@ export default function UpdateFollowUp({ params }) {
             tirzepatideDose: '',
             tirzepatideUnit: '',
             createTimeDate: '',
+            file1: '',
+            file2: '',
+
 
             followUpRefills: false,
+            needLabafter3RxFills: false,
             initialAuthId: '',
             glp1ApprovalLast6Months: '',
             currentWeight: '',
@@ -57,6 +62,7 @@ export default function UpdateFollowUp({ params }) {
             continueDosage: '',
             increaseDosage: '',
             patientStatement: '',
+            providerStatement: '',
 
             closetickets: false,
             Reasonclosetickets: '',
@@ -69,7 +75,10 @@ export default function UpdateFollowUp({ params }) {
 
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
-
+    const [fileUrls, setFileUrls] = useState({
+        file1: '',
+        file2: ''
+    });
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -85,9 +94,13 @@ export default function UpdateFollowUp({ params }) {
                 const apiImages = (data.result.images || []).map(img => img || null);
                 // Fill remaining slots with null
                 const mergedImages = [...apiImages, ...Array(3).fill(null)].slice(0, 3);
-
+                setFileUrls({
+                    file1: data.result.file1 || '',
+                    file2: data.result.file2 || ''
+                });
                 setFormData(data.result);
                 setImages(mergedImages);
+
             } catch (error) {
                 console.error('Fetch error:', error);
                 setMessageHead("Error ❌");
@@ -138,7 +151,9 @@ export default function UpdateFollowUp({ params }) {
                 },
                 body: JSON.stringify({
                     ...formData,
-                    images: images.filter(url => url !== '')
+                    images: images.filter(url => url !== ''),
+                    file1: fileUrls.file1,
+                    file2: fileUrls.file2
                 }),
             });
 
@@ -208,38 +223,29 @@ export default function UpdateFollowUp({ params }) {
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
                 <div className="mb-6">
                     <h2 className="text-2xl font-semibold mb-4">Follow Up</h2>
-                    <div className="flex items-center space-x-2 mb-4">
-                        <input
-                            type="checkbox"
-                            id="followUpRefills"
-                            checked={formData.followUpRefills}
-                            onChange={(e) => setFormData(prev => ({ ...prev, followUpRefills: e.target.checked }))}
-                            className="h-4 w-4"
-                        />
-                        <Label htmlFor="followUpRefills">Follow up/Refills</Label>
+                    <div className="flex items-center space-x-2 gap-4 mb-4">
+                        <div className="flex items-center space-x-2 mb-4">
+                            <input
+                                type="checkbox"
+                                id="followUpRefills"
+                                checked={formData.followUpRefills}
+                                onChange={(e) => setFormData(prev => ({ ...prev, followUpRefills: e.target.checked }))}
+                                className="h-4 w-4"
+                            />
+                            <Label htmlFor="followUpRefills">Follow up/Refills</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 mb-4">
+                            <input
+                                type="checkbox"
+                                id="needLabafter3RxFills"
+                                checked={formData.needLabafter3RxFills}
+                                onChange={(e) => setFormData(prev => ({ ...prev, needLabafter3RxFills: e.target.checked }))}
+                                className="h-4 w-4"
+                            />
+                            <Label htmlFor="needLabafter3RxFills">Need Lab After 3 Rx Fills</Label>
+                        </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        {/* <div className="space-y-2 flex-1">
-                            <Label>Initial Intake Auth ID</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    name="initialAuthId"
-                                    value={formData.initialAuthId}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter initial Auth ID"
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={handleSearch}
-                                    disabled={searchLoading}
-                                >
-                                    {searchLoading ? 'Searching...' : 'Search'}
-                                </Button>
-                            </div>
-                            {searchError && (
-                                <p className="text-red-500 text-sm">{searchError}</p>
-                            )}
-                        </div> */}
                         <div className="space-y-2">
                             <Label>New Auth ID</Label>
                             <Input
@@ -276,7 +282,7 @@ export default function UpdateFollowUp({ params }) {
                 </div>
 
                 <h3 className="text-sm font-semibold">Basic information</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
                         <Label htmlFor="dob">DOB</Label>
                         <Input
@@ -381,7 +387,7 @@ export default function UpdateFollowUp({ params }) {
 
                 {/* Address Section */}
                 <h3 className="text-sm font-semibold">Address</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -423,6 +429,108 @@ export default function UpdateFollowUp({ params }) {
                     </Select>
                 </div>
 
+                {/* Add these to the Basic Information grid */}
+                <div className="space-y-2">
+                    <Label htmlFor="currentWeight">Current Weight (lbs)</Label>
+                    <Input
+                        id="currentWeight"
+                        name="currentWeight"
+                        value={formData.currentWeight}
+                        onChange={handleInputChange}
+                        placeholder="Current weight"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="glp1ApprovalLast6Months">GLP-1 Approval (Last 6mo)</Label>
+                    <Input
+                        id="glp1ApprovalLast6Months"
+                        name="glp1ApprovalLast6Months"
+                        value={formData.glp1ApprovalLast6Months}
+                        onChange={handleInputChange}
+                        placeholder="Approval status"
+                    />
+                </div>
+
+                {/* Current Medication Section */}
+                <h3 className="text-sm font-semibold">Current Medication Details</h3>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
+                    <div className="space-y-2">
+                        <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
+                        <Input
+                            id="currentGlp1Medication"
+                            name="currentGlp1Medication"
+                            value={formData.currentGlp1Medication}
+                            onChange={handleInputChange}
+                            placeholder="Current medication"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="anySideEffects">Side Effects Experienced</Label>
+                        <Input
+                            id="anySideEffects"
+                            name="anySideEffects"
+                            value={formData.anySideEffects}
+                            onChange={handleInputChange}
+                            placeholder="Any side effects?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="happyWithMedication">Happy with Medication?</Label>
+                        <Input
+                            id="happyWithMedication"
+                            name="happyWithMedication"
+                            value={formData.happyWithMedication}
+                            onChange={handleInputChange}
+                            placeholder="Are you satisfied with the medication?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="switchMedication">Switch Medication?</Label>
+                        <Input
+                            id="switchMedication"
+                            name="switchMedication"
+                            value={formData.switchMedication}
+                            onChange={handleInputChange}
+                            placeholder="Consider switching medication?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="continueDosage">Continue Dosage?</Label>
+                        <Input
+                            id="continueDosage"
+                            name="continueDosage"
+                            value={formData.continueDosage}
+                            onChange={handleInputChange}
+                            placeholder="Continue current dose?"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="increaseDosage">Increase Dosage?</Label>
+                        <Input
+                            id="increaseDosage"
+                            name="increaseDosage"
+                            value={formData.increaseDosage}
+                            onChange={handleInputChange}
+                            placeholder="Increase dose?"
+                        />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="patientStatement">Patient Statement</Label>
+                    <Textarea
+                        id="patientStatement"
+                        name="patientStatement"
+                        value={formData.patientStatement}
+                        onChange={handleInputChange}
+                        placeholder="Patient's comments and statements"
+                        className="min-h-[100px]"
+                    />
+                </div>
                 {/* Image Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Images</h3>
                 <div className="flex justify-between flex-wrap items-center gap-4">
@@ -450,13 +558,15 @@ export default function UpdateFollowUp({ params }) {
                                     >
                                         <Fullscreen className="h-5 w-5" />
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => removeImage(index)}
-                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
-                                    >
-                                        <X className="h-5 w-5" />
-                                    </button>
+                                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeImage(index)}
+                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                                        >
+                                            <X className="h-5 w-5" />
+                                        </button>
+                                    )}
                                 </>
                             ) : (
                                 <div className="relative w-full h-full">
@@ -479,8 +589,28 @@ export default function UpdateFollowUp({ params }) {
                         </div>
                     ))}
                 </div>
+                {/* File Upload Section */}
+                <h3 className="text-sm font-semibold">Upload Documents</h3>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                    <div className="space-y-2">
+                        <Label>Document 1</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => setFileUrls(prev => ({ ...prev, file1: url }))}
+                            onDelete={() => setFileUrls(prev => ({ ...prev, file1: '' }))}
+                            file={fileUrls.file1}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Document 2</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => setFileUrls(prev => ({ ...prev, file2: url }))}
+                            onDelete={() => setFileUrls(prev => ({ ...prev, file2: '' }))}
+                            file={fileUrls.file2}
+                        />
+                    </div>
+                </div>
 
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-white">
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">
@@ -555,11 +685,11 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.5">2.5mg</SelectItem>
-                                    <SelectItem value="4.5">4.5mg</SelectItem>
-                                    <SelectItem value="6.5">6.5mg</SelectItem>
-                                    <SelectItem value="9.0">9.0mg</SelectItem>
-                                    <SelectItem value="11.5">11.5mg</SelectItem>
+                                    <SelectItem value="2.25">2.25mg</SelectItem>
+                                    <SelectItem value="4.50">4.50mg</SelectItem>
+                                    <SelectItem value="6.75">6.75mg</SelectItem>
+                                    <SelectItem value="9.00">9.00mg</SelectItem>
+                                    <SelectItem value="11.25">11.25mg</SelectItem>
                                     <SelectItem value="13.5">13.5mg</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -584,111 +714,20 @@ export default function UpdateFollowUp({ params }) {
                     </div>
                 </div>
 
-                {/* Add these to the Basic Information grid */}
-                <div className="space-y-2">
-                    <Label htmlFor="currentWeight">Current Weight (lbs)</Label>
-                    <Input
-                        id="currentWeight"
-                        name="currentWeight"
-                        value={formData.currentWeight}
-                        onChange={handleInputChange}
-                        placeholder="Current weight"
-                    />
-                </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="glp1ApprovalLast6Months">GLP-1 Approval (Last 6mo)</Label>
-                    <Input
-                        id="glp1ApprovalLast6Months"
-                        name="glp1ApprovalLast6Months"
-                        value={formData.glp1ApprovalLast6Months}
-                        onChange={handleInputChange}
-                        placeholder="Approval status"
-                    />
-                </div>
-
-
-                {/* Current Medication Section */}
-                <h3 className="text-sm font-semibold">Current Medication Details</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-white">
-                    <div className="space-y-2">
-                        <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
-                        <Input
-                            id="currentGlp1Medication"
-                            name="currentGlp1Medication"
-                            value={formData.currentGlp1Medication}
-                            onChange={handleInputChange}
-                            placeholder="Current medication"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="anySideEffects">Side Effects Experienced</Label>
-                        <Input
-                            id="anySideEffects"
-                            name="anySideEffects"
-                            value={formData.anySideEffects}
-                            onChange={handleInputChange}
-                            placeholder="Any side effects?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="happyWithMedication">Happy with Medication?</Label>
-                        <Input
-                            id="happyWithMedication"
-                            name="happyWithMedication"
-                            value={formData.happyWithMedication}
-                            onChange={handleInputChange}
-                            placeholder="Are you satisfied with the medication?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="switchMedication">Switch Medication?</Label>
-                        <Input
-                            id="switchMedication"
-                            name="switchMedication"
-                            value={formData.switchMedication}
-                            onChange={handleInputChange}
-                            placeholder="Consider switching medication?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="continueDosage">Continue Dosage?</Label>
-                        <Input
-                            id="continueDosage"
-                            name="continueDosage"
-                            value={formData.continueDosage}
-                            onChange={handleInputChange}
-                            placeholder="Continue current dose?"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="increaseDosage">Increase Dosage?</Label>
-                        <Input
-                            id="increaseDosage"
-                            name="increaseDosage"
-                            value={formData.increaseDosage}
-                            onChange={handleInputChange}
-                            placeholder="Increase dose?"
-                        />
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="patientStatement">Patient Statement</Label>
+                    <Label htmlFor="providerStatement">Provider Statement </Label>
                     <Textarea
-                        id="patientStatement"
-                        name="patientStatement"
-                        value={formData.patientStatement}
+                        id="providerStatement"
+                        name="providerStatement"
+                        value={formData.providerStatement}
                         onChange={handleInputChange}
-                        placeholder="Patient's comments or statements"
+                        placeholder="provider Statement"
                         className="min-h-[100px]"
                     />
                 </div>
                 <Button type="submit" className="w-full">
-                    Update Follow Up
+                    {session?.user?.accounttype === 'C' ? 'Submit Patient' : 'Update Patient'}
                 </Button>
             </form>
 

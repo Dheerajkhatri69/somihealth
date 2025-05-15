@@ -66,8 +66,11 @@ export async function POST(request) {
             closetickets: body.closetickets || false,
             Reasonclosetickets: body.Reasonclosetickets,
             images: body.images || [],
+            file1: body.file1,
+            file2: body.file2,
             // Follow-up specific fields
             followUpRefills: body.followUpRefills || false,
+            needLabafter3RxFills: body.needLabafter3RxFills || false,
             initialAuthId: body.initialAuthId,
             glp1ApprovalLast6Months: body.glp1ApprovalLast6Months,
             currentWeight: body.currentWeight,
@@ -83,11 +86,11 @@ export async function POST(request) {
 
         result = await newFollowUp.save();
     } catch (error) {
-        result = { 
-            result: "error", 
-            message: error.message.includes("duplicate key") 
-                ? "Follow-up with this authid already exists" 
-                : error.message 
+        result = {
+            result: "error",
+            message: error.message.includes("duplicate key")
+                ? "Follow-up with this authid already exists"
+                : error.message
         };
         success = false;
     }
@@ -110,7 +113,7 @@ export async function PUT(request) {
         if (!body.authid) {
             throw new Error("authid is required for update");
         }
-        
+
         const updatedFollowUp = await FollowUp.findOneAndUpdate(
             { authid: body.authid },
             {
