@@ -61,7 +61,7 @@ export default function Dashboard() {
     const { data: session } = useSession();
 
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 5;
+    const rowsPerPage = 100;
 
     useEffect(() => {
         const fetchPatients = async () => {

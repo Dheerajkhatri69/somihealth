@@ -66,7 +66,7 @@ export default function FollowUp() {
 
     // Add pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 5;
+    const rowsPerPage = 100;
 
     useEffect(() => {
         const fetchPatients = async () => {
