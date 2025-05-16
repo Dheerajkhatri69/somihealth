@@ -177,7 +177,7 @@ export default function FollowUp() {
     const [semaglutideUnitFilter, setSemaglutideUnitFilter] = useState('all');
     const [tirzepatideDoseOnly, setTirzepatideDoseOnly] = useState('all');
     const [tirzepatideUnitFilter, setTirzepatideUnitFilter] = useState('all');
-
+  const [createDateFilter, setCreateDateFilter] = useState("");
     const [selectedImageInfo, setSelectedImageInfo] = useState(null);
 
     const [selectedStatus, setSelectedStatus] = useState('all');
@@ -190,6 +190,7 @@ export default function FollowUp() {
             approved: patients.filter(p => p.approvalStatus === 'approved').length,
             pending: patients.filter(p => p.approvalStatus === 'pending').length,
             denied: patients.filter(p => p.approvalStatus === 'denied').length,
+            disqualified: patients.filter(p => p.approvalStatus === 'disqualified').length,
         };
     };
     const filteredPatients = patients.filter(patient => {
@@ -213,9 +214,10 @@ export default function FollowUp() {
             (tirzepatideUnitFilter === 'all' || patient.tirzepatideUnit === tirzepatideUnitFilter)
         );
 
+        const createDateMatch = createDateFilter ? patient.createTimeDate.split('T')[0] === createDateFilter : true;
 
         return emailMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
-            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch;
+            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch;
     });
 
     const statusCounts = getStatusCounts(filteredPatients);
@@ -389,6 +391,21 @@ export default function FollowUp() {
                         <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                 </Select>
+                <div className="flex flex-nowrap items-center gap-2 rounded-md justify-center">
+                    {/* <label className="text-sm font-medium px-2 whitespace-nowrap">Created Date</label> */}
+                    <input
+                        type="date"
+                        value={createDateFilter}
+                        onChange={(e) => setCreateDateFilter(e.target.value)}
+                        className="w-full border rounded bg-secondary text-white border-none  h-9"
+                    />
+                    <Button className="bg-secondary hover:bg-secondary-foreground h-full"
+                        type="button"
+                        onClick={() => setCreateDateFilter("")}
+                    >
+                        Clear
+                    </Button>
+                </div>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger
@@ -413,6 +430,7 @@ export default function FollowUp() {
                                     <SelectItem value="approved">Approved</SelectItem>
                                     <SelectItem value="denied">Denied</SelectItem>
                                     <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="disqualified">Disqualified</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -526,7 +544,10 @@ export default function FollowUp() {
 
             {session?.user?.accounttype === 'A' && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('all')}
+                    >
                         <span className="text-sm font-medium">All Patients</span>
                         <Badge
                             variant="outline"
@@ -536,7 +557,10 @@ export default function FollowUp() {
                         </Badge>
                     </div>
 
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-blue-300 text-blue-foreground rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-blue-300 text-blue-foreground rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('')}
+                    >
                         <span className="text-sm font-medium">Awaiting</span>
                         <Badge
                             variant="outline"
@@ -546,7 +570,10 @@ export default function FollowUp() {
                         </Badge>
                     </div>
 
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-yellow-200 text-yellow-900 rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-yellow-200 text-yellow-900 rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('pending')}
+                    >
                         <span className="text-sm font-medium">Pending</span>
                         <Badge
                             variant="outline"
@@ -556,13 +583,29 @@ export default function FollowUp() {
                         </Badge>
                     </div>
 
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-green-200 text-green-900 rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-green-200 text-green-900 rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('approved')}
+                    >
                         <span className="text-sm font-medium">Approved</span>
                         <Badge
                             variant="outline"
                             className="absolute -top-2 -right-2 py-1 bg-green-500 rounded-full text-sm"
                         >
                             {statusCounts.approved}
+                        </Badge>
+                    </div>
+
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-purple-200 text-purple-900 rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('disqualified')}
+                    >
+                        <span className="text-sm font-medium">Disqualified</span>
+                        <Badge
+                            variant="outline"
+                            className="absolute -top-2 -right-2 py-1 bg-purple-500 rounded-full text-sm"
+                        >
+                            {statusCounts.disqualified}
                         </Badge>
                     </div>
                 </div>
@@ -609,21 +652,21 @@ export default function FollowUp() {
                                         />
                                     </div>
                                 </TableHead>
+                                <TableHead className="sticky left-[32px] z-10 w-[94px] bg-secondary text-white whitespace-nowrap">Date</TableHead>
 
-                                <TableHead className="sticky left-[35px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[126px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
                                     AUTH ID
                                 </TableHead>
 
-                                <TableHead className="sticky left-[115px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[200px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     First Name
                                 </TableHead>
 
-                                <TableHead className="sticky left-[200px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[288px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     Last Name
                                 </TableHead>
 
                                 {/* Updated table headers */}
-                                <TableHead>Date</TableHead>
                                 <TableHead>DOB</TableHead>
                                 <TableHead>Sex</TableHead>
                                 {/* <TableHead>Height</TableHead>
@@ -693,21 +736,19 @@ export default function FollowUp() {
                                             className="h-4 w-4"
                                         />
                                     </TableCell>
-                                    {/* <TimeSensitiveCell patient={patient} onDeletePatient={handleDelete} /> */}
-                                    {/* <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
-                                        {patient.authid}
-                                    </TableCell> */}
+                                    <TableCell className="sticky left-[32px] z-10 w-[94px] text-secondary bg-white font-bold whitespace-nowrap">{patient.createTimeDate.split('T')[0]}</TableCell>
+
                                     <FollowupShowAssig patient={patient} />
 
-                                    <TableCell className="sticky left-[115px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[200px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}
                                     </TableCell>
-                                    <TableCell className="sticky left-[200px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[288px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.lastName}
                                     </TableCell>
 
                                     {/* Patient Data */}
-                                    <TableCell className="whitespace-nowrap">{patient.createTimeDate.split('T')[0]}</TableCell>
+
                                     <TableCell className="whitespace-nowrap">
                                         {patient.dob?.split('T')[0]}
                                     </TableCell>
@@ -753,26 +794,43 @@ export default function FollowUp() {
 
                                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                         <>
-                                            <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
                                             <TableCell>
                                                 <Badge
-                                                    className={
-                                                        [
-                                                            "px-3 py-1 text-sm rounded-md",
-                                                            patient.approvalStatus === "approved" ||
-                                                                patient.approvalStatus === "pending" ||
-                                                                patient.approvalStatus === "request a call"
-                                                                ? "bg-green-100 text-green-700 hover:bg-green-100"
-                                                                : "bg-red-100 text-red-700 hover:bg-red-100"
-                                                        ].join(" ")
-                                                    }
+                                                    className={[
+                                                        "px-3 py-1 text-sm rounded-md capitalize",
+                                                        patient.approvalStatus === "pending"
+                                                            ? "bg-yellow-200 text-yellow-900 hover:bg-yellow-200"
+                                                            : patient.approvalStatus === "approved"
+                                                                ? "bg-green-200 text-green-900 hover:bg-green-200"
+                                                                : patient.approvalStatus === ""
+                                                                    ? "bg-blue-200 text-black hover:bg-blue-200"
+                                                                    : patient.approvalStatus === "disqualified"
+                                                                        ? "bg-purple-200 text-purple-900 hover:bg-purple-200"
+                                                                        : ["denied", "closed"].includes(patient.approvalStatus)
+                                                                            ? "bg-red-200 text-red-900 hover:bg-red-200"
+                                                                            : "bg-gray-200 text-gray-900 hover:bg-gray-200" // default case
+                                                    ].join(" ")}
                                                 >
-                                                    {["approved", "denied", "disqualified", "closed"].includes(patient.approvalStatus)
+                                                    {patient.approvalStatus === ""
+                                                        ? "Awaiting"
+                                                        : patient.approvalStatus}
+                                                </Badge>
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <Badge
+                                                    className={[
+                                                        "px-3 py-1 text-sm rounded-md",
+                                                        ["approved", "denied", "closed"].includes(patient.approvalStatus)
+                                                            ? "bg-red-200 text-red-900 hover:bg-red-200"
+                                                            : "bg-green-200 text-green-900 hover:bg-green-200"
+                                                    ].join(" ")}
+                                                >
+                                                    {["approved", "denied", "closed"].includes(patient.approvalStatus)
                                                         ? "Closed"
                                                         : "Open"}
                                                 </Badge>
                                             </TableCell>
-
                                         </>
                                     )}
 

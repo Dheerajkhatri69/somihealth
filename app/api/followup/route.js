@@ -81,7 +81,9 @@ export async function POST(request) {
             switchMedication: body.switchMedication,
             continueDosage: body.continueDosage,
             increaseDosage: body.increaseDosage,
-            patientStatement: body.patientStatement
+            patientStatement: body.patientStatement,
+            providerComments: body.providerComments,
+            providerNote: body.providerNote
         });
 
         result = await newFollowUp.save();

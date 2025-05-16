@@ -49,6 +49,8 @@ export async function GET(request, { params }) {
                 images: patient.images,
                 file1: patient.file1,
                 file2: patient.file2,
+                providerComments: patient.providerComments,
+                providerNote: patient.providerNote,
             }
         });
 

@@ -78,7 +78,7 @@ function FollowupShowAssig({ patient }) {
 
     return (
         <>
-            <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap font-bold bg-white text-secondary">
+            <TableCell className="sticky left-[126px] z-20 w-[80px] text-center text-wrap font-bold bg-white text-secondary">
                 <div className="relative">
                     {patient.authid}
                     {session?.user?.accounttype === 'A' && (

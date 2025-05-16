@@ -45,6 +45,8 @@ export default function UpdateFollowUp({ params }) {
             tirzepatideDose: '',
             tirzepatideUnit: '',
             createTimeDate: '',
+            providerComments: '',
+            providerNote: '',
             file1: '',
             file2: '',
 
@@ -520,16 +522,19 @@ export default function UpdateFollowUp({ params }) {
                         />
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="patientStatement">Patient Statement</Label>
-                    <Textarea
-                        id="patientStatement"
-                        name="patientStatement"
-                        value={formData.patientStatement}
-                        onChange={handleInputChange}
-                        placeholder="Patient's comments and statements"
-                        className="min-h-[100px]"
-                    />
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="space-y-2">
+                        <Label htmlFor="providerComments">Enter your questions and comments</Label>
+                        <textarea
+                            id="providerComments"
+                            name="providerComments"
+                            className="w-full p-4 border rounded-md shadow-sm"
+                            rows="4"
+                            value={formData.providerComments}
+                            onChange={handleInputChange}
+                            placeholder="Write your questions or comments here..."
+                        />
+                    </div>
                 </div>
                 {/* Image Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Images</h3>
@@ -714,17 +719,19 @@ export default function UpdateFollowUp({ params }) {
                     </div>
                 </div>
 
-
-                <div className="space-y-2">
-                    <Label htmlFor="providerStatement">Provider Statement </Label>
-                    <Textarea
-                        id="providerStatement"
-                        name="providerStatement"
-                        value={formData.providerStatement}
-                        onChange={handleInputChange}
-                        placeholder="provider Statement"
-                        className="min-h-[100px]"
-                    />
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="space-y-2">
+                        <Label htmlFor="providerNote">Provider Note</Label>
+                        <textarea
+                            id="providerNote"
+                            name="providerNote"
+                            className="w-full p-4 border rounded-md shadow-sm"
+                            rows="4"
+                            value={formData.providerNote}
+                            onChange={handleInputChange}
+                            placeholder="Enter any notes or comments here..."
+                        />
+                    </div>
                 </div>
                 <Button type="submit" className="w-full">
                     {session?.user?.accounttype === 'C' ? 'Submit Patient' : 'Update Patient'}

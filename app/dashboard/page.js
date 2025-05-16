@@ -190,6 +190,7 @@ export default function Dashboard() {
             approved: patients.filter(p => p.approvalStatus === 'approved').length,
             pending: patients.filter(p => p.approvalStatus === 'pending').length,
             denied: patients.filter(p => p.approvalStatus === 'denied').length,
+            disqualified: patients.filter(p => p.approvalStatus === 'disqualified').length,
         };
     };
     const filteredPatients = patients.filter(patient => {
@@ -455,6 +456,7 @@ export default function Dashboard() {
                                     <SelectItem value="approved">Approved</SelectItem>
                                     <SelectItem value="denied">Denied</SelectItem>
                                     <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="disqualified">Disqualified</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -569,7 +571,10 @@ export default function Dashboard() {
 
             {session?.user?.accounttype === 'A' && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('all')}
+                    >
                         <span className="text-sm font-medium">All Patients</span>
                         <Badge
                             variant="outline"
@@ -579,7 +584,10 @@ export default function Dashboard() {
                         </Badge>
                     </div>
 
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-blue-300 text-blue-foreground rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-blue-300 text-blue-foreground rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('')}
+                    >
                         <span className="text-sm font-medium">Awaiting</span>
                         <Badge
                             variant="outline"
@@ -589,7 +597,10 @@ export default function Dashboard() {
                         </Badge>
                     </div>
 
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-yellow-200 text-yellow-900 rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-yellow-200 text-yellow-900 rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('pending')}
+                    >
                         <span className="text-sm font-medium">Pending</span>
                         <Badge
                             variant="outline"
@@ -599,13 +610,29 @@ export default function Dashboard() {
                         </Badge>
                     </div>
 
-                    <div className="relative flex items-center gap-2 px-5 py-2 bg-green-200 text-green-900 rounded-full cursor-pointer">
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-green-200 text-green-900 rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('approved')}
+                    >
                         <span className="text-sm font-medium">Approved</span>
                         <Badge
                             variant="outline"
                             className="absolute -top-2 -right-2 py-1 bg-green-500 rounded-full text-sm"
                         >
                             {statusCounts.approved}
+                        </Badge>
+                    </div>
+
+                    <div
+                        className="relative flex items-center gap-2 px-5 py-2 bg-purple-200 text-purple-900 rounded-full cursor-pointer"
+                        onClick={() => setApprovalFilter('disqualified')}
+                    >
+                        <span className="text-sm font-medium">Disqualified</span>
+                        <Badge
+                            variant="outline"
+                            className="absolute -top-2 -right-2 py-1 bg-purple-500 rounded-full text-sm"
+                        >
+                            {statusCounts.disqualified}
                         </Badge>
                     </div>
                 </div>
@@ -652,21 +679,21 @@ export default function Dashboard() {
                                         />
                                     </div>
                                 </TableHead>
+                                <TableHead className="sticky left-[32px] z-10 w-[94px] bg-secondary text-white whitespace-nowrap">Date</TableHead>
 
-                                <TableHead className="sticky left-[35px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[126px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
                                     AUTH ID
                                 </TableHead>
 
-                                <TableHead className="sticky left-[115px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[200px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     First Name
                                 </TableHead>
 
-                                <TableHead className="sticky left-[200px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[288px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     Last Name
                                 </TableHead>
 
                                 {/* Updated table headers */}
-                                <TableHead>Date</TableHead>
                                 <TableHead>DOB</TableHead>
                                 <TableHead>Sex</TableHead>
                                 {/* <TableHead>Height</TableHead> */}
@@ -751,31 +778,20 @@ export default function Dashboard() {
                                             className="h-4 w-4"
                                         />
                                     </TableCell>
+
+                                    <TableCell className="sticky left-[32px] z-10 w-[94px] text-secondary bg-white font-bold whitespace-nowrap">{patient.createTimeDate.split('T')[0]}</TableCell>
+
                                     <TimeSensitiveCell patient={patient} />
-                                    {/* <TableCell className="sticky left-[35px] z-20 w-[80px] text-center text-wrap text-secondary bg-white font-bold">
-                                        <div className="relative">
-                                            {patient.authid}
 
-                                            {patient.approvalStatus === "" && (
-                                                <div className="absolute  -top-5 -right-1 group">
-                                                    <Timer className="cursor-pointer text-secondary-foreground rounded-full text-sm" />
-                                                    <div className="absolute -top-6 -right-5 hidden group-hover:block bg-black/50 text-white text-xs px-2 py-1 rounded z-50 whitespace-nowrap">
-                                                        {patient.createTimeDate}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </TableCell> */}
 
-                                    <TableCell className="sticky left-[115px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[200px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}
                                     </TableCell>
-                                    <TableCell className="sticky left-[200px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[288px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.lastName}
                                     </TableCell>
 
                                     {/* Patient Data */}
-                                    <TableCell className="whitespace-nowrap">{patient.createTimeDate.split('T')[0]}</TableCell>
                                     <TableCell className="whitespace-nowrap">{patient.dob}</TableCell>
                                     <TableCell>{patient.sex}</TableCell>
                                     {/* <TableCell>{patient.height}</TableCell> */}
@@ -845,27 +861,43 @@ export default function Dashboard() {
 
                                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                         <>
-                                            <TableCell className="capitalize">{patient.approvalStatus}</TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    className={[
+                                                        "px-3 py-1 text-sm rounded-md capitalize",
+                                                        patient.approvalStatus === "pending"
+                                                            ? "bg-yellow-200 text-yellow-900 hover:bg-yellow-200"
+                                                            : patient.approvalStatus === "approved"
+                                                                ? "bg-green-200 text-green-900 hover:bg-green-200"
+                                                                : patient.approvalStatus === ""
+                                                                    ? "bg-blue-200 text-black hover:bg-blue-200"
+                                                                    : patient.approvalStatus === "disqualified"
+                                                                        ? "bg-purple-200 text-purple-900 hover:bg-purple-200"
+                                                                        : ["denied", "closed"].includes(patient.approvalStatus)
+                                                                            ? "bg-red-200 text-red-900 hover:bg-red-200"
+                                                                            : "bg-gray-200 text-gray-900 hover:bg-gray-200" // default case
+                                                    ].join(" ")}
+                                                >
+                                                    {patient.approvalStatus === ""
+                                                        ? "Awaiting"
+                                                        : patient.approvalStatus}
+                                                </Badge>
+                                            </TableCell>
 
                                             <TableCell>
                                                 <Badge
-                                                    className={
-                                                        [
-                                                            "px-3 py-1 text-sm rounded-md",
-                                                            patient.approvalStatus === "approved" ||
-                                                                patient.approvalStatus === "pending" ||
-                                                                patient.approvalStatus === "request a call"
-                                                                ? "bg-green-100 text-green-700 hover:bg-green-100"
-                                                                : "bg-red-100 text-red-700 hover:bg-red-100"
-                                                        ].join(" ")
-                                                    }
+                                                    className={[
+                                                        "px-3 py-1 text-sm rounded-md",
+                                                        ["approved", "denied", "closed"].includes(patient.approvalStatus)
+                                                            ? "bg-red-200 text-red-900 hover:bg-red-200"
+                                                            : "bg-green-200 text-green-900 hover:bg-green-200"
+                                                    ].join(" ")}
                                                 >
-                                                    {["approved", "denied", "disqualified", "closed"].includes(patient.approvalStatus)
+                                                    {["approved", "denied", "closed"].includes(patient.approvalStatus)
                                                         ? "Closed"
                                                         : "Open"}
                                                 </Badge>
                                             </TableCell>
-
                                         </>
                                     )}
 

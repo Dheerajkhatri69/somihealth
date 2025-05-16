@@ -48,7 +48,8 @@ export default function FollowUpForm() {
             createTimeDate: '',
             file1: '',
             file2: '',
-
+            providerComments: '',
+            providerNote: '',
 
             followUpRefills: true,
             needLabafter3RxFills: false,
@@ -62,8 +63,6 @@ export default function FollowUpForm() {
             switchMedication: '',
             continueDosage: '',
             increaseDosage: '',
-            patientStatement: '',
-            providerStatement: '',
             closetickets: false,
             Reasonclosetickets: '',
         };
@@ -138,7 +137,10 @@ export default function FollowUpForm() {
                 semaglutideUnit: patientData.patient.semaglutideUnit || '',
                 tirzepatideDose: patientData.patient.tirzepatideDose || '',
                 tirzepatideUnit: patientData.patient.tirzepatideUnit || '',
+                providerComments: patientData.patient.providerComments || '',
+                providerNote: patientData.patient.providerNote || ''
             }));
+            // console.log(patientData.patient)
 
             // Handle images
             const dbImages = patientData.patient.images || [];
@@ -624,6 +626,20 @@ export default function FollowUpForm() {
                     </div>
                 </div>
 
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="space-y-2">
+                        <Label htmlFor="providerComments">Enter your questions and comments</Label>
+                        <textarea
+                            id="providerComments"
+                            name="providerComments"
+                            className="w-full p-4 border rounded-md shadow-sm"
+                            rows="4"
+                            value={formData.providerComments}
+                            onChange={handleInputChange}
+                            placeholder="Write your questions or comments here..."
+                        />
+                    </div>
+                </div>
                 {/* Image Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Images</h3>
 
@@ -798,16 +814,19 @@ export default function FollowUpForm() {
                     </div>
                 </div>
 
-                <div className="space-y-2 ">
-                    <Label htmlFor="patientStatement">Patient Statement</Label>
-                    <Textarea
-                        id="patientStatement"
-                        name="patientStatement"
-                        value={formData.patientStatement}
-                        onChange={handleInputChange}
-                        placeholder="Patient's comments or statements"
-                        className="min-h-[100px]"
-                    />
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="space-y-2">
+                        <Label htmlFor="providerNote">Provider Note</Label>
+                        <textarea
+                            id="providerNote"
+                            name="providerNote"
+                            className="w-full p-4 border rounded-md shadow-sm"
+                            rows="4"
+                            value={formData.providerNote}
+                            onChange={handleInputChange}
+                            placeholder="Enter any notes or comments here..."
+                        />
+                    </div>
                 </div>
                 <Button type="submit" className="w-full">
                     Submit
