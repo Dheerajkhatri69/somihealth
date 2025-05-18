@@ -62,7 +62,7 @@ export default function FollowUp() {
     const [Tloading, setTLoading] = useState(true);
     const router = useRouter();
     const { data: session } = useSession();
-    const [viewMode, setViewMode] = useState('all'); // 'all' or 'assigned'
+    const [viewMode, setViewMode] = useState('assigned'); // 'all' or 'assigned'
 
     // Add pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -177,7 +177,7 @@ export default function FollowUp() {
     const [semaglutideUnitFilter, setSemaglutideUnitFilter] = useState('all');
     const [tirzepatideDoseOnly, setTirzepatideDoseOnly] = useState('all');
     const [tirzepatideUnitFilter, setTirzepatideUnitFilter] = useState('all');
-  const [createDateFilter, setCreateDateFilter] = useState("");
+    const [createDateFilter, setCreateDateFilter] = useState("");
     const [selectedImageInfo, setSelectedImageInfo] = useState(null);
 
     const [selectedStatus, setSelectedStatus] = useState('all');
@@ -186,7 +186,7 @@ export default function FollowUp() {
     const getStatusCounts = (patients) => {
         return {
             all: patients.length,
-            awaiting: patients.filter(p => !p.approvalStatus).length,
+            awaiting: patients.filter(p => !p.approvalStatus || p.approvalStatus === 'None').length,
             approved: patients.filter(p => p.approvalStatus === 'approved').length,
             pending: patients.filter(p => p.approvalStatus === 'pending').length,
             denied: patients.filter(p => p.approvalStatus === 'denied').length,
@@ -202,7 +202,11 @@ export default function FollowUp() {
         const cityMatch = cityFilter ? patient.city.toLowerCase().includes(cityFilter.toLowerCase()) : true;
         const medicineMatch = medicineFilter === 'all' || patient.glp1 === medicineFilter;
 
-        const approvalMatch = approvalFilter === 'all' || patient.approvalStatus === approvalFilter;
+        // const approvalMatch = approvalFilter === 'all' || patient.approvalStatus === approvalFilter;
+        const approvalMatch =
+            approvalFilter === 'all' ||
+            (approvalFilter === '' && (patient.approvalStatus === '' || patient.approvalStatus === 'None')) ||
+            patient.approvalStatus === approvalFilter;
 
         const semaglutideMatch = (
             (semaglutideDoseOnly === 'all' || patient.semaglutideDose == semaglutideDoseOnly) &&
@@ -389,6 +393,7 @@ export default function FollowUp() {
                         <SelectItem value="Male">Male</SelectItem>
                         <SelectItem value="Female">Female</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
+                        <SelectItem value="None">None</SelectItem>
                     </SelectContent>
                 </Select>
                 <div className="flex flex-nowrap items-center gap-2 rounded-md justify-center">
@@ -431,6 +436,7 @@ export default function FollowUp() {
                                     <SelectItem value="denied">Denied</SelectItem>
                                     <SelectItem value="pending">Pending</SelectItem>
                                     <SelectItem value="disqualified">Disqualified</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -457,6 +463,7 @@ export default function FollowUp() {
                                     <SelectItem value="all">All</SelectItem>
                                     <SelectItem value="Semaglutide">Semaglutide</SelectItem>
                                     <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -476,6 +483,7 @@ export default function FollowUp() {
                                         <SelectItem value="1.7">1.7 mg</SelectItem>
                                         <SelectItem value="2.0">2.0 mg</SelectItem>
                                         <SelectItem value="2.5">2.5 mg</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -493,6 +501,7 @@ export default function FollowUp() {
                                         <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
                                         <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
                                         <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -514,6 +523,7 @@ export default function FollowUp() {
                                         <SelectItem value="9.00">9.00mg</SelectItem>
                                         <SelectItem value="11.25">11.25mg</SelectItem>
                                         <SelectItem value="13.5">13.5mg</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -529,6 +539,7 @@ export default function FollowUp() {
                                         <SelectItem value="40.00 mg/2mL">40.00 mg/2mL</SelectItem>
                                         <SelectItem value="50.00 mg/2mL">50.00 mg/2mL</SelectItem>
                                         <SelectItem value="60.00 mg/2mL">60.00 mg/2mL</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -802,7 +813,7 @@ export default function FollowUp() {
                                                             ? "bg-yellow-200 text-yellow-900 hover:bg-yellow-200"
                                                             : patient.approvalStatus === "approved"
                                                                 ? "bg-green-200 text-green-900 hover:bg-green-200"
-                                                                : patient.approvalStatus === ""
+                                                                : patient.approvalStatus === "" || patient.approvalStatus === "None"
                                                                     ? "bg-blue-200 text-black hover:bg-blue-200"
                                                                     : patient.approvalStatus === "disqualified"
                                                                         ? "bg-purple-200 text-purple-900 hover:bg-purple-200"
@@ -811,7 +822,7 @@ export default function FollowUp() {
                                                                             : "bg-gray-200 text-gray-900 hover:bg-gray-200" // default case
                                                     ].join(" ")}
                                                 >
-                                                    {patient.approvalStatus === ""
+                                                    {patient.approvalStatus === "" || patient.approvalStatus === "None"
                                                         ? "Awaiting"
                                                         : patient.approvalStatus}
                                                 </Badge>
@@ -821,12 +832,12 @@ export default function FollowUp() {
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md",
-                                                        ["approved", "denied", "closed"].includes(patient.approvalStatus)
+                                                        ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
                                                             ? "bg-red-200 text-red-900 hover:bg-red-200"
                                                             : "bg-green-200 text-green-900 hover:bg-green-200"
                                                     ].join(" ")}
                                                 >
-                                                    {["approved", "denied", "closed"].includes(patient.approvalStatus)
+                                                    {["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
                                                         ? "Closed"
                                                         : "Open"}
                                                 </Badge>
@@ -913,16 +924,21 @@ export default function FollowUp() {
                 </div>
             </div>
             {/* Add Patient Button */}
-            <div className="flex justify-start items-center gap-4 mt-4">
+            <div className="fixed bottom-4 right-4 flex justify-start items-center gap-4 z-50">
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                     <Link href="/dashboard/addfollowup">
-                        <Button ><Plus /> Follow Up</Button>
+                        <Button><Plus /> Follow Up</Button>
                     </Link>
                 )}
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                    <EmailDialog selectedPatients={selectedPatients} selectedEmail={selectedEmail} selectedPatientData={selectedPatientData} />
+                    <EmailDialog
+                        selectedPatients={selectedPatients}
+                        selectedEmail={selectedEmail}
+                        selectedPatientData={selectedPatientData}
+                    />
                 )}
             </div>
+
             <AlertDialog
                 open={!!selectedImageInfo}
                 onOpenChange={() => setSelectedImageInfo(null)}

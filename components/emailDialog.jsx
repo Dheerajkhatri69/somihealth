@@ -35,7 +35,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n 
-joinsomi.com`
+Website: joinsomi.com`
     },
     {
         title: "Approval Semaglutide",
@@ -47,8 +47,8 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n 
-joinsomi.com\n
-https://joinsomi.com/wp-content/uploads/2022/11/Somi-GLP-1-Patient-Information-Handout.pdf
+Website: joinsomi.com\n
+View Somi GLP-1 Patient Information Packet: https://joinsomi.com/wp-content/uploads/2022/11/Somi-GLP-1-Patient-Information-Handout.pdf
 `
     },
     {
@@ -61,8 +61,8 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n
-joinsomi.com\n
-https://joinsomi.com/wp-content/uploads/2022/11/Somi-GLP-1-Patient-Information-Handout.pdf
+Website: joinsomi.com\n
+View Somi GLP-1 Patient Information Packet: https://joinsomi.com/wp-content/uploads/2022/11/Somi-GLP-1-Patient-Information-Handout.pdf
 `
     },
     {
@@ -73,7 +73,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n 
-joinsomi.com`
+Website: joinsomi.com`
     },
     {
         title: "Denial Based on BMI < 27",
@@ -85,7 +85,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n 
-joinsomi.com`
+Website: joinsomi.com`
     },
     {
         title: "Denial Based on No Comorbidity (BMI 27-29)",
@@ -117,7 +117,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n
-joinsomi.com`
+Website: joinsomi.com`
     },
     {
         title: "Incomplete Medical History",
@@ -129,7 +129,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n
-joinsomi.com`
+Website: joinsomi.com`
     },
     {
         title: "Pending for Comorbidity",
@@ -156,7 +156,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n 
-joinsomi.com`
+Website: joinsomi.com`
     },
     {
         title: "Custom Communication",
@@ -167,7 +167,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n 
-joinsomi.com`
+Website: joinsomi.com`
     },
     {
         title: "Soft Denial Requiring Labs (BMI 27-29 w/o Comorbidity)",
@@ -183,7 +183,7 @@ Sincerely,\n
 {providerName}\n
 Txt: (704) 386-6871\n
 Email: support@joinsomi.com\n 
-joinsomi.com`
+Website: joinsomi.com`
     }
 ];
 

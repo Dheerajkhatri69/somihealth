@@ -332,6 +332,7 @@ export default function UpdateFollowUp({ params }) {
                                 <SelectItem value="Male">Male</SelectItem>
                                 <SelectItem value="Female">Female</SelectItem>
                                 <SelectItem value="Other">Other</SelectItem>
+                                <SelectItem value="None">None</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -427,6 +428,7 @@ export default function UpdateFollowUp({ params }) {
                         <SelectContent>
                             <SelectItem value="Semaglutide">Semaglutide</SelectItem>
                             <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
+                            <SelectItem value="None">None</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -632,6 +634,7 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectItem value="denied">Denied</SelectItem>
                                     <SelectItem value="pending">Pending / Request a call</SelectItem>
                                     <SelectItem value="disqualified">Disqualified / Close</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -654,6 +657,7 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectItem value="1.7">1.7 mg</SelectItem>
                                     <SelectItem value="2.0">2.0 mg</SelectItem>
                                     <SelectItem value="2.5">2.5 mg</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
 
                             </Select>
@@ -673,6 +677,7 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
                                     <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
                                     <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -696,6 +701,7 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectItem value="9.00">9.00mg</SelectItem>
                                     <SelectItem value="11.25">11.25mg</SelectItem>
                                     <SelectItem value="13.5">13.5mg</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
 
@@ -713,6 +719,7 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectItem value="40.00 mg/2mL">40.00 mg/2mL</SelectItem>
                                     <SelectItem value="50.00 mg/2mL">50.00 mg/2mL</SelectItem>
                                     <SelectItem value="60.00 mg/2mL">60.00 mg/2mL</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
