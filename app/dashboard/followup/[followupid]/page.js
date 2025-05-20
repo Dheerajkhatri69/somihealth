@@ -216,6 +216,19 @@ export default function UpdateFollowUp({ params }) {
         updatedImages[index] = null;
         setImages(updatedImages);
     };
+    const [isOpen, setIsOpen] = useState(false);
+    const [sheetUrl, setSheetUrl] = useState('');
+
+    const openDialog = () => {
+        // Use the preview mode with cache busting
+        const timestamp = new Date().getTime();
+        setSheetUrl(
+            `https://docs.google.com/spreadsheets/d/13cpO5_q0yBb1Z-RiyZnAt32CUOr10QtzZx875PnuBuI/preview?rm=minimal&cacheBust=${timestamp}`
+        );
+        setIsOpen(true);
+    };
+
+
     if (!formData.authid) {
         return <div className="p-4 text-yellow-500">loading..</div>;
     }
@@ -695,12 +708,12 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.25">2.25mg</SelectItem>
-                                    <SelectItem value="4.50">4.50mg</SelectItem>
-                                    <SelectItem value="6.75">6.75mg</SelectItem>
-                                    <SelectItem value="9.00">9.00mg</SelectItem>
-                                    <SelectItem value="11.25">11.25mg</SelectItem>
-                                    <SelectItem value="13.5">13.5mg</SelectItem>
+                                    <SelectItem value="2.50">2.50mg</SelectItem>
+                                    <SelectItem value="5.00">5.00mg</SelectItem>
+                                    <SelectItem value="7.50">7.50mg</SelectItem>
+                                    <SelectItem value="10.00">10.00mg</SelectItem>
+                                    <SelectItem value="12.50">12.50mg</SelectItem>
+                                    <SelectItem value="15.00">15.00mg</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -725,6 +738,17 @@ export default function UpdateFollowUp({ params }) {
                         </div>
                     </div>
                 </div>
+                {(session?.user?.accounttype === 'C') && (
+                    <div className="w-full max-w-5xl mx-auto flex justify-center">
+                        <Button
+                            type="button"
+                            onClick={openDialog}
+                            className="max-w-sm bg-[#FFE4C9] text-black hover:bg-[#FFE4CC] hover:font-bold duration-150 shadow-xl"
+                        >
+                            Dosing Calculator
+                        </Button>
+                    </div>
+                )}
 
                 <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
@@ -788,6 +812,35 @@ export default function UpdateFollowUp({ params }) {
                             Close
                         </AlertDialogCancel>
                     </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+                <AlertDialogContent className="max-w-[90vw] h-[90vh] p-0 flex flex-col">
+                    <div className="relative flex-shrink-0">
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="absolute right-2 top-2 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-50"
+                        >
+                            <X className="h-6 w-6 bg-background/80 backdrop-blur-sm p-1 rounded-md border" />
+                            <span className="sr-only">Close</span>
+                        </button>
+                        <div className="px-6 pt-6 pb-2">
+                            <h2 className="text-lg font-semibold">Dosing Calculator</h2>
+                            <p className="text-sm text-muted-foreground">
+                                Interactive calculator (read-only view)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 min-h-0">
+                        {sheetUrl && (
+                            <iframe
+                                src={sheetUrl}
+                                className="w-full h-full border-0"
+                                allowFullScreen
+                            />
+                        )}
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
         </div>

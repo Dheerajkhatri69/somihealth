@@ -490,7 +490,7 @@ export default function Dashboard() {
                                     <SelectItem value="all">All</SelectItem>
                                     <SelectItem value="Semaglutide">Semaglutide</SelectItem>
                                     <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
-                                    <SelectItem value="None">None</SelectItem> 
+                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -544,12 +544,12 @@ export default function Dashboard() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="2.25">2.25mg</SelectItem>
-                                        <SelectItem value="4.50">4.50mg</SelectItem>
-                                        <SelectItem value="6.75">6.75mg</SelectItem>
-                                        <SelectItem value="9.00">9.00mg</SelectItem>
-                                        <SelectItem value="11.25">11.25mg</SelectItem>
-                                        <SelectItem value="13.5">13.5mg</SelectItem>
+                                        <SelectItem value="2.50">2.50mg</SelectItem>
+                                        <SelectItem value="5.00">5.00mg</SelectItem>
+                                        <SelectItem value="7.50">7.50mg</SelectItem>
+                                        <SelectItem value="10.00">10.00mg</SelectItem>
+                                        <SelectItem value="12.50">12.50mg</SelectItem>
+                                        <SelectItem value="15.00">15.00mg</SelectItem>
                                         <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
