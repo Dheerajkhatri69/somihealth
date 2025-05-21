@@ -216,19 +216,20 @@ export default function UpdateFollowUp({ params }) {
         updatedImages[index] = null;
         setImages(updatedImages);
     };
+
     const [isOpen, setIsOpen] = useState(false);
-    const [sheetUrl, setSheetUrl] = useState('');
+    const [sheetUrl, setSheetUrl] = useState("");
 
-    const openDialog = () => {
-        // Use the preview mode with cache busting
-        const timestamp = new Date().getTime();
-        setSheetUrl(
-            `https://docs.google.com/spreadsheets/d/13cpO5_q0yBb1Z-RiyZnAt32CUOr10QtzZx875PnuBuI/preview?rm=minimal&cacheBust=${timestamp}`
-        );
-        setIsOpen(true);
+    const openDialog = async () => {
+        try {
+            const res = await fetch("https://script.google.com/macros/s/AKfycbzD_xjGHjBtlXldIUy7KMv5n6_2gZOIUdBy6l4D6cD5WqTPabPJKoPdxZcChwWa3ou4ag/exec"); // replace with your deployed URL
+            const data = await res.json();
+            setSheetUrl(data.url);
+            setIsOpen(true);
+        } catch (err) {
+            console.error("Failed to load sheet copy:", err);
+        }
     };
-
-
     if (!formData.authid) {
         return <div className="p-4 text-yellow-500">loading..</div>;
     }
@@ -827,7 +828,7 @@ export default function UpdateFollowUp({ params }) {
                         <div className="px-6 pt-6 pb-2">
                             <h2 className="text-lg font-semibold">Dosing Calculator</h2>
                             <p className="text-sm text-muted-foreground">
-                                Interactive calculator (read-only view)
+                                You’re working on a temporary copy. Changes will not affect the original.
                             </p>
                         </div>
                     </div>
