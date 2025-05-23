@@ -24,6 +24,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import toast from 'react-hot-toast';
+import Link from "next/link";
+import { Badge } from '@/components/ui/badge';
 const Page = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatients, setSelectedPatients] = useState([]);
@@ -313,15 +315,33 @@ const Page = () => {
               <TableCell>{patient.Reasonclosetickets}</TableCell>
 
               <TableCell>
-                <span className={`px-2 py-1 rounded ${patient.approvalStatus === 'approved'
-                  ? 'bg-green-200 text-green-800'
-                  : 'bg-yellow-200 text-yellow-800'
-                  }`}>
-                  {patient.approvalStatus}
-                </span>
+                <Badge
+                  className={[
+                    "px-3 py-1 text-sm rounded-md capitalize",
+                    patient.approvalStatus === "pending"
+                      ? "bg-yellow-200 text-yellow-900 hover:bg-yellow-200"
+                      : patient.approvalStatus === "approved"
+                        ? "bg-green-200 text-green-900 hover:bg-green-200"
+                        : patient.approvalStatus === "" || patient.approvalStatus === "None"
+                          ? "bg-blue-200 text-black hover:bg-blue-200"
+                          : patient.approvalStatus === "disqualified"
+                            ? "bg-purple-200 text-purple-900 hover:bg-purple-200"
+                            : ["denied", "closed"].includes(patient.approvalStatus)
+                              ? "bg-red-200 text-red-900 hover:bg-red-200"
+                              : "bg-gray-200 text-gray-900 hover:bg-gray-200" // default case
+                  ].join(" ")}
+                >
+                  {patient.approvalStatus === "" || patient.approvalStatus === "None"
+                    ? "Awaiting"
+                    : patient.approvalStatus}
+                </Badge>
               </TableCell>
-
-              <TableCell className="bg-white">
+              <TableCell className="bg-white flex flex-wrap gap-2">
+                <Link href={`/dashboard/${patient.authid}`}>
+                  <Button variant="outline" size="sm" className="bg-gray-400 text-white hover:bg-gray-300 duration-150 hover:text-white">
+                    Open
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   size="sm"

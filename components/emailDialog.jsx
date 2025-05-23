@@ -277,7 +277,7 @@ export const EmailDialog = ({ selectedPatients, selectedEmail, selectedPatientDa
     return (
         <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
-                <Button disabled={!selectedPatients.length}>
+                <Button className="bg-secondary hover:bg-secondary" disabled={!selectedPatients.length}>
                     Send Email
                 </Button>
             </AlertDialogTrigger>

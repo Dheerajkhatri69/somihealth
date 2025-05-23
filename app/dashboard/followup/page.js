@@ -553,7 +553,7 @@ export default function FollowUp() {
                 )}
             </div>
 
-            {session?.user?.accounttype === 'A' && (
+            {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
                     <div
                         className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
@@ -705,15 +705,15 @@ export default function FollowUp() {
                                 {/* Tirzepatide */}
                                 <TableHead className="whitespace-nowrap">Tirzepatide Dose</TableHead>
 
+                                <TableHead className="whitespace-nowrap">Follow-Up/Refills</TableHead>
 
                                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                     <>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="whitespace-nowrap">Out Come</TableHead>
+                                        <TableHead className="sticky right-[165px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
+                                        <TableHead className="sticky right-[76px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
                                     </>
                                 )}
                                 {/* Add these new headers after existing ones */}
-                                <TableHead className="whitespace-nowrap">Follow-Up/Refills</TableHead>
                                 {/* <TableHead>GLP-1 Approval (6mo)</TableHead>
                                 <TableHead>Current Weight</TableHead>
                                 <TableHead>Current GLP-1 Med</TableHead>
@@ -802,10 +802,11 @@ export default function FollowUp() {
                                     <TableCell className="whitespace-nowrap">
                                         {patient.tirzepatideDose}{" unit: "}{patient.tirzepatideUnit}
                                     </TableCell>
+                                    <TableCell>{patient.followUpRefills ? "Yes" : "No"}</TableCell>
 
                                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                         <>
-                                            <TableCell>
+                                            <TableCell className="sticky right-[165px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md capitalize",
@@ -828,7 +829,7 @@ export default function FollowUp() {
                                                 </Badge>
                                             </TableCell>
 
-                                            <TableCell>
+                                            <TableCell className="sticky right-[76px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md",
@@ -845,7 +846,6 @@ export default function FollowUp() {
                                         </>
                                     )}
 
-                                    <TableCell>{patient.followUpRefills ? "Yes" : "No"}</TableCell>
                                     {/* <TableCell>{patient.glp1ApprovalLast6Months}</TableCell>
                                     <TableCell>{patient.currentWeight}</TableCell>
                                     <TableCell>{patient.currentGlp1Medication}</TableCell>
@@ -860,7 +860,7 @@ export default function FollowUp() {
                                     <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
                                         <Link href={`/dashboard/followup/${patient.authid}`}>
                                             <Button variant="outline" size="sm">
-                                                {session?.user?.accounttype === 'C' ? 'Submit' : 'Update'}
+                                                {session?.user?.accounttype === 'C' ? 'Open' : 'Open'}
                                             </Button>
                                         </Link>
                                         {session?.user?.accounttype === 'A' && (
@@ -927,7 +927,7 @@ export default function FollowUp() {
             <div className="fixed bottom-4 right-4 flex justify-start items-center gap-4 z-50">
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                     <Link href="/dashboard/addfollowup">
-                        <Button><Plus /> Follow Up</Button>
+                        <Button className="bg-secondary hover:bg-secondary"><Plus /> Follow Up</Button>
                     </Link>
                 )}
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (

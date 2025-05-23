@@ -580,7 +580,7 @@ export default function Dashboard() {
                 )}
             </div>
 
-            {session?.user?.accounttype === 'A' && (
+            {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
                     <div
                         className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
@@ -762,8 +762,8 @@ export default function Dashboard() {
 
                                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                     <>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Out Come</TableHead>
+                                        <TableHead className="sticky right-[165px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
+                                        <TableHead className="sticky right-[76px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
                                     </>
                                 )}
                                 {/* <TableHead>Provider Note</TableHead> */}
@@ -873,7 +873,7 @@ export default function Dashboard() {
 
                                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                         <>
-                                            <TableCell>
+                                            <TableCell className="sticky right-[165px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md capitalize",
@@ -896,7 +896,7 @@ export default function Dashboard() {
                                                 </Badge>
                                             </TableCell>
 
-                                            <TableCell>
+                                            <TableCell className="sticky right-[76px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md",
@@ -917,7 +917,7 @@ export default function Dashboard() {
                                     <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
                                         <Link href={`/dashboard/${patient.authid}`}>
                                             <Button variant="outline" size="sm">
-                                                {session?.user?.accounttype === 'C' ? 'Submit' : 'Update'}
+                                                {session?.user?.accounttype === 'C' ? 'Open' : 'Open'}
                                             </Button>
                                         </Link>
                                         {session?.user?.accounttype === 'A' && (
@@ -993,7 +993,7 @@ export default function Dashboard() {
             <div className="fixed bottom-4 right-4 flex justify-start items-center gap-4 z-50">
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                     <Link href="/dashboard/addrecord">
-                        <Button><Plus /> Add Patient</Button>
+                        <Button className="bg-secondary hover:bg-secondary"><Plus /> Add Patient</Button>
                     </Link>
                 )}
                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
