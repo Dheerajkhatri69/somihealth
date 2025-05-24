@@ -170,7 +170,7 @@ function FollowupShowAssig({ patient }) {
                     {patient.authid}
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                         <div 
-                            className="absolute -top-7 -left-1 group cursor-pointer"
+                            className="absolute -top-5 -left-1 group cursor-pointer"
                             onClick={() => setIsDialogOpen(true)}
                         >
                             <Bot className={`rounded-full text-sm ${

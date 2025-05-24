@@ -239,7 +239,7 @@ function TimeSensitiveCell({ patient }) {
                     {patient.authid}
 
                     {patient.approvalStatus === "None" && !isOver120 && (
-                        <div className="absolute -top-7 -right-1 group">
+                        <div className="absolute -top-5 -right-1 group">
                             <Timer className="cursor-pointer text-secondary-foreground rounded-full text-sm" />
                             <div className="absolute -top-7 -right-5 hidden group-hover:block bg-black/50 text-white text-xs px-2 py-1 rounded z-50 whitespace-nowrap">
                                 {timeLeft} left
@@ -249,7 +249,7 @@ function TimeSensitiveCell({ patient }) {
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                         <div
-                            className="absolute -top-7 -left-1 group cursor-pointer"
+                            className="absolute -top-5 -left-1 group cursor-pointer"
                             onClick={() => setIsDialogOpen(true)}
                         >
                             <Bot className={`rounded-full text-sm ${isClinicianAssigned ? "text-green-500" : "text-yellow-500"

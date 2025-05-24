@@ -47,7 +47,10 @@ export function AppSidebar() {
       <SidebarContent className="bg-secondary text-white">
         <SidebarGroup>
           <SidebarGroupLabel className="h-20 flex flex-col items-start mb-4">
-            <Image src={logo} alt="Logo" width={60} height={60} />
+            {/* <Image src={logo} alt="Logo" width={60} height={60} /> */}
+            <h1 className="font-tagesschrift text-4xl mb-2 text-white z-20 font-bold">
+            Somi
+          </h1>
             <div className="text-slate-300 text-[1rem] ">
               Patient Data Analysis
             </div>
