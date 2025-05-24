@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Hamburger } from "lucide-react";
+import { Bot } from "lucide-react";
 import { TableCell } from "./ui/table";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -173,7 +173,7 @@ function FollowupShowAssig({ patient }) {
                             className="absolute -top-7 -left-1 group cursor-pointer"
                             onClick={() => setIsDialogOpen(true)}
                         >
-                            <Hamburger className={`rounded-full text-sm ${
+                            <Bot className={`rounded-full text-sm ${
                                 isClinicianAssigned ? "text-green-500" : "text-yellow-500"
                             }`} />
                         </div>

@@ -14,7 +14,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-
+import Image from "next/image"
+import logo from '@/public/logo/somilogo.png';
 const items = [
   // {
   //   title: "Data Form",
@@ -45,12 +46,15 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent className="bg-secondary text-white">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-white text-[1rem]">
-            Patient Data Analysis
+          <SidebarGroupLabel className="h-20 flex flex-col items-start mb-4">
+            <Image src={logo} alt="Logo" width={60} height={60} />
+            <div className="text-slate-300 text-[1rem] ">
+              Patient Data Analysis
+            </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              
+
               {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                 <SidebarMenuItem>
                   <SidebarMenuButton

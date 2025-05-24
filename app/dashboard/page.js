@@ -11,7 +11,7 @@ import {
     TableRow,
     TableCell,
 } from "@/components/ui/table";
-import { ArrowDownNarrowWide, Plus, StepBack, StepForward, Timer } from "lucide-react";
+import { ArrowDownNarrowWide, Menu, Plus, StepBack, StepForward, Timer } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -62,6 +62,11 @@ export default function Dashboard() {
 
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 100;
+
+
+    const [openDialog, setOpenDialog] = useState(false);
+    const [selectedPatientId, setSelectedPatientId] = useState(null);
+    const [deleteReason, setDeleteReason] = useState("");
 
     useEffect(() => {
         const fetchPatients = async () => {
@@ -161,7 +166,7 @@ export default function Dashboard() {
         }
     }, [selectedPatients, patients]);
 
-    const [deleteReason, setDeleteReason] = useState("");
+    // const [deleteReason, setDeleteReason] = useState("");
 
     const [selectedImage, setSelectedImage] = useState(null);
     // State for filters
@@ -762,8 +767,8 @@ export default function Dashboard() {
 
                                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                     <>
-                                        <TableHead className="sticky right-[165px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
-                                        <TableHead className="sticky right-[76px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
+                                        <TableHead className="sticky right-[155px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
+                                        <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
                                     </>
                                 )}
                                 {/* <TableHead>Provider Note</TableHead> */}
@@ -873,7 +878,7 @@ export default function Dashboard() {
 
                                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                         <>
-                                            <TableCell className="sticky right-[165px] z-10 w-[80px] bg-white">
+                                            <TableCell className="sticky right-[155px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md capitalize",
@@ -896,7 +901,7 @@ export default function Dashboard() {
                                                 </Badge>
                                             </TableCell>
 
-                                            <TableCell className="sticky right-[76px] z-10 w-[80px] bg-white">
+                                            <TableCell className="sticky right-[66px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md",
@@ -914,50 +919,85 @@ export default function Dashboard() {
                                     )}
 
                                     {/* <TableCell>{patient.providerNote}</TableCell> */}
-                                    <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
-                                        <Link href={`/dashboard/${patient.authid}`}>
-                                            <Button variant="outline" size="sm">
-                                                {session?.user?.accounttype === 'C' ? 'Open' : 'Open'}
-                                            </Button>
-                                        </Link>
-                                        {session?.user?.accounttype === 'A' && (
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="sm">
+
+                                    <TableCell className="sticky right-0 bg-white">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon">
+                                                    <Menu className="h-5 w-5" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-52">
+                                                <DropdownMenuItem
+                                                    asChild
+                                                    disabled={
+                                                        session?.user?.accounttype === 'C' &&
+                                                        ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
+                                                    }
+                                                    className={`rounded-md ${session?.user?.accounttype === 'C' &&
+                                                            ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
+                                                            ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                            : "bg-secondary text-white"
+                                                        }`}
+                                                >
+                                                    <Link href={`/dashboard/${patient.authid}`}>Open</Link>
+                                                </DropdownMenuItem>
+
+
+                                                {session?.user?.accounttype === 'A' && (
+                                                    <DropdownMenuItem
+                                                        className="text-destructive"
+                                                        onClick={() => {
+                                                            setSelectedPatientId(patient.authid);
+                                                            setOpenDialog(true);
+                                                        }}
+                                                    >
                                                         Delete
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This patient record will be moved to the <strong>Closed Tickets</strong> section. You can access it later from there.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
+                                                    </DropdownMenuItem>
+                                                )}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
 
-                                                    {/* Reason Input */}
-                                                    <div className="mt-4">
-                                                        <label className="block text-sm font-medium mb-1">Reason for Closing</label>
-                                                        <Textarea
-                                                            placeholder="Enter reason..."
-                                                            value={deleteReason}
-                                                            onChange={(e) => setDeleteReason(e.target.value)}
-                                                        />
-                                                    </div>
+                                        {/* AlertDialog for Delete Confirmation */}
+                                        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This patient record will be moved to the <strong>Closed Tickets</strong> section.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
 
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() => handleDelete(patient.authid, deleteReason)}
-                                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                        >
-                                                            Move to Closed Tickets
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        )}
+                                                <div className="mt-4">
+                                                    <label className="block text-sm font-medium mb-1">Reason for Closing</label>
+                                                    <Textarea
+                                                        placeholder="Enter reason..."
+                                                        value={deleteReason}
+                                                        onChange={(e) => setDeleteReason(e.target.value)}
+                                                    />
+                                                </div>
+
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={() => {
+                                                            if (selectedPatientId) {
+                                                                handleDelete(selectedPatientId, deleteReason);
+                                                                setSelectedPatientId(null);
+                                                                setDeleteReason("");
+                                                                setOpenDialog(false);
+                                                            }
+                                                        }}
+                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                    >
+                                                        Move to Closed Tickets
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </TableCell>
+
+
                                 </TableRow>
                             ))}
                         </TableBody>

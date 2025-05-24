@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
-import { Bot, Hamburger, Menu, Timer } from "lucide-react";
+import { Bot, Timer } from "lucide-react";
 import { TableCell } from "./ui/table";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
-import { 
-  AlertDialog, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogHeader, 
-  AlertDialogTitle,
-  AlertDialogFooter
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogFooter
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
 } from "@/components/ui/select";
 
 function TimeSensitiveCell({ patient }) {
@@ -50,7 +50,7 @@ function TimeSensitiveCell({ patient }) {
                 }
             };
             fetchCreatorInfo();
-            
+
             // Fetch clinicians when dialog opens
             const fetchClinicians = async () => {
                 try {
@@ -232,9 +232,8 @@ function TimeSensitiveCell({ patient }) {
     return (
         <>
             <TableCell
-                className={`sticky left-[126px] z-20 w-[80px] text-center text-wrap font-bold bg-white text-secondary ${
-                    isOver24 && !isOver120 ? "bg-red-100 text-red-700" : ""
-                }`}
+                className={`sticky left-[126px] z-20 w-[80px] text-center text-wrap font-bold bg-white text-secondary ${isOver24 && !isOver120 ? "bg-red-100 text-red-700" : ""
+                    }`}
             >
                 <div className="relative">
                     {patient.authid}
@@ -247,15 +246,14 @@ function TimeSensitiveCell({ patient }) {
                             </div>
                         </div>
                     )}
-                    
+
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
                         <div
                             className="absolute -top-7 -left-1 group cursor-pointer"
                             onClick={() => setIsDialogOpen(true)}
                         >
-                            <Hamburger className={`rounded-full text-sm ${
-                                isClinicianAssigned ? "text-green-500" : "text-yellow-500"
-                            }`} />
+                            <Bot className={`rounded-full text-sm ${isClinicianAssigned ? "text-green-500" : "text-yellow-500"
+                                }`} />
                         </div>
                     )}
                 </div>
@@ -313,8 +311,8 @@ function TimeSensitiveCell({ patient }) {
                                 {operation !== "delete" && (
                                     <div className="grid gap-2">
                                         <label className="block text-sm font-medium mb-1">Select Clinician</label>
-                                        <Select 
-                                            value={selectedClinician} 
+                                        <Select
+                                            value={selectedClinician}
                                             onValueChange={setSelectedClinician}
                                         >
                                             <SelectTrigger>
@@ -334,14 +332,14 @@ function TimeSensitiveCell({ patient }) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <Button 
+                        <Button
                             onClick={() => setIsDialogOpen(false)}
                             variant="outline"
                             disabled={isSubmitting}
                         >
                             Close
                         </Button>
-                        <Button 
+                        <Button
                             onClick={handleAssignment}
                             disabled={isSubmitting || (operation !== "delete" && !selectedClinician)}
                         >

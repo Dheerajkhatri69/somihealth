@@ -11,7 +11,7 @@ import {
     TableRow,
     TableCell,
 } from "@/components/ui/table";
-import { ArrowDownNarrowWide, Plus, StepBack, StepForward, Timer } from "lucide-react";
+import { ArrowDownNarrowWide, Menu, Plus, StepBack, StepForward, Timer } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -63,6 +63,10 @@ export default function FollowUp() {
     const router = useRouter();
     const { data: session } = useSession();
     const [viewMode, setViewMode] = useState('assigned'); // 'all' or 'assigned'
+
+    const [openDialog, setOpenDialog] = useState(false)
+    const [selectedPatientId, setSelectedPatientId] = useState(null)
+
 
     // Add pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -709,8 +713,8 @@ export default function FollowUp() {
 
                                 {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                     <>
-                                        <TableHead className="sticky right-[165px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
-                                        <TableHead className="sticky right-[76px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
+                                        <TableHead className="sticky right-[155px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
+                                        <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
                                     </>
                                 )}
                                 {/* Add these new headers after existing ones */}
@@ -806,7 +810,7 @@ export default function FollowUp() {
 
                                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                                         <>
-                                            <TableCell className="sticky right-[165px] z-10 w-[80px] bg-white">
+                                            <TableCell className="sticky right-[155px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md capitalize",
@@ -829,7 +833,7 @@ export default function FollowUp() {
                                                 </Badge>
                                             </TableCell>
 
-                                            <TableCell className="sticky right-[76px] z-10 w-[80px] bg-white">
+                                            <TableCell className="sticky right-[66px] z-10 w-[80px] bg-white">
                                                 <Badge
                                                     className={[
                                                         "px-3 py-1 text-sm rounded-md",
@@ -857,41 +861,62 @@ export default function FollowUp() {
                                     <TableCell>{patient.increaseDosage}</TableCell>
                                     <TableCell className="max-w-[250px] truncate">{patient.patientStatement}</TableCell> */}
 
-                                    <TableCell className={`sticky right-0 bg-white ${session?.user?.accounttype === 'A' ? 'flex flex-col gap-2' : ''}`}>
-                                        <Link href={`/dashboard/followup/${patient.authid}`}>
-                                            <Button variant="outline" size="sm">
-                                                {session?.user?.accounttype === 'C' ? 'Open' : 'Open'}
-                                            </Button>
-                                        </Link>
-                                        {session?.user?.accounttype === 'A' && (
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="sm">
+
+                                    <TableCell className="sticky right-0 bg-white">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon">
+                                                    <Menu className="h-5 w-5" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-52">
+                                                <DropdownMenuItem asChild className="bg-secondary rounded-md text-white">
+                                                    <Link href={`/dashboard/followup/${patient.authid}`}>Open</Link>
+                                                </DropdownMenuItem>
+
+                                                {session?.user?.accounttype === 'A' && (
+                                                    <DropdownMenuItem
+                                                        onClick={() => {
+                                                            setSelectedPatientId(patient.authid)
+                                                            setOpenDialog(true)
+                                                        }}
+                                                        className="text-destructive"
+                                                    >
                                                         Delete
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This action cannot be undone. This will permanently delete the selected patients from our servers.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
+                                                    </DropdownMenuItem>
+                                                )}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
 
+                                        {/* Delete Confirmation Dialog */}
+                                        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. This will permanently delete the selected patient from our servers.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
 
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() => handleDelete(patient.authid)}
-                                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                        >
-                                                            Delete Permanently
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        )}
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={() => {
+                                                            if (selectedPatientId) {
+                                                                handleDelete(selectedPatientId)
+                                                                setOpenDialog(false)
+                                                                setSelectedPatientId(null)
+                                                            }
+                                                        }}
+                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                    >
+                                                        Delete Permanently
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </TableCell>
+
                                 </TableRow>
                             ))}
                         </TableBody>
