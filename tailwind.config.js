@@ -70,7 +70,7 @@ module.exports = {
 				}
 			},
 			fontFamily: {
-				tagesschrift: ['Tagesschrift', 'system-ui'],
+				tagesschrift: ["Cormorant Garamond", "serif"],
 			},
 		}
 	},
