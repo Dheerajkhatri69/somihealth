@@ -212,6 +212,7 @@ function TimeSensitiveCell({ patient }) {
                 }).filter(Boolean);
 
                 setClinicianAssignData(filteredData);
+                setIsDialogOpen(false);
             } else {
                 toast.error(data.result?.message || `Failed to ${operation} assignment`);
             }
@@ -232,7 +233,7 @@ function TimeSensitiveCell({ patient }) {
     return (
         <>
             <TableCell
-                className={`sticky left-[126px] z-20 w-[80px] text-center text-wrap font-bold bg-white text-secondary ${isOver24 && !isOver120 ? "bg-red-100 text-red-700" : ""
+                className={`sticky left-[133px] z-20 w-[80px] text-center text-wrap font-bold bg-white text-secondary ${isOver24 && !isOver120 ? "bg-red-100 text-red-700" : ""
                     }`}
             >
                 <div className="relative">

@@ -149,6 +149,7 @@ function FollowupShowAssig({ patient }) {
                 }).filter(Boolean);
 
                 setClinicianAssignData(filteredData);
+                setIsDialogOpen(false);
             } else {
                 toast.error(data.result?.message || `Failed to ${operation} assignment`);
             }
@@ -165,7 +166,7 @@ function FollowupShowAssig({ patient }) {
 
     return (
         <>
-            <TableCell className="sticky left-[126px] z-20 w-[80px] text-center text-wrap font-bold bg-white text-secondary">
+            <TableCell className="sticky left-[133px] z-20 w-[80px] text-center text-wrap whitespace-nowrap font-bold bg-white text-secondary">
                 <div className="relative">
                     {patient.authid}
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (

@@ -51,6 +51,8 @@ import toast from "react-hot-toast";
 import { EmailDialog } from "@/components/emailDialog";
 import TimeSensitiveCell from "@/components/timer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DiagnosisCell } from "@/components/diagnosisCell";
+import { ClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 
 export default function Dashboard() {
     const [patients, setPatients] = useState([]);
@@ -59,7 +61,6 @@ export default function Dashboard() {
     const [Tloading, setTLoading] = useState(true);
     const [ticketFilter, setTicketFilter] = useState('assigned'); // 'all' or 'assigned'
     const { data: session } = useSession();
-
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 100;
 
@@ -698,15 +699,15 @@ export default function Dashboard() {
                                 </TableHead>
                                 <TableHead className="sticky left-[32px] z-10 w-[94px] bg-secondary text-white whitespace-nowrap">Date</TableHead>
 
-                                <TableHead className="sticky left-[126px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[133px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
                                     AUTH ID
                                 </TableHead>
 
-                                <TableHead className="sticky left-[200px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[206px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     First Name
                                 </TableHead>
 
-                                <TableHead className="sticky left-[288px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[294px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     Last Name
                                 </TableHead>
 
@@ -772,7 +773,9 @@ export default function Dashboard() {
                                     </>
                                 )}
                                 {/* <TableHead>Provider Note</TableHead> */}
-
+                                {session?.user?.accounttype === 'T' && (
+                                    <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
+                                )}
                                 <TableHead className="sticky right-0 bg-secondary text-white">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -801,10 +804,10 @@ export default function Dashboard() {
                                     <TimeSensitiveCell patient={patient} />
 
 
-                                    <TableCell className="sticky left-[200px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[206px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}
                                     </TableCell>
-                                    <TableCell className="sticky left-[288px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[294px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.lastName}
                                     </TableCell>
 
@@ -833,7 +836,11 @@ export default function Dashboard() {
                                     <TableCell>{patient.thyroidCancerHistory}</TableCell>
                                     <TableCell>{patient.surgeryList}</TableCell>
                                     <TableCell>{patient.disqualifiers}</TableCell> */}
-                                    <TableCell>{patient.diagnosis}</TableCell>
+                                    {/* <TableCell>{patient.diagnosis}</TableCell> */}
+                                    <TableCell className="relative overflow-visible">
+                                        <DiagnosisCell diagnosis={patient.diagnosis} />
+                                    </TableCell>
+
 
                                     {/* <TableCell>{patient.startingWeight}</TableCell>
                                     <TableCell>{patient.currentWeight}</TableCell>
@@ -917,6 +924,9 @@ export default function Dashboard() {
                                             </TableCell>
                                         </>
                                     )}
+                                    {session?.user?.accounttype === 'T' && (
+                                        <ClinicianStatusBadge patient={patient} />
+                                    )}
 
                                     {/* <TableCell>{patient.providerNote}</TableCell> */}
 
@@ -935,9 +945,9 @@ export default function Dashboard() {
                                                         ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
                                                     }
                                                     className={`rounded-md ${session?.user?.accounttype === 'C' &&
-                                                            ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
-                                                            ? "bg-muted text-muted-foreground cursor-not-allowed"
-                                                            : "bg-secondary text-white"
+                                                        ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
+                                                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                        : "bg-secondary text-white"
                                                         }`}
                                                 >
                                                     <Link href={`/dashboard/${patient.authid}`}>Open</Link>

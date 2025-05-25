@@ -54,6 +54,7 @@ import { useRouter } from "next/navigation";
 import { FollowupClinicianDropdown } from "@/components/followupClinicianDropdown";
 import FollowupShowAssig from "@/components/followupshowassign";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FollowupClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 
 export default function FollowUp() {
     const [patients, setPatients] = useState([]);
@@ -669,15 +670,15 @@ export default function FollowUp() {
                                 </TableHead>
                                 <TableHead className="sticky left-[32px] z-10 w-[94px] bg-secondary text-white whitespace-nowrap">Date</TableHead>
 
-                                <TableHead className="sticky left-[126px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[133px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">
                                     AUTH ID
                                 </TableHead>
 
-                                <TableHead className="sticky left-[200px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[217px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     First Name
                                 </TableHead>
 
-                                <TableHead className="sticky left-[288px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
+                                <TableHead className="sticky left-[305px] z-10 w-[100px] bg-secondary text-white whitespace-nowrap">
                                     Last Name
                                 </TableHead>
 
@@ -717,6 +718,9 @@ export default function FollowUp() {
                                         <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
                                     </>
                                 )}
+                                {session?.user?.accounttype === 'T' && (
+                                    <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
+                                )}
                                 {/* Add these new headers after existing ones */}
                                 {/* <TableHead>GLP-1 Approval (6mo)</TableHead>
                                 <TableHead>Current Weight</TableHead>
@@ -755,10 +759,10 @@ export default function FollowUp() {
 
                                     <FollowupShowAssig patient={patient} />
 
-                                    <TableCell className="sticky left-[200px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[217px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}
                                     </TableCell>
-                                    <TableCell className="sticky left-[288px] z-10 w-[100px] text-secondary bg-white font-bold">
+                                    <TableCell className="sticky left-[305px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.lastName}
                                     </TableCell>
 
@@ -849,7 +853,9 @@ export default function FollowUp() {
                                             </TableCell>
                                         </>
                                     )}
-
+                                    {session?.user?.accounttype === 'T' && (
+                                        <FollowupClinicianStatusBadge patient={patient} />
+                                    )}
                                     {/* <TableCell>{patient.glp1ApprovalLast6Months}</TableCell>
                                     <TableCell>{patient.currentWeight}</TableCell>
                                     <TableCell>{patient.currentGlp1Medication}</TableCell>

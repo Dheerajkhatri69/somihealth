@@ -5,7 +5,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { useState } from "react";
-import logo from '@/public/logo/somilogo.png';
 import {
   Form,
   FormControl,
@@ -18,8 +17,6 @@ import { useRouter } from 'next/navigation';
 import { signIn } from "next-auth/react";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
-import { TypeAnimation } from "react-type-animation";
 
 const formSchema = z.object({
   id: z.string()
@@ -74,35 +71,14 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#50699f] via-[#2c3a57] to-[#5d77ae] flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-lg flex flex-col md:flex-row overflow-hidden">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-secondary shadow-2xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Section */}
-        <div className="md:w-1/2 w-full text-white p-8 md:p-12 relative flex flex-col justify-start items-start">
-          {/* <div className="flex justify-center z-20">
-            <Image src={logo} alt="Logo" width={100} height={100} />
-          </div> */}
-          <h1 className="font-tagesschrift text-5xl mb-2 text-white z-20 font-bold">
-            Somi
+        <div className="relative md:w-1/2 w-full flex justify-start items-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5d77ae] via-[#50699f] to-[#28354f] [clip-path:ellipse(100%_100%_at_50%_0%)] md:[clip-path:ellipse(100%_100%_at_0%_50%)] z-0"></div>
+          <h1 className="font-tagesschrift md:text-9xl text-7xl w-full text-center text-white z-10 font-bold">
+            somi
           </h1>
-          <h4 className="text-lg font-semibold mb-2 z-20">Your Health, Your Future, Your Time.</h4>
-
-          <TypeAnimation
-            sequence={[
-              "No hidden fees. No hassle. Just results.",
-              2000,
-              "Custom plans. Real help. Real care.",
-              2000,
-            ]}
-            wrapper="p"
-            speed={50}
-            style={{ fontSize: '0.875rem', opacity: 0.8 }}
-            className="z-20 min-h-[3.5rem]"
-            repeat={Infinity}
-          />
-          {/* Circles */}
-          <div className="absolute -top-48 -left-10 w-[600px] h-[600px] md:-top-28 md:-left-28  md:w-[500px] md:h-[500px] bg-gradient-to-br from-[#5d77ae] via-[#50699f] to-[#28354f] rounded-full"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 md:w-96 md:h-96 bg-gradient-to-br from-[#2b354a] via-[#50699f] to-[#5d77ae]  rounded-full transform -translate-x-1/2 translate-y-1/2"></div>
-          <div className="absolute bottom-[10%] right-0 w-36 h-36 md:w-64 md:h-64 bg-gradient-to-br from-[#5d77ae] via-[#50699f] to-[#28354f]  rounded-full"></div>
         </div>
 
         {/* Right Section */}
@@ -172,12 +148,6 @@ export default function LoginForm() {
               >
                 {isLoading ? <Loader2 className="animate-spin" /> : "Sign in"}
               </Button>
-
-              {/* Or */}
-              <div className="flex items-center space-x-2 text-gray-400 text-sm">
-                <div className="flex-1 border-t"></div>
-                <div className="flex-1 border-t"></div>
-              </div>
             </form>
           </Form>
         </div>
