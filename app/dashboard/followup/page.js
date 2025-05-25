@@ -54,7 +54,7 @@ import { useRouter } from "next/navigation";
 import { FollowupClinicianDropdown } from "@/components/followupClinicianDropdown";
 import FollowupShowAssig from "@/components/followupshowassign";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FollowupClinicianStatusBadge } from "@/components/clinicianStatusBadge";
+import { FollowupClinicianAction, FollowupClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 
 export default function FollowUp() {
     const [patients, setPatients] = useState([]);
@@ -372,8 +372,8 @@ export default function FollowUp() {
                             <SelectValue placeholder="View Mode" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="assigned">My Tickets</SelectItem>
-                            <SelectItem value="all">All Tickets</SelectItem>
+                            <SelectItem value="assigned">Assigned Patients</SelectItem>
+                            <SelectItem value="all">All Patients</SelectItem>
                         </SelectContent>
                     </Select>
                 )}
@@ -876,10 +876,27 @@ export default function FollowUp() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-52">
-                                                <DropdownMenuItem asChild className="bg-secondary rounded-md text-white">
-                                                    <Link href={`/dashboard/followup/${patient.authid}`}>Open</Link>
-                                                </DropdownMenuItem>
 
+                                                {session?.user?.accounttype === 'T' && (
+                                                    <FollowupClinicianAction patient={patient} />
+                                                )}
+
+                                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                                    <DropdownMenuItem
+                                                        asChild
+                                                        disabled={
+                                                            session?.user?.accounttype === 'C' &&
+                                                            ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
+                                                        }
+                                                        className={`rounded-md ${session?.user?.accounttype === 'C' &&
+                                                            ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
+                                                            ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                            : "bg-secondary text-white"
+                                                            }`}
+                                                    >
+                                                        <Link href={`/dashboard/followup/${patient.authid}`}>Open</Link>
+                                                    </DropdownMenuItem>
+                                                )}
                                                 {session?.user?.accounttype === 'A' && (
                                                     <DropdownMenuItem
                                                         onClick={() => {

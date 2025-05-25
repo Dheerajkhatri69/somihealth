@@ -52,7 +52,7 @@ import { EmailDialog } from "@/components/emailDialog";
 import TimeSensitiveCell from "@/components/timer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DiagnosisCell } from "@/components/diagnosisCell";
-import { ClinicianStatusBadge } from "@/components/clinicianStatusBadge";
+import { ClinicianAction, ClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 
 export default function Dashboard() {
     const [patients, setPatients] = useState([]);
@@ -389,8 +389,8 @@ export default function Dashboard() {
                             <SelectValue placeholder="Filter Tickets" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="assigned">My Assigned Tickets</SelectItem>
-                            <SelectItem value="all">All Tickets</SelectItem>
+                            <SelectItem value="assigned">Assigned Patients</SelectItem>
+                            <SelectItem value="all">All Patients</SelectItem>
                         </SelectContent>
                     </Select>
                 )}
@@ -937,22 +937,27 @@ export default function Dashboard() {
                                                     <Menu className="h-5 w-5" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="w-52">
-                                                <DropdownMenuItem
-                                                    asChild
-                                                    disabled={
-                                                        session?.user?.accounttype === 'C' &&
-                                                        ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
-                                                    }
-                                                    className={`rounded-md ${session?.user?.accounttype === 'C' &&
-                                                        ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
-                                                        ? "bg-muted text-muted-foreground cursor-not-allowed"
-                                                        : "bg-secondary text-white"
-                                                        }`}
-                                                >
-                                                    <Link href={`/dashboard/${patient.authid}`}>Open</Link>
-                                                </DropdownMenuItem>
 
+                                            <DropdownMenuContent align="end" className="w-52">
+                                                {session?.user?.accounttype === 'T' && (
+                                                    <ClinicianAction patient={patient} />
+                                                )}
+                                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                                    <DropdownMenuItem
+                                                        asChild
+                                                        disabled={
+                                                            session?.user?.accounttype === 'C' &&
+                                                            ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
+                                                        }
+                                                        className={`rounded-md ${session?.user?.accounttype === 'C' &&
+                                                            ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
+                                                            ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                            : "bg-secondary text-white"
+                                                            }`}
+                                                    >
+                                                        <Link href={`/dashboard/${patient.authid}`}>Open</Link>
+                                                    </DropdownMenuItem>
+                                                )}
 
                                                 {session?.user?.accounttype === 'A' && (
                                                     <DropdownMenuItem

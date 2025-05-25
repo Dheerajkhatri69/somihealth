@@ -278,7 +278,7 @@ export default function PatientUpdateForm({ params }) {
         try {
             const res = await fetch("https://script.google.com/macros/s/AKfycbzD_xjGHjBtlXldIUy7KMv5n6_2gZOIUdBy6l4D6cD5WqTPabPJKoPdxZcChwWa3ou4ag/exec"); // replace with your deployed URL
             const data = await res.json();
-            setSheetUrl(data.url);
+            setSheetUrl("https://docs.google.com/spreadsheets/d/1mwd2O4IyXiy7T2U39sE4tGBWE8x9B9zQLhNQuolgBgM/edit?gid=892870457#gid=892870457");
             setIsOpen(true);
         } catch (err) {
             console.error("Failed to load sheet copy:", err);
