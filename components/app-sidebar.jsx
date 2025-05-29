@@ -1,6 +1,6 @@
 'use client'
-import { useEffect } from "react"
-import { Calendar, History, Home, Inbox, Plus, Search, Settings, Trash, UserRoundPlus } from "lucide-react"
+import { useMemo } from "react"
+import { History, Home, Inbox, Plus, Trash, UserRoundPlus } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import {
@@ -14,65 +14,103 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import Image from "next/image"
-import logo from '@/public/logo/somilogo.png';
-const items = [
-  // {
-  //   title: "Data Form",
-  //   url: "/dashboard/addrecord",
-  //   icon: Home,
-  // },
+import { Skeleton } from "@/components/ui/skeleton"
+
+const sidebarItems = [
+  {
+    title: "Data Form",
+    url: "/dashboard/addrecord",
+    icon: Home,
+    allowedRoles: ['A', 'T']
+  },
   {
     title: "Dashboard",
     url: "/dashboard",
     icon: Inbox,
+    allowedRoles: ['A', 'T', 'C'] // A: Admin, T: Technician, S: Staff
   },
   {
     title: "Follow up",
     url: "/dashboard/followup",
     icon: UserRoundPlus,
+    allowedRoles: ['A', 'T', 'C']
   },
+  {
+    title: "Email History",
+    url: "/dashboard/emailhistorytable",
+    icon: History,
+    allowedRoles: ['A']
+  },
+  {
+    title: "Close tickets",
+    url: "/dashboard/closetickets",
+    icon: Trash,
+    allowedRoles: ['A']
+  }
 ]
 
 export function AppSidebar() {
-  const { data: session } = useSession()
-  const pathname = usePathname() // 🔹 Get current route
+  const { data: session, status } = useSession()
+  const pathname = usePathname()
 
-  useEffect(() => {
-    // console.log("Session user:", session?.user);
-  }, [session]);
+  const filteredItems = useMemo(() => {
+    return sidebarItems.filter(item =>
+      item.allowedRoles.includes(session?.user?.accounttype || '')
+    )
+  }, [session?.user?.accounttype])
+  if (status === 'loading') {
+    return (
+      <Sidebar>
+        <SidebarContent className="bg-secondary text-white">
+          <SidebarGroup>
+            <SidebarGroupLabel className="h-20 flex flex-col items-start">
+              <h1 className="font-tagesschrift text-4xl mb-2 text-white z-20 font-bold">
+                somi
+              </h1>
+              <div className="text-slate-300 text-[1rem]">
+                Patient Data Analysis
+              </div>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {[...Array(3)].map((_, i) => (
+                  <SidebarMenuItem key={i}>
+                    <SidebarMenuButton asChild>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-5 w-5 bg-gray-400" />
+                        <Skeleton className="h-4 w-28 bg-gray-400" />
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    )
+  }
+
+  // const filteredItems = sidebarItems.filter(item =>
+  //   item.allowedRoles.includes(session?.user?.accounttype || '')
+  // )
 
   return (
     <Sidebar>
       <SidebarContent className="bg-secondary text-white">
         <SidebarGroup>
           <SidebarGroupLabel className="h-20 flex flex-col items-start">
-            {/* <Image src={logo} alt="Logo" width={60} height={60} /> */}
             <h1 className="font-tagesschrift text-4xl mb-2 text-white z-20 font-bold">
               somi
             </h1>
-            <div className="text-slate-300 text-[1rem] ">
+            <div className="text-slate-300 text-[1rem]">
               Patient Data Analysis
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-
-              {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={pathname === "/dashboard/addrecord" ? "bg-white text-black" : ""}
-                  >
-                    <a href="/dashboard/addrecord">
-                      <Home size={20} />
-                      <span>Data Form</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-              {items.map((item) => {
-                const isActive = pathname === item.url;
+              {filteredItems.map((item) => {
+                const isActive = pathname === item.url
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
@@ -85,36 +123,8 @@ export function AppSidebar() {
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                );
+                )
               })}
-
-              {(session?.user?.accounttype === 'A') && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={pathname === "/dashboard/emailhistorytable" ? "bg-white text-black" : ""}
-                  >
-                    <a href="/dashboard/emailhistorytable">
-                      <History size={20} />
-                      <span>Email History</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-
-              {session?.user?.accounttype === 'A' && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={pathname === "/dashboard/closetickets" ? "bg-white text-black" : ""}
-                  >
-                    <a href="/dashboard/closetickets">
-                      <Trash size={20} />
-                      <span>Close tickets</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
