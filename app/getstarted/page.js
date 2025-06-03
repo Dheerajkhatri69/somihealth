@@ -1,41 +1,9 @@
 "use client"
-import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Progress } from '@/components/ui/progress';
 
 const LandingPage = () => {
-    const [loading, setLoading] = useState(true);
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        let percent = 0;
-
-        const interval = setInterval(() => {
-            percent += 10;
-            if (percent >= 100) {
-                setProgress(100);
-                clearInterval(interval);
-                setTimeout(() => setLoading(false), 100); // extra 200ms for smoothness
-            } else {
-                setProgress(percent);
-            }
-        }, 100);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex flex-col justify-center items-center bg-white p-6">
-                <div className="w-64">
-                    <Progress value={progress} />
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen overflow-hidden flex flex-col md:flex-row items-center justify-center bg-white p-6">
             {/* Left Section - Text */}
@@ -82,8 +50,8 @@ const LandingPage = () => {
                         width={500}
                         height={400}
                         className="rounded-xl object-contain"
-                        style={{ width: '100%', height: 'auto' }} // maintain ratio
-                        priority // ✅ this eliminates the LCP warning
+                        style={{ width: '100%', height: 'auto' }}
+                        priority
                     />
                 </div>
             </motion.div>

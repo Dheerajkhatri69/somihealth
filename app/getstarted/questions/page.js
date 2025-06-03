@@ -1,19 +1,19 @@
 'use client';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
-import { BasicInformationSegment } from './segments/BasicInformationSegment';
-import { AddressSegment } from './segments/AddressSegment';
-import { VitalsSegment } from './segments/VitalsSegment';
-import { MedicalHistorySegment } from './segments/MedicalHistorySegment';
-import { DiagnosisSegment } from './segments/DiagnosisSegment';
-import { WeightProgressSegment } from './segments/WeightProgressSegment';
-import { WeightLossMedicationSegment } from './segments/WeightLossMedicationSegment';
-import { GLP1Segment } from './segments/GLP1Segment';
-import { SemaglutideSegment } from './segments/SemaglutideSegment';
-import { TirzepatideSegment } from './segments/TirzepatideSegment';
-import { TirzepatideDetailsSegment } from './segments/TirzepatideDetailsSegment';
-import { CommentsSegment } from './segments/CommentsSegment';
-import { MedicationSelectionSegment } from './segments/MedicationSelectionSegment';
+import { BasicInformationSegment } from '@/components/segments/BasicInformationSegment';
+import { AddressSegment } from '@/components/segments/AddressSegment';
+import { VitalsSegment } from '@/components/segments/VitalsSegment';
+import { MedicalHistorySegment } from '@/components/segments/MedicalHistorySegment';
+import { DiagnosisSegment } from '@/components/segments/DiagnosisSegment';
+import { WeightProgressSegment } from '@/components/segments/WeightProgressSegment';
+import { WeightLossMedicationSegment } from '@/components/segments/WeightLossMedicationSegment';
+import { GLP1Segment } from '@/components/segments/GLP1Segment';
+import { SemaglutideSegment } from '@/components/segments/SemaglutideSegment';
+import { TirzepatideSegment } from '@/components/segments/TirzepatideSegment';
+import { TirzepatideDetailsSegment } from '@/components/segments/TirzepatideDetailsSegment';
+import { CommentsSegment } from '@/components/segments/CommentsSegment';
+import { MedicationSelectionSegment } from '@/components/segments/MedicationSelectionSegment';
 
 const segments = [
     'Let start with the Basic Information',
