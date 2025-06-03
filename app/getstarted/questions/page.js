@@ -1,5 +1,6 @@
-'use client';
-import { useState } from 'react';
+"use client";
+
+import React, { useState } from "react";
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -237,18 +238,17 @@ const QuestionForm = () => {
                         <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Address Information</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
-                                <div 
-                                    key={field} 
-                                    className={`space-y-1.5 ${
-                                        field === 'address1' ? 'md:col-span-2' : 
-                                        field === 'address2' ? 'md:col-span-2' : ''
-                                    }`}
+                                <div
+                                    key={field}
+                                    className={`space-y-1.5 ${field === 'address1' ? 'md:col-span-2' :
+                                            field === 'address2' ? 'md:col-span-2' : ''
+                                        }`}
                                 >
                                     <Label htmlFor={field}>
                                         {field === 'address1' ? 'Street Address' :
                                             field === 'address2' ? 'Address Line 2' :
-                                            field === 'city' ? 'City' :
-                                            field === 'state' ? 'State/Province' : 'Postal Code'}
+                                                field === 'city' ? 'City' :
+                                                    field === 'state' ? 'State/Province' : 'Postal Code'}
                                     </Label>
                                     <Input
                                         id={field}
@@ -257,9 +257,9 @@ const QuestionForm = () => {
                                         onChange={handleInputChange}
                                         placeholder={
                                             field === 'address1' ? '123 Main St' :
-                                            field === 'address2' ? 'Apt, suite, or unit' :
-                                            field === 'city' ? 'e.g. New York' :
-                                            field === 'state' ? 'e.g. NY' : 'e.g. 10001'
+                                                field === 'address2' ? 'Apt, suite, or unit' :
+                                                    field === 'city' ? 'e.g. New York' :
+                                                        field === 'state' ? 'e.g. NY' : 'e.g. 10001'
                                         }
                                         className="focus-visible:ring-primary"
                                     />
@@ -310,9 +310,9 @@ const QuestionForm = () => {
                                     <Label htmlFor={field}>
                                         {field === 'takingMedication' ? 'Taking Medication' :
                                             field === 'medicineAllergy' ? 'Medicine Allergy' :
-                                            field === 'majorSurgeries' ? 'Major Surgeries' :
-                                            field === 'bariatricSurgery' ? 'Bariatric Surgery (last 18 months)' :
-                                            'Family History of Thyroid Cancer'}
+                                                field === 'majorSurgeries' ? 'Major Surgeries' :
+                                                    field === 'bariatricSurgery' ? 'Bariatric Surgery (last 18 months)' :
+                                                        'Family History of Thyroid Cancer'}
                                     </Label>
                                     <Select
                                         value={formData[field]}
@@ -336,8 +336,8 @@ const QuestionForm = () => {
                                     <Label htmlFor={field}>
                                         {field === 'listAllMedication' ? 'List All Medication' :
                                             field === 'allergyList' ? 'Allergy List' :
-                                            field === 'surgeryList' ? 'Surgery List' :
-                                            'Disqualifiers'}
+                                                field === 'surgeryList' ? 'Surgery List' :
+                                                    'Disqualifiers'}
                                     </Label>
                                     <Textarea
                                         id={field}
@@ -346,9 +346,9 @@ const QuestionForm = () => {
                                         onChange={handleInputChange}
                                         placeholder={
                                             field === 'listAllMedication' ? 'List known medication...' :
-                                            field === 'allergyList' ? 'List known allergies...' :
-                                            field === 'surgeryList' ? 'List of major surgeries...' :
-                                            'Mention any disqualifiers...'
+                                                field === 'allergyList' ? 'List known allergies...' :
+                                                    field === 'surgeryList' ? 'List of major surgeries...' :
+                                                        'Mention any disqualifiers...'
                                         }
                                         className="focus-visible:ring-primary"
                                     />
@@ -569,14 +569,13 @@ const QuestionForm = () => {
                             <Label htmlFor="providerComments">
                                 Questions or Notes for Provider
                             </Label>
-                            <textarea
+                            <Textarea
                                 id="providerComments"
                                 name="providerComments"
-                                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent transition-colors min-h-[120px]"
-                                rows={5}
                                 value={formData.providerComments}
                                 onChange={handleInputChange}
                                 placeholder="Enter any additional questions, notes, or special requests..."
+                                className="focus-visible:ring-primary min-h-[120px]"
                             />
                             <p className="text-sm text-gray-500 mt-1">
                                 This information will be shared directly with your healthcare provider.
