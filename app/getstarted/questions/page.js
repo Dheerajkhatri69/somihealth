@@ -1,19 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
-import { BasicInformationSegment } from '@/components/segments/BasicInformationSegment';
-import { AddressSegment } from '@/components/segments/AddressSegment';
-import { VitalsSegment } from '@/components/segments/VitalsSegment';
-import { MedicalHistorySegment } from '@/components/segments/MedicalHistorySegment';
-import { DiagnosisSegment } from '@/components/segments/DiagnosisSegment';
-import { WeightProgressSegment } from '@/components/segments/WeightProgressSegment';
-import { WeightLossMedicationSegment } from '@/components/segments/WeightLossMedicationSegment';
-import { GLP1Segment } from '@/components/segments/GLP1Segment';
-import { SemaglutideSegment } from '@/components/segments/SemaglutideSegment';
-import { TirzepatideSegment } from '@/components/segments/TirzepatideSegment';
-import { TirzepatideDetailsSegment } from '@/components/segments/TirzepatideDetailsSegment';
-import { CommentsSegment } from '@/components/segments/CommentsSegment';
-import { MedicationSelectionSegment } from '@/components/segments/MedicationSelectionSegment';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 const segments = [
     'Let start with the Basic Information',
@@ -108,50 +99,515 @@ const QuestionForm = () => {
 
     const renderCurrentSegment = () => {
         switch (currentSegment) {
-            case 0:
+            case 0: // Basic Information
                 return (
-                    <BasicInformationSegment
-                        formData={formData}
-                        handleInputChange={handleInputChange}
-                        handleSelectChange={handleSelectChange}
-                    />
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Let&apos;s start with the Basic Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="firstName">First Name</Label>
+                                <Input
+                                    id="firstName"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleInputChange}
+                                    placeholder="First Name"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="lastName">Last Name</Label>
+                                <Input
+                                    id="lastName"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleInputChange}
+                                    placeholder="Last Name"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="dob">Date of Birth</Label>
+                                <Input
+                                    type="date"
+                                    id="dob"
+                                    name="dob"
+                                    value={formData.dob}
+                                    onChange={handleInputChange}
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="sex">Gender</Label>
+                                <Select
+                                    value={formData.sex}
+                                    onValueChange={(value) => handleSelectChange('sex', value)}
+                                >
+                                    <SelectTrigger id="sex" className="focus:ring-primary">
+                                        <SelectValue placeholder="Select gender" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Male">Male</SelectItem>
+                                        <SelectItem value="Female">Female</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="height">Height</Label>
+                                <Input
+                                    id="height"
+                                    name="height"
+                                    value={formData.height}
+                                    onChange={handleInputChange}
+                                    placeholder="5'9"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="weight">Weight (lbs)</Label>
+                                <Input
+                                    id="weight"
+                                    name="weight"
+                                    value={formData.weight}
+                                    onChange={handleInputChange}
+                                    placeholder="214"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="bmi">BMI</Label>
+                                <Input
+                                    id="bmi"
+                                    name="bmi"
+                                    value={formData.bmi}
+                                    onChange={handleInputChange}
+                                    placeholder="32"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="glp1">GLP-1 Preference</Label>
+                                <Select
+                                    value={formData.glp1}
+                                    onValueChange={(value) => handleSelectChange('glp1', value)}
+                                >
+                                    <SelectTrigger id="glp1" className="focus:ring-primary">
+                                        <SelectValue placeholder="Select preference" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
+                                        <SelectItem value="Semaglutide">Semaglutide</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="example@mail.com"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="phone">Phone</Label>
+                                <Input
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    placeholder="(555) 123-4567"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 );
-            case 1:
-                return <AddressSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 2:
-                return <VitalsSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 3:
+
+            case 1: // Address
                 return (
-                    <MedicalHistorySegment
-                        formData={formData}
-                        handleSelectChange={handleSelectChange}
-                        handleInputChange={handleInputChange}
-                    />
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Address Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
+                                <div 
+                                    key={field} 
+                                    className={`space-y-1.5 ${
+                                        field === 'address1' ? 'md:col-span-2' : 
+                                        field === 'address2' ? 'md:col-span-2' : ''
+                                    }`}
+                                >
+                                    <Label htmlFor={field}>
+                                        {field === 'address1' ? 'Street Address' :
+                                            field === 'address2' ? 'Address Line 2' :
+                                            field === 'city' ? 'City' :
+                                            field === 'state' ? 'State/Province' : 'Postal Code'}
+                                    </Label>
+                                    <Input
+                                        id={field}
+                                        name={field}
+                                        value={formData[field]}
+                                        onChange={handleInputChange}
+                                        placeholder={
+                                            field === 'address1' ? '123 Main St' :
+                                            field === 'address2' ? 'Apt, suite, or unit' :
+                                            field === 'city' ? 'e.g. New York' :
+                                            field === 'state' ? 'e.g. NY' : 'e.g. 10001'
+                                        }
+                                        className="focus-visible:ring-primary"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 );
-            case 4:
-                return <DiagnosisSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 5:
-                return <WeightProgressSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 6:
-                return <WeightLossMedicationSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 7:
-                return <GLP1Segment formData={formData} handleInputChange={handleInputChange} />;
-            case 8:
-                return <SemaglutideSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 9:
-                return <TirzepatideSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 10:
+
+            case 2: // Vitals
                 return (
-                    <TirzepatideDetailsSegment
-                        formData={formData}
-                        handleInputChange={handleInputChange}
-                        handleSelectChange={handleSelectChange}
-                    />
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Vitals</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="bloodPressure">Blood Pressure</Label>
+                                <Input
+                                    id="bloodPressure"
+                                    name="bloodPressure"
+                                    value={formData.bloodPressure}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. 120/80"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="heartRate">Heart Rate</Label>
+                                <Input
+                                    id="heartRate"
+                                    name="heartRate"
+                                    value={formData.heartRate}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. 72 bpm"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 );
-            case 11:
-                return <CommentsSegment formData={formData} handleInputChange={handleInputChange} />;
-            case 12:
-                return <MedicationSelectionSegment formData={formData} handleSelectChange={handleSelectChange} />;
+
+            case 3: // Medical History
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Medical History</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {['takingMedication', 'medicineAllergy', 'majorSurgeries', 'bariatricSurgery', 'thyroidCancerHistory'].map((field) => (
+                                <div key={field} className="space-y-1.5">
+                                    <Label htmlFor={field}>
+                                        {field === 'takingMedication' ? 'Taking Medication' :
+                                            field === 'medicineAllergy' ? 'Medicine Allergy' :
+                                            field === 'majorSurgeries' ? 'Major Surgeries' :
+                                            field === 'bariatricSurgery' ? 'Bariatric Surgery (last 18 months)' :
+                                            'Family History of Thyroid Cancer'}
+                                    </Label>
+                                    <Select
+                                        value={formData[field]}
+                                        onValueChange={(value) => handleSelectChange(field, value)}
+                                    >
+                                        <SelectTrigger id={field} className="focus:ring-primary">
+                                            <SelectValue placeholder="Select option" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="yes">Yes</SelectItem>
+                                            <SelectItem value="no">No</SelectItem>
+                                            <SelectItem value="None">None</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 mt-4">
+                            {['listAllMedication', 'allergyList', 'surgeryList', 'disqualifiers'].map((field) => (
+                                <div key={field} className="space-y-1.5">
+                                    <Label htmlFor={field}>
+                                        {field === 'listAllMedication' ? 'List All Medication' :
+                                            field === 'allergyList' ? 'Allergy List' :
+                                            field === 'surgeryList' ? 'Surgery List' :
+                                            'Disqualifiers'}
+                                    </Label>
+                                    <Textarea
+                                        id={field}
+                                        name={field}
+                                        value={formData[field]}
+                                        onChange={handleInputChange}
+                                        placeholder={
+                                            field === 'listAllMedication' ? 'List known medication...' :
+                                            field === 'allergyList' ? 'List known allergies...' :
+                                            field === 'surgeryList' ? 'List of major surgeries...' :
+                                            'Mention any disqualifiers...'
+                                        }
+                                        className="focus-visible:ring-primary"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+
+            case 4: // Diagnosis
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Diagnosis</h3>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="diagnosis">Diagnosis Notes</Label>
+                            <Textarea
+                                id="diagnosis"
+                                name="diagnosis"
+                                value={formData.diagnosis}
+                                onChange={handleInputChange}
+                                placeholder="Enter patient diagnosis, symptoms, or relevant notes..."
+                                className="focus-visible:ring-primary"
+                            />
+                        </div>
+                    </div>
+                );
+
+            case 5: // Weight Progress
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Weight Progress</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {['startingWeight', 'currentWeight', 'goalWeight', 'weightChange12m'].map((field) => (
+                                <div key={field} className="space-y-1.5">
+                                    <Label htmlFor={field}>
+                                        {field === 'startingWeight' ? 'Starting Weight (lbs)' :
+                                            field === 'currentWeight' ? 'Current Weight (lbs)' :
+                                                field === 'goalWeight' ? 'Goal Weight (lbs)' :
+                                                    '12-Month Weight Change (lbs)'}
+                                    </Label>
+                                    <Input
+                                        id={field}
+                                        name={field}
+                                        value={formData[field]}
+                                        onChange={handleInputChange}
+                                        placeholder={
+                                            field === 'startingWeight' ? 'e.g. 240' :
+                                                field === 'currentWeight' ? 'e.g. 214' :
+                                                    field === 'goalWeight' ? 'e.g. 180' : 'e.g. -26, +10, etc.'
+                                        }
+                                        className="focus-visible:ring-primary"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="space-y-1.5 mt-4">
+                            <Label htmlFor="weightLossPrograms">Weight Loss Programs</Label>
+                            <Textarea
+                                id="weightLossPrograms"
+                                name="weightLossPrograms"
+                                value={formData.weightLossPrograms}
+                                onChange={handleInputChange}
+                                placeholder="List any previous or current weight loss programs..."
+                                className="focus-visible:ring-primary"
+                            />
+                        </div>
+                    </div>
+                );
+
+            case 6: // Weight Loss Medication
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Weight Loss Medication History</h3>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="weightLossMeds12m">Weight Loss Medication (Last 12 Months)</Label>
+                            <Textarea
+                                id="weightLossMeds12m"
+                                name="weightLossMeds12m"
+                                value={formData.weightLossMeds12m}
+                                onChange={handleInputChange}
+                                placeholder="List any weight loss medications taken in the past 12 months..."
+                                className="focus-visible:ring-primary"
+                            />
+                        </div>
+                    </div>
+                );
+
+            case 7: // GLP-1
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">GLP-1 Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="glpTaken">GLP-1 Taken</Label>
+                                <Input
+                                    id="glpTaken"
+                                    type="text"
+                                    name="glpTaken"
+                                    value={formData.glpTaken}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter value"
+                                    className="focus-visible:ring-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="glpRecentInjection">Date of last Injection</Label>
+                                <Input
+                                    type="date"
+                                    id="glpRecentInjection"
+                                    name="glpRecentInjection"
+                                    value={formData.glpRecentInjection}
+                                    onChange={handleInputChange}
+                                    max={new Date().toISOString().split('T')[0]}
+                                    className="focus-visible:ring-primary w-full"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 8: // Semaglutide
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Semaglutide Details</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {['semaglutideLastDose', 'semaglutideRequestedDose'].map((field) => (
+                                <div key={field} className="space-y-1.5">
+                                    <Label htmlFor={field}>
+                                        {field === 'semaglutideLastDose' ? 'Last Dose' : 'Requested Dose'}
+                                    </Label>
+                                    <Input
+                                        id={field}
+                                        name={field}
+                                        type="text"
+                                        value={formData[field]}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter dose"
+                                        className="focus-visible:ring-primary"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+
+            case 9: // Tirzepatide
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Tirzepatide Details</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {['tirzepetideLastDose', 'tirzepetideRequestedDose'].map((field) => (
+                                <div key={field} className="space-y-1.5">
+                                    <Label htmlFor={field}>
+                                        {field === 'tirzepetideLastDose' ? 'Last Dose' : 'Requested Dose'}
+                                    </Label>
+                                    <Input
+                                        id={field}
+                                        name={field}
+                                        type="text"
+                                        value={formData[field]}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter dose"
+                                        className="focus-visible:ring-primary"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+
+            case 10: // Tirzepatide Details
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Tirzepatide Additional Details</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {['tirzepetidePlanPurchased', 'tirzepetideVial'].map((field) => (
+                                <div key={field} className="space-y-1.5">
+                                    <Label htmlFor={field}>
+                                        {field === 'tirzepetidePlanPurchased' ? 'Plan Purchased' : 'Vial'}
+                                    </Label>
+                                    <Input
+                                        id={field}
+                                        name={field}
+                                        type="text"
+                                        value={formData[field]}
+                                        onChange={handleInputChange}
+                                        placeholder={`Enter ${field === 'tirzepetidePlanPurchased' ? 'plan' : 'vial'}`}
+                                        className="focus-visible:ring-primary"
+                                    />
+                                </div>
+                            ))}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="tirzepetideDosingSchedule">Dosing Schedule</Label>
+                                <Select
+                                    value={formData.tirzepetideDosingSchedule}
+                                    onValueChange={(value) => handleSelectChange('tirzepetideDosingSchedule', value)}
+                                >
+                                    <SelectTrigger id="tirzepetideDosingSchedule" className="focus:ring-primary">
+                                        <SelectValue placeholder="Select dosing schedule" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="weekly">Weekly</SelectItem>
+                                        <SelectItem value="biweekly">Biweekly</SelectItem>
+                                        <SelectItem value="monthly">Monthly</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 11: // Comments
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Additional Comments</h3>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="providerComments">
+                                Questions or Notes for Provider
+                            </Label>
+                            <textarea
+                                id="providerComments"
+                                name="providerComments"
+                                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent transition-colors min-h-[120px]"
+                                rows={5}
+                                value={formData.providerComments}
+                                onChange={handleInputChange}
+                                placeholder="Enter any additional questions, notes, or special requests..."
+                            />
+                            <p className="text-sm text-gray-500 mt-1">
+                                This information will be shared directly with your healthcare provider.
+                            </p>
+                        </div>
+                    </div>
+                );
+
+            case 12: // Medication Selection
+                return (
+                    <div className="space-y-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Medication Selection</h3>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="medicine">Medication</Label>
+                            <Select
+                                value={formData.medicine}
+                                onValueChange={(value) => handleSelectChange('medicine', value)}
+                            >
+                                <SelectTrigger id="medicine" className="focus:ring-primary">
+                                    <SelectValue placeholder="Select medication" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Semaglutide">Semaglutide</SelectItem>
+                                    <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                );
+
             default:
                 return null;
         }
