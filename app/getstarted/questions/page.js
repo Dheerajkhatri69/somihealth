@@ -240,7 +240,7 @@ const QuestionForm = () => {
                                 <div
                                     key={field}
                                     className={`space-y-1.5 ${field === 'address1' ? 'md:col-span-2' :
-                                            field === 'address2' ? 'md:col-span-2' : ''
+                                        field === 'address2' ? 'md:col-span-2' : ''
                                         }`}
                                 >
                                     <Label htmlFor={field}>
@@ -605,7 +605,6 @@ const QuestionForm = () => {
                         </div>
                     </div>
                 );
-
             default:
                 return null;
         }
