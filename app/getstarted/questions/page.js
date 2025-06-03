@@ -26,9 +26,8 @@ const segments = [
 const QuestionForm = () => {
     const [currentSegment, setCurrentSegment] = useState(0);
 
-    const randomNum = Math.floor(Math.random() * 100000);
     const [formData, setFormData] = useState({
-        authid: `P${randomNum.toString().padStart(5, '0')}`,
+        authid: 'P00001',
         firstName: '',
         lastName: '',
         dob: '',
