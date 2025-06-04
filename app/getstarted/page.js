@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+// import { getstartedpic } from '../../public/getstarted.png';
 
 // ProgressBar Component
 const ProgressBar = ({ progress }) => {
@@ -45,46 +46,49 @@ const LandingPage = () => {
 
     return (
         <div className="min-h-screen overflow-hidden flex flex-col items-center justify-center bg-white p-6">
-            <motion.div
-                className="w-full max-w-2xl text-center"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-            >
-                <h1 className="font-tagesschrift text-6xl md:text-8xl text-secondary font-bold">
-                    somi
-                </h1>
+            <div className="p-6 bg-white rounded-xl overflow-hidden  border border-gray-200 shadow-secondary shadow-2xl ">
 
-                <div className="relative w-full max-w-md aspect-video mx-auto mt-2">
-                    <Image
-                        src="/getstarted.svg"
-                        alt="Weight Loss"
-                        width={500}
-                        height={400}
-                        className="rounded-xl object-contain"
-                        style={{ width: '100%', height: 'auto' }}
-                        priority
-                    />
-                </div>
+                <motion.div
+                    className="w-full max-w-2xl text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <h1 className="font-tagesschrift text-6xl md:text-8xl text-secondary font-bold">
+                        somi
+                    </h1>
 
-                <h2 className="text-2xl font-semibold mt-4 mb-2">
-                    Start Your Weight Loss Journey Today!
-                </h2>
+                    <div className="relative w-full max-w-md aspect-video mx-auto ">
+                        <Image
+                            src="/getstarted.jpg"
+                            alt="Weight Loss"
+                            width={500}
+                            height={400}
+                            className="rounded-xl object-contain"
+                            style={{ width: '100%', height: 'auto' }}
+                            priority
+                        />
+                    </div>
 
-                <p className="text-gray-700 mb-2">
-                    No Hidden Fees. $0 Consultation Fee. No Subscriptions. Free Shipping.
-                </p>
+                    <h2 className="text-2xl font-semibold mt-4 mb-2">
+                        Start Your Weight Loss Journey Today!
+                    </h2>
 
-                <p className="text-green-600 font-medium mb-6">
-                    Only Pay When Approved
-                </p>
+                    <p className="text-gray-700 mb-2">
+                        No Hidden Fees. $0 Consultation Fee. No Subscriptions. Free Shipping.
+                    </p>
 
-                <Link href="/getstarted/questions">
-                    <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">
-                        Let&apos;s Get Started
-                    </button>
-                </Link>
-            </motion.div>
+                    <p className="text-green-600 font-medium mb-6">
+                        Pay only when approved
+                    </p>
+
+                    <Link href="/getstarted/questions">
+                        <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">
+                            Let&apos;s Get Started
+                        </button>
+                    </Link>
+                </motion.div>
+            </div>
         </div>
     );
 };
