@@ -915,7 +915,7 @@ export default function PatientRegistrationForm() {
           </div>
         )}
 
-        <div className="fixed bottom-0 left-0 right-0 py-4 bg-white border-t">
+        <div className="fixed bottom-0 left-0 right-0 py-4">
           <div className="container mx-auto max-w-6xl px-6">
             <div className="flex justify-between">
               {currentSegment > 0 ? (

@@ -1,49 +1,61 @@
-"use client"
+"use client";
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+
+// ProgressBar Component
+const ProgressBar = ({ progress }) => {
+    return (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+            <div
+                className="bg-secondary h-2.5 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+            ></div>
+        </div>
+    );
+};
 
 const LandingPage = () => {
+    const [loading, setLoading] = useState(true);
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        let interval;
+        let current = 0;
+        interval = setInterval(() => {
+            current += 10;
+            setProgress(current);
+            if (current >= 100) {
+                clearInterval(interval);
+                setTimeout(() => setLoading(false), 200); // slight pause after reaching 100%
+            }
+        }, 80); // adjust speed if needed
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-6 bg-white">
+                <div className="w-full max-w-xl">
+                    <ProgressBar progress={progress} />
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen overflow-hidden flex flex-col md:flex-row items-center justify-center bg-white p-6">
-            {/* Left Section - Text */}
+        <div className="min-h-screen overflow-hidden flex flex-col items-center justify-center bg-white p-6">
             <motion.div
-                className="w-full md:w-1/2 flex flex-col justify-center items-start text-left p-6"
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
+                className="w-full max-w-2xl text-center"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
             >
-                <h1 className="font-tagesschrift md:text-9xl text-6xl mb-2 text-secondary font-bold">somi</h1>
+                <h1 className="font-tagesschrift text-6xl md:text-8xl text-secondary font-bold">
+                    somi
+                </h1>
 
-                <h2 className="text-2xl font-semibold mb-2 mt-4">
-                    Start Your Weight Loss Journey Today!
-                </h2>
-
-                <p className="text-gray-700 mb-2">
-                    No Hidden Fees. $0 Consultation Fee. No Subscriptions. Free Shipping.
-                </p>
-
-                <p className="text-gray-600 mb-4">
-                    Fill out our brief 7-minute questionnaire. Within 24 hours, a qualified nurse practitioner will assess your suitability for GLP-1 treatment, helping you take a step towards your weight management goals.
-                </p>
-
-                <p className="text-green-600 font-medium mb-6">Only Pay When Approved</p>
-
-                <Link href="/getstarted/questions">
-                    <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">
-                        Let&apos;s Get Started
-                    </button>
-                </Link>
-            </motion.div>
-
-            {/* Right Section - Image */}
-            <motion.div
-                className="w-full md:w-1/2 flex justify-center items-center p-6"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-            >
-                <div className="relative w-full max-w-md aspect-video">
+                <div className="relative w-full max-w-md aspect-video mx-auto mt-2">
                     <Image
                         src="/getstarted.svg"
                         alt="Weight Loss"
@@ -54,6 +66,24 @@ const LandingPage = () => {
                         priority
                     />
                 </div>
+
+                <h2 className="text-2xl font-semibold mt-4 mb-2">
+                    Start Your Weight Loss Journey Today!
+                </h2>
+
+                <p className="text-gray-700 mb-2">
+                    No Hidden Fees. $0 Consultation Fee. No Subscriptions. Free Shipping.
+                </p>
+
+                <p className="text-green-600 font-medium mb-6">
+                    Only Pay When Approved
+                </p>
+
+                <Link href="/getstarted/questions">
+                    <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">
+                        Let&apos;s Get Started
+                    </button>
+                </Link>
             </motion.div>
         </div>
     );
