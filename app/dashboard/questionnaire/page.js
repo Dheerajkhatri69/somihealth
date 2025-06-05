@@ -86,50 +86,6 @@ export default function Dashboard() {
                     patient.closetickets === false && patient.questionnaire === true
                 );
 
-                // If user is a clinician, filter only their assigned patients
-                // For clinicians, apply additional filtering based on ticketFilter state
-                if (session?.user?.accounttype === 'C') {
-                    const assigningRes = await fetch("/api/assigning");
-                    const assigningData = await assigningRes.json();
-
-                    if (assigningData.success) {
-                        const clinicianAssignments = assigningData.result.filter(
-                            assignment => assignment.cid === session.user.id
-                        );
-                        const assignedPids = clinicianAssignments.map(item => item.pid);
-
-                        if (ticketFilter === 'assigned') {
-                            activePatients = activePatients.filter(patient =>
-                                assignedPids.includes(patient.authid)
-                            );
-                        }
-                        setCLoading(false);
-                    } else {
-                        console.error("Error fetching assignments:", assigningData.result.message);
-                    }
-                }
-                // If user is a technician, filter only patients they created
-                else if (session?.user?.accounttype === 'T') {
-                    const creatorRes = await fetch("/api/creatorofp");
-                    const creatorData = await creatorRes.json();
-
-                    if (creatorData.success) {
-                        // Filter creator records for this technician
-                        const technicianCreations = creatorData.result.filter(
-                            record => record.tid === session.user.id
-                        );
-                        // Get list of patient IDs created by this technician
-                        const createdPids = technicianCreations.map(item => item.pid);
-                        // Filter patients to only those created by this technician
-                        activePatients = activePatients.filter(patient =>
-                            createdPids.includes(patient.authid)
-                        );
-                        setTLoading(false);
-                    } else {
-                        console.error("Error fetching creator records:", creatorData.result.message);
-                    }
-                }
-
                 setPatients(activePatients);
             } catch (err) {
                 console.error("Fetch failed:", err);
@@ -628,7 +584,7 @@ export default function Dashboard() {
                                                         : "bg-secondary text-white"
                                                         }`}
                                                 >
-                                                    <Link href={`/dashboard/${patient.authid}`}>Open</Link>
+                                                    <Link href={`/dashboard/questionnaire/${patient.authid}`}>Open</Link>
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem
