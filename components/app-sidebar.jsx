@@ -1,6 +1,6 @@
 'use client'
 import { useMemo } from "react"
-import { History, Home, Inbox, Plus, Trash, UserRoundPlus } from "lucide-react"
+import { History, Home, Inbox, Plus, Trash, UserRoundPlus, FilePlus2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import {
@@ -34,6 +34,12 @@ const sidebarItems = [
     url: "/dashboard/followup",
     icon: UserRoundPlus,
     allowedRoles: ['A', 'T', 'C']
+  },
+  {
+    title: "Questionnaire",
+    url: "/dashboard/questionnaire",
+    icon: FilePlus2,
+    allowedRoles: ['A', 'T']
   },
   {
     title: "Email History",

@@ -82,7 +82,10 @@ export default function Dashboard() {
                 }
 
                 // Filter active patients (closetickets === false)
-                let activePatients = patientsData.result.filter(patient => patient.closetickets === false);
+                // let activePatients = patientsData.result.filter(patient => patient.closetickets === false );
+                let activePatients = patientsData.result.filter(patient =>
+                    patient.closetickets === false && patient.questionnaire === false
+                );
 
                 // If user is a clinician, filter only their assigned patients
                 // For clinicians, apply additional filtering based on ticketFilter state

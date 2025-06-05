@@ -98,6 +98,7 @@ export async function POST(request) {
             images: body.images || [],
             file1: body.file1,
             file2: body.file2,
+            questionnaire: body.questionnaire || false,
         });
 
         result = await newPatient.save();

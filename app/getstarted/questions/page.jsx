@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogDescription } from '@/components/ui/alert-dialog';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 // Form validation schema
 const formSchema = z.object({
@@ -158,11 +160,45 @@ export default function PatientRegistrationForm() {
       setCurrentSegment(currentSegment - 1);
     }
   };
+  // const { toast } = useToaster();
+  const router = useRouter();
+  const onSubmit = async (data) => {
+    // Add authid
+    const randomNum = Math.floor(Math.random() * 100000);
+    const submissionData = {
+      ...data,
+      authid: `P${randomNum.toString().padStart(5, '0')}`,
+      questionnaire: true,
+    };
 
-  const onSubmit = (data) => {
-    console.log('Form submitted:', data);
-    // Handle form submission
+    try {
+      const patientResponse = await fetch('/api/patients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (!patientResponse.ok) {
+        throw new Error('Failed to submit patient data');
+      }
+
+      const patientData = await patientResponse.json();
+
+      // Show success alert using shadcn
+      toast.success(`Patient registered! Auth ID: ${submissionData.authid}`);
+      console.log('Patient registered:', patientData);
+      // Redirect after a short delay (e.g., 1.5 seconds)
+      setTimeout(() => {
+        router.push('/getstarted');
+      }, 1500);
+
+    } catch (error) {
+      toast.error(error.message || 'Something went wrong');
+    }
   };
+
 
   const getSegmentFields = (segmentId) => {
     switch (segmentId) {
