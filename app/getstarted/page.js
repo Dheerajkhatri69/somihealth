@@ -1,7 +1,6 @@
 "use client";
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 // import { getstartedpic } from '../../public/getstarted.png';
 
@@ -48,12 +47,7 @@ const LandingPage = () => {
         <div className="min-h-screen overflow-hidden flex flex-col items-center justify-center bg-white p-6">
             <div className="p-6 bg-white rounded-xl overflow-hidden  border border-gray-200 shadow-secondary shadow-2xl ">
 
-                <motion.div
-                    className="w-full max-w-2xl text-center"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                >
+                <div className="w-full max-w-2xl text-center">
                     <h1 className="font-tagesschrift text-6xl md:text-8xl text-secondary font-bold">
                         somi
                     </h1>
@@ -85,7 +79,7 @@ const LandingPage = () => {
                             Let&apos;s Get Started
                         </button>
                     </Link>
-                </motion.div>
+                </div>
             </div>
         </div>
     );

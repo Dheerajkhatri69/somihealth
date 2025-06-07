@@ -63,10 +63,11 @@ const formSchema = z.object({
   eatingDisorders: z.string().min(1, "This field is required"),
   labs: z.string().min(1, "This field is required"),
   glp1Statement: z.string().min(1, "This field is required"),
+  glp1DoseInfo: z.string().optional(), // Add new field for dose information
   agreeTerms: z.string().min(1, "This field is required"),
   prescriptionPhoto: z.string().optional(), // Changed from required to optional
   idPhoto: z.string().min(1, "This field is required"),
-  comments: z.string().min(1, "This field is required"),
+  comments: z.string().optional(), // Changed from required to optional
   dob: z.string().min(1, "Date of birth is required")
     .refine(dob => {
       const birthDate = new Date(dob);
@@ -138,6 +139,7 @@ export default function PatientRegistrationForm() {
   const [showIneligible, setShowIneligible] = useState(false);
   const [fileUrls, setFileUrls] = useState({ file1: '', file2: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const {
     register,
@@ -289,8 +291,8 @@ export default function PatientRegistrationForm() {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      toast.success('Form submitted successfully!');
-      router.push('/getstarted');
+      setIsSubmitting(false);
+      setShowSuccess(true);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error('Failed to submit form. Please try again.');
@@ -357,11 +359,74 @@ export default function PatientRegistrationForm() {
     }
   };
 
+  // Ineligibility full page
+  if (showIneligible) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+        <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col items-center">
+          {/* Replace with somi logo or styled text */}
+          <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
+          <h2 className="text-2xl font-semibold text-gray-900 text-center mt-4 mb-2">Unfortunately, you do not qualify<br/>for GLP - 1 medication</h2>
+          <p className="text-gray-700 text-center mb-6 mt-2">
+            We are sorry, but based on your response to the previous question, you currently do not meet the requirements for GLP-1 medication.
+          </p>
+          <p className="text-gray-700 text-center mb-8">
+            If you need assistance, text or call a live agent at <a href="tel:17043866871" className="text-secondary underline">(704) 386-6871</a>
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => { window.location.href = 'https://joinsomi.com/'; }}
+            className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+          >
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+        <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col">
+          <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
+          <div className="space-y-4 mt-4">
+            <h3 className="text-xl font-semibold text-gray-900 text-center">Thanks for filling out your GLP-1 weight loss treatment intake form!</h3>
+            <p className="text-gray-600 text-center">
+              Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you.
+            </p>
+            <p className="text-gray-600 text-center">
+              Thanks for your patience.
+            </p>
+          </div>
+          <Button
+            onClick={() => { window.location.href = 'https://joinsomi.com/'; }}
+            className="bg-secondary text-white hover:bg-secondary rounded-2xl px-8"
+          >
+            OK
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 max-w-[600px] flex flex-col min-h-screen">
-      <h1 className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</h1>
+      {/* Sticky header for logo and progress bar */}
+      <div className="fixed top-0 left-0 w-full z-40 bg-white">
+        <div className="max-w-[600px] mx-auto flex flex-col items-center">
+          <div className="font-tagesschrift text-center text-6xl mt-2 mb-2 text-secondary font-bold">somi</div>
+          <div className="w-full px-6">
+            <ProgressBar progress={progress} />
+            <div className="text-right text-sm text-gray-600 mb-2">
+              {progress}% Complete
+            </div>
+          </div>
+        </div>
+      </div>
 
+      {/* Add top padding to prevent overlap with fixed header */}
+      <div style={{paddingTop: '120px'}}>
       {/* Loading Overlay */}
       {isSubmitting && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -371,14 +436,6 @@ export default function PatientRegistrationForm() {
           </div>
         </div>
       )}
-
-      {/* Custom progress bar */}
-      <div className="mb-8">
-        <ProgressBar progress={progress} />
-        <div className="text-right text-sm text-gray-600">
-          {progress}% Complete
-        </div>
-      </div>
 
       {/* Form segments */}
       <form
@@ -1501,6 +1558,29 @@ export default function PatientRegistrationForm() {
               {errors.glp1Statement && (
                 <p className="text-sm text-red-500">{errors.glp1Statement.message}</p>
               )}
+
+              {/* Conditional field for dose details */}
+              {(watch('glp1Statement') === 'New to GLP-1 therapy' || watch('glp1Statement') === 'Other') && (
+                <div className="mt-6 space-y-4">
+                  <h3 className="font-semibold">You have selected to continue on your current therapy or a change in therapy, please specify below, if applicable.</h3>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="glp1DoseInfo">
+                        A) Please provide your current GLP-1 dose
+                        <br />
+                        B) Please provide the new GLP-1 dose you are requesting.
+                        <br />
+                        Description (optional)
+                      </Label>
+                      <Textarea
+                        id="glp1DoseInfo"
+                        {...register('glp1DoseInfo')}
+                        placeholder="Type your answer here..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1594,10 +1674,10 @@ export default function PatientRegistrationForm() {
         {/* Comments segment */}
         {currentSegment === 32 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Questions/Comments for Provider</h2>
+            <h2 className="text-xl font-semibold">Questions/Comments for Provider? If none</h2>
             <div className="space-y-2">
               <Label htmlFor="comments">
-                Questions/Comments for Provider? If none <span className="text-red-500">*</span>
+                Discription (Optional) 
               </Label>
               <Textarea
                 id="comments"
@@ -1747,27 +1827,6 @@ export default function PatientRegistrationForm() {
           </div>
         )}
 
-        {/* Ineligible Alert Dialog */}
-        <AlertDialog open={showIneligible} onOpenChange={setShowIneligible}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Ineligibility Notice</AlertDialogTitle>
-              <AlertDialogDescription>
-                Based on your responses, you currently do not meet the criteria for GLP-1 medication.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => router.push('/getstarted')}
-                className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
-              >
-                Go Back
-              </Button>
-            </div>
-          </AlertDialogContent>
-        </AlertDialog>
-
         {/* Form segments */}
         {currentSegment === 0 && (
           <div className="space-y-4">
@@ -1836,6 +1895,7 @@ export default function PatientRegistrationForm() {
           </div>
         )}
       </form>
+      </div>
     </div>
   );
 }
