@@ -32,7 +32,7 @@ const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
   zip: z.string().min(1, "Zip code is required"),
-  country: z.string().min(1, "Country is required"),
+  country: z.string().optional(), // Changed to optional
   // Medical Information
   glp1Preference: z.string().min(1, "This field is required"),
   sex: z.string().min(1, "This field is required"),
@@ -64,7 +64,7 @@ const formSchema = z.object({
   labs: z.string().min(1, "This field is required"),
   glp1Statement: z.string().min(1, "This field is required"),
   agreeTerms: z.string().min(1, "This field is required"),
-  prescriptionPhoto: z.string().min(1, "This field is required"),
+  prescriptionPhoto: z.string().optional(), // Changed from required to optional
   idPhoto: z.string().min(1, "This field is required"),
   comments: z.string().min(1, "This field is required"),
   dob: z.string().min(1, "Date of birth is required")
@@ -137,6 +137,7 @@ export default function PatientRegistrationForm() {
   const [showAgeAlert, setShowAgeAlert] = useState(false);
   const [showIneligible, setShowIneligible] = useState(false);
   const [fileUrls, setFileUrls] = useState({ file1: '', file2: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -209,6 +210,11 @@ export default function PatientRegistrationForm() {
           // Removed ineligibility check for weight related conditions
           break;
         case 'medications':
+          const medications = currentValues.medications || [];
+          if (medications.includes('Opioid pain medication')) {
+            // Allow opioid pain medication without disqualification
+            break;
+          }
           if (hasOtherOptionsSelected('medications')) {
             isIneligible = true;
           }
@@ -226,6 +232,16 @@ export default function PatientRegistrationForm() {
           break;
         case 'glp1History':
           if (hasOtherOptionsSelected('glp1PastYear')) {
+            isIneligible = true;
+          }
+          break;
+        case 'pregnancy':
+          if (currentValues.pregnant === 'yes') {
+            isIneligible = true;
+          }
+          break;
+        case 'breastfeeding':
+          if (currentValues.breastfeeding === 'yes') {
             isIneligible = true;
           }
           break;
@@ -251,6 +267,7 @@ export default function PatientRegistrationForm() {
   const onSubmit = async (data) => {
     console.log('Form submission started');
     console.log('Raw form data:', data);
+    setIsSubmitting(true);
 
     try {
       // Calculate BMI
@@ -269,20 +286,15 @@ export default function PatientRegistrationForm() {
 
       console.log('Final submission data:', submissionData);
 
-      // You can add your API call here
-      // const response = await fetch('/api/submit-form', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(submissionData),
-      // });
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       toast.success('Form submitted successfully!');
-      router.push('/getstarted'); // Redirect to success page or wherever you want
+      router.push('/getstarted');
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error('Failed to submit form. Please try again.');
+      setIsSubmitting(false);
     }
   };
 
@@ -347,8 +359,18 @@ export default function PatientRegistrationForm() {
 
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl flex flex-col min-h-screen">
+    <div className="container mx-auto p-6 max-w-[600px] flex flex-col min-h-screen">
       <h1 className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</h1>
+
+      {/* Loading Overlay */}
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+            <p className="text-lg font-medium text-gray-700">Submitting your information...</p>
+          </div>
+        </div>
+      )}
 
       {/* Custom progress bar */}
       <div className="mb-8">
@@ -364,39 +386,35 @@ export default function PatientRegistrationForm() {
           console.log('Form submit event triggered');
           handleSubmit(onSubmit)(e);
         }}
-        className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl mb-24"
+        className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl"
         noValidate
       >
         {/* Age verification segment */}
         {currentSegment === 0 && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Age Verification</h2>
-
-            {showAgeAlert && (
-              <AlertDialog variant="destructive" className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDialogDescription>
-                  You must be at least 18 years old to register.
-                </AlertDialogDescription>
-              </AlertDialog>
-            )}
-
             <div className="space-y-2">
-              <Label htmlFor="isOver18">
+              <Label>
                 Are you over 18? <span className="text-red-500">*</span>
               </Label>
-              <Select
-                onValueChange={(value) => setValue('isOver18', value)}
-                defaultValue={watch('isOver18')}
-              >
-                <SelectTrigger id="isOver18" className="w-full">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Yes, I am over 18</SelectItem>
-                  <SelectItem value="no">No, I am under 18</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 gap-3">
+                {['yes', 'no'].map((option, index) => (
+                  <label
+                    key={index}
+                    htmlFor={`isOver18-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('isOver18') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                  >
+                    <input
+                      type="radio"
+                      id={`isOver18-${index}`}
+                      value={option}
+                      className="hidden"
+                      {...register('isOver18')}
+                    />
+                    <span className="ml-2">{option === 'yes' ? 'Yes' : 'No'}</span>
+                  </label>
+                ))}
+              </div>
               {errors.isOver18 && (
                 <p className="text-sm text-red-500">{errors.isOver18.message}</p>
               )}
@@ -432,11 +450,32 @@ export default function PatientRegistrationForm() {
               <Label htmlFor="dob">
                 Date of Birth <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="dob"
-                type="date"
-                {...register('dob')}
-              />
+              <div className="relative w-[200px]">
+                <Input
+                  id="dob"
+                  type="text"
+                  placeholder="DD / MM / YYYY"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  {...register('dob', {
+                    pattern: {
+                      value: /^(0[1-9]|[12][0-9]|3[01])\s\/\s(0[1-9]|1[0-2])\s\/\s(19|20)\d{2}$/,
+                      message: "Please use DD / MM / YYYY format"
+                    }
+                  })}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 8) {
+                      let formatted = value;
+                      if (value.length > 4) {
+                        formatted = `${value.slice(0, 2)} / ${value.slice(2, 4)} / ${value.slice(4)}`;
+                      } else if (value.length > 2) {
+                        formatted = `${value.slice(0, 2)} / ${value.slice(2)}`;
+                      }
+                      e.target.value = formatted;
+                    }
+                  }}
+                />
+              </div>
               {errors.dob && (
                 <p className="text-sm text-red-500">{errors.dob.message}</p>
               )}
@@ -506,76 +545,73 @@ export default function PatientRegistrationForm() {
         {/* Address segment */}
         {currentSegment === 4 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Please provide your shipping address</h2>
-            <div className="space-y-2">
-              <Label htmlFor="address">
-                Address <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="address"
-                {...register('address')}
-              />
-              {errors.address && (
-                <p className="text-sm text-red-500">{errors.address.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="address2">Address line 2</Label>
-              <Input
-                id="address2"
-                {...register('address2')}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+            <h2 className="text-xl font-semibold">Shipping Address</h2>
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="city">
-                  City/Town <span className="text-red-500">*</span>
+                <Label htmlFor="address">
+                  Address line 1 <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="city"
-                  {...register('city')}
+                  id="address"
+                  {...register('address')}
                 />
-                {errors.city && (
-                  <p className="text-sm text-red-500">{errors.city.message}</p>
+                {errors.address && (
+                  <p className="text-sm text-red-500">{errors.address.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="state">
-                  State/Region/Province <span className="text-red-500">*</span>
-                </Label>
+                <Label htmlFor="address2">Address line 2</Label>
                 <Input
-                  id="state"
-                  {...register('state')}
+                  id="address2"
+                  {...register('address2')}
                 />
-                {errors.state && (
-                  <p className="text-sm text-red-500">{errors.state.message}</p>
-                )}
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="zip">
-                  Zip/Post code <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="zip"
-                  {...register('zip')}
-                />
-                {errors.zip && (
-                  <p className="text-sm text-red-500">{errors.zip.message}</p>
-                )}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">
+                    City/Town <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="city"
+                    {...register('city')}
+                  />
+                  {errors.city && (
+                    <p className="text-sm text-red-500">{errors.city.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">
+                    State/Region/Province <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="state"
+                    {...register('state')}
+                  />
+                  {errors.state && (
+                    <p className="text-sm text-red-500">{errors.state.message}</p>
+                  )}
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="country">
-                  Country <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="country"
-                  {...register('country')}
-                />
-                {errors.country && (
-                  <p className="text-sm text-red-500">{errors.country.message}</p>
-                )}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="zip">
+                    Zip/Post code <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="zip"
+                    {...register('zip')}
+                  />
+                  {errors.zip && (
+                    <p className="text-sm text-red-500">{errors.zip.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Input
+                    id="country"
+                    {...register('country')}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -586,19 +622,24 @@ export default function PatientRegistrationForm() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Do you have a GLP-1 Preference</h2>
             <div className="space-y-2">
-              <Select
-                onValueChange={(value) => setValue('glp1Preference', value)}
-                defaultValue={watch('glp1Preference')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Semaglutide">Semaglutide</SelectItem>
-                  <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
-                  <SelectItem value="None">None</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 gap-3">
+                {['Semaglutide', 'Tirzepatide', 'None'].map((option, index) => (
+                  <label
+                    key={index}
+                    htmlFor={`glp1Preference-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1Preference') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                  >
+                    <input
+                      type="radio"
+                      id={`glp1Preference-${index}`}
+                      value={option}
+                      className="hidden"
+                      {...register('glp1Preference')}
+                    />
+                    <span className="ml-2">{option}</span>
+                  </label>
+                ))}
+              </div>
               {errors.glp1Preference && (
                 <p className="text-sm text-red-500">{errors.glp1Preference.message}</p>
               )}
@@ -611,19 +652,24 @@ export default function PatientRegistrationForm() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Sex assigned at birth</h2>
             <div className="space-y-2">
-              <Select
-                onValueChange={(value) => setValue('sex', value)}
-                defaultValue={watch('sex')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 gap-3">
+                {['Male', 'Female', 'Other'].map((option, index) => (
+                  <label
+                    key={index}
+                    htmlFor={`sex-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('sex') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                  >
+                    <input
+                      type="radio"
+                      id={`sex-${index}`}
+                      value={option}
+                      className="hidden"
+                      {...register('sex')}
+                    />
+                    <span className="ml-2">{option}</span>
+                  </label>
+                ))}
+              </div>
               {errors.sex && (
                 <p className="text-sm text-red-500">{errors.sex.message}</p>
               )}
@@ -635,58 +681,61 @@ export default function PatientRegistrationForm() {
         {currentSegment === 7 && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Height</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="heightFeet">
-                  Height in Feet <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) => setValue('heightFeet', value)}
-                  defaultValue={watch('heightFeet')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select feet" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 7].map(feet => (
-                      <SelectItem key={feet} value={feet.toString()}>{feet}</SelectItem>
+            <div className="space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>
+                    Feet <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex flex-wrap gap-3">
+                    {[1, 2, 3, 4, 5, 6, 7].map((feet, index) => (
+                      <label
+                        key={index}
+                        htmlFor={`heightFeet-${index}`}
+                        className={`flex items-center justify-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('heightFeet') === feet.toString() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      >
+                        <input
+                          type="radio"
+                          id={`heightFeet-${index}`}
+                          value={feet.toString()}
+                          className="hidden"
+                          {...register('heightFeet')}
+                        />
+                        <span>{feet}</span>
+                      </label>
                     ))}
-                  </SelectContent>
-                </Select>
-                {errors.heightFeet && (
-                  <p className="text-sm text-red-500">{errors.heightFeet.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="heightInches">
-                  Height in Inches <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) => setValue('heightInches', value)}
-                  defaultValue={watch('heightInches')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select inches" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(inches => (
-                      <SelectItem key={inches} value={inches.toString()}>{inches}</SelectItem>
+                  </div>
+                  {errors.heightFeet && (
+                    <p className="text-sm text-red-500">{errors.heightFeet.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>
+                    Inches <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex flex-wrap gap-3">
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((inches, index) => (
+                      <label
+                        key={index}
+                        htmlFor={`heightInches-${index}`}
+                        className={`flex items-center justify-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('heightInches') === inches.toString() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      >
+                        <input
+                          type="radio"
+                          id={`heightInches-${index}`}
+                          value={inches.toString()}
+                          className="hidden"
+                          {...register('heightInches')}
+                        />
+                        <span>{inches}</span>
+                      </label>
                     ))}
-                  </SelectContent>
-                </Select>
-                {errors.heightInches && (
-                  <p className="text-sm text-red-500">{errors.heightInches.message}</p>
-                )}
+                  </div>
+                  {errors.heightInches && (
+                    <p className="text-sm text-red-500">{errors.heightInches.message}</p>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Weight segment */}
-        {currentSegment === 8 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Weight</h2>
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="currentWeight">
                   Current Weight (lbs) <span className="text-red-500">*</span>
@@ -700,19 +749,26 @@ export default function PatientRegistrationForm() {
                   <p className="text-sm text-red-500">{errors.currentWeight.message}</p>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="goalWeight">
-                  Goal Weight (lbs) <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="goalWeight"
-                  type="number"
-                  {...register('goalWeight')}
-                />
-                {errors.goalWeight && (
-                  <p className="text-sm text-red-500">{errors.goalWeight.message}</p>
-                )}
-              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Weight segment */}
+        {currentSegment === 8 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Weight</h2>
+            <div className="space-y-2">
+              <Label htmlFor="goalWeight">
+                Goal Weight (lbs) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="goalWeight"
+                type="number"
+                {...register('goalWeight')}
+              />
+              {errors.goalWeight && (
+                <p className="text-sm text-red-500">{errors.goalWeight.message}</p>
+              )}
             </div>
           </div>
         )}
@@ -746,7 +802,7 @@ export default function PatientRegistrationForm() {
                 Have you ever experienced any of the following conditions? <span className="text-red-500">*</span>
                 <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'History of severe GI disease/ Chronic Constipation',
                   'Current gallbladder problems (not including previous gallbladder removal/cholecystectomy)',
@@ -793,7 +849,7 @@ export default function PatientRegistrationForm() {
                 Does any members of your family have these conditions? <span className="text-red-500">*</span>
                 <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Medullary thyroid cancer',
                   'Multiple endocrine neoplasia type 2',
@@ -833,7 +889,7 @@ export default function PatientRegistrationForm() {
                 Have you ever received any of these diagnoses? <span className="text-red-500">*</span>
                 <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Type 1 diabetes',
                   'Pancreatitis',
@@ -875,7 +931,7 @@ export default function PatientRegistrationForm() {
               <Label>
                 Have you had weight loss surgery in the last 18 months? <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Sleeve gastrectomy',
                   'Laparoscopic adjustable gastric band (Lap-band)',
@@ -917,7 +973,7 @@ export default function PatientRegistrationForm() {
               <Label>
                 Have you ever been diagnosed with any of the following weight-related conditions? <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Type 2 diabetes (Non-insulin dependent)',
                   'Sleep apnea',
@@ -977,7 +1033,7 @@ export default function PatientRegistrationForm() {
                 Are you taking any of these medications? <span className="text-red-500">*</span>
                 <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Insulin',
                   'Sulfonylureas',
@@ -1018,7 +1074,7 @@ export default function PatientRegistrationForm() {
                 History of kidney disease or failure? Consulted a nephrologist? <span className="text-red-500">*</span>
                 <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {['Yes', 'No'].map((option, index) => (
                   <label
                     key={index}
@@ -1051,7 +1107,7 @@ export default function PatientRegistrationForm() {
               <Label>
                 Have you used any of these medications for weight loss? <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Zepbound (Tirzepatide)',
                   'Wegovy (Semaglutide)',
@@ -1103,7 +1159,7 @@ export default function PatientRegistrationForm() {
               <Label>
                 Have you tried any of these diets? <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Keto',
                   'Whole30',
@@ -1152,7 +1208,7 @@ export default function PatientRegistrationForm() {
                 Have you taken GLP-1 medications in the past year? <span className="text-red-500">*</span>
                 <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[
                   'Zepbound (Tirzepatide)',
                   'Wegovy (Semaglutide)',
@@ -1256,22 +1312,23 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 Are you pregnant or planning to become pregnant in the near future? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-2 gap-3">
-                {['Yes', 'No'].map((option, index) => (
+              <div className="grid grid-cols-1 gap-3">
+                {['yes', 'no'].map((option, index) => (
                   <label
                     key={index}
-                    htmlFor={`pregnant${option}`}
-                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('pregnant') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    htmlFor={`pregnant-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('pregnant') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
-                      id={`pregnant${option}`}
-                      value={option.toLowerCase()}
+                      id={`pregnant-${index}`}
+                      value={option}
                       className="hidden"
                       {...register('pregnant')}
                     />
-                    <span className="ml-2">{option}</span>
+                    <span className="ml-2">{option === 'yes' ? 'Yes' : 'No'}</span>
                   </label>
                 ))}
               </div>
@@ -1289,22 +1346,23 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 Are you breastfeeding? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
-              <div className="grid grid-cols-2 gap-3">
-                {['Yes', 'No'].map((option, index) => (
+              <div className="grid grid-cols-1 gap-3">
+                {['yes', 'no'].map((option, index) => (
                   <label
                     key={index}
-                    htmlFor={`breastfeeding${option}`}
-                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('breastfeeding') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    htmlFor={`breastfeeding-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('breastfeeding') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
-                      id={`breastfeeding${option}`}
-                      value={option.toLowerCase()}
+                      id={`breastfeeding-${index}`}
+                      value={option}
                       className="hidden"
                       {...register('breastfeeding')}
                     />
-                    <span className="ml-2">{option}</span>
+                    <span className="ml-2">{option === 'yes' ? 'Yes' : 'No'}</span>
                   </label>
                 ))}
               </div>
@@ -1323,21 +1381,21 @@ export default function PatientRegistrationForm() {
               <Label>
                 Are you under the care of a healthcare provider? <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-2 gap-3">
-                {['Yes', 'No'].map((option, index) => (
+              <div className="grid grid-cols-1 gap-3">
+                {['yes', 'no'].map((option, index) => (
                   <label
                     key={index}
-                    htmlFor={`provider${option}`}
-                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('healthcareProvider') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    htmlFor={`provider-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('healthcareProvider') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
-                      id={`provider${option}`}
-                      value={option.toLowerCase()}
+                      id={`provider-${index}`}
+                      value={option}
                       className="hidden"
                       {...register('healthcareProvider')}
                     />
-                    <span className="ml-2">{option}</span>
+                    <span className="ml-2">{option === 'yes' ? 'Yes' : 'No'}</span>
                   </label>
                 ))}
               </div>
@@ -1356,21 +1414,21 @@ export default function PatientRegistrationForm() {
               <Label>
                 Do you have a history of eating disorders? <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-2 gap-3">
-                {['Yes', 'No'].map((option, index) => (
+              <div className="grid grid-cols-1 gap-3">
+                {['yes', 'no'].map((option, index) => (
                   <label
                     key={index}
-                    htmlFor={`eating${option}`}
-                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('eatingDisorders') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    htmlFor={`eating-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('eatingDisorders') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
-                      id={`eating${option}`}
-                      value={option.toLowerCase()}
+                      id={`eating-${index}`}
+                      value={option}
                       className="hidden"
                       {...register('eatingDisorders')}
                     />
-                    <span className="ml-2">{option}</span>
+                    <span className="ml-2">{option === 'yes' ? 'Yes' : 'No'}</span>
                   </label>
                 ))}
               </div>
@@ -1389,21 +1447,21 @@ export default function PatientRegistrationForm() {
               <Label>
                 Have you had any labs done in the last year that includes Hgb A1c, kidney function (CMP/BMP), lipids, and thyroid studies? <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-2 gap-3">
-                {['Yes', 'No'].map((option, index) => (
+              <div className="grid grid-cols-1 gap-3">
+                {['yes', 'no'].map((option, index) => (
                   <label
                     key={index}
-                    htmlFor={`labs${option}`}
-                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('labs') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    htmlFor={`labs-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('labs') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
-                      id={`labs${option}`}
-                      value={option.toLowerCase()}
+                      id={`labs-${index}`}
+                      value={option}
                       className="hidden"
                       {...register('labs')}
                     />
-                    <span className="ml-2">{option}</span>
+                    <span className="ml-2">{option === 'yes' ? 'Yes' : 'No'}</span>
                   </label>
                 ))}
               </div>
@@ -1422,24 +1480,24 @@ export default function PatientRegistrationForm() {
               <Label>
                 Please select the following statement that applies to you. <span className="text-red-500">*</span>
               </Label>
-              <Select
-                onValueChange={(value) => setValue('glp1Statement', value)}
-                defaultValue={watch('glp1Statement')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="New to GLP-1 therapy">New to GLP-1 therapy</SelectItem>
-                  <SelectItem value="Currently on Semaglutide, requesting dose increase">Currently on Semaglutide, requesting dose increase</SelectItem>
-                  <SelectItem value="Currently on Semaglutide, keep my current dose">Currently on Semaglutide, keep my current dose</SelectItem>
-                  <SelectItem value="Currently on Tirzepatide, requesting dose increase">Currently on Tirzepatide, requesting dose increase</SelectItem>
-                  <SelectItem value="Currently on Tirzepatide, keep my current dose">Currently on Tirzepatide, keep my current dose</SelectItem>
-                  <SelectItem value="On Semaglutide, requesting change to Tirzepatide">On Semaglutide, requesting change to Tirzepatide</SelectItem>
-                  <SelectItem value="On Tirzepatide, requesting change to Semaglutide">On Tirzepatide, requesting change to Semaglutide</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 gap-3">
+                {['New to GLP-1 therapy', 'Currently on Semaglutide, requesting dose increase', 'Currently on Semaglutide, keep my current dose', 'Currently on Tirzepatide, requesting dose increase', 'Currently on Tirzepatide, keep my current dose', 'On Semaglutide, requesting change to Tirzepatide', 'On Tirzepatide, requesting change to Semaglutide', 'Other'].map((statement, index) => (
+                  <label
+                    key={index}
+                    htmlFor={`statement-${index}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1Statement') === statement ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                  >
+                    <input
+                      type="radio"
+                      id={`statement-${index}`}
+                      value={statement}
+                      className="hidden"
+                      {...register('glp1Statement')}
+                    />
+                    <span className="ml-2">{statement}</span>
+                  </label>
+                ))}
+              </div>
               {errors.glp1Statement && (
                 <p className="text-sm text-red-500">{errors.glp1Statement.message}</p>
               )}
@@ -1455,16 +1513,16 @@ export default function PatientRegistrationForm() {
               <Label>
                 I agree to only use Somi Health for GLP-1. <span className="text-red-500">*</span>
               </Label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {['Yes', 'No'].map((option, index) => (
                   <label
                     key={index}
-                    htmlFor={`terms${option}`}
+                    htmlFor={`terms-${index}`}
                     className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('agreeTerms') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
-                      id={`terms${option}`}
+                      id={`terms-${index}`}
                       value={option.toLowerCase()}
                       className="hidden"
                       {...register('agreeTerms')}
@@ -1486,7 +1544,7 @@ export default function PatientRegistrationForm() {
             <h2 className="text-xl font-semibold">Prescription Upload</h2>
             <div className="space-y-2">
               <Label>
-                Please upload a clear photo of your GLP-1 prescription. If not applicable, Click ok <span className="text-red-500">*</span>
+                Please upload a clear photo of your GLP-1 prescription (Optional)
               </Label>
               <UploadFile
                 onUploadComplete={(url) => {
@@ -1710,45 +1768,73 @@ export default function PatientRegistrationForm() {
           </AlertDialogContent>
         </AlertDialog>
 
-        <div className="fixed bottom-0 left-0 right-0 py-4">
-          <div className="container mx-auto max-w-6xl px-6">
-            <div className="flex justify-between">
-              {currentSegment > 0 ? (
-                <Button
-                  variant="outline"
-                  onClick={handlePrevious}
-                  type="button"
-                  className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
-                >
-                  Previous
-                </Button>
-              ) : (
-                <div></div>
-              )}
-
-              {currentSegment < segments.length - 1 ? (
-                <Button
-                  onClick={handleNext}
-                  type="button"
-                  className="bg-secondary text-white hover:bg-secondary rounded-2xl"
-                >
-                  Continue
-                </Button>
-              ) : currentSegment === segments.length - 1 ? (
-                <Button
-                  onClick={() => {
-                    console.log('Final form data:', watch());
-                    handleSubmit(onSubmit)();
-                  }}
-                  type="button"
-                  className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
-                >
-                  OK
-                </Button>
-              ) : null}
+        {/* Form segments */}
+        {currentSegment === 0 && (
+          <div className="space-y-4">
+            {/* Age verification content */}
+            <div className="flex justify-between mt-8">
+              <div></div>
+              <Button
+                onClick={handleNext}
+                type="button"
+                className="bg-secondary text-white hover:bg-secondary rounded-2xl"
+              >
+                Continue
+              </Button>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Other segments */}
+        {currentSegment > 0 && currentSegment < segments.length - 1 && (
+          <div className="space-y-4">
+            {/* Segment content */}
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                type="button"
+                className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+              >
+                Previous
+              </Button>
+              <Button
+                onClick={handleNext}
+                type="button"
+                className="bg-secondary text-white hover:bg-secondary rounded-2xl"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Final segment */}
+        {currentSegment === segments.length - 1 && (
+          <div className="space-y-4">
+            {/* Final segment content */}
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                type="button"
+                className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+              >
+                Previous
+              </Button>
+              <Button
+                onClick={() => {
+                  console.log('Final form data:', watch());
+                  handleSubmit(onSubmit)();
+                }}
+                type="button"
+                className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
+              >
+                Submit
+              </Button>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );
