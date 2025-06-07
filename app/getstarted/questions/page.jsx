@@ -203,29 +203,26 @@ export default function PatientRegistrationForm() {
           }
           break;
         case 'surgery':
-          if (hasOtherOptionsSelected('weightLossSurgery')) {
-            isIneligible = true;
-          }
+          // Removed ineligibility check for weight loss surgery
+          break;
+        case 'weightConditions':
+          // Removed ineligibility check for weight related conditions
           break;
         case 'medications':
           if (hasOtherOptionsSelected('medications')) {
             isIneligible = true;
           }
           break;
-        case 'weightConditions':
-          if (hasOtherOptionsSelected('weightRelatedConditions')) {
+        case 'kidney':
+          if (watch('kidneyDisease') === 'yes') {
             isIneligible = true;
           }
           break;
         case 'pastMeds':
-          if (hasOtherOptionsSelected('pastWeightLossMeds')) {
-            isIneligible = true;
-          }
+          // Removed ineligibility check for past medications
           break;
         case 'diets':
-          if (hasOtherOptionsSelected('diets')) {
-            isIneligible = true;
-          }
+          // Removed ineligibility check for diets
           break;
         case 'glp1History':
           if (hasOtherOptionsSelected('glp1PastYear')) {
@@ -254,7 +251,7 @@ export default function PatientRegistrationForm() {
   const onSubmit = async (data) => {
     console.log('Form submission started');
     console.log('Raw form data:', data);
-    
+
     try {
       // Calculate BMI
       const heightInInches = parseInt(data.heightFeet) * 12 + parseInt(data.heightInches);
@@ -271,7 +268,7 @@ export default function PatientRegistrationForm() {
       };
 
       console.log('Final submission data:', submissionData);
-      
+
       // You can add your API call here
       // const response = await fetch('/api/submit-form', {
       //   method: 'POST',
@@ -362,12 +359,12 @@ export default function PatientRegistrationForm() {
       </div>
 
       {/* Form segments */}
-      <form 
+      <form
         onSubmit={(e) => {
           console.log('Form submit event triggered');
           handleSubmit(onSubmit)(e);
-        }} 
-        className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl"
+        }}
+        className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl mb-24"
         noValidate
       >
         {/* Age verification segment */}
@@ -747,6 +744,7 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 Have you ever experienced any of the following conditions? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
               <div className="grid grid-cols-1 gap-3">
                 {[
@@ -764,7 +762,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`condition-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('conditions')?.includes(condition) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('conditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -793,6 +791,7 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 Does any members of your family have these conditions? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
               <div className="grid grid-cols-1 gap-3">
                 {[
@@ -803,7 +802,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`family-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('familyConditions')?.includes(condition) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('familyConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -832,6 +831,7 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 Have you ever received any of these diagnoses? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
               <div className="grid grid-cols-1 gap-3">
                 {[
@@ -845,7 +845,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`diagnosis-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('diagnoses')?.includes(diagnosis) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('diagnoses')?.includes(diagnosis) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -887,7 +887,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`surgery-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('weightLossSurgery')?.includes(surgery) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('weightLossSurgery')?.includes(surgery) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -946,7 +946,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`weightCondition-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('weightRelatedConditions')?.includes(condition) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('weightRelatedConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -975,6 +975,7 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 Are you taking any of these medications? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
               <div className="grid grid-cols-1 gap-3">
                 {[
@@ -986,7 +987,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`med-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('medications')?.includes(med) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('medications')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -1015,13 +1016,14 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 History of kidney disease or failure? Consulted a nephrologist? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
               <div className="grid grid-cols-2 gap-3">
                 {['Yes', 'No'].map((option, index) => (
                   <label
                     key={index}
                     htmlFor={`kidney${option}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('kidneyDisease') === option.toLowerCase() ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('kidneyDisease') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
@@ -1071,7 +1073,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`pastMed-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('pastWeightLossMeds')?.includes(med) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('pastWeightLossMeds')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -1119,7 +1121,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`diet-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('diets')?.includes(diet) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('diets')?.includes(diet) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -1148,6 +1150,7 @@ export default function PatientRegistrationForm() {
             <div className="space-y-2">
               <Label>
                 Have you taken GLP-1 medications in the past year? <span className="text-red-500">*</span>
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
               </Label>
               <div className="grid grid-cols-1 gap-3">
                 {[
@@ -1164,7 +1167,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`glp1History-${index}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('glp1PastYear')?.includes(med) ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1PastYear')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="checkbox"
@@ -1259,7 +1262,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`pregnant${option}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('pregnant') === option.toLowerCase() ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('pregnant') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
@@ -1292,7 +1295,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`breastfeeding${option}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('breastfeeding') === option.toLowerCase() ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('breastfeeding') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
@@ -1325,7 +1328,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`provider${option}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('healthcareProvider') === option.toLowerCase() ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('healthcareProvider') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
@@ -1358,7 +1361,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`eating${option}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('eatingDisorders') === option.toLowerCase() ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('eatingDisorders') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
@@ -1391,7 +1394,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`labs${option}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('labs') === option.toLowerCase() ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('labs') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
@@ -1457,7 +1460,7 @@ export default function PatientRegistrationForm() {
                   <label
                     key={index}
                     htmlFor={`terms${option}`}
-                    className={`flex items-center px-4 py-2 border text-secondary border-secondary bg-white rounded-full cursor-pointer hover:bg-secondary/90 hover:text-white transition-all duration-200 ${watch('agreeTerms') === option.toLowerCase() ? 'bg-secondary/95 text-white' : ''}`}
+                    className={`flex items-center px-4 py-2 border border-blue-400 rounded-full cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('agreeTerms') === option.toLowerCase() ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                   >
                     <input
                       type="radio"
@@ -1554,7 +1557,7 @@ export default function PatientRegistrationForm() {
         {currentSegment === 33 && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Telehealth Consent to Treatment and HIPAA Notice</h2>
-            <div className="space-y-4 p-4 border rounded-lg">
+            <div className="space-y-4">
               <div className="space-y-4">
                 <h3 className="font-semibold">Weight Management (Semaglutide and Tirzepatide) Prescription Drug Management Consent</h3>
                 <p>This document confirms informed consent for GLP-1, a weight management medication.</p>
@@ -1623,10 +1626,10 @@ export default function PatientRegistrationForm() {
                 <div className="space-y-2">
                   <h4 className="font-semibold">Contact Information</h4>
                   <p>Somi Health<br />
-                  4111 E Rose Lake Dr<br />
-                  Charlotte NC, 28217<br />
-                  (704) 386-6871<br />
-                  joinsomi.com</p>
+                    4111 E Rose Lake Dr<br />
+                    Charlotte NC, 28217<br />
+                    (704) 386-6871<br />
+                    joinsomi.com</p>
                   <p>This notice is effective as of 03/15/2025</p>
                 </div>
 
@@ -1639,7 +1642,15 @@ export default function PatientRegistrationForm() {
                       className="h-4 w-4 text-secondary border-secondary rounded"
                     />
                     <label htmlFor="consent-checkbox" className="text-sm">
-                      I have read the Somi Health telehealth consent form and HIPAA Privacy Notice at https://joinsomi.com/telehealth-consent/
+                      I have read the Somi Health telehealth consent form and HIPAA Privacy Notice at{' '}
+                      <a 
+                        href="https://joinsomi.com/telehealth-consent/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-secondary hover:underline"
+                      >
+                        https://joinsomi.com/telehealth-consent/
+                      </a>
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -1650,10 +1661,18 @@ export default function PatientRegistrationForm() {
                       className="h-4 w-4 text-secondary border-secondary rounded"
                     />
                     <label htmlFor="terms-checkbox" className="text-sm">
-                      I have read the Somi Health Terms of Services at https://joinsomi.com/terrms-of-use/
+                      I have read the Somi Health Terms of Services at{' '}
+                      <a 
+                        href="https://joinsomi.com/terrms-of-use/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-secondary hover:underline"
+                      >
+                        https://joinsomi.com/terrms-of-use/
+                      </a>
                     </label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 mb-10">
                     <input
                       type="checkbox"
                       id="treatment-checkbox"

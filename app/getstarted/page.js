@@ -58,14 +58,12 @@ const LandingPage = () => {
                         somi
                     </h1>
 
-                    <div className="relative w-full max-w-md aspect-video mx-auto ">
+                    <div className="relative w-[300px] h-[300px] mx-auto">
                         <Image
                             src="/getstarted.jpg"
                             alt="Weight Loss"
-                            width={500}
-                            height={400}
+                            fill
                             className="rounded-xl object-contain"
-                            style={{ width: '100%', height: 'auto' }}
                             priority
                         />
                     </div>
