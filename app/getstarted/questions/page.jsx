@@ -14,6 +14,13 @@ import { AlertDialog, AlertDialogDescription, AlertDialogHeader, AlertDialogCont
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import UploadFile from "@/components/FileUpload";
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { ChevronDownIcon } from "lucide-react"
 
 // Form validation schema
 const formSchema = z.object({
@@ -68,17 +75,17 @@ const formSchema = z.object({
   prescriptionPhoto: z.string().optional(), // Changed from required to optional
   idPhoto: z.string().min(1, "This field is required"),
   comments: z.string().optional(), // Changed from required to optional
-  dob: z.string().min(1, "Date of birth is required")
-    .refine(dob => {
-      const birthDate = new Date(dob);
-      const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        return age - 1 >= 18;
-      }
-      return age >= 18;
-    }, "You must be at least 18 years old"),
+  dob: z.date({
+    required_error: "Date of birth is required",
+  }).refine((date) => {
+    const today = new Date();
+    const age = today.getFullYear() - date.getFullYear();
+    const monthDiff = today.getMonth() - date.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) {
+      return age - 1 >= 18;
+    }
+    return age >= 18;
+  }, "You must be at least 18 years old"),
   consent: z.boolean().refine(val => val === true, "You must consent to proceed"),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
   treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
@@ -140,6 +147,7 @@ export default function PatientRegistrationForm() {
   const [fileUrls, setFileUrls] = useState({ file1: '', file2: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const {
     register,
@@ -152,6 +160,9 @@ export default function PatientRegistrationForm() {
   } = useForm({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
+    defaultValues: {
+      dob: null
+    }
   });
 
   const handleNext = async () => {
@@ -504,34 +515,47 @@ export default function PatientRegistrationForm() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Date of Birth</h2>
             <div className="space-y-2">
-              <Label htmlFor="dob">
-                Date of Birth <span className="text-red-500">*</span>
-              </Label>
-              <div className="relative w-[200px]">
-                <Input
-                  id="dob"
-                  type="text"
-                  placeholder="DD / MM / YYYY"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                  {...register('dob', {
-                    pattern: {
-                      value: /^(0[1-9]|[12][0-9]|3[01])\s\/\s(0[1-9]|1[0-2])\s\/\s(19|20)\d{2}$/,
-                      message: "Please use DD / MM / YYYY format"
-                    }
-                  })}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '');
-                    if (value.length <= 8) {
-                      let formatted = value;
-                      if (value.length > 4) {
-                        formatted = `${value.slice(0, 2)} / ${value.slice(2, 4)} / ${value.slice(4)}`;
-                      } else if (value.length > 2) {
-                        formatted = `${value.slice(0, 2)} / ${value.slice(2)}`;
-                      }
-                      e.target.value = formatted;
-                    }
-                  }}
-                />
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="dob">
+                  Date of Birth <span className="text-red-500">*</span>
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      id="dob"
+                      className="w-[200px] justify-between font-normal"
+                    >
+                      {selectedDate ? selectedDate.toLocaleDateString() : "Select date"}
+                      <ChevronDownIcon className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          setSelectedDate(date);
+                          setValue('dob', date, { shouldValidate: true });
+                        }
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        const age = today.getFullYear() - date.getFullYear();
+                        const monthDiff = today.getMonth() - date.getMonth();
+                        const isOver18 = monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate()) 
+                          ? age - 1 >= 18 
+                          : age >= 18;
+                        return !isOver18 || date > today;
+                      }}
+                      initialFocus
+                      fromYear={1900}
+                      toYear={new Date().getFullYear()}
+                      captionLayout="dropdown"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               {errors.dob && (
                 <p className="text-sm text-red-500">{errors.dob.message}</p>
