@@ -2,6 +2,11 @@
 import React from "react";
 
 export const DiagnosisCell = ({ diagnosis }) => {
+    // Handle undefined or null diagnosis
+    if (!diagnosis) {
+        return <div className="truncate whitespace-nowrap overflow-hidden">-</div>;
+    }
+
     return (
         <div className="relative group w-full max-w-[140px]">
             {/* Truncated preview */}

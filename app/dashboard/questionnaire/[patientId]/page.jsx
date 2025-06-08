@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import UploadFile from "@/components/FileUpload";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -17,102 +18,97 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-
+import toast from 'react-hot-toast';
 
 export default function PatientUpdateForm({ params }) {
     const { data: session } = useSession();
-    const [patients, setPatients] = useState([]);
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [messageHead, setMessageHead] = useState("");
+    const [message, setMessage] = useState("");
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [fileUrls, setFileUrls] = useState({
+        file1: '',
+        file2: ''
+    });
+
+    const [formData, setFormData] = useState({
+        authid: '',
+        isOver18: '',
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        phone: '',
+        email: '',
+        address: '',
+        address2: '',
+        city: '',
+        state: '',
+        zip: '',
+        country: '',
+        glp1Preference: '',
+        sex: '',
+        heightFeet: '',
+        heightInches: '',
+        currentWeight: '',
+        goalWeight: '',
+        bmi: '',
+        allergies: '',
+        conditions: [],
+        familyConditions: [],
+        diagnoses: [],
+        weightLossSurgery: [],
+        weightRelatedConditions: [],
+        medications: [],
+        kidneyDisease: '',
+        pastWeightLossMeds: [],
+        diets: [],
+        glp1PastYear: '',
+        otherConditions: '',
+        currentMedications: '',
+        surgeries: '',
+        pregnant: '',
+        breastfeeding: '',
+        healthcareProvider: '',
+        eatingDisorders: '',
+        labs: '',
+        glp1Statement: '',
+        glp1DoseInfo: '',
+        agreeTerms: false,
+        prescriptionPhoto: '',
+        idPhoto: '',
+        comments: '',
+        consent: false,
+        status: '',
+    });
 
     useEffect(() => {
-        const fetchPatients = async () => {
+        const fetchQuestionnaire = async () => {
             try {
-                const res = await fetch("/api/patients");
-                const data = await res.json();
+                const response = await fetch(`/api/questionnaire/${params.patientId}`);
+                const data = await response.json();
 
                 if (data.success) {
-                    setPatients(data.result); // from your API response
+                    setFormData(data.result);
+                    // Set file URLs from the fetched data
+                    setFileUrls({
+                        file1: data.result.prescriptionPhoto || '',
+                        file2: data.result.idPhoto || ''
+                    });
                 } else {
-                    console.error("Error fetching patients:", data.result.message);
+                    toast.error("Failed to fetch questionnaire data");
                 }
-            } catch (err) {
-                console.error("Fetch failed:", err);
+            } catch (error) {
+                console.error("Error fetching questionnaire:", error);
+                toast.error("Error fetching questionnaire data");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchPatients();
-    }, []);
-
-    const [formData, setFormData] = useState({
-        authid: '',
-        firstName: '',
-        lastName: '',
-        dob: '',
-        height: '',
-        email: '',
-        sex: '',
-        weight: '',
-        phone: '',
-        glp1: '',
-        bmi: '',
-        address1: '',
-        address2: '',
-        city: '',
-        state: '',
-        zip: '',
-        bloodPressure: '',
-        heartRate: '',
-        takingMedication: '',
-        medicineAllergy: '',
-        listAllMedication: '',
-        allergyList: '',
-        majorSurgeries: '',
-        bariatricSurgery: '',
-        thyroidCancerHistory: '',
-        surgeryList: '',
-        disqualifiers: '',
-        diagnosis: '',
-        startingWeight: '',
-        currentWeight: '',
-        goalWeight: '',
-        weightChange12m: '',
-        weightLossPrograms: '',
-        weightLossMeds12m: '',
-        glpTaken: '',
-        glpRecentInjection: '',
-        semaglutideLastDose: '',
-        semaglutideRequestedDose: '',
-        tirzepetideLastDose: '',
-        tirzepetideRequestedDose: '',
-        tirzepetidePlanPurchased: '',
-        tirzepetideVial: '',
-        tirzepetideDosingSchedule: '',
-        providerComments: '',
-        medicine: '',
-        approvalStatus: '',
-        semaglutideDose: '',
-        semaglutideUnit: '',
-        tirzepatideDose: '',
-        tirzepatideUnit: '',
-        providerNote: '',
-        createTimeDate: '',
-        closetickets: false,
-        Reasonclosetickets: '',
-        file1: '',
-        file2: '',
-        questionnaire: true,
-    });
-
-
-    useEffect(() => {
-        const patient = patients.find(p => p.authid === params.patientId);
-        if (patient) {
-            setFormData(prev => ({ ...prev, ...patient }));
-
-        }
-    }, [patients, params.patientId]);
+        fetchQuestionnaire();
+    }, [params.patientId]);
 
     const handleInputChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -122,38 +118,59 @@ export default function PatientUpdateForm({ params }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-
-    const router = useRouter();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [messageHead, setMessageHead] = useState("");
-    const [message, setMessage] = useState("");
-    const [isSuccess, setIsSuccess] = useState(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const submissionData = {
-            ...formData,
-            questionnaire: false,
-        };
-
         try {
-            const res = await fetch("/api/patients", {
-                method: "PUT",
+            // Map questionnaire fields to patient fields
+            const patientData = {
+                authid: formData.authid,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                dob: formData.dateOfBirth?.split('T')[0], // Convert to YYYY-MM-DD format
+                height: `${formData.heightFeet}.${formData.heightInches}`,
+                email: formData.email,
+                sex: formData.sex,
+                weight: formData.currentWeight,
+                phone: formData.phone,
+                glp1: formData.glp1Preference,
+                bmi: formData.bmi,
+                address1: formData.address,
+                address2: formData.address2,
+                city: formData.city,
+                state: formData.state,
+                zip: formData.zip,
+                medicine: formData.glp1Preference,
+                approvalStatus: '',
+                semaglutideDose: '',
+                semaglutideUnit: '',
+                tirzepatideDose: '',
+                tirzepatideUnit: '',
+                createTimeDate: new Date().toISOString(),
+                images: [],
+                file1: formData.prescriptionPhoto,
+                file2: formData.idPhoto,
+                providerComments: formData.comments || '',
+                providerNote: ''
+            };
+
+            // Submit to /api/patients
+            const response = await fetch('/api/patients', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(submissionData),
+                body: JSON.stringify(patientData),
             });
 
-            const data = await res.json();
+            const result = await response.json();
 
-            if (data.success) {
+            if (result.success) {
+                // If user is a technician, create the creator-patient relationship
                 if (session?.user?.accounttype === 'T') {
                     const creatorData = {
-                        pid: submissionData.authid, // Patient ID
-                        tid: session.user.id,       // Technician ID
-                        tname: session.user.fullname // Technician Name
+                        pid: formData.authid,           // Patient ID
+                        tid: session.user.id,           // Technician ID
+                        tname: session.user.fullname    // Technician Name
                     };
 
                     const creatorResponse = await fetch('/api/creatorofp', {
@@ -168,91 +185,100 @@ export default function PatientUpdateForm({ params }) {
 
                     if (!creatorResult.success) {
                         console.error('Failed to create creator relationship:', creatorResult.message);
-                        // You might want to handle this case differently
+                        // Continue with questionnaire deletion even if creator record fails
                     }
                 }
-                setMessageHead("Success");
-                setMessage("Patient Submited successfully!");
-                setIsSuccess(true);
-                setIsDialogOpen(true);
+
+                // Delete questionnaire data after successful patient data submission
+                const deleteResponse = await fetch('/api/questionnaire', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ authids: [formData.authid] }),
+                });
+
+                const deleteResult = await deleteResponse.json();
+
+                if (deleteResult.success) {
+                    toast.success('Patient data updated and questionnaire deleted successfully');
+                    setIsSuccess(true);
+                    setMessageHead('Success');
+                    setMessage('Patient data has been updated and questionnaire deleted successfully.');
+                    setIsDialogOpen(true);
+                    // Redirect to questionnaire list after successful submission
+                    router.push('/dashboard/questionnaire');
+                } else {
+                    throw new Error(deleteResult.message || 'Failed to delete questionnaire data');
+                }
             } else {
-                setMessageHead("Error");
-                setMessage(data.result.message || "Failed to Submited patient");
-                setIsSuccess(false);
-                setIsDialogOpen(true);
+                throw new Error(result.message || 'Failed to update patient data');
             }
-        } catch (err) {
-            setMessageHead("Error");
-            setMessage("Failed to Submited patient. Please try again.");
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            toast.error(error.message || 'Failed to update patient data');
             setIsSuccess(false);
+            setMessageHead('Error');
+            setMessage(error.message || 'Failed to update patient data');
             setIsDialogOpen(true);
-            console.error("Request failed:", err);
         }
     };
 
-
-    if (!formData.authid) {
-        return <div className="p-4 text-yellow-500">loading..</div>;
+    if (loading) {
+        return <div className="p-4 text-yellow-500">Loading...</div>;
     }
 
     return (
         <div className="mb-4 p-4">
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold">Submit {formData.firstName} {formData.lastName}</h2>
+                    <h2 className="text-2xl font-semibold">Questionnaire Details</h2>
                     <div className="space-y-2">
                         <Label>Patient ID</Label>
                         <Input value={formData.authid} readOnly className="font-mono w-32" />
                     </div>
                 </div>
 
-                <div className="flex space-x-4 mb-6">
-                    <div className="space-y-2 flex-1">
+                {/* Basic Information */}
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
                         <Input
                             id="firstName"
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleInputChange}
-                            placeholder="Enter First name"
                         />
                     </div>
-                    <div className="space-y-2 flex-1">
+                    <div className="space-y-2">
                         <Label htmlFor="lastName">Last Name</Label>
                         <Input
                             id="lastName"
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleInputChange}
-                            placeholder="Enter Last name"
                         />
                     </div>
-                </div>
-
-                <h3 className="text-sm font-semibold">Basic information</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
-                        <Label htmlFor="dob">DOB</Label>
+                        <Label htmlFor="dateOfBirth">Date of Birth</Label>
                         <Input
                             type="date"
-                            id="dob"
-                            name="dob"
-                            value={formData.dob}
+                            id="dateOfBirth"
+                            name="dateOfBirth"
+                            value={formData.dateOfBirth?.split('T')[0]}
                             onChange={handleInputChange}
                         />
                     </div>
-
                     <div className="space-y-2">
-                        <Label htmlFor="height">Height</Label>
+                        <Label htmlFor="phone">Phone</Label>
                         <Input
-                            id="height"
-                            name="height"
-                            value={formData.height}
+                            id="phone"
+                            name="phone"
+                            value={formData.phone}
                             onChange={handleInputChange}
-                            placeholder="e.g. 5'9&quot;"
                         />
                     </div>
-
                     <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
@@ -261,57 +287,138 @@ export default function PatientUpdateForm({ params }) {
                             type="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            placeholder="example@mail.com"
                         />
                     </div>
-
                     <div className="space-y-2">
                         <Label htmlFor="sex">Sex</Label>
                         <Select
                             value={formData.sex}
                             onValueChange={(value) => handleSelectChange('sex', value)}
                         >
-                            <SelectTrigger id="sex" className="w-full">
+                            <SelectTrigger id="sex">
                                 <SelectValue placeholder="Select gender" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="Male">Male</SelectItem>
                                 <SelectItem value="Female">Female</SelectItem>
                                 <SelectItem value="Other">Other</SelectItem>
-                                <SelectItem value="None">None</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
+                </div>
 
+                {/* Address Information */}
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     <div className="space-y-2">
-                        <Label htmlFor="weight">Weight (lbs)</Label>
+                        <Label htmlFor="address">Address</Label>
                         <Input
-                            id="weight"
-                            name="weight"
-                            value={formData.weight}
+                            id="address"
+                            name="address"
+                            value={formData.address}
                             onChange={handleInputChange}
-                            placeholder="e.g. 214"
                         />
                     </div>
-
                     <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
+                        <Label htmlFor="address2">Address Line 2</Label>
                         <Input
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
+                            id="address2"
+                            name="address2"
+                            value={formData.address2}
                             onChange={handleInputChange}
-                            placeholder="+1 555 123 4567"
                         />
                     </div>
-
                     <div className="space-y-2">
-                        <Label htmlFor="glp1">GLP-1 Preference</Label>
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                            id="city"
+                            name="city"
+                            value={formData.city}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="state">State</Label>
+                        <Input
+                            id="state"
+                            name="state"
+                            value={formData.state}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="zip">ZIP Code</Label>
+                        <Input
+                            id="zip"
+                            name="zip"
+                            value={formData.zip}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="country">Country</Label>
+                        <Input
+                            id="country"
+                            name="country"
+                            value={formData.country}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                {/* Medical Information */}
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
+                    <div className="space-y-2">
+                        <Label htmlFor="heightFeet">Height (Feet)</Label>
+                        <Input
+                            id="heightFeet"
+                            name="heightFeet"
+                            value={formData.heightFeet}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="heightInches">Height (Inches)</Label>
+                        <Input
+                            id="heightInches"
+                            name="heightInches"
+                            value={formData.heightInches}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="currentWeight">Current Weight (lbs)</Label>
+                        <Input
+                            id="currentWeight"
+                            name="currentWeight"
+                            value={formData.currentWeight}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="goalWeight">Goal Weight (lbs)</Label>
+                        <Input
+                            id="goalWeight"
+                            name="goalWeight"
+                            value={formData.goalWeight}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="bmi">BMI</Label>
+                        <Input
+                            id="bmi"
+                            name="bmi"
+                            value={formData.bmi}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="glp1Preference">GLP-1 Preference</Label>
                         <Select
-                            value={formData.glp1}
-                            onValueChange={(value) => handleSelectChange('glp1', value)}
+                            value={formData.glp1Preference}
+                            onValueChange={(value) => handleSelectChange('glp1Preference', value)}
                         >
-                            <SelectTrigger id="glp1" className="w-full">
+                            <SelectTrigger id="glp1Preference">
                                 <SelectValue placeholder="Select preference" />
                             </SelectTrigger>
                             <SelectContent>
@@ -321,347 +428,336 @@ export default function PatientUpdateForm({ params }) {
                             </SelectContent>
                         </Select>
                     </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="bmi">BMI</Label>
-                        <Input
-                            id="bmi"
-                            name="bmi"
-                            value={formData.bmi}
-                            onChange={handleInputChange}
-                            placeholder="e.g. 32"
-                        />
-                    </div>
                 </div>
 
-                {/* Address Section */}
-                <h3 className="text-sm font-semibold">Address</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
-                    {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'address1' ? 'Address' :
-                                    field === 'address2' ? 'Address line 2' :
-                                        field === 'city' ? 'City/Town' :
-                                            field === 'state' ? 'State' : 'Zip code'}
-                            </Label>
-                            <Input
-                                id={field}
-                                name={field}
-                                value={formData[field]}
+                {/* Health Conditions */}
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2]">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="allergies">Allergies</Label>
+                            <Textarea
+                                id="allergies"
+                                name="allergies"
+                                value={formData.allergies}
                                 onChange={handleInputChange}
-                                placeholder={
-                                    field === 'address1' ? 'Street address' :
-                                        field === 'address2' ? 'Apartment, suite, etc.' :
-                                            field === 'city' ? 'e.g. Springfield' :
-                                                field === 'state' ? 'e.g. California' : 'e.g. 12345'
-                                }
                             />
                         </div>
-                    ))}
-                </div>
-
-                {/* Vitals Section */}
-                <h3 className="text-sm font-semibold">Vitals</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
-                    <div className="space-y-2">
-                        <Label htmlFor="bloodPressure">Blood Pressure</Label>
-                        <Input
-                            id="bloodPressure"
-                            name="bloodPressure"
-                            value={formData.bloodPressure}
-                            onChange={handleInputChange}
-                            placeholder="e.g. 120/80"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="heartRate">Heart Rate</Label>
-                        <Input
-                            id="heartRate"
-                            name="heartRate"
-                            value={formData.heartRate}
-                            onChange={handleInputChange}
-                            placeholder="e.g. 72 bpm"
-                        />
-                    </div>
-                </div>
-
-                {/* Medical History Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
-                    {['takingMedication', 'medicineAllergy', 'majorSurgeries', 'bariatricSurgery', 'thyroidCancerHistory'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'takingMedication' ? 'Taking Medication' :
-                                    field === 'medicineAllergy' ? 'Medicine Allergy' :
-                                        field === 'majorSurgeries' ? 'Major Surgeries' :
-                                            field === 'bariatricSurgery' ? 'Bariatric Surgery (last 18 months)' :
-                                                'Family History of Thyroid Cancer'}
-                            </Label>
+                        <div className="space-y-2">
+                            <Label htmlFor="conditions">Medical Conditions</Label>
+                            <Textarea
+                                id="conditions"
+                                name="conditions"
+                                value={formData.conditions.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="familyConditions">Family Conditions</Label>
+                            <Textarea
+                                id="familyConditions"
+                                name="familyConditions"
+                                value={formData.familyConditions.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="diagnoses">Diagnoses</Label>
+                            <Textarea
+                                id="diagnoses"
+                                name="diagnoses"
+                                value={formData.diagnoses.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="weightLossSurgery">Weight Loss Surgery</Label>
+                            <Textarea
+                                id="weightLossSurgery"
+                                name="weightLossSurgery"
+                                value={formData.weightLossSurgery.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="weightRelatedConditions">Weight Related Conditions</Label>
+                            <Textarea
+                                id="weightRelatedConditions"
+                                name="weightRelatedConditions"
+                                value={formData.weightRelatedConditions.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="medications">Medications</Label>
+                            <Textarea
+                                id="medications"
+                                name="medications"
+                                value={formData.medications.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="kidneyDisease">Kidney Disease</Label>
                             <Select
-                                value={formData[field]}
-                                onValueChange={(value) => handleSelectChange(field, value)}
+                                value={formData.kidneyDisease}
+                                onValueChange={(value) => handleSelectChange('kidneyDisease', value)}
                             >
-                                <SelectTrigger id={field} className="w-full">
+                                <SelectTrigger id="kidneyDisease">
                                     <SelectValue placeholder="Select option" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="yes">Yes</SelectItem>
                                     <SelectItem value="no">No</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
-                    ))}
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="listAllMedication">List All Medication</Label>
-                        <Textarea
-                            id="listAllMedication"
-                            name="listAllMedication"
-                            value={formData.listAllMedication}
-                            onChange={handleInputChange}
-                            placeholder="List known medication..."
-                        />
-                    </div>
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="allergyList">Allergy List</Label>
-                        <Textarea
-                            id="allergyList"
-                            name="allergyList"
-                            value={formData.allergyList}
-                            onChange={handleInputChange}
-                            placeholder="List known allergies..."
-                        />
-                    </div>
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="surgeryList">Surgery List</Label>
-                        <Textarea
-                            id="surgeryList"
-                            name="surgeryList"
-                            value={formData.surgeryList}
-                            onChange={handleInputChange}
-                            placeholder="List of major surgeries..."
-                        />
-                    </div>
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="disqualifiers">Disqualifiers</Label>
-                        <Textarea
-                            id="disqualifiers"
-                            name="disqualifiers"
-                            value={formData.disqualifiers}
-                            onChange={handleInputChange}
-                            placeholder="Mention any disqualifiers..."
-                        />
-                    </div>
-                </div>
-
-                {/* Diagnosis Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2]">
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="diagnosis">Diagnosis</Label>
-                        <Textarea
-                            id="diagnosis"
-                            name="diagnosis"
-                            value={formData.diagnosis}
-                            onChange={handleInputChange}
-                            placeholder="Enter patient diagnosis, symptoms, or relevant notes..."
-                        />
-                    </div>
-                </div>
-
-                {/* Weight Progress Section */}
-                <h3 className="text-sm font-semibold">Weight Progress</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
-                    {['startingWeight', 'currentWeight', 'goalWeight', 'weightChange12m'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'startingWeight' ? 'Starting Weight (lbs)' :
-                                    field === 'currentWeight' ? 'Current Weight (lbs)' :
-                                        field === 'goalWeight' ? 'Goal Weight (lbs)' :
-                                            '12-Month Weight Change (lbs)'}
-                            </Label>
-                            <Input
-                                id={field}
-                                name={field}
-                                value={formData[field]}
+                        <div className="space-y-2">
+                            <Label htmlFor="otherConditions">Other Conditions</Label>
+                            <Textarea
+                                id="otherConditions"
+                                name="otherConditions"
+                                value={formData.otherConditions}
                                 onChange={handleInputChange}
-                                placeholder={
-                                    field === 'startingWeight' ? 'e.g. 240' :
-                                        field === 'currentWeight' ? 'e.g. 214' :
-                                            field === 'goalWeight' ? 'e.g. 180' : 'e.g. -26, +10, etc.'
-                                }
                             />
                         </div>
-                    ))}
-
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="weightLossPrograms">Weight Loss Programs</Label>
-                        <Textarea
-                            id="weightLossPrograms"
-                            name="weightLossPrograms"
-                            value={formData.weightLossPrograms}
-                            onChange={handleInputChange}
-                            placeholder="List any previous or current weight loss programs..."
-                        />
-                    </div>
-                </div>
-
-                {/* Weight Loss Medication Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fff7ed]">
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="weightLossMeds12m">Weight Loss Medication (Last 12 Months)</Label>
-                        <Textarea
-                            id="weightLossMeds12m"
-                            name="weightLossMeds12m"
-                            value={formData.weightLossMeds12m}
-                            onChange={handleInputChange}
-                            placeholder="List any weight loss medications taken in the past 12 months..."
-                        />
-                    </div>
-                </div>
-
-                {/* GLP-1 Section */}
-                <h3 className="text-sm font-semibold">GLP-1</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
-                    <div className="space-y-2">
-                        <Label htmlFor="glpTaken">GLP-1 Taken</Label>
-                        <Input
-                            id="glpTaken"
-                            type="text"
-                            value={formData.glpTaken}
-                            onChange={(e) => handleSelectChange('glpTaken', e.target.value)}
-                            placeholder="Enter value"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="glpRecentInjection">Date of last Injection</Label>
-                        <Input
-                            type="date"
-                            id="glpRecentInjection"
-                            name="glpRecentInjection"
-                            value={formData.glpRecentInjection}
-                            onChange={handleInputChange}
-                            max={new Date().toISOString().split('T')[0]}
-                            className="w-full"
-                        />
-                    </div>
-                </div>
-
-                {/* Semaglutide Section */}
-                <h3 className="text-sm font-semibold">Semaglutide</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#ffe4e6]">
-                    {['semaglutideLastDose', 'semaglutideRequestedDose'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'semaglutideLastDose' ? 'Last Dose' : 'Requested Dose'}
-                            </Label>
-                            <Input
-                                id={field}
-                                type="text"
-                                value={formData[field]}
-                                onChange={(e) => handleSelectChange(field, e.target.value)}
-                                placeholder="Enter dose"
+                        <div className="space-y-2">
+                            <Label htmlFor="currentMedications">Current Medications</Label>
+                            <Textarea
+                                id="currentMedications"
+                                name="currentMedications"
+                                value={formData.currentMedications}
+                                onChange={handleInputChange}
                             />
                         </div>
-                    ))}
+                        <div className="space-y-2">
+                            <Label htmlFor="surgeries">Surgeries</Label>
+                            <Textarea
+                                id="surgeries"
+                                name="surgeries"
+                                value={formData.surgeries}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Tirzepatide Section */}
-                <h3 className="text-sm font-semibold">Tirzepetide</h3>
+                {/* Medical History */}
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="pastWeightLossMeds">Past Weight Loss Medications</Label>
+                            <Textarea
+                                id="pastWeightLossMeds"
+                                name="pastWeightLossMeds"
+                                value={formData.pastWeightLossMeds.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="diets">Diets</Label>
+                            <Textarea
+                                id="diets"
+                                name="diets"
+                                value={formData.diets.join(', ')}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="glp1PastYear">GLP-1 Past Year</Label>
+                            <Textarea
+                                id="glp1PastYear"
+                                name="glp1PastYear"
+                                value={formData.glp1PastYear}
+                                onChange={handleInputChange}
+                                placeholder='e.g. "Wegovy (Semaglutide)"'
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Health Status */}
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#dbeafe]">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="pregnant">Pregnant</Label>
+                            <Select
+                                value={formData.pregnant}
+                                onValueChange={(value) => handleSelectChange('pregnant', value)}
+                            >
+                                <SelectTrigger id="pregnant">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="breastfeeding">Breastfeeding</Label>
+                            <Select
+                                value={formData.breastfeeding}
+                                onValueChange={(value) => handleSelectChange('breastfeeding', value)}
+                            >
+                                <SelectTrigger id="breastfeeding">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="healthcareProvider">Healthcare Provider</Label>
+                            <Textarea
+                                id="healthcareProvider"
+                                name="healthcareProvider"
+                                value={formData.healthcareProvider}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="eatingDisorders">Eating Disorders</Label>
+                            <Select
+                                value={formData.eatingDisorders}
+                                onValueChange={(value) => handleSelectChange('eatingDisorders', value)}
+                            >
+                                <SelectTrigger id="eatingDisorders">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="labs">Labs</Label>
+                            <Select
+                                value={formData.labs}
+                                onValueChange={(value) => handleSelectChange('labs', value)}
+                            >
+                                <SelectTrigger id="labs">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* GLP-1 Information */}
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
-                    {['tirzepetideLastDose', 'tirzepetideRequestedDose'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'tirzepetideLastDose' ? 'Last Dose' : 'Requested Dose'}
-                            </Label>
-                            <Input
-                                id={field}
-                                type="text"
-                                value={formData[field]}
-                                onChange={(e) => handleSelectChange(field, e.target.value)}
-                                placeholder="Enter dose"
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Tirzepatide Details Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
-                    {['tirzepetidePlanPurchased', 'tirzepetideVial', 'tirzepetideDosingSchedule'].map((field) => (
-                        <div key={field} className="space-y-2">
-                            <Label htmlFor={field}>
-                                {field === 'tirzepetidePlanPurchased' ? 'Plan Purchased' :
-                                    field === 'tirzepetideVial' ? 'Vial' : 'Dosing Schedule'}
-                            </Label>
-
-                            {(field === 'tirzepetidePlanPurchased' || field === 'tirzepetideVial') ? (
-                                <Input
-                                    id={field}
-                                    type="text"
-                                    value={formData[field]}
-                                    onChange={(e) => handleSelectChange(field, e.target.value)}
-                                    placeholder={`Enter ${field === 'tirzepetidePlanPurchased' ? 'plan' : 'vial'}`}
-                                />
-                            ) : (
-                                <Select
-                                    value={formData[field]}
-                                    onValueChange={(value) => handleSelectChange(field, value)}
-                                >
-                                    <SelectTrigger id={field} className="w-full">
-                                        <SelectValue placeholder="Select dosing schedule" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="weekly">Weekly</SelectItem>
-                                        <SelectItem value="biweekly">Biweekly</SelectItem>
-                                        <SelectItem value="monthly">Monthly</SelectItem>
-                                        <SelectItem value="None">None</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Comments Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
-                        <Label htmlFor="providerComments">Enter your questions and comments</Label>
-                        <textarea
-                            id="providerComments"
-                            name="providerComments"
-                            className="w-full p-4 border rounded-md shadow-sm"
-                            rows="4"
-                            value={formData.providerComments}
+                        <Label htmlFor="glp1Statement">GLP-1 Statement</Label>
+                        <Textarea
+                            id="glp1Statement"
+                            name="glp1Statement"
+                            value={formData.glp1Statement}
                             onChange={handleInputChange}
-                            placeholder="Write your questions or comments here..."
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="glp1DoseInfo">GLP-1 Dose Information</Label>
+                        <Textarea
+                            id="glp1DoseInfo"
+                            name="glp1DoseInfo"
+                            value={formData.glp1DoseInfo}
+                            onChange={handleInputChange}
                         />
                     </div>
                 </div>
 
-                {/* Medication Selection */}
-                <div className="space-y-2">
-                    <Label htmlFor="medicine">Medication</Label>
-                    <Select
-                        value={formData.medicine}
-                        onValueChange={(value) => handleSelectChange('medicine', value)}
-                    >
-                        <SelectTrigger id="medicine" className="w-full">
-                            <SelectValue placeholder="Select option" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Semaglutide">Semaglutide</SelectItem>
-                            <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
-                            <SelectItem value="None">None</SelectItem>
-                        </SelectContent>
-                    </Select>
+                {/* Terms and Consent */}
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="agreeTerms">Agree to Terms</Label>
+                            <Select
+                                value={formData.agreeTerms ? 'yes' : 'no'}
+                                onValueChange={(value) => handleSelectChange('agreeTerms', value === 'yes')}
+                            >
+                                <SelectTrigger id="agreeTerms">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="consent">Consent</Label>
+                            <Select
+                                value={formData.consent ? 'yes' : 'no'}
+                                onValueChange={(value) => handleSelectChange('consent', value === 'yes')}
+                            >
+                                <SelectTrigger id="consent">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* File Upload Section */}
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                    <div className="space-y-2">
+                        <Label>Prescription Photo</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => {
+                                setFileUrls(prev => ({ ...prev, file1: url }));
+                                setFormData(prev => ({ ...prev, prescriptionPhoto: url }));
+                            }}
+                            onDelete={() => {
+                                setFileUrls(prev => ({ ...prev, file1: '' }));
+                                setFormData(prev => ({ ...prev, prescriptionPhoto: '' }));
+                            }}
+                            file={fileUrls.file1}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>ID Photo</Label>
+                        <UploadFile
+                            onUploadComplete={(url) => {
+                                setFileUrls(prev => ({ ...prev, file2: url }));
+                                setFormData(prev => ({ ...prev, idPhoto: url }));
+                            }}
+                            onDelete={() => {
+                                setFileUrls(prev => ({ ...prev, file2: '' }));
+                                setFormData(prev => ({ ...prev, idPhoto: '' }));
+                            }}
+                            file={fileUrls.file2}
+                        />
+                    </div>
+                </div>
+
+                {/* Comments */}
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                    <div className="space-y-2">
+                        <Label htmlFor="comments">Comments</Label>
+                        <Textarea
+                            id="comments"
+                            name="comments"
+                            value={formData.comments}
+                            onChange={handleInputChange}
+                        />
+                    </div>
                 </div>
 
                 <Button type="submit" className="w-full bg-secondary hover:bg-secondary">
-                    Submit Patient
+                    Submit
                 </Button>
             </form>
+
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogContent className="rounded-md">
                     <AlertDialogHeader>
@@ -669,15 +765,12 @@ export default function PatientUpdateForm({ params }) {
                         <AlertDialogDescription>{message}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        {/* Stay on page button */}
                         <AlertDialogCancel>
                             {isSuccess ? "Continue Editing" : "Cancel"}
                         </AlertDialogCancel>
-
-                        {/* Redirect button (only show for success) */}
                         {isSuccess && (
                             <Button
-                                onClick={() => router.push("/dashboard//questionnaire")}
+                                onClick={() => router.push("/dashboard/questionnaire")}
                                 className="bg-primary hover:bg-primary-dark"
                             >
                                 Return to Questionnaire

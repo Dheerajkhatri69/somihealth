@@ -42,7 +42,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
-export default function Dashboard() {
+export default function QuestionnaireTable() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -54,6 +54,7 @@ export default function Dashboard() {
     // Filters state
     const [filters, setFilters] = useState({
         search: '',
+        status: 'all',
         dateRange: 'all',
         glp1Preference: 'all',
         sex: 'all'
@@ -86,15 +87,16 @@ export default function Dashboard() {
             item.email?.toLowerCase().includes(filters.search.toLowerCase()) ||
             item.authid?.toLowerCase().includes(filters.search.toLowerCase());
 
+        const statusMatch = filters.status === 'all' || item.status === filters.status;
         const glp1Match = filters.glp1Preference === 'all' || item.glp1Preference === filters.glp1Preference;
         const sexMatch = filters.sex === 'all' || item.sex === filters.sex;
 
         const dateMatch = filters.dateRange === 'all' || 
-            (filters.dateRange === 'today' && new Date(item.dob).toDateString() === new Date().toDateString()) ||
-            (filters.dateRange === 'week' && (new Date() - new Date(item.dob)) <= 7 * 24 * 60 * 60 * 1000) ||
-            (filters.dateRange === 'month' && (new Date() - new Date(item.dob)) <= 30 * 24 * 60 * 60 * 1000);
+            (filters.dateRange === 'today' && new Date(item.createTimeDate).toDateString() === new Date().toDateString()) ||
+            (filters.dateRange === 'week' && (new Date() - new Date(item.createTimeDate)) <= 7 * 24 * 60 * 60 * 1000) ||
+            (filters.dateRange === 'month' && (new Date() - new Date(item.createTimeDate)) <= 30 * 24 * 60 * 60 * 1000);
 
-        return searchMatch && glp1Match && sexMatch && dateMatch;
+        return searchMatch && statusMatch && glp1Match && sexMatch && dateMatch;
     });
 
     const handleSelectAll = (checked) => {
@@ -115,19 +117,10 @@ export default function Dashboard() {
 
     const handleDelete = async (id) => {
         try {
-            const item = data.find(item => item._id === id);
-            if (!item) {
-                toast.error('Questionnaire not found');
-                return;
-            }
-
             const response = await fetch('/api/questionnaire', {
                 method: 'DELETE',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ authids: [item.authid] }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ authids: [id] }),
             });
 
             const result = await response.json();
@@ -135,33 +128,19 @@ export default function Dashboard() {
                 setData(prev => prev.filter(item => item._id !== id));
                 toast.success('Questionnaire deleted successfully');
             } else {
-                console.error('Delete failed:', result);
-                toast.error(result.message || 'Failed to delete questionnaire');
+                toast.error('Failed to delete questionnaire');
             }
         } catch (error) {
-            console.error('Delete error:', error);
             toast.error('Error deleting questionnaire');
         }
     };
 
     const handleDeleteSelected = async () => {
         try {
-            const selectedAuthIds = data
-                .filter(item => selectedItems.includes(item._id))
-                .map(item => item.authid);
-
-            if (selectedAuthIds.length === 0) {
-                toast.error('No questionnaires selected');
-                return;
-            }
-
             const response = await fetch('/api/questionnaire', {
                 method: 'DELETE',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ authids: selectedAuthIds }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ authids: selectedItems }),
             });
 
             const result = await response.json();
@@ -170,11 +149,9 @@ export default function Dashboard() {
                 setSelectedItems([]);
                 toast.success('Selected questionnaires deleted successfully');
             } else {
-                console.error('Bulk delete failed:', result);
-                toast.error(result.message || 'Failed to delete selected questionnaires');
+                toast.error('Failed to delete selected questionnaires');
             }
         } catch (error) {
-            console.error('Bulk delete error:', error);
             toast.error('Error deleting selected questionnaires');
         }
     };
@@ -193,6 +170,18 @@ export default function Dashboard() {
                     value={filters.search}
                     onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 />
+                <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="submitted">Submitted</SelectItem>
+                        <SelectItem value="approved">Approved</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                </Select>
                 <Select value={filters.glp1Preference} onValueChange={(value) => setFilters(prev => ({ ...prev, glp1Preference: value }))}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="GLP-1 Preference" />
@@ -216,7 +205,7 @@ export default function Dashboard() {
                 </Select>
                 <Select value={filters.dateRange} onValueChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Date of Birth Range" />
+                        <SelectValue placeholder="Date Range" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Time</SelectItem>
@@ -233,7 +222,7 @@ export default function Dashboard() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    {[...Array(12)].map((_, i) => (
+                                    {[...Array(10)].map((_, i) => (
                                         <TableHead key={i}>
                                             <Skeleton className="h-8 w-full" />
                                         </TableHead>
@@ -243,7 +232,7 @@ export default function Dashboard() {
                             <TableBody>
                                 {[...Array(5)].map((_, i) => (
                                     <TableRow key={i}>
-                                        {[...Array(12)].map((_, j) => (
+                                        {[...Array(10)].map((_, j) => (
                                             <TableCell key={j}>
                                                 <Skeleton className="h-6 w-full" />
                                             </TableCell>
@@ -255,46 +244,52 @@ export default function Dashboard() {
                     </div>
                 ) : (
                     <Table>
-                        <TableHeader className="bg-secondary">
-                            <TableRow className="hover:bg-secondary/80">
-                                <TableHead className="w-[50px] text-white sticky left-0 bg-secondary z-10">
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[50px]">
                                     <Checkbox
                                         ref={checkboxRef}
                                         checked={selectedItems.length === filteredData.length && filteredData.length > 0}
                                         onCheckedChange={handleSelectAll}
                                     />
                                 </TableHead>
-                                <TableHead className="text-white sticky left-[25px] bg-secondary z-10">Date</TableHead>
-                                <TableHead className="text-white sticky left-[105px] bg-secondary whitespace-nowrap z-10">AUTH ID</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">First Name</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Last Name</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">DOB</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Sex</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Email</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Phone</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">GLP-1 Preference</TableHead>
-                                <TableHead className="text-white sticky right-0 bg-secondary z-10">Actions</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead>Phone</TableHead>
+                                <TableHead>GLP-1</TableHead>
+                                <TableHead>BMI</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {currentRows.map((item) => (
                                 <TableRow key={item._id}>
-                                    <TableCell className="sticky left-0 bg-background z-10">
+                                    <TableCell>
                                         <Checkbox
                                             checked={selectedItems.includes(item._id)}
                                             onCheckedChange={() => handleSelectItem(item._id)}
                                         />
                                     </TableCell>
-                                    <TableCell className="sticky left-[25px] bg-background z-10 whitespace-nowrap">{new Date(item.createTimeDate).toLocaleDateString()}</TableCell>
-                                    <TableCell className="sticky left-[105px] bg-background z-10 whitespace-nowrap">{item.authid}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.firstName}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.lastName}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.dateOfBirth ? new Date(item.dateOfBirth).toLocaleDateString() : '-'}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.sex}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.email}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.phone}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.glp1Preference}</TableCell>
-                                    <TableCell className="sticky right-0 bg-background z-10">
+                                    <TableCell>{new Date(item.createTimeDate).toLocaleDateString()}</TableCell>
+                                    <TableCell>{item.authid}</TableCell>
+                                    <TableCell>{item.firstName} {item.lastName}</TableCell>
+                                    <TableCell>{item.email}</TableCell>
+                                    <TableCell>{item.phone}</TableCell>
+                                    <TableCell>{item.glp1Preference}</TableCell>
+                                    <TableCell>{item.bmi?.toFixed(1)}</TableCell>
+                                    <TableCell>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                                            ${item.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            item.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                            item.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
+                                            'bg-gray-100 text-gray-800'}`}>
+                                            {item.status}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="icon">
@@ -304,7 +299,7 @@ export default function Dashboard() {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem asChild>
                                                     <Link href={`/dashboard/questionnaire/${item.authid}`}>
-                                                        Open
+                                                        View Details
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem asChild>
@@ -399,4 +394,4 @@ export default function Dashboard() {
             )}
         </div>
     );
-}
+} 
