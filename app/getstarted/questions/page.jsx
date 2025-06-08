@@ -605,6 +605,12 @@ export default function PatientRegistrationForm() {
                       }
                     }}
                     onKeyDown={(e) => {
+                      // Prevent form submission when Enter is pressed
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        return;
+                      }
+
                       // Allow: backspace, delete, tab, escape, enter
                       if ([8, 46, 9, 27, 13].includes(e.keyCode)) {
                         return;
