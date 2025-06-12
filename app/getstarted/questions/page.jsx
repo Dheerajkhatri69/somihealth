@@ -572,7 +572,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`isOver18-${index}`}
-                      className={`flex items-center w-[100px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('isOver18') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center w-[100px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('isOver18') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="radio"
@@ -1045,7 +1045,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`condition-${index}`}
-                      className={`flex items-center px-4 text-xs py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('conditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center px-4 text-xs py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('conditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1085,7 +1085,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`family-${index}`}
-                      className={`flex items-center px-4 text-xs max-w-[240px] py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('familyConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center px-4 text-xs max-w-[240px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('familyConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1128,7 +1128,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`diagnosis-${index}`}
-                      className={`flex items-center max-w-[140px] px-4 py-2 text-xs border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('diagnoses')?.includes(diagnosis) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center max-w-[140px] px-4 py-2 text-xs border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('diagnoses')?.includes(diagnosis) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1170,7 +1170,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`surgery-${index}`}
-                      className={`flex items-center px-4 text-xs max-w-[320px] py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('weightLossSurgery')?.includes(surgery) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center px-4 text-xs max-w-[320px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('weightLossSurgery')?.includes(surgery) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1229,7 +1229,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`weightCondition-${index}`}
-                      className={`flex items-center text-xs max-w-[280px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('weightRelatedConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center text-xs max-w-[280px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('weightRelatedConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1270,7 +1270,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`med-${index}`}
-                      className={`flex items-center text-xs max-w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('medications')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center text-xs max-w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('medications')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1361,7 +1361,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`pastMed-${index}`}
-                      className={`flex items-center text-xs max-w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('pastWeightLossMeds')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center text-xs max-w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('pastWeightLossMeds')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1409,7 +1409,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`diet-${index}`}
-                      className={`flex items-center text-xs max-w-[150px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('diets')?.includes(diet) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center text-xs max-w-[150px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('diets')?.includes(diet) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1452,7 +1452,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`glp1History-${index}`}
-                      className={`flex items-center text-xs max-w-[140px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1PastYear')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center text-xs max-w-[140px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('glp1PastYear')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
