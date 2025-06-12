@@ -75,10 +75,19 @@ const formSchema = z.object({
   comments: z.string().optional(),
   dob: z.string().min(1, "Date of birth is required")
     .refine(dob => {
-      const birthDate = new Date(dob);
+      // Parse the date string in MM / DD / YYYY format
+      const [month, day, year] = dob.split('/').map(part => parseInt(part.trim()));
+      const birthDate = new Date(year, month - 1, day);
       const today = new Date();
+      
+      // Check if the date is valid
+      if (isNaN(birthDate.getTime())) {
+        return false;
+      }
+
       const age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
+      
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         return age - 1 >= 18;
       }
@@ -624,7 +633,7 @@ export default function PatientRegistrationForm() {
                   <Input
                     id="dob"
                     type="text"
-                    inputMode="text"
+                    inputMode="numeric"
                     placeholder="MM / DD / YYYY"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     {...register('dob', {
