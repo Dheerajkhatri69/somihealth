@@ -624,7 +624,7 @@ export default function PatientRegistrationForm() {
                   <Input
                     id="dob"
                     type="text"
-                    inputMode="numeric"
+                    inputMode="text"
                     placeholder="MM / DD / YYYY"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     {...register('dob', {
