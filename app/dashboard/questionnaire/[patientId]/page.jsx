@@ -65,6 +65,7 @@ export default function PatientUpdateForm({ params }) {
         pastWeightLossMeds: [],
         diets: [],
         glp1PastYear: '',
+        lastInjectionDate: '',
         otherConditions: '',
         currentMedications: '',
         surgeries: '',
@@ -408,7 +409,7 @@ export default function PatientUpdateForm({ params }) {
                         <Input
                             id="bmi"
                             name="bmi"
-                            value={formData.bmi}
+                            value={Math.floor(formData.bmi)}
                             readOnly
                         />
                     </div>
@@ -671,6 +672,29 @@ export default function PatientUpdateForm({ params }) {
                         />
                     </div>
                 </div>
+                {/* GLP-1 History Section */}
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
+                    <div className="space-y-2">
+                        <Label htmlFor="glp1PastYear">GLP-1 Past Year</Label>
+                        <Input
+                            id="glp1PastYear"
+                            name="glp1PastYear"
+                            value={formData.glp1PastYear}
+                            onChange={handleInputChange}
+                            placeholder="Enter GLP-1 history"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lastInjectionDate">Last Injection Date (MM / DD / YYYY)</Label>
+                        <Input
+                            id="lastInjectionDate"
+                            name="lastInjectionDate"
+                            value={formData.lastInjectionDate}
+                            onChange={handleInputChange}
+                            placeholder="MM / DD / YYYY"
+                        />
+                    </div>
+                </div>
 
                 {/* Terms and Consent */}
                 <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
@@ -752,6 +776,7 @@ export default function PatientUpdateForm({ params }) {
                         />
                     </div>
                 </div>
+
 
                 <Button type="submit" className="w-full bg-secondary hover:bg-secondary">
                     Submit
