@@ -67,11 +67,11 @@ const LandingPage = () => {
                     </h2>
 
                     <p className="text-gray-700 mb-2">
-                        No Hidden Fees. $0 Consultation Fee. No Subscriptions. Free Shipping.
+                        No hidden fees, No monthly subscription, Free Expedited shipping
                     </p>
 
                     <p className="text-green-600 font-medium mb-6">
-                        Pay only when approved
+                        $25 Initial Review Payment
                     </p>
 
                     <Link href="/getstarted/questions">

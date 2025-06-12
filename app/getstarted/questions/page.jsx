@@ -250,7 +250,7 @@ export default function PatientRegistrationForm() {
           </div>
           <Button
             onClick={() => { window.location.href = 'https://connect.intuit.com/pay/SomiHealth/scs-v1-7cb597849501499f9f119195593be1d6be2309e7d7e848b3b451bfa6260191d54dd7f556dff049078713b75ad2bba03c?locale=EN_US'; }}
-            className="bg-secondary text-white hover:bg-secondary rounded-2xl font-bold text-lg px-8 w-[120px]"
+            className="bg-green-400 text-white hover:bg-green-500 rounded-2xl font-bold text-lg px-8 w-[120px]"
           >
             Pay Here
           </Button>
@@ -976,7 +976,7 @@ export default function PatientRegistrationForm() {
                     {...register('currentWeight')}
                   />
                   {bmi !== null && (
-                    <div className="text-sm mt-1 text-gray-700">
+                    <div className="text-md text-center mt-1 text-gray-700">
                       <strong>BMI:</strong> {bmi}
                     </div>
                   )}
@@ -1395,10 +1395,10 @@ export default function PatientRegistrationForm() {
           {/* Diets segment */}
           {currentSegment === 18 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Diets</h2>
+              <h2 className="text-xl font-semibold">Lifestyle Changes</h2>
               <div className="space-y-2">
                 <Label>
-                  Have you tried any of these diets? <span className="text-red-500">*</span>
+                  Have you ever tried any of these diets/lifestyle changes? <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex flex-col gap-3">
                   {[
@@ -2040,12 +2040,12 @@ export default function PatientRegistrationForm() {
                   </div>
 
                   <div className="space-y-4 mt-6">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex space-x-2">
                       <input
                         type="checkbox"
                         id="consent-checkbox"
                         {...register('consent')}
-                        className="h-4 w-4 text-secondary border-secondary rounded"
+                        className="h-4 w-4 text-secondary mt-1 border-secondary rounded"
                       />
                       <label htmlFor="consent-checkbox" className="text-sm">
                         I have read the Somi Health telehealth consent form and HIPAA Privacy Notice at{' '}
@@ -2059,12 +2059,12 @@ export default function PatientRegistrationForm() {
                         </a>
                       </label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex space-x-2">
                       <input
                         type="checkbox"
                         id="terms-checkbox"
                         {...register('terms')}
-                        className="h-4 w-4 text-secondary border-secondary rounded"
+                        className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
                       />
                       <label htmlFor="terms-checkbox" className="text-sm">
                         I have read the Somi Health Terms of Services at{' '}
@@ -2078,15 +2078,26 @@ export default function PatientRegistrationForm() {
                         </a>
                       </label>
                     </div>
-                    <div className="flex items-center space-x-2 mb-10">
+                    <div className="flex space-x-2 mb-10">
                       <input
                         type="checkbox"
                         id="treatment-checkbox"
                         {...register('treatment')}
-                        className="h-4 w-4 text-secondary border-secondary rounded"
+                        className="h-4 w-4 mt-0 text-secondary border-secondary rounded"
                       />
                       <label htmlFor="treatment-checkbox" className="text-sm">
                         I have read these forms, understand it, and voluntarily consent to treatment.
+                      </label>
+                    </div>
+                    <div className="flex space-x-2 mb-10">
+                      <input
+                        type="checkbox"
+                        id="agree-to-pay-checkbox"
+                        {...register('agreetopay')}
+                        className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
+                      />
+                      <label htmlFor="agree-to-pay-checkbox" className="text-sm">
+                        I agree to pay the $25 initial review payment. This will be refunded if our provider determines you are NOT eligible for GLP-1 treatment.
                       </label>
                     </div>
                   </div>
@@ -2140,15 +2151,15 @@ export default function PatientRegistrationForm() {
           {currentSegment === segments.length - 1 && (
             <div className="space-y-4">
               {/* Final segment content */}
-              <div className="flex justify-between mt-8">
-                <Button
+              <div className="flex justify-center mt-8">
+                {/* <Button
                   variant="outline"
                   onClick={handlePrevious}
                   type="button"
                   className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
                 >
                   Previous
-                </Button>
+                </Button> */}
                 <Button
                   onClick={() => {
                     console.log('Final form data:', watch());
@@ -2157,7 +2168,7 @@ export default function PatientRegistrationForm() {
                   type="button"
                   className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
                 >
-                  Submit
+                  Continue to payment
                 </Button>
               </div>
             </div>
