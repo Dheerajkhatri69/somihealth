@@ -4,17 +4,15 @@ import React, { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogDescription, AlertDialogHeader, AlertDialogContent, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import UploadFile from "@/components/FileUpload";
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 // Form validation schema
 const formSchema = z.object({
@@ -79,7 +77,7 @@ const formSchema = z.object({
       const [month, day, year] = dob.split('/').map(part => parseInt(part.trim()));
       const birthDate = new Date(year, month - 1, day);
       const today = new Date();
-      
+
       // Check if the date is valid
       if (isNaN(birthDate.getTime())) {
         return false;
@@ -87,7 +85,7 @@ const formSchema = z.object({
 
       const age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
+
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         return age - 1 >= 18;
       }
@@ -96,6 +94,9 @@ const formSchema = z.object({
   consent: z.boolean().refine(val => val === true, "You must consent to proceed"),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
   treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
+  glp1StartingWeight: z.string().min(1, "This field is required"),
+  bloodPressure: z.string().min(1, "This field is required"),
+  heartRate: z.string().min(1, "This field is required"),
 });
 
 const segments = [
@@ -108,6 +109,9 @@ const segments = [
   { id: 'sex', name: 'Sex' },
   { id: 'height', name: 'Height' },
   { id: 'weight', name: 'Weight' },
+  { id: 'glp1StartingWeight', name: 'GLP-1 Medication' },
+  { id: 'bloodPressure', name: 'Blood Pressure' },
+  { id: 'heartRate', name: 'Heart Rate' },
   { id: 'allergies', name: 'Allergies' },
   { id: 'conditions', name: 'Medical Conditions' },
   { id: 'family', name: 'Family History' },
@@ -132,7 +136,7 @@ const segments = [
   { id: 'prescription', name: 'Prescription Upload' },
   { id: 'id', name: 'ID Upload' },
   { id: 'comments', name: 'Comments' },
-  { id: 'consent', name: 'Telehealth Consent' }
+  { id: 'consent', name: 'Telehealth Consent' },
 ];
 
 // Custom progress bar component
@@ -242,7 +246,7 @@ export default function PatientRegistrationForm() {
             </h3>
 
             <p className="text-gray-600 text-center">
-              <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br/><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
+              <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
             </p>
             <p className="text-gray-600 text-center">
               Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patierice.
@@ -443,8 +447,11 @@ export default function PatientRegistrationForm() {
       case 'address': return ['address', 'address2', 'city', 'state', 'zip', 'country'];
       case 'preference': return ['glp1Preference'];
       case 'sex': return ['sex'];
-      case 'height': return ['heightFeet', 'heightInches'];
-      case 'weight': return ['currentWeight', 'goalWeight'];
+      case 'height': return ['heightFeet', 'heightInches', 'currentWeight'];
+      case 'weight': return ['goalWeight'];
+      case 'glp1StartingWeight': return ['glp1StartingWeight'];
+      case 'bloodPressure': return ['bloodPressure'];
+      case 'heartRate': return ['heartRate'];
       case 'allergies': return ['allergies'];
       case 'conditions': return ['conditions'];
       case 'family': return ['familyConditions'];
@@ -976,8 +983,12 @@ export default function PatientRegistrationForm() {
                     {...register('currentWeight')}
                   />
                   {bmi !== null && (
-                    <div className="text-md text-center mt-1 text-gray-700">
-                      <strong>BMI:</strong> {bmi}
+                    <div className="flex justify-center">
+                      <Badge
+                        className="px-3 py-1 text-lg mt-2 font-bold rounded-md bg-green-200 text-green-900 hover:bg-green-200"
+                      >
+                        BMI: {bmi}
+                      </Badge>
                     </div>
                   )}
 
@@ -1009,8 +1020,122 @@ export default function PatientRegistrationForm() {
             </div>
           )}
 
-          {/* Allergies segment */}
+          {/* GLP-1 Starting Weight segment */}
           {currentSegment === 9 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">GLP-1 Medication</h2>
+              <div className="space-y-2">
+                <Label htmlFor="glp1StartingWeight">
+                  If you are currently on GLP-1 Medication, what was your starting weight? (lbs) <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="glp1StartingWeight"
+                  type="number"
+                  {...register('glp1StartingWeight', {
+                    required: 'This field is required'
+                  })}
+                />
+                {errors.glp1StartingWeight && (
+                  <p className="text-sm text-red-500">{errors.glp1StartingWeight.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Blood Pressure segment */}
+          {currentSegment === 10 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Blood Pressure</h2>
+              <div className="space-y-2">
+                <Label>
+                  What is your blood pressure range? <span className="text-red-500">*</span>
+                </Label>
+                <div className="flex flex-col gap-3">
+                  {[
+                    'Normal < 120/<80',
+                    'Elevated 120-129/<80',
+                    'Stage 1 HTN 130-139/80-90',
+                    'Stage 2 HTN 140 or Higher/ 90 or Higher'
+                  ].map((option, index) => (
+                    <label
+                      key={index}
+                      htmlFor={`bp-${index}`}
+                      className={`flex items-center px-4 max-w-[270px] text-xs py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('bloodPressure') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    >
+                      <input
+                        type="checkbox"
+                        id={`bp-${index}`}
+                        className="hidden"
+                        checked={watch('bloodPressure') === option}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setValue('bloodPressure', option);
+                          } else {
+                            setValue('bloodPressure', '');
+                          }
+                        }}
+                      />
+                      <span>
+                        {option}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {errors.bloodPressure && (
+                  <p className="text-sm text-red-500">{errors.bloodPressure.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Heart Rate segment */}
+          {currentSegment === 11 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Heart Rate</h2>
+              <div className="space-y-2">
+                <Label>
+                  What is your resting heart rate range? <span className="text-red-500">*</span>
+                </Label>
+                <div className="flex flex-col gap-3">
+                  {[
+                    'Slow <60 beats per minute',
+                    'Normal 60-100 beats per minute',
+                    'Lightly Fast >100 to 115 beats per minute',
+                    'Fast >150 beats per minute'
+                  ].map((option, index) => (
+                    <label
+                      key={index}
+                      htmlFor={`hr-${index}`}
+                      className={`flex items-center px-4 text-xs max-w-[270px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heartRate') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    >
+                      <input
+                        type="checkbox"
+                        id={`hr-${index}`}
+                        className="hidden"
+                        checked={watch('heartRate') === option}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setValue('heartRate', option);
+                          } else {
+                            setValue('heartRate', '');
+                          }
+                        }}
+                      />
+                      <span>
+                        {option}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {errors.heartRate && (
+                  <p className="text-sm text-red-500">{errors.heartRate.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Allergies segment */}
+          {currentSegment === 12 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Allergies</h2>
               <div className="space-y-2">
@@ -1030,7 +1155,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Medical Conditions segment */}
-          {currentSegment === 10 && (
+          {currentSegment === 13 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Medical Conditions</h2>
               <div className="space-y-2">
@@ -1077,7 +1202,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Family History segment */}
-          {currentSegment === 11 && (
+          {currentSegment === 14 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Family History</h2>
               <div className="space-y-2">
@@ -1117,7 +1242,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Diagnoses segment */}
-          {currentSegment === 12 && (
+          {currentSegment === 15 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Diagnoses</h2>
               <div className="space-y-2">
@@ -1160,7 +1285,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Weight Loss Surgery segment */}
-          {currentSegment === 13 && (
+          {currentSegment === 16 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Weight Loss Surgery</h2>
               <div className="space-y-2">
@@ -1202,7 +1327,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Weight Related Conditions segment */}
-          {currentSegment === 14 && (
+          {currentSegment === 17 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Weight Related Conditions</h2>
               <div className="space-y-2">
@@ -1261,7 +1386,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Medications segment */}
-          {currentSegment === 15 && (
+          {currentSegment === 18 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Medications</h2>
               <div className="space-y-2">
@@ -1302,7 +1427,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Kidney Health segment */}
-          {currentSegment === 16 && (
+          {currentSegment === 19 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Kidney Health</h2>
               <div className="space-y-4">
@@ -1341,7 +1466,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Past Weight Loss Medications segment */}
-          {currentSegment === 17 && (
+          {currentSegment === 20 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Past Weight Loss Medications</h2>
               <div className="space-y-2">
@@ -1393,12 +1518,12 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Diets segment */}
-          {currentSegment === 18 && (
+          {currentSegment === 21 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Lifestyle Changes</h2>
               <div className="space-y-2">
                 <Label>
-                  Have you ever tried any of these diets/lifestyle changes? <span className="text-red-500">*</span>
+                  Have you ever tried any of these diets/lifestyle changes? <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex flex-col gap-3">
                   {[
@@ -1441,7 +1566,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* GLP-1 History segment */}
-          {currentSegment === 19 && (
+          {currentSegment === 22 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">GLP-1 History</h2>
               <div className="space-y-4">
@@ -1450,18 +1575,27 @@ export default function PatientRegistrationForm() {
                 </Label>
                 <div className="flex flex-col gap-3">
                   {[
-                    'Ozempic',
-                    'Wegovy',
-                    'Mounjaro',
+                    'Zepbound (Tirzepatide)',
+                    'Wegovy (Semaglutide)',
+                    'Ozempic (Semaglutide)',
+                    'Mounjaro (Tirzepatide)',
+                    'Saxenda (Liraglutide)',
+                    'Victoza (Liraglutide)',
+                    'Compound Semaglutide',
+                    'Compound Tirzepatide',
+                    'Metformin',
+                    'Phentermine',
+                    'Topiramate',
+                    'Orlistat/Alli',
                     'Saxenda',
-                    'Victoza',
-                    'Trulicity',
+                    'Contrave',
+                    'Qsymia',
                     'None of the above'
                   ].map((med, index) => (
                     <label
                       key={index}
                       htmlFor={`glp1History-${index}`}
-                      className={`flex items-center text-xs max-w-[140px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('glp1PastYear')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center text-xs max-w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('glp1PastYear')?.includes(med) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="checkbox"
@@ -1568,7 +1702,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Other Medical Info segment */}
-          {currentSegment === 20 && (
+          {currentSegment === 23 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Other Medical Info</h2>
               <div className="space-y-2">
@@ -1588,7 +1722,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Current Medications segment */}
-          {currentSegment === 21 && (
+          {currentSegment === 24 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Current Medications</h2>
               <div className="space-y-2">
@@ -1608,7 +1742,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Surgical History segment */}
-          {currentSegment === 22 && (
+          {currentSegment === 25 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Surgical History</h2>
               <div className="space-y-2">
@@ -1628,7 +1762,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Pregnancy Status segment */}
-          {currentSegment === 23 && (
+          {currentSegment === 26 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Pregnancy Status</h2>
               <div className="space-y-4">
@@ -1662,7 +1796,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Breastfeeding segment */}
-          {currentSegment === 24 && (
+          {currentSegment === 27 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Breastfeeding</h2>
               <div className="space-y-4">
@@ -1696,7 +1830,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Healthcare Provider segment */}
-          {currentSegment === 25 && (
+          {currentSegment === 28 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Healthcare Provider</h2>
               <div className="space-y-4">
@@ -1729,7 +1863,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Eating Disorders segment */}
-          {currentSegment === 26 && (
+          {currentSegment === 29 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Eating Disorders</h2>
               <div className="space-y-4">
@@ -1762,7 +1896,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Lab Tests segment */}
-          {currentSegment === 27 && (
+          {currentSegment === 30 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Lab Tests</h2>
               <div className="space-y-4">
@@ -1795,7 +1929,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* GLP-1 Statement segment */}
-          {currentSegment === 28 && (
+          {currentSegment === 31 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">GLP-1 Statement</h2>
               <div className="space-y-2">
@@ -1854,7 +1988,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Terms Agreement segment */}
-          {currentSegment === 29 && (
+          {currentSegment === 32 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Terms Agreement</h2>
               <div className="space-y-4">
@@ -1887,7 +2021,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Prescription Upload segment */}
-          {currentSegment === 30 && (
+          {currentSegment === 33 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Prescription Upload</h2>
               <div className="space-y-2">
@@ -1912,7 +2046,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* ID Upload segment */}
-          {currentSegment === 31 && (
+          {currentSegment === 34 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">ID Upload</h2>
               <div className="space-y-2">
@@ -1940,7 +2074,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Comments segment */}
-          {currentSegment === 32 && (
+          {currentSegment === 35 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Do you have any questions or comments for the provider?</h2>
               <div className="space-y-2">
@@ -1960,7 +2094,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Telehealth Consent segment */}
-          {currentSegment === 33 && (
+          {currentSegment === 36 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Telehealth Consent to Treatment and HIPAA Notice</h2>
               <div className="space-y-4">
