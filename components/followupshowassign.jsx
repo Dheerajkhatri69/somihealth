@@ -4,20 +4,20 @@ import { TableCell } from "./ui/table";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
 } from "@/components/ui/select";
 
 function FollowupShowAssig({ patient }) {
@@ -47,7 +47,8 @@ function FollowupShowAssig({ patient }) {
                         return {
                             id: clinician.id,
                             fullname: clinician.fullname,
-                            pid: assign.pid
+                            pid: assign.pid,
+                            createTimeDate: assign.createTimeDate
                         };
                     }
                     return null;
@@ -170,13 +171,12 @@ function FollowupShowAssig({ patient }) {
                 <div className="relative">
                     {patient.authid}
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
-                        <div 
+                        <div
                             className="absolute -top-5 -left-1 group cursor-pointer"
                             onClick={() => setIsDialogOpen(true)}
                         >
-                            <Bot className={`rounded-full text-sm ${
-                                isClinicianAssigned ? "text-green-500" : "text-yellow-500"
-                            }`} />
+                            <Bot className={`rounded-full text-sm ${isClinicianAssigned ? "text-green-500" : "text-yellow-500"
+                                }`} />
                         </div>
                     )}
                 </div>
@@ -185,8 +185,8 @@ function FollowupShowAssig({ patient }) {
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogContent className="sm:max-w-[600px]">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Followup Patient Details</AlertDialogTitle>
-                        <AlertDialogDescription className="space-y-4">
+                        <AlertDialogTitle className='text-secondary text-xl'>Followup Patient Details</AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-4 text-black">
                             <div className="space-y-2">
                                 <h4 className="font-medium">Patient ID:</h4>
                                 <p className="pl-4">{patient.authid}</p>
@@ -200,7 +200,7 @@ function FollowupShowAssig({ patient }) {
                                         <p>Technician Name: {creatorInfo.tname}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500">System record created by Admin</p>
+                                    <p className="text-sm">System record created by Admin</p>
                                 )}
                             </div>
 
@@ -210,9 +210,10 @@ function FollowupShowAssig({ patient }) {
                                     <div className="pl-4">
                                         <p>Clinician ID: {matchedClinician.id}</p>
                                         <p>Clinician Name: {matchedClinician.fullname}</p>
+                                        <p>Date: {(() => { const d = new Date(matchedClinician.createTimeDate); return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}` })()}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500">Not assigned yet</p>
+                                    <p className="text-sm">Not assigned yet</p>
                                 )}
                             </div>
 
@@ -234,8 +235,8 @@ function FollowupShowAssig({ patient }) {
                                 {operation !== "delete" && (
                                     <div className="grid gap-2">
                                         <label className="block text-sm font-medium mb-1">Select Clinician</label>
-                                        <Select 
-                                            value={selectedClinician} 
+                                        <Select
+                                            value={selectedClinician}
                                             onValueChange={setSelectedClinician}
                                         >
                                             <SelectTrigger>
@@ -255,14 +256,14 @@ function FollowupShowAssig({ patient }) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <Button 
+                        <Button
                             onClick={() => setIsDialogOpen(false)}
                             variant="outline"
                             disabled={isSubmitting}
                         >
                             Close
                         </Button>
-                        <Button 
+                        <Button
                             onClick={handleAssignment}
                             disabled={isSubmitting || (operation !== "delete" && !selectedClinician)}
                         >

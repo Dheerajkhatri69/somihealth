@@ -144,7 +144,8 @@ function TimeSensitiveCell({ patient }) {
                         return {
                             id: clinician.id,
                             fullname: clinician.fullname,
-                            pid: assign.pid
+                            pid: assign.pid,
+                            createTimeDate: assign.createTimeDate
                         };
                     }
                     return null;
@@ -263,8 +264,8 @@ function TimeSensitiveCell({ patient }) {
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogContent className="sm:max-w-[600px]">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Patient Details</AlertDialogTitle>
-                        <AlertDialogDescription className="space-y-4">
+                        <AlertDialogTitle className='text-secondary text-xl'>Patient Details</AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-4 text-black">
                             <div className="space-y-2">
                                 <h4 className="font-medium">Patient ID:</h4>
                                 <p className="pl-4">{patient.authid}</p>
@@ -278,7 +279,7 @@ function TimeSensitiveCell({ patient }) {
                                         <p>Technician Name: {creatorInfo.tname}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500">System record created by Admin</p>
+                                    <p className="text-sm">System record created by Admin</p>
                                 )}
                             </div>
 
@@ -288,9 +289,10 @@ function TimeSensitiveCell({ patient }) {
                                     <div className="pl-4">
                                         <p>Clinician ID: {matchedClinician.id}</p>
                                         <p>Clinician Name: {matchedClinician.fullname}</p>
+                                        <p>Date: {(() => { const d = new Date(matchedClinician.createTimeDate); return `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-${d.getFullYear()}` })()}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500">Not assigned yet</p>
+                                    <p className="text-sm">Not assigned yet</p>
                                 )}
                             </div>
 
