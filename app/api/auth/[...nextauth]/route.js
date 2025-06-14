@@ -13,45 +13,57 @@ const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { id, password } = credentials;
+        try {
+          const { id, password } = credentials;
 
-        const cleanId = id.trim();
-        const cleanPassword = password.trim();
+          if (!id || !password) {
+            throw new Error("Missing credentials");
+          }
 
-        if (mongoose.connection.readyState === 0) {
-          await mongoose.connect(connectionSrt);
+          const cleanId = id.trim();
+          const cleanPassword = password.trim();
+
+          if (mongoose.connection.readyState === 0) {
+            await mongoose.connect(connectionSrt);
+          }
+
+          const foundUser = await user.findOne({ id: cleanId });
+
+          if (!foundUser) {
+            throw new Error("Invalid ID");
+          }
+
+          if (foundUser.password !== cleanPassword) {
+            throw new Error("Invalid password");
+          }
+
+          return {
+            _id: foundUser._id.toString(),
+            id: foundUser.id,
+            fullname: foundUser.fullname,
+            email: foundUser.email,
+            accounttype: foundUser.accounttype,
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
+          throw new Error(error.message || "Authentication failed");
         }
-
-        const foundUser = await user.findOne({ id: cleanId });
-
-        if (!foundUser) {
-          throw new Error("Invalid ID");
-        }
-
-        if (foundUser.password !== cleanPassword) {
-          throw new Error("Invalid password");
-        }
-
-        // ✅ Important: include accounttype here
-        return {
-          _id: foundUser._id.toString(),
-          id: foundUser.id,
-          fullname: foundUser.fullname,
-          email: foundUser.email,
-          accounttype: foundUser.accounttype, // <-- include this
-        };
       },
     }),
   ],
 
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/",
+    error: "/auth/error",
   },
+
+  debug: process.env.NODE_ENV === "development",
 
   callbacks: {
     async jwt({ token, user }) {
@@ -60,17 +72,21 @@ const authOptions = {
         token.id = user.id;
         token.email = user.email;
         token.fullname = user.fullname;
-        token.accounttype = user.accounttype; // ✅ now this exists
+        token.accounttype = user.accounttype;
       }
       return token;
     },
 
     async session({ session, token }) {
-      session.user._id = token._id;
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.fullname = token.fullname;
-      session.user.accounttype = token.accounttype; // ✅ finally added to session
+      if (token) {
+        session.user = {
+          _id: token._id,
+          id: token.id,
+          email: token.email,
+          fullname: token.fullname,
+          accounttype: token.accounttype,
+        };
+      }
       return session;
     },
 

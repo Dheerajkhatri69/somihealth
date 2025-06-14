@@ -36,7 +36,7 @@ const sidebarItems = [
     allowedRoles: ['A', 'T', 'C']
   },
   {
-    title: "Questionnaire",
+    title: "New Patients",
     url: "/dashboard/questionnaire",
     icon: FilePlus2,
     allowedRoles: ['A', 'T']

@@ -156,3 +156,8 @@ input {
     @apply bg-background text-foreground;
   }
 }
+/* Hide scrollbar for all browsers */
+html, body {
+  scrollbar-width: none;     /* Firefox */
+}
+

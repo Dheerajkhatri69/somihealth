@@ -380,7 +380,15 @@ export default function PatientRegistrationForm() {
     try {
       // Calculate BMI
       const heightInches = parseInt(data.heightFeet) * 12 + parseInt(data.heightInches);
-      const bmi = (parseInt(data.currentWeight) / (heightInches * heightInches)) * 703;
+      // const bmi = (parseInt(data.currentWeight) / (heightInches * heightInches)) * 703;
+      // const bmi = bmi;
+
+      let bmi = null;
+      const totalInches = parseInt(watchedFeet || '0') * 12 + parseInt(watchedInches || '0');
+      if (totalInches > 0 && watchedWeight) {
+        bmi = (parseFloat(watchedWeight) / (totalInches * totalInches)) * 703;
+        bmi = Math.round(bmi * 10) / 10; // round to 1 decimal
+      }
 
       // Format date from "MM / DD / YYYY" to ISO string
       const [month, day, year] = data.dob.split('/').map(part => part.trim());
@@ -543,7 +551,7 @@ export default function PatientRegistrationForm() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen">
+    <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen " >
       {/* Sticky header for logo and progress bar */}
       <div className="fixed top-0 left-0 w-full z-40 bg-white">
         <div className="max-w-[500px] mx-auto flex flex-col items-center">
@@ -1605,13 +1613,6 @@ export default function PatientRegistrationForm() {
                     'Victoza (Liraglutide)',
                     'Compound Semaglutide',
                     'Compound Tirzepatide',
-                    'Metformin',
-                    'Phentermine',
-                    'Topiramate',
-                    'Orlistat/Alli',
-                    'Saxenda',
-                    'Contrave',
-                    'Qsymia',
                     'None of the above'
                   ].map((med, index) => (
                     <label

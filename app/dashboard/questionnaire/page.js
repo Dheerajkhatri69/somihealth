@@ -78,9 +78,8 @@ export default function Dashboard() {
             setLoading(false);
         }
     };
-
     const filteredData = data.filter(item => {
-        const searchMatch = 
+        const searchMatch =
             item.firstName?.toLowerCase().includes(filters.search.toLowerCase()) ||
             item.lastName?.toLowerCase().includes(filters.search.toLowerCase()) ||
             item.email?.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -89,13 +88,19 @@ export default function Dashboard() {
         const glp1Match = filters.glp1Preference === 'all' || item.glp1Preference === filters.glp1Preference;
         const sexMatch = filters.sex === 'all' || item.sex === filters.sex;
 
-        const dateMatch = filters.dateRange === 'all' || 
-            (filters.dateRange === 'today' && new Date(item.dob).toDateString() === new Date().toDateString()) ||
-            (filters.dateRange === 'week' && (new Date() - new Date(item.dob)) <= 7 * 24 * 60 * 60 * 1000) ||
-            (filters.dateRange === 'month' && (new Date() - new Date(item.dob)) <= 30 * 24 * 60 * 60 * 1000);
+        const createdAt = new Date(item.createTimeDate); // this replaces `item.dob`
+        const now = new Date();
+        const diffInDays = (now - createdAt) / (1000 * 60 * 60 * 24);
+
+        const dateMatch =
+            filters.dateRange === 'all' ||
+            (filters.dateRange === 'today' && createdAt.toDateString() === now.toDateString()) ||
+            (filters.dateRange === 'week' && diffInDays <= 7) ||
+            (filters.dateRange === 'month' && diffInDays <= 30);
 
         return searchMatch && glp1Match && sexMatch && dateMatch;
     });
+
 
     const handleSelectAll = (checked) => {
         if (checked) {
@@ -123,7 +128,7 @@ export default function Dashboard() {
 
             const response = await fetch('/api/questionnaire', {
                 method: 'DELETE',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
@@ -157,7 +162,7 @@ export default function Dashboard() {
 
             const response = await fetch('/api/questionnaire', {
                 method: 'DELETE',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },

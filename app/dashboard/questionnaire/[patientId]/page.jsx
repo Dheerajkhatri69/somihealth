@@ -146,7 +146,18 @@ export default function PatientUpdateForm({ params }) {
                 city: formData.city,
                 state: formData.state,
                 zip: formData.zip,
+                bloodPressure: formData.bloodPressure,
+                heartRate: formData.heartRate,
                 medicine: formData.glp1Preference,
+                glpTaken: formData.glp1PastYear,
+                glpRecentInjection: formData.lastInjectionDate.split('/').map(p => p.trim()).map((v, i) => i < 2 ? v.padStart(2, '0') : v).reverse().join('/').replace(/^(\d{4})\/(\d{2})\/(\d{2})$/, '$3/$2/$1'),
+                allergyList: formData.allergies,
+                surgeryList: formData.surgeries,
+                diagnosis: formData.diagnoses.join(', '),
+                startingWeight: formData.glp1StartingWeight,
+                currentWeight: formData.currentWeight,
+                goalWeight: formData.goalWeight,
+                weightLossMeds12m: formData.pastWeightLossMeds.join(', '),
                 approvalStatus: '',
                 semaglutideDose: '',
                 semaglutideUnit: '',
@@ -240,7 +251,7 @@ export default function PatientUpdateForm({ params }) {
         <div className="mb-4 p-4">
             <form onSubmit={handleSubmit} className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold">Questionnaire Details</h2>
+                    <h2 className="text-2xl font-semibold">New Patient Details</h2>
                     <div className="space-y-2">
                         <Label>Patient ID</Label>
                         <Input value={formData.authid} readOnly className="font-mono w-32" />
@@ -415,7 +426,7 @@ export default function PatientUpdateForm({ params }) {
                         <Input
                             id="bmi"
                             name="bmi"
-                            value={Math.floor(formData.bmi)}
+                            value={formData.bmi}
                             readOnly
                         />
                     </div>
