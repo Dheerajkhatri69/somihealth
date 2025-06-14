@@ -94,7 +94,8 @@ const formSchema = z.object({
   consent: z.boolean().refine(val => val === true, "You must consent to proceed"),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
   treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
-  glp1StartingWeight: z.string().min(1, "This field is required"),
+  agreetopay: z.boolean().refine(val => val === true, "You must consent to agree to pay"),
+  glp1StartingWeight: z.string().optional(),
   bloodPressure: z.string().min(1, "This field is required"),
   heartRate: z.string().min(1, "This field is required"),
 });
@@ -478,7 +479,7 @@ export default function PatientRegistrationForm() {
       case 'prescription': return ['prescriptionPhoto'];
       case 'id': return ['idPhoto'];
       case 'comments': return ['comments'];
-      case 'consent': return ['consent'];
+      case 'consent': return ['consent', 'terms', 'treatment', 'agreetopay'];
       default: return [];
     }
   };
@@ -644,7 +645,7 @@ export default function PatientRegistrationForm() {
                     type="text"
                     inputMode="numeric"
                     placeholder="MM / DD / YYYY"
-                    className="bg-gray-50 border text-sm sm:text-base border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    className="bg-gray-50 border text-base sm:text-base border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     {...register('dob', {
                       pattern: {
                         value: /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/,
@@ -1042,14 +1043,12 @@ export default function PatientRegistrationForm() {
               <h2 className="text-xl font-semibold">GLP-1 Medication</h2>
               <div className="space-y-2">
                 <Label htmlFor="glp1StartingWeight">
-                  If you are currently on GLP-1 Medication, what was your starting weight? (lbs) <span className="text-red-500">*</span>
+                  If you are currently on GLP-1 Medication, what was your starting weight? (lbs)
                 </Label>
                 <Input
                   id="glp1StartingWeight"
                   type="number"
-                  {...register('glp1StartingWeight', {
-                    required: 'This field is required'
-                  })}
+                  {...register('glp1StartingWeight')}
                   onKeyDown={(e) => {
                     // Prevent form submission when Enter is pressed
                     if (e.key === 'Enter') {
@@ -2200,7 +2199,7 @@ export default function PatientRegistrationForm() {
                     <div className="flex space-x-2">
                       <input
                         type="checkbox"
-                        id="consent-checkbox"
+                        id="consent"
                         {...register('consent')}
                         className="h-4 w-4 text-secondary mt-1 border-secondary rounded"
                       />
@@ -2216,10 +2215,13 @@ export default function PatientRegistrationForm() {
                         </a>
                       </label>
                     </div>
+                    {errors.consent && (
+                      <p className="text-sm text-red-500">{errors.consent.message}</p>
+                    )}
                     <div className="flex space-x-2">
                       <input
                         type="checkbox"
-                        id="terms-checkbox"
+                        id="terms"
                         {...register('terms')}
                         className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
                       />
@@ -2235,10 +2237,13 @@ export default function PatientRegistrationForm() {
                         </a>
                       </label>
                     </div>
+                    {errors.terms && (
+                      <p className="text-sm text-red-500">{errors.terms.message}</p>
+                    )}
                     <div className="flex space-x-2 mb-10">
                       <input
                         type="checkbox"
-                        id="treatment-checkbox"
+                        id="treatment"
                         {...register('treatment')}
                         className="h-4 w-4 mt-0 text-secondary border-secondary rounded"
                       />
@@ -2246,10 +2251,13 @@ export default function PatientRegistrationForm() {
                         I have read these forms, understand it, and voluntarily consent to treatment.
                       </label>
                     </div>
+                    {errors.treatment && (
+                      <p className="text-sm text-red-500">{errors.treatment.message}</p>
+                    )}
                     <div className="flex space-x-2 mb-10">
                       <input
                         type="checkbox"
-                        id="agree-to-pay-checkbox"
+                        id="agreetopay"
                         {...register('agreetopay')}
                         className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
                       />
@@ -2257,6 +2265,9 @@ export default function PatientRegistrationForm() {
                         I agree to pay the $25 initial review payment. This will be refunded if our provider determines you are NOT eligible for GLP-1 treatment.
                       </label>
                     </div>
+                    {errors.agreetopay && (
+                      <p className="text-sm text-red-500">{errors.agreetopay.message}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2309,14 +2320,6 @@ export default function PatientRegistrationForm() {
             <div className="space-y-4">
               {/* Final segment content */}
               <div className="flex justify-center mt-8">
-                {/* <Button
-                  variant="outline"
-                  onClick={handlePrevious}
-                  type="button"
-                  className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
-                >
-                  Previous
-                </Button> */}
                 <Button
                   onClick={() => {
                     console.log('Final form data:', watch());

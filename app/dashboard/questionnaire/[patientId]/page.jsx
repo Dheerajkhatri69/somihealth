@@ -53,6 +53,9 @@ export default function PatientUpdateForm({ params }) {
         heightInches: '',
         currentWeight: '',
         goalWeight: '',
+        glp1StartingWeight: '',
+        bloodPressure: '',
+        heartRate: '',
         bmi: '',
         allergies: '',
         conditions: [],
@@ -81,6 +84,9 @@ export default function PatientUpdateForm({ params }) {
         idPhoto: '',
         comments: '',
         consent: false,
+        terms: false,
+        treatment: false,
+        agreetopay: false,
         status: '',
     });
 
@@ -430,6 +436,35 @@ export default function PatientUpdateForm({ params }) {
                         </Select>
                     </div>
                 </div>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfbfc]">
+                    <div className="space-y-2">
+                        <Label htmlFor="glp1StartingWeight">GLP 1 Starting Weight</Label>
+                        <Input
+                            id="glp1StartingWeight"
+                            name="glp1StartingWeight"
+                            value={formData.glp1StartingWeight}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="bloodPressure">Blood Pressure</Label>
+                        <Input
+                            id="bloodPressure"
+                            name="bloodPressure"
+                            value={formData.bloodPressure}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="heartRate">Heart Rate</Label>
+                        <Input
+                            id="heartRate"
+                            name="heartRate"
+                            value={formData.heartRate}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                </div>
 
                 {/* Health Conditions */}
                 <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2]">
@@ -721,6 +756,51 @@ export default function PatientUpdateForm({ params }) {
                                 onValueChange={(value) => handleSelectChange('consent', value === 'yes')}
                             >
                                 <SelectTrigger id="consent">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="terms">Terms of Services</Label>
+                            <Select
+                                value={formData.terms ? 'yes' : 'no'}
+                                onValueChange={(value) => handleSelectChange('terms', value === 'yes')}
+                            >
+                                <SelectTrigger id="terms">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="treatment">Consent to treatment</Label>
+                            <Select
+                                value={formData.treatment ? 'yes' : 'no'}
+                                onValueChange={(value) => handleSelectChange('treatment', value === 'yes')}
+                            >
+                                <SelectTrigger id="treatment">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="agreetopay">I agree to pay the $25 </Label>
+                            <Select
+                                value={formData.agreetopay ? 'yes' : 'no'}
+                                onValueChange={(value) => handleSelectChange('agreetopay', value === 'yes')}
+                            >
+                                <SelectTrigger id="agreetopay">
                                     <SelectValue placeholder="Select option" />
                                 </SelectTrigger>
                                 <SelectContent>
