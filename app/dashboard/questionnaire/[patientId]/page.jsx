@@ -21,6 +21,7 @@ import { useSession } from "next-auth/react";
 import toast from 'react-hot-toast';
 
 export default function PatientUpdateForm({ params }) {
+    const [submitting, setSubmitting] = useState(false);
     const { data: session } = useSession();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -127,6 +128,7 @@ export default function PatientUpdateForm({ params }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitting(true); // Start loading
         try {
             // Map questionnaire fields to patient fields
             const patientData = {
@@ -225,6 +227,7 @@ export default function PatientUpdateForm({ params }) {
                     setMessageHead('Success');
                     setMessage('Patient data has been updated and questionnaire deleted successfully.');
                     setIsDialogOpen(true);
+                    setSubmitting(false); // Stop loading after everything
                     // Redirect to questionnaire list after successful submission
                     router.push('/dashboard/questionnaire');
                 } else {
@@ -869,9 +872,14 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
 
-                <Button type="submit" className="w-full bg-secondary hover:bg-secondary">
-                    Submit
+                <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full bg-secondary hover:bg-secondary"
+                >
+                    {submitting ? 'Submitting...' : 'Submit'}
                 </Button>
+
             </form>
 
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
