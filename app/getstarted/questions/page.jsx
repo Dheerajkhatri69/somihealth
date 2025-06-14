@@ -264,6 +264,7 @@ export default function PatientRegistrationForm() {
   }
 
   const handleNext = async () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (currentSegment === 0) {
       const isOver18Valid = watch('isOver18') === 'yes';
       if (!isOver18Valid) {
@@ -366,6 +367,7 @@ export default function PatientRegistrationForm() {
   };
 
   const handlePrevious = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (currentSegment > 0) {
       setCurrentSegment(currentSegment - 1);
     }
@@ -642,7 +644,7 @@ export default function PatientRegistrationForm() {
                     type="text"
                     inputMode="numeric"
                     placeholder="MM / DD / YYYY"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    className="bg-gray-50 border text-sm sm:text-base border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     {...register('dob', {
                       pattern: {
                         value: /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/,
@@ -981,6 +983,13 @@ export default function PatientRegistrationForm() {
                     id="currentWeight"
                     type="number"
                     {...register('currentWeight')}
+                    onKeyDown={(e) => {
+                      // Prevent form submission when Enter is pressed
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        return;
+                      }
+                    }}
                   />
                   {bmi !== null && (
                     <div className="flex justify-center">
@@ -1012,6 +1021,13 @@ export default function PatientRegistrationForm() {
                   id="goalWeight"
                   type="number"
                   {...register('goalWeight')}
+                  onKeyDown={(e) => {
+                    // Prevent form submission when Enter is pressed
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      return;
+                    }
+                  }}
                 />
                 {errors.goalWeight && (
                   <p className="text-sm text-red-500">{errors.goalWeight.message}</p>
@@ -1034,6 +1050,13 @@ export default function PatientRegistrationForm() {
                   {...register('glp1StartingWeight', {
                     required: 'This field is required'
                   })}
+                  onKeyDown={(e) => {
+                    // Prevent form submission when Enter is pressed
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      return;
+                    }
+                  }}
                 />
                 {errors.glp1StartingWeight && (
                   <p className="text-sm text-red-500">{errors.glp1StartingWeight.message}</p>
@@ -2230,7 +2253,7 @@ export default function PatientRegistrationForm() {
                         {...register('agreetopay')}
                         className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
                       />
-                      <label htmlFor="agree-to-pay-checkbox" className="text-sm">
+                      <label htmlFor="agree-to-pay-checkbox" className="text-sm font-bold">
                         I agree to pay the $25 initial review payment. This will be refunded if our provider determines you are NOT eligible for GLP-1 treatment.
                       </label>
                     </div>
