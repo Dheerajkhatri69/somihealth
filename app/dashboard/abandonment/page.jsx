@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { AreaChart, Area, CartesianGrid, XAxis } from "recharts";
-
 import {
     Card,
     CardHeader,
@@ -11,184 +9,209 @@ import {
     CardContent,
 } from "@/components/ui/card";
 import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-    ChartLegend,
-    ChartLegendContent,
-} from "@/components/ui/chart";
-import {
     Select,
     SelectTrigger,
     SelectValue,
     SelectContent,
     SelectItem,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
-// ShadCN chart config
-const chartConfig = {
-    desktop: {
-        label: "Last Segment",
-        color: "#2c3a57",
-    },
-};
-
-const ChartAreaInteractive = () => {
+const DashboardStats = () => {
     const [chartData, setChartData] = useState([]);
-    const [timeRange, setTimeRange] = useState("90d");
+    const [selectedState, setSelectedState] = useState(0);
+    const [timeRange, setTimeRange] = useState("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const recordsPerPage = 100;
 
     useEffect(() => {
         async function fetchData() {
+            setLoading(true);
             const res = await fetch("/api/abandoned");
             const { result } = await res.json();
 
             const transformed = result.map((item) => ({
-                date: item.updatedAt.split("T")[0],
-                desktop: item.lastSegmentReached,
+                date: item.updatedAt,
+                state: item.state,
+                segment: item.lastSegmentReached,
                 email: item.firstSegment?.email || "",
-                name: item.firstSegment?.firstName + " " + item.firstSegment?.lastName || "",
+                name: `${item.firstSegment?.firstName || ""} ${item.firstSegment?.lastName || ""}`,
                 phone: item.firstSegment?.phone || "",
             }));
 
             setChartData(transformed);
+            setLoading(false);
         }
 
         fetchData();
     }, []);
 
-    const filteredData = chartData.filter((item) => {
-        const itemDate = new Date(item.date);
-        const reference = new Date();
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedState, timeRange]);
+
+    const getFilteredDataByDate = () => {
+        if (timeRange === "all") return chartData;
+
         const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - days);
 
-        const startDate = new Date(reference);
-        startDate.setDate(reference.getDate() - days);
+        return chartData.filter((item) => new Date(item.date) >= cutoff);
+    };
 
-        return itemDate >= startDate;
-    });
+    const dateFilteredData = getFilteredDataByDate();
+    const filtered = dateFilteredData.filter((d) => d.state === selectedState);
+    const pageCount = Math.ceil(filtered.length / recordsPerPage);
+    const paginatedData = filtered.slice(
+        (currentPage - 1) * recordsPerPage,
+        currentPage * recordsPerPage
+    );
+
+    const counts = {
+        leaveBetween: dateFilteredData.filter((d) => d.state === 0).length,
+        kickedOut: dateFilteredData.filter((d) => d.state === 1).length,
+        filled: dateFilteredData.filter((d) => d.state === 2).length,
+    };
 
     return (
-        <Card className="m-2">
-            <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
-                <div className="grid flex-1 gap-1">
-                    <CardTitle>Area Chart - Interactive</CardTitle>
-                    <CardDescription>
-                        Showing last segment reached per user (last {timeRange})
-                    </CardDescription>
+        <Card className="m-4 p-4">
+            {/* Filter Dropdown */}
+            <div className="flex justify-end mb-4">
+                {loading ? (
+                    <Skeleton className="w-[160px] h-10 rounded-md" />
+                ) : (
+                    <Select value={timeRange} onValueChange={setTimeRange}>
+                        <SelectTrigger className="w-[160px]">
+                            <SelectValue placeholder="Filter Days" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="7d">Last 7 days</SelectItem>
+                            <SelectItem value="30d">Last 30 days</SelectItem>
+                            <SelectItem value="90d">Last 90 days</SelectItem>
+                            <SelectItem value="all">All Time</SelectItem>
+                        </SelectContent>
+                    </Select>
+                )}
+            </div>
+
+            {/* Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                {loading
+                    ? Array.from({ length: 3 }).map((_, i) => (
+                          <Skeleton key={i} className="h-[100px] w-full rounded-xl" />
+                      ))
+                    : [0, 1, 2].map((state) => (
+                          <Card
+                              key={state}
+                              onClick={() => setSelectedState(state)}
+                              className={`cursor-pointer shadow hover:shadow-md ${
+                                  selectedState === state ? "border-l-8 border-secondary" : ""
+                              }`}
+                          >
+                              <CardHeader className="text-center">
+                                  <CardTitle>
+                                      {state === 0
+                                          ? "LEAVE BETWEEN"
+                                          : state === 1
+                                          ? "KICKED OUT"
+                                          : "FILLED"}
+                                  </CardTitle>
+                                  <CardDescription className="text-3xl font-bold text-secondary">
+                                      {state === 0
+                                          ? counts.leaveBetween
+                                          : state === 1
+                                          ? counts.kickedOut
+                                          : counts.filled}
+                                  </CardDescription>
+                              </CardHeader>
+                          </Card>
+                      ))}
+            </div>
+
+            {/* Table */}
+            <CardContent className="p-0">
+                <div className="overflow-x-auto border border-secondary rounded-lg">
+                    <table className="min-w-full table-auto text-sm text-left">
+                        <thead className="bg-secondary border-b text-white">
+                            <tr>
+                                <th className="px-4 py-2">FULL NAME</th>
+                                <th className="px-4 py-2">EMAIL</th>
+                                <th className="px-4 py-2">NUMBER</th>
+                                <th className="px-4 py-2">DATE AND TIME</th>
+                                <th className="px-4 py-2">SEGMENT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading
+                                ? Array.from({ length: 3 }).map((_, idx) => (
+                                      <tr key={idx} className="border-b">
+                                          <td colSpan={5} className="px-4 py-2">
+                                              <Skeleton className="h-10 w-full rounded-md" />
+                                          </td>
+                                      </tr>
+                                  ))
+                                : paginatedData.map((user, idx) => (
+                                      <tr key={idx} className="border-b">
+                                          <td className="px-4 py-2">{user.name}</td>
+                                          <td className="px-4 py-2">{user.email}</td>
+                                          <td className="px-4 py-2">{user.phone}</td>
+                                          <td className="px-4 py-2">
+                                              {new Date(user.date).toLocaleString("en-US", {
+                                                  year: "numeric",
+                                                  month: "short",
+                                                  day: "numeric",
+                                              })}
+                                          </td>
+                                          <td className="px-4 py-2">{user.segment}</td>
+                                      </tr>
+                                  ))}
+                            {!loading && paginatedData.length === 0 && (
+                                <tr>
+                                    <td colSpan="5" className="text-center text-muted py-4">
+                                        No data found.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-                <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="hidden w-[160px] sm:flex">
-                        <SelectValue placeholder="Time Range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="90d">Last 3 months</SelectItem>
-                        <SelectItem value="30d">Last 30 days</SelectItem>
-                        <SelectItem value="7d">Last 7 days</SelectItem>
-                    </SelectContent>
-                </Select>
-            </CardHeader>
 
-            <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-                <ChartContainer
-                    config={chartConfig}
-                    className="aspect-auto h-[250px] w-full"
-                >
-                    <AreaChart data={filteredData}>
-                        <defs>
-                            <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                                <stop
-                                    offset="5%"
-                                    stopColor="#2c3a57"
-                                    stopOpacity={0.8}
-                                />
-                                <stop
-                                    offset="95%"
-                                    stopColor="#2c3a57"
-                                    stopOpacity={0.1}
-                                />
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                            dataKey="date"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            minTickGap={32}
-                            tickFormatter={(value) => {
-                                const date = new Date(value);
-                                return date.toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                });
-                            }}
-                        />
-                        {/* <ChartTooltip
-                            cursor={false}
-                            content={
-                                <ChartTooltipContent
-                                    labelFormatter={(value) =>
-                                        new Date(value).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                        })
-                                        
-                                    }
-                                    indicator="dot"
-                                />
-                            }
-                        /> */}
-                        <ChartTooltip
-                            content={({ active, payload }) =>
-                                active && payload?.length ? (
-                                    <div className="bg-white p-2 border rounded-lg shadow">
-                                        <p>Name: {payload[0].payload.name}</p>
-                                        <p>Email: {payload[0].payload.email}</p>
-                                        <p>Last Segment: {payload[0].value}</p>
-                                    </div>
-                                ) : null
-                            }
-                        />
-
-                        <Area
-                            dataKey="desktop"
-                            type="natural"
-                            fill="url(#fillDesktop)"
-                            stroke="#2c3a57"
-                            stackId="a"
-                        />
-                        <ChartLegend content={<ChartLegendContent />} />
-                    </AreaChart>
-                </ChartContainer>
+                {/* Pagination Controls */}
+                <div className="flex justify-between items-center pt-4">
+                    {loading ? (
+                        <>
+                            <Skeleton className="h-10 w-[100px] rounded-md" />
+                            <Skeleton className="h-5 w-[80px] rounded-md" />
+                            <Skeleton className="h-10 w-[100px] rounded-md" />
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 border rounded-md bg-secondary text-white disabled:opacity-50"
+                            >
+                                Previous
+                            </Button>
+                            <span className="text-sm text-muted-foreground">
+                                Page {currentPage} of {pageCount}
+                            </span>
+                            <Button
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
+                                disabled={currentPage === pageCount}
+                                className="px-4 py-2 border rounded-md bg-secondary text-white disabled:opacity-50"
+                            >
+                                Next
+                            </Button>
+                        </>
+                    )}
+                </div>
             </CardContent>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-                {filteredData.map((user, index) => (
-                    <Card key={index} className="border-2 border-l-4 duration-200 hover:border-l-8  border-secondary">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-base text-secondary-foreground">
-                                Full name: {user.name || "N/A"}
-                                <br />
-                                {user.email || "Unknown User"}
-                            </CardTitle>
-                            <CardDescription className="text-sm text-muted-foreground">
-                                Last Segment: {user.desktop}
-                                <br />
-                                Phone: {user.phone || "N/A"}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="text-sm text-muted-foreground">
-                            Date: {new Date(user.date).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                            })}
-                        </CardContent>
-                    </Card>
-                ))}
-            </CardContent>
-
         </Card>
     );
 };
 
-export default ChartAreaInteractive;
+export default DashboardStats;

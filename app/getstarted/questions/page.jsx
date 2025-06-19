@@ -235,6 +235,7 @@ export default function PatientRegistrationForm() {
       userSessionId,
       firstSegment: currentData,
       lastSegmentReached: currentSegment,
+      state: 0,
       timestamp: new Date().toISOString(),
     };
 
@@ -266,6 +267,7 @@ export default function PatientRegistrationForm() {
           userSessionId,
           firstSegment: currentData,
           lastSegmentReached: currentSegment,
+          state: 0,
           timestamp: new Date().toISOString(),
         }),
       }).catch((err) => console.error("Basic info update failed:", err));
@@ -286,6 +288,7 @@ export default function PatientRegistrationForm() {
         userSessionId,
         firstSegment: currentData,
         lastSegmentReached: currentSegment,
+        state: 0,
         timestamp: new Date().toISOString(),
       };
 
@@ -298,14 +301,37 @@ export default function PatientRegistrationForm() {
 
   // Render ineligible state
   if (showIneligible) {
+    const currentData = {
+      firstName: watch("firstName"),
+      lastName: watch("lastName"),
+      phone: watch("phone"),
+      email: watch("email"),
+    };
+
+    fetch("/api/abandoned", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userSessionId,
+        firstSegment: currentData,
+        lastSegmentReached: currentSegment,
+        state: 1,
+        timestamp: new Date().toISOString(),
+      }),
+    }).catch((err) => console.error("Disqualified state update failed:", err));
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
         <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col items-center">
           <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
-          <h2 className="text-2xl font-semibold text-gray-900 text-center  mb-4">Based on your response to the previous question, you currently do not meet the criteria for GLP-1 medication.</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-4">
+            Based on your response to the previous question, you currently do not meet the criteria for GLP-1 medication.
+          </h2>
           <Button
             variant="outline"
-            onClick={() => { window.location.href = 'https://joinsomi.com/'; }}
+            onClick={() => {
+              window.location.href = "https://joinsomi.com/";
+            }}
             className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
           >
             Go Back
@@ -535,13 +561,28 @@ export default function PatientRegistrationForm() {
       setIsSubmitting(false);
       setShowSuccess(true);
 
-      // Clean abandoned record using userSessionId
+
       if (userSessionId) {
-        await fetch(`/api/abandoned?userSessionId=${userSessionId}`, {
-          method: "DELETE",
+        const currentData = {
+          firstName: watch("firstName"),
+          lastName: watch("lastName"),
+          phone: watch("phone"),
+          email: watch("email"),
+        };
+        fetch("/api/abandoned", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userSessionId,
+            firstSegment: currentData,
+            lastSegmentReached: currentSegment,
+            state: 2,
+            timestamp: new Date().toISOString(),
+          }),
         });
         localStorage.removeItem("userSessionId");
       }
+
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error(error.message || 'Failed to submit form. Please try again.');
