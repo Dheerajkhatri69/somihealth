@@ -374,10 +374,10 @@ export default function Dashboard() {
             </div>
 
             {selectedItems.length > 0 && (
-                <div className="fixed bottom-4 right-4">
+                <div className="fixed bottom-4 right-4 z-20">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
+                            <Button variant="destructive" size="sm" >
                                 <Delete className="mr-2 h-4 w-4" />
                                 Delete Selected ({selectedItems.length})
                             </Button>

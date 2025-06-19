@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,15 +16,15 @@ import { Badge } from '@/components/ui/badge';
 
 // Form validation schema
 const formSchema = z.object({
-  // Age verification
-  isOver18: z.enum(['yes', 'no'], {
-    required_error: "You must be at least 18 years old to register",
-  }),
   // Personal Information
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   phone: z.string().min(1, "Phone number is required"),
   email: z.string().email("Invalid email address"),
+  // Age verification
+  isOver18: z.enum(['yes', 'no'], {
+    required_error: "You must be at least 18 years old to register",
+  }),
   // Address
   address: z.string().min(1, "Address is required"),
   address2: z.string().optional(),
@@ -101,10 +101,10 @@ const formSchema = z.object({
 });
 
 const segments = [
+  { id: 'personal', name: 'Personal Information' },
   { id: 'age', name: 'Age Verification' },
   { id: 'bmiInfo', name: 'BMI Information' },
   { id: 'dob', name: 'Date of Birth' },
-  { id: 'personal', name: 'Personal Information' },
   { id: 'address', name: 'Shipping Address' },
   { id: 'preference', name: 'GLP-1 Preference' },
   { id: 'sex', name: 'Sex' },
@@ -204,6 +204,97 @@ export default function PatientRegistrationForm() {
       setValue(field, currentValues.filter(item => item !== value));
     }
   };
+  const [userSessionId, setUserSessionId] = useState("");
+  const [lastVisitedSegment, setLastVisitedSegment] = useState(0);
+  const [previousBasicData, setPreviousBasicData] = useState(null);
+
+  // Generate session ID once
+  useEffect(() => {
+    let id = localStorage.getItem("userSessionId");
+    if (!id) {
+      id = `USR-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      localStorage.setItem("userSessionId", id);
+    }
+    setUserSessionId(id);
+  }, []);
+
+  // Update database on every segment change
+  useEffect(() => {
+    const currentData = {
+      firstName: watch("firstName"),
+      lastName: watch("lastName"),
+      phone: watch("phone"),
+      email: watch("email"),
+    };
+
+    setLastVisitedSegment(currentSegment);
+
+    if (!userSessionId) return;
+
+    const payload = {
+      userSessionId,
+      firstSegment: currentData,
+      lastSegmentReached: currentSegment,
+      timestamp: new Date().toISOString(),
+    };
+
+    fetch("/api/abandoned", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error("Segment update failed:", err));
+  }, [currentSegment]); // <-- runs on *every* segment change
+
+  // Update firstSegment if changed in Segment 0
+  useEffect(() => {
+    if (currentSegment !== 0 || !userSessionId) return;
+
+    const currentData = {
+      firstName: watch("firstName"),
+      lastName: watch("lastName"),
+      phone: watch("phone"),
+      email: watch("email"),
+    };
+
+    const changed = JSON.stringify(currentData) !== JSON.stringify(previousBasicData);
+    if (changed) {
+      setPreviousBasicData(currentData);
+      fetch("/api/abandoned", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userSessionId,
+          firstSegment: currentData,
+          lastSegmentReached: currentSegment,
+          timestamp: new Date().toISOString(),
+        }),
+      }).catch((err) => console.error("Basic info update failed:", err));
+    }
+  }, [watch("firstName"), watch("lastName"), watch("phone"), watch("email"), currentSegment]);
+
+  // Final fallback on tab/browser close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const currentData = {
+        firstName: watch("firstName"),
+        lastName: watch("lastName"),
+        phone: watch("phone"),
+        email: watch("email"),
+      };
+
+      const payload = {
+        userSessionId,
+        firstSegment: currentData,
+        lastSegmentReached: currentSegment,
+        timestamp: new Date().toISOString(),
+      };
+
+      navigator.sendBeacon("/api/abandoned", JSON.stringify(payload));
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [userSessionId, currentSegment]);
 
   // Render ineligible state
   if (showIneligible) {
@@ -264,9 +355,10 @@ export default function PatientRegistrationForm() {
     );
   }
 
+
   const handleNext = async () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (currentSegment === 0) {
+    if (currentSegment === 1) {
       const isOver18Valid = watch('isOver18') === 'yes';
       if (!isOver18Valid) {
         setShowIneligible(true);
@@ -442,6 +534,14 @@ export default function PatientRegistrationForm() {
 
       setIsSubmitting(false);
       setShowSuccess(true);
+
+      // Clean abandoned record using userSessionId
+      if (userSessionId) {
+        await fetch(`/api/abandoned?userSessionId=${userSessionId}`, {
+          method: "DELETE",
+        });
+        localStorage.removeItem("userSessionId");
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error(error.message || 'Failed to submit form. Please try again.');
@@ -451,10 +551,10 @@ export default function PatientRegistrationForm() {
 
   const getSegmentFields = (segmentId) => {
     switch (segmentId) {
+      case 'personal': return ['firstName', 'lastName', 'phone', 'email'];
       case 'age': return ['isOver18'];
       case 'bmiInfo': return [];
       case 'dob': return ['dob'];
-      case 'personal': return ['firstName', 'lastName', 'phone', 'email'];
       case 'address': return ['address', 'address2', 'city', 'state', 'zip', 'country'];
       case 'preference': return ['glp1Preference'];
       case 'sex': return ['sex'];
@@ -586,8 +686,67 @@ export default function PatientRegistrationForm() {
           className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl"
           noValidate
         >
-          {/* Age verification segment */}
+          {/* Personal Information segment */}
           {currentSegment === 0 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Let&apos;s get to know you!</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">
+                    First name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="firstName"
+                    {...register('firstName')}
+                  />
+                  {errors.firstName && (
+                    <p className="text-sm text-red-500">{errors.firstName.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">
+                    Last name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="lastName"
+                    {...register('lastName')}
+                  />
+                  {errors.lastName && (
+                    <p className="text-sm text-red-500">{errors.lastName.message}</p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">
+                  Phone number <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  {...register('phone')}
+                />
+                {errors.phone && (
+                  <p className="text-sm text-red-500">{errors.phone.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Email <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  {...register('email')}
+                />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Age verification segment */}
+          {currentSegment === 1 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Age Verification</h2>
               <div className="space-y-2">
@@ -620,7 +779,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* BMI Information segment */}
-          {currentSegment === 1 && (
+          {currentSegment === 2 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Body Max Index (BMI) requirement</h2>
               <p className="text-gray-600">
@@ -640,7 +799,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Date of Birth segment */}
-          {currentSegment === 2 && (
+          {currentSegment === 3 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Date of Birth</h2>
               <div className="space-y-2">
@@ -730,66 +889,6 @@ export default function PatientRegistrationForm() {
               </div>
             </div>
           )}
-
-          {/* Personal Information segment */}
-          {currentSegment === 3 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Let&apos;s get to know you!</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">
-                    First name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="firstName"
-                    {...register('firstName')}
-                  />
-                  {errors.firstName && (
-                    <p className="text-sm text-red-500">{errors.firstName.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">
-                    Last name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="lastName"
-                    {...register('lastName')}
-                  />
-                  {errors.lastName && (
-                    <p className="text-sm text-red-500">{errors.lastName.message}</p>
-                  )}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">
-                  Phone number <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  {...register('phone')}
-                />
-                {errors.phone && (
-                  <p className="text-sm text-red-500">{errors.phone.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">
-                  Email <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Address segment */}
           {currentSegment === 4 && (
             <div className="space-y-4">
