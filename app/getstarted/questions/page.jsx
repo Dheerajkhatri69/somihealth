@@ -581,6 +581,7 @@ export default function PatientRegistrationForm() {
           }),
         });
         localStorage.removeItem("userSessionId");
+        setUserSessionId("");
       }
 
     } catch (error) {
