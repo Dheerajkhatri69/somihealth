@@ -634,64 +634,6 @@ export default function PatientRegistrationForm() {
     }
   };
 
-  // Ineligibility full page
-  if (showIneligible) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
-        <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col items-center">
-          {/* Replace with somi logo or styled text */}
-          <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mt-4 mb-2">Based on your response to the previous question, you currently do not meet the criteria for GLP-1 medication.</h2>
-          <Button
-            variant="outline"
-            onClick={() => { window.location.href = 'https://joinsomi.com/'; }}
-            className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
-          >
-            Go Back
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (showSuccess) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
-        <div className="w-full max-w-md mx-auto bg-white p-4 rounded-xl shadow-lg flex flex-col">
-          <div className="font-tagesschrift text-center text-4xl md:text-6xl mb-2 text-secondary font-bold">somi</div>
-          <div className="space-y-2 p-4 md:p-6">
-            <div className="relative w-full aspect-square max-w-[300px] mx-auto">
-              <Image
-                src="/getstartedend.jpg"
-                alt="Weight Loss"
-                fill
-                className="rounded-xl object-contain"
-                priority
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
-            </div>
-            <h3 className="text-lg md:text-xl font-semibold text-gray-900 text-center">
-              Thanks for filling out your GLP-1 weight loss treatment intake form!
-            </h3>
-
-            <p className="text-gray-600 text-center">
-              Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you.
-            </p>
-            <p className="text-gray-600 text-center">
-              Thanks for your patience.
-            </p>
-          </div>
-          <Button
-            onClick={() => { window.location.href = 'https://joinsomi.com/'; }}
-            className="bg-secondary text-white hover:bg-secondary rounded-2xl px-8"
-          >
-            End
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen " >
       {/* Sticky header for logo and progress bar */}
