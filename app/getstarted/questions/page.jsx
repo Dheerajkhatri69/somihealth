@@ -275,29 +275,29 @@ export default function PatientRegistrationForm() {
   }, [watch("firstName"), watch("lastName"), watch("phone"), watch("email"), currentSegment]);
 
   // Final fallback on tab/browser close
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      const currentData = {
-        firstName: watch("firstName"),
-        lastName: watch("lastName"),
-        phone: watch("phone"),
-        email: watch("email"),
-      };
+  // useEffect(() => {
+  //   const handleBeforeUnload = () => {
+  //     const currentData = {
+  //       firstName: watch("firstName"),
+  //       lastName: watch("lastName"),
+  //       phone: watch("phone"),
+  //       email: watch("email"),
+  //     };
 
-      const payload = {
-        userSessionId,
-        firstSegment: currentData,
-        lastSegmentReached: currentSegment,
-        state: 0,
-        timestamp: new Date().toISOString(),
-      };
+  //     const payload = {
+  //       userSessionId,
+  //       firstSegment: currentData,
+  //       lastSegmentReached: currentSegment,
+  //       state: 0,
+  //       timestamp: new Date().toISOString(),
+  //     };
 
-      navigator.sendBeacon("/api/abandoned", JSON.stringify(payload));
-    };
+  //     navigator.sendBeacon("/api/abandoned", JSON.stringify(payload));
+  //   };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [userSessionId, currentSegment]);
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  // }, [userSessionId, currentSegment]);
 
   // Render ineligible state
   if (showIneligible) {
