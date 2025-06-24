@@ -58,6 +58,7 @@ export default function PatientUpdateForm({ params }) {
         bloodPressure: '',
         heartRate: '',
         bmi: '',
+        goalBmi: '',
         allergies: '',
         conditions: [],
         familyConditions: [],
@@ -416,6 +417,15 @@ export default function PatientUpdateForm({ params }) {
                         />
                     </div>
                     <div className="space-y-2">
+                        <Label htmlFor="bmi">BMI</Label>
+                        <Input
+                            id="bmi"
+                            name="bmi"
+                            value={formData.bmi}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
                         <Label htmlFor="goalWeight">Goal Weight (lbs)</Label>
                         <Input
                             id="goalWeight"
@@ -425,11 +435,11 @@ export default function PatientUpdateForm({ params }) {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="bmi">BMI</Label>
+                        <Label htmlFor="goalBmi">Goal Bmi</Label>
                         <Input
-                            id="bmi"
-                            name="bmi"
-                            value={formData.bmi}
+                            id="goalBmi"
+                            name="goalBmi"
+                            value={formData.goalBmi}
                             readOnly
                         />
                     </div>

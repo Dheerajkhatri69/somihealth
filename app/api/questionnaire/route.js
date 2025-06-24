@@ -68,6 +68,7 @@ export async function POST(request) {
             currentWeight: body.currentWeight,
             goalWeight: body.goalWeight,
             bmi: body.bmi,
+            goalBmi: body.goalBmi,
             glp1StartingWeight: body.glp1StartingWeight,
             bloodPressure: body.bloodPressure,
             heartRate: body.heartRate,

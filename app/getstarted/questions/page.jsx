@@ -187,6 +187,8 @@ export default function PatientRegistrationForm() {
   const watchedInches = useWatch({ control, name: 'heightInches' });
   const watchedWeight = useWatch({ control, name: 'currentWeight' });
 
+  const watchedGoalWeight = useWatch({ control, name: 'goalWeight' });
+
   // Calculate BMI
   let bmi = null;
   const totalInches = parseInt(watchedFeet || '0') * 12 + parseInt(watchedInches || '0');
@@ -194,7 +196,11 @@ export default function PatientRegistrationForm() {
     bmi = (parseFloat(watchedWeight) / (totalInches * totalInches)) * 703;
     bmi = Math.round(bmi * 10) / 10; // round to 1 decimal
   }
-
+  let goalBmi = null;
+  if (totalInches > 0 && watchedGoalWeight) {
+    goalBmi = (parseFloat(watchedGoalWeight) / (totalInches * totalInches)) * 703;
+    goalBmi = Math.round(goalBmi * 10) / 10; // round to 1 decimal
+  }
   // Helper function to handle checkbox changes
   const handleCheckboxChange = (field, value, checked) => {
     const currentValues = watch(field) || [];
@@ -273,31 +279,6 @@ export default function PatientRegistrationForm() {
       }).catch((err) => console.error("Basic info update failed:", err));
     }
   }, [watch("firstName"), watch("lastName"), watch("phone"), watch("email"), currentSegment]);
-
-  // Final fallback on tab/browser close
-  // useEffect(() => {
-  //   const handleBeforeUnload = () => {
-  //     const currentData = {
-  //       firstName: watch("firstName"),
-  //       lastName: watch("lastName"),
-  //       phone: watch("phone"),
-  //       email: watch("email"),
-  //     };
-
-  //     const payload = {
-  //       userSessionId,
-  //       firstSegment: currentData,
-  //       lastSegmentReached: currentSegment,
-  //       state: 0,
-  //       timestamp: new Date().toISOString(),
-  //     };
-
-  //     navigator.sendBeacon("/api/abandoned", JSON.stringify(payload));
-  //   };
-
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-  //   return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  // }, [userSessionId, currentSegment]);
 
   // Render ineligible state
   if (showIneligible) {
@@ -537,6 +518,7 @@ export default function PatientRegistrationForm() {
         pastWeightLossMeds,
         diets,
         bmi: bmi,
+        goalBmi: goalBmi,
         prescriptionPhoto: fileUrls.file1,
         idPhoto: fileUrls.file2,
         authid: `P${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`,
@@ -1121,6 +1103,15 @@ export default function PatientRegistrationForm() {
                     }
                   }}
                 />
+                {goalBmi !== null && (
+                  <div className="flex justify-center">
+                    <Badge
+                      className="px-3 py-1 text-lg mt-2 font-bold rounded-md bg-green-200 text-green-900 hover:bg-green-200"
+                    >
+                      Goal BMI: {goalBmi}
+                    </Badge>
+                  </div>
+                )}
                 {errors.goalWeight && (
                   <p className="text-sm text-red-500">{errors.goalWeight.message}</p>
                 )}
