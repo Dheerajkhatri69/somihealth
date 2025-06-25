@@ -788,20 +788,25 @@ export default function FollowUp() {
                                     <TableCell>{patient.medicine}</TableCell>
                                     <TableCell className="w-[200px] max-h-20">
                                         <div className="flex gap-1 overflow-x-auto">
-                                            {patient.images?.map((image, index) => (
-                                                <img
-                                                    key={index}
-                                                    src={image} // <-- Use image directly
-                                                    alt={`Preview ${index + 1}`}
-                                                    className="h-12 w-12 object-cover cursor-pointer rounded border flex-shrink-0"
-                                                    onClick={() => setSelectedImageInfo({
-                                                        images: patient.images,
-                                                        index: index
-                                                    })}
-                                                />
-                                            ))}
+                                            {patient.images
+                                                ?.filter(image => typeof image === "string" && image.trim() !== "")
+                                                .map((image, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={image}
+                                                        alt={`Preview ${index + 1}`}
+                                                        className="h-12 w-12 object-cover cursor-pointer rounded border flex-shrink-0"
+                                                        onClick={() =>
+                                                            setSelectedImageInfo({
+                                                                images: patient.images.filter(img => typeof img === "string" && img.trim() !== ""),
+                                                                index: index,
+                                                            })
+                                                        }
+                                                    />
+                                                ))}
                                         </div>
                                     </TableCell>
+
 
                                     <TableCell className="whitespace-nowrap">
                                         {patient.semaglutideDose}{" unit: "}{patient.semaglutideUnit}

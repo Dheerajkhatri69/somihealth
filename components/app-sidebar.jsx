@@ -1,6 +1,6 @@
 'use client'
 import { useMemo } from "react"
-import { History, Home, Inbox, Plus, Trash, UserRoundPlus, FilePlus2 , AudioWaveform} from "lucide-react"
+import { History, Home, Inbox, Plus, Trash, UserRoundPlus, FilePlus2 , AudioWaveform, FilePlus} from "lucide-react"
 import { useSession } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import {
@@ -46,6 +46,12 @@ const sidebarItems = [
     url: "/dashboard/abandonment",
     icon: AudioWaveform,
     allowedRoles: ['A']
+  },
+  {
+    title: "Refills",
+    url: "/dashboard/refills",
+    icon: FilePlus,
+    allowedRoles: ['A', 'T']
   },
   {
     title: "Email History",

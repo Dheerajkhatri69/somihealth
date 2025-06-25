@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const formSchema = z
     .object({
@@ -74,6 +76,10 @@ export default function PatientRegistrationForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showIneligible, setShowIneligible] = useState(false);
     const [loadingExistsByEmailPhone, setLoadingExistsByEmailPhone] = useState(false);
+    const [authID, setAuthId] = useState(null);
+    const [submissionStatus, setSubmissionStatus] = useState(null);
+    const [userSessionId, setUserSessionId] = useState("");
+    const [previousBasicData, setPreviousBasicData] = useState(null);
     const {
         register,
         handleSubmit,
@@ -104,6 +110,38 @@ export default function PatientRegistrationForm() {
         dosageNote: ["dosageNote"],
     };
 
+    // Generate session ID once
+    useEffect(() => {
+        let id = localStorage.getItem("refillsUserSessionId");
+        if (!id) {
+            id = `REFILL-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            localStorage.setItem("refillsUserSessionId", id);
+        }
+        setUserSessionId(id);
+    }, []);
+
+    // On segment change, update abandonment
+    useEffect(() => {
+        const currentData = {
+            firstName: watch("firstName"),
+            lastName: watch("lastName"),
+            phone: watch("phone"),
+            email: watch("email"),
+        };
+        if (!userSessionId) return;
+        fetch("/api/followup/abandoned", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userSessionId,
+                firstSegment: currentData,
+                lastSegmentReached: currentSegment,
+                state: 0,
+                timestamp: new Date().toISOString(),
+            }),
+        });
+    }, [currentSegment]);
+
     const onSubmit = async (data) => {
         const isValid = await trigger();
         if (!isValid) {
@@ -120,12 +158,53 @@ export default function PatientRegistrationForm() {
             return;
         }
         setIsSubmitting(true);
-        console.log('Submitted Data:', data);
-        // Handle submission logic here
-        setIsSubmitting(false);
+        setSubmissionStatus(null);
+
+        const submissionData = {
+            ...data,
+            authid: authID,
+        };
+
+        try {
+            const res = await fetch('/api/refills', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(submissionData)
+            });
+
+            const currentData = {
+                firstName: watch("firstName"),
+                lastName: watch("lastName"),
+                phone: watch("phone"),
+                email: watch("email"),
+            };
+
+            if (res.ok) {
+                setSubmissionStatus('success');
+                fetch("/api/followup/abandoned", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userSessionId,
+                        firstSegment: currentData,
+                        lastSegmentReached: currentSegment,
+                        state: 2,
+                        timestamp: new Date().toISOString(),
+                    }),
+                });
+                localStorage.removeItem("refillsUserSessionId");
+                setUserSessionId("");
+            } else {
+                setSubmissionStatus('error');
+            }
+        } catch (error) {
+            setSubmissionStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const progress = Math.round(((currentSegment) / (segments.length -1)) * 100);
+    const progress = Math.round(((currentSegment) / (segments.length - 1)) * 100);
 
     const goToNextSegment = async () => {
         const segmentKey = segments[currentSegment];
@@ -136,9 +215,26 @@ export default function PatientRegistrationForm() {
         if (!isValid) return;
 
         // Ineligible logic
+        const currentData = {
+            firstName: watch("firstName"),
+            lastName: watch("lastName"),
+            phone: watch("phone"),
+            email: watch("email"),
+        };
         if (segmentKey === 'glp1ApprovalCheck') {
             if (glp1Approved === 'no') {
                 setShowIneligible(true);
+                fetch("/api/followup/abandoned", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userSessionId,
+                        firstSegment: currentData,
+                        lastSegmentReached: currentSegment,
+                        state: 1,
+                        timestamp: new Date().toISOString(),
+                    }),
+                });
                 return;
             }
             if (glp1Approved === 'yes') {
@@ -153,16 +249,40 @@ export default function PatientRegistrationForm() {
                         body: JSON.stringify({ email, phone })
                     });
                     const data = await res.json();
+
                     if (data?.result?.exists) {
                         setLoadingExistsByEmailPhone(false);
+                        setAuthId(data?.result?.patient?.authid);
                         setCurrentSegment((prev) => prev + 1);
                         return;
                     } else {
                         setShowIneligible(true);
+                        fetch("/api/followup/abandoned", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                userSessionId,
+                                firstSegment: previousBasicData,
+                                lastSegmentReached: currentSegment,
+                                state: 1,
+                                timestamp: new Date().toISOString(),
+                            }),
+                        });
                         return;
                     }
                 } catch (err) {
                     setShowIneligible(true);
+                    fetch("/api/followup/abandoned", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            userSessionId,
+                            firstSegment: previousBasicData,
+                            lastSegmentReached: currentSegment,
+                            state: 1,
+                            timestamp: new Date().toISOString(),
+                        }),
+                    });
                     return;
                 }
             }
@@ -179,6 +299,40 @@ export default function PatientRegistrationForm() {
         }
     };
 
+    if (submissionStatus === 'success') {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
+                <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
+                    <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
+                    <div className="space-y-2 p-4">
+                        <div className="relative w-full aspect-square max-w-[300px] mx-auto">
+                            <Image
+                                src="/getstartedend.jpg"
+                                alt="Weight Loss"
+                                fill
+                                className="rounded-xl object-contain"
+                                priority
+                                sizes="(max-width: 768px) 100vw, 300px"
+                            />
+                        </div>
+                        <h3 className="text-lg md:text-x text-center text-black font-semibold">
+                            Thank you for refilling your prescription with Somi
+                        </h3>
+                        <p className="text-gray-600 text-center">
+                            We truly appreciate your trust and look forward to continuing to support your health.
+                        </p>
+                    </div>
+                    <Button
+                        onClick={() => { window.location.href = 'https://joinsomi.com/'; }}
+                        className="bg-secondary text-white hover:bg-secondary rounded-2xl font-bold text-lg mb-4 px-8 w-[120px]"
+                    >
+                        End
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     if (showIneligible) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
@@ -187,12 +341,14 @@ export default function PatientRegistrationForm() {
                     <h2 className="text-2xl font-semibold text-gray-900 text-center mb-4">
                         It looks like you are a new patient based on the information provided. Please click &quot;Get Started&quot; to complete your new patient intake form.
                     </h2>
-                    <Button
-                        variant="outline"
-                        className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
-                    >
-                        Get Started
-                    </Button>
+                    <Link href="/getstarted">
+                        <Button
+                            variant="outline"
+                            className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+                        >
+                            Get Started
+                        </Button>
+                    </Link>
                 </div>
             </div>
         );
@@ -472,6 +628,11 @@ export default function PatientRegistrationForm() {
                             </Button>
                         )}
                     </div>
+                    {submissionStatus === 'error' && (
+                        <p className="text-sm text-red-500 text-center mt-4">
+                            There was an error submitting your form. Please try again.
+                        </p>
+                    )}
                 </form>
             </div>
         </div>

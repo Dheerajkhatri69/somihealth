@@ -490,6 +490,16 @@ export default function UpdateFollowUp({ params }) {
                             placeholder="Any side effects?"
                         />
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="listSideEffects">List Side Effects</Label>
+                        <Input
+                            id="listSideEffects"
+                            name="listSideEffects"
+                            value={formData.listSideEffects}
+                            onChange={handleInputChange}
+                            placeholder="Any side effects?"
+                        />
+                    </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="happyWithMedication">Happy with Medication?</Label>
