@@ -4,13 +4,11 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSession } from "next-auth/react";
-import { UploadButton } from "@/utils/uploadthing";
 import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
+import { Fullscreen, X } from "lucide-react";
 import { upload } from "@imagekit/next";
 import Image from "next/image";
 import UploadFile from "@/components/FileUpload";
@@ -21,7 +19,6 @@ export default function FollowUpForm() {
         // console.log("Session user:", session?.user);
     }, [session]);
     const [formData, setFormData] = useState(() => {
-        const randomNum = Math.floor(Math.random() * 100000); // Generates number between 0-99999
         return {
             authid: '', // Ensures 5 digits after P
             firstName: '',
@@ -72,7 +69,6 @@ export default function FollowUpForm() {
         file1: '',
         file2: ''
     });
-    // const [images, setImages] = useState(Array(3).fill(''));
     // Add this state
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchError, setSearchError] = useState('');
@@ -140,7 +136,6 @@ export default function FollowUpForm() {
                 providerComments: patientData.patient.providerComments || '',
                 providerNote: patientData.patient.providerNote || ''
             }));
-            // console.log(patientData.patient)
 
             // Handle images
             const dbImages = patientData.patient.images || [];
@@ -164,10 +159,6 @@ export default function FollowUpForm() {
     const handleImageUpload = (index, url) => {
         setImages(prev => prev.map((img, i) => i === index ? url : img));
     };
-
-    // const removeImage = (index) => {
-    //     setImages(prev => prev.map((img, i) => i === index ? '' : img));
-    // };
 
 
     const handleInputChange = (e) => {
@@ -583,6 +574,16 @@ export default function FollowUpForm() {
                         />
                     </div>
 
+                    <div className="space-y-2">
+                        <Label htmlFor="listSideEffects">List Side Effects</Label>
+                        <Input
+                            id="listSideEffects"
+                            name="listSideEffects"
+                            value={formData.listSideEffects}
+                            onChange={handleInputChange}
+                            placeholder="Any side effects?"
+                        />
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="happyWithMedication">Happy with Medication?</Label>
                         <Input

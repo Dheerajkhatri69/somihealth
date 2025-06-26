@@ -50,6 +50,8 @@ export default function RefillsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 100;
     const checkboxRef = useRef(null);
+    const [newlySeenIds, setNewlySeenIds] = useState([]);
+    const [newFormsCount, setNewFormsCount] = useState(0);
 
     // Filters state
     const [filters, setFilters] = useState({
@@ -59,8 +61,10 @@ export default function RefillsPage() {
     });
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (session) {
+            fetchData();
+        }
+    }, [session]);
 
     const fetchData = async () => {
         try {
@@ -68,6 +72,24 @@ export default function RefillsPage() {
             const result = await response.json();
             if (result.success) {
                 setData(result.result);
+
+                const unseenItems = result.result.filter(item => !item.seen);
+                if (unseenItems.length > 0) {
+                    setNewFormsCount(unseenItems.length);
+                    const unseenIds = unseenItems.map(item => item._id);
+                    setNewlySeenIds(unseenIds);
+
+                    // Mark them as seen
+                    const markAsSeenResponse = await fetch('/api/refills/mark-as-seen', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids: unseenIds }),
+                    });
+                    const markAsSeenResult = await markAsSeenResponse.json();
+                    if (!markAsSeenResult.success) {
+                        toast.error('Could not mark refills as seen.');
+                    }
+                }
             } else {
                 toast.error('Failed to fetch data');
             }
@@ -193,15 +215,23 @@ export default function RefillsPage() {
                         <SelectItem value="month">Last 30 Days</SelectItem>
                     </SelectContent>
                 </Select>
-                <Link href="/dashboard/followup/abandonment">
-                    <Button
-                        variant="outline"
-                        className="bg-secondary text-white hover:text-white hover:bg-secondary"
-                    >
-                        Refills Abandoned
-                    </Button>
-                </Link>
+                {session?.user?.accounttype === 'A' && (
+                    <Link href="/dashboard/followup/abandonment">
+                        <Button
+                            variant="outline"
+                            className="bg-secondary text-white hover:text-white hover:bg-secondary"
+                        >
+                            Refills Abandoned
+                        </Button>
+                    </Link>
+                )}
             </div>
+
+            {newFormsCount > 0 && (
+                <div className="mb-4 text-center text-green-700 bg-green-100 p-2 rounded-md">
+                    You have {newFormsCount} new refill requests.
+                </div>
+            )}
 
             <div className="rounded-md border bg-background/50">
                 {loading ? (
@@ -252,7 +282,7 @@ export default function RefillsPage() {
                         </TableHeader>
                         <TableBody>
                             {currentRows.map((item) => (
-                                <TableRow key={item._id}>
+                                <TableRow key={item._id} className={newlySeenIds.includes(item._id) ? 'bg-green-100 hover:bg-green-200' : 'hover:bg-muted/50'}>
                                     <TableCell className="sticky left-0 bg-background z-10">
                                         <Checkbox
                                             checked={selectedItems.includes(item._id)}

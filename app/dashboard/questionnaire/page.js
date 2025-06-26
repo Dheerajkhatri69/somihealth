@@ -50,6 +50,8 @@ export default function Dashboard() {
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 100;
     const checkboxRef = useRef(null);
+    const [newlySeenIds, setNewlySeenIds] = useState([]);
+    const [newFormsCount, setNewFormsCount] = useState(0);
 
     // Filters state
     const [filters, setFilters] = useState({
@@ -60,8 +62,10 @@ export default function Dashboard() {
     });
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (session) {
+            fetchData();
+        }
+    }, [session]);
 
     const fetchData = async () => {
         try {
@@ -69,6 +73,25 @@ export default function Dashboard() {
             const result = await response.json();
             if (result.success) {
                 setData(result.result);
+
+
+                const unseenItems = result.result.filter(item => !item.seen);
+                if (unseenItems.length > 0) {
+                    setNewFormsCount(unseenItems.length);
+                    const unseenIds = unseenItems.map(item => item._id);
+                    setNewlySeenIds(unseenIds);
+
+                    // Mark them as seen
+                    const markAsSeenResponse = await fetch('/api/questionnaire/mark-as-seen', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids: unseenIds }),
+                    });
+                    const markAsSeenResult = await markAsSeenResponse.json();
+                    if (!markAsSeenResult.success) {
+                        toast.error('Could not mark questionnaires as seen.');
+                    }
+                }
             } else {
                 toast.error('Failed to fetch data');
             }
@@ -259,92 +282,99 @@ export default function Dashboard() {
                         </Table>
                     </div>
                 ) : (
-                    <Table>
-                        <TableHeader className="bg-secondary">
-                            <TableRow className="hover:bg-secondary/80">
-                                <TableHead className="w-[50px] text-white sticky left-0 bg-secondary z-10">
-                                    <Checkbox
-                                        ref={checkboxRef}
-                                        checked={selectedItems.length === filteredData.length && filteredData.length > 0}
-                                        onCheckedChange={handleSelectAll}
-                                    />
-                                </TableHead>
-                                <TableHead className="text-white sticky left-[25px] bg-secondary z-10">Date</TableHead>
-                                <TableHead className="text-white sticky left-[105px] bg-secondary whitespace-nowrap z-10">AUTH ID</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">First Name</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Last Name</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">DOB</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Sex</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Email</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">Phone</TableHead>
-                                <TableHead className="text-white whitespace-nowrap">GLP-1 Preference</TableHead>
-                                <TableHead className="text-white sticky right-0 bg-secondary z-10">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {currentRows.map((item) => (
-                                <TableRow key={item._id}>
-                                    <TableCell className="sticky left-0 bg-background z-10">
+                    <>
+                        {newFormsCount > 0 && (
+                            <div className="mb-4 text-center text-green-700 bg-green-100 p-2 rounded-md">
+                                You have {newFormsCount} new patient forms.
+                            </div>
+                        )}
+                        <Table>
+                            <TableHeader className="bg-secondary">
+                                <TableRow className="hover:bg-secondary/80">
+                                    <TableHead className="w-[50px] text-white sticky left-0 bg-secondary z-10">
                                         <Checkbox
-                                            checked={selectedItems.includes(item._id)}
-                                            onCheckedChange={() => handleSelectItem(item._id)}
+                                            ref={checkboxRef}
+                                            checked={selectedItems.length === filteredData.length && filteredData.length > 0}
+                                            onCheckedChange={handleSelectAll}
                                         />
-                                    </TableCell>
-                                    <TableCell className="sticky left-[25px] bg-background z-10 whitespace-nowrap">{new Date(item.createTimeDate).toLocaleDateString()}</TableCell>
-                                    <TableCell className="sticky left-[105px] bg-background z-10 whitespace-nowrap">{item.authid}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.firstName}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.lastName}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.dateOfBirth ? new Date(item.dateOfBirth).toLocaleDateString() : '-'}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.sex}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.email}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.phone}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{item.glp1Preference}</TableCell>
-                                    <TableCell className="sticky right-0 bg-background z-10">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon">
-                                                    <Menu className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem asChild>
-                                                    <Link href={`/dashboard/questionnaire/${item.authid}`}>
-                                                        Open
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button variant="destructive" size="sm" className="w-full justify-start">
-                                                                Delete
-                                                            </Button>
-                                                        </AlertDialogTrigger>
-                                                        <AlertDialogContent>
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                                                <AlertDialogDescription>
-                                                                    This action cannot be undone. This will permanently delete the questionnaire.
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction
-                                                                    onClick={() => handleDelete(item._id)}
-                                                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                                >
-                                                                    Delete
-                                                                </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
+                                    </TableHead>
+                                    <TableHead className="text-white sticky left-[25px] bg-secondary z-10">Date</TableHead>
+                                    <TableHead className="text-white sticky left-[105px] bg-secondary whitespace-nowrap z-10">AUTH ID</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">First Name</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Last Name</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">DOB</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Sex</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Email</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Phone</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">GLP-1 Preference</TableHead>
+                                    <TableHead className="text-white sticky right-0 bg-secondary z-10">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {currentRows.map((item) => (
+                                    <TableRow key={item._id} className={newlySeenIds.includes(item._id) ? 'bg-green-100 hover:bg-green-200' : 'hover:bg-muted/50'}>
+                                        <TableCell className="sticky left-0 bg-background z-10">
+                                            <Checkbox
+                                                checked={selectedItems.includes(item._id)}
+                                                onCheckedChange={() => handleSelectItem(item._id)}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="sticky left-[25px] bg-background z-10 whitespace-nowrap">{new Date(item.createTimeDate).toLocaleDateString()}</TableCell>
+                                        <TableCell className="sticky left-[105px] bg-background z-10 whitespace-nowrap">{item.authid}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.firstName}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.lastName}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.dateOfBirth ? new Date(item.dateOfBirth).toLocaleDateString() : '-'}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.sex}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.email}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.phone}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.glp1Preference}</TableCell>
+                                        <TableCell className="sticky right-0 bg-background z-10">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon">
+                                                        <Menu className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/dashboard/questionnaire/${item.authid}`}>
+                                                            Open
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button variant="destructive" size="sm" className="w-full justify-start">
+                                                                    Delete
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        This action cannot be undone. This will permanently delete the questionnaire.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction
+                                                                        onClick={() => handleDelete(item._id)}
+                                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                                    >
+                                                                        Delete
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </>
                 )}
             </div>
 

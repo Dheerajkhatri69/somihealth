@@ -1,5 +1,5 @@
 'use client'
-import { useMemo } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { History, Home, Inbox, Plus, Trash, UserRoundPlus, FilePlus2 , AudioWaveform, FilePlus} from "lucide-react"
 import { useSession } from "next-auth/react"
 import { usePathname } from "next/navigation"
@@ -70,6 +70,46 @@ const sidebarItems = [
 export function AppSidebar() {
   const { data: session, status } = useSession()
   const pathname = usePathname()
+  const [unseenCount, setUnseenCount] = useState(0);
+  const [unseenQuestionnaireCount, setUnseenQuestionnaireCount] = useState(0);
+
+  useEffect(() => {
+    if (session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') {
+      const fetchUnseenCount = async () => {
+        try {
+          const response = await fetch('/api/refills/unseen');
+          const data = await response.json();
+          if (data.success) {
+            setUnseenCount(data.count);
+          }
+        } catch (error) {
+          console.error("Failed to fetch unseen refills count", error);
+        }
+      };
+      fetchUnseenCount();
+      const interval = setInterval(fetchUnseenCount, 30000); // Poll every 30 seconds
+      return () => clearInterval(interval);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') {
+      const fetchUnseenQuestionnaireCount = async () => {
+        try {
+          const response = await fetch('/api/questionnaire/unseen');
+          const data = await response.json();
+          if (data.success) {
+            setUnseenQuestionnaireCount(data.count);
+          }
+        } catch (error) {
+          console.error("Failed to fetch unseen questionnaire count", error);
+        }
+      };
+      fetchUnseenQuestionnaireCount();
+      const interval = setInterval(fetchUnseenQuestionnaireCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [session]);
 
   const filteredItems = useMemo(() => {
     return sidebarItems.filter(item =>
@@ -135,9 +175,21 @@ export function AppSidebar() {
                       asChild
                       className={isActive ? 'bg-white text-black' : ''}
                     >
-                      <a href={item.url}>
-                        <item.icon size={20} />
-                        <span>{item.title}</span>
+                      <a href={item.url} className="flex items-center justify-between w-full">
+                        <span className="flex items-center gap-2">
+                          <item.icon size={20} />
+                          <span>{item.title}</span>
+                        </span>
+                        {item.title === 'Refills' && unseenCount > 0 && (
+                          <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {unseenCount}
+                          </span>
+                        )}
+                        {item.title === 'New Patients' && unseenQuestionnaireCount > 0 && (
+                          <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {unseenQuestionnaireCount}
+                          </span>
+                        )}
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
