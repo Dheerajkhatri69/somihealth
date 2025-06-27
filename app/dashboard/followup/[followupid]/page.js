@@ -14,6 +14,16 @@ import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
 import { upload } from "@imagekit/next";
 import Image from "next/image";
 import UploadFile from "@/components/FileUpload";
+
+function toDateInputValue(dateString) {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    // Offset for timezone so the date is correct in local time
+    const offset = d.getTimezoneOffset();
+    d.setMinutes(d.getMinutes() - offset);
+    return d.toISOString().slice(0, 10);
+}
+
 export default function UpdateFollowUp({ params }) {
     const { data: session } = useSession();
 
@@ -134,7 +144,7 @@ export default function UpdateFollowUp({ params }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
     const router = useRouter();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState("");
     const [messageHead, setMessageHead] = useState("");
     const [message, setMessage] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
@@ -302,7 +312,7 @@ export default function UpdateFollowUp({ params }) {
                             type="date"
                             id="dob"
                             name="dob"
-                            value={formData.dob}
+                            value={toDateInputValue(formData.dob)}
                             onChange={handleInputChange}
                         />
                     </div>
@@ -835,7 +845,7 @@ export default function UpdateFollowUp({ params }) {
                         <div className="px-6 pt-6 pb-2">
                             <h2 className="text-lg font-semibold">Dosing Calculator</h2>
                             <p className="text-sm text-muted-foreground">
-                                You’re working on a temporary copy. Changes will not affect the original.
+                                You&apos;re working on a temporary copy. Changes will not affect the original.
                             </p>
                         </div>
                     </div>

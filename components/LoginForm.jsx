@@ -59,6 +59,12 @@ export default function LoginForm() {
         setMessage(errorMessage);
         setIsDialogOpen(true);
       } else {
+        // Fetch session to get user type
+        const sessionRes = await fetch('/api/auth/session');
+        const sessionData = await sessionRes.json();
+        if (sessionData?.user?.accounttype) {
+          localStorage.setItem('usertype', sessionData.user.accounttype);
+        }
         router.push("/dashboard");
       }
     } catch (error) {

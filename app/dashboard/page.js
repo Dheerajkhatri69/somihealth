@@ -427,9 +427,10 @@ export default function Dashboard() {
                         type="date"
                         value={createDateFilter}
                         onChange={(e) => setCreateDateFilter(e.target.value)}
-                        className="w-full border rounded bg-secondary text-white border-none  h-9"
+                        className="w-full border rounded-xl bg-secondary text-white border-none white-calendar h-9 p-2"
                     />
-                    <Button className="bg-secondary hover:bg-secondary-foreground h-full"
+                    <Button
+                        className="bg-secondary hover:bg-secondary-foreground h-full rounded-r-full rounded-l-full"
                         type="button"
                         onClick={() => setCreateDateFilter("")}
                     >

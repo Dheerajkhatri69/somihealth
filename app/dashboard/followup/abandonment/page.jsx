@@ -107,7 +107,7 @@ const DashboardStats = () => {
                           <Card
                               key={state}
                               onClick={() => setSelectedState(state)}
-                              className={`cursor-pointer shadow hover:shadow-md ${
+                              className={`cursor-pointer shadow hover:shadow-md ${state===0 ? "bg-yellow-200":""} ${state===1 ? "bg-red-200":""} ${state===2 ? "bg-green-200":""} ${
                                   selectedState === state ? "border-l-8 border-secondary" : ""
                               }`}
                           >

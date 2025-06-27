@@ -1,7 +1,6 @@
 'use client'
 import { useMemo, useState, useEffect } from "react"
-import { History, Home, Inbox, Plus, Trash, UserRoundPlus, FilePlus2 , AudioWaveform, FilePlus} from "lucide-react"
-import { useSession } from "next-auth/react"
+import { History, Home, Inbox, Plus, Trash, UserRoundPlus, FilePlus2, AudioWaveform, FilePlus, Settings2 } from "lucide-react"
 import { usePathname } from "next/navigation"
 import {
   Sidebar,
@@ -54,6 +53,12 @@ const sidebarItems = [
     allowedRoles: ['A', 'T']
   },
   {
+    title: "Referrals",
+    url: "/dashboard/referrals",
+    icon: Settings2,
+    allowedRoles: ['A']
+  },
+  {
     title: "Email History",
     url: "/dashboard/emailhistorytable",
     icon: History,
@@ -68,13 +73,23 @@ const sidebarItems = [
 ]
 
 export function AppSidebar() {
-  const { data: session, status } = useSession()
   const pathname = usePathname()
   const [unseenCount, setUnseenCount] = useState(0);
   const [unseenQuestionnaireCount, setUnseenQuestionnaireCount] = useState(0);
+  const [unseenReferralsCount, setUnseenReferralsCount] = useState(0);
+  const [userType, setUserType] = useState(null);
 
   useEffect(() => {
-    if (session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') {
+    // Get usertype from localStorage if available
+    const storedType = typeof window !== 'undefined' ? localStorage.getItem('usertype') : null;
+    if (storedType) setUserType(storedType);
+  }, []);
+
+  // Use userType from localStorage only
+  const effectiveUserType = userType;
+
+  useEffect(() => {
+    if (effectiveUserType === 'A' || effectiveUserType === 'T') {
       const fetchUnseenCount = async () => {
         try {
           const response = await fetch('/api/refills/unseen');
@@ -90,10 +105,10 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenCount, 30000); // Poll every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [session]);
+  }, [effectiveUserType]);
 
   useEffect(() => {
-    if (session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') {
+    if (effectiveUserType === 'A' || effectiveUserType === 'T') {
       const fetchUnseenQuestionnaireCount = async () => {
         try {
           const response = await fetch('/api/questionnaire/unseen');
@@ -109,14 +124,33 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenQuestionnaireCount, 30000);
       return () => clearInterval(interval);
     }
-  }, [session]);
+  }, [effectiveUserType]);
+
+  useEffect(() => {
+    if (effectiveUserType === 'A' || effectiveUserType === 'T') {
+      const fetchUnseenReferralsCount = async () => {
+        try {
+          const response = await fetch('/api/referrals/unseen');
+          const data = await response.json();
+          if (data.success) {
+            setUnseenReferralsCount(data.count);
+          }
+        } catch (error) {
+          console.error("Failed to fetch unseen referrals count", error);
+        }
+      };
+      fetchUnseenReferralsCount();
+      const interval = setInterval(fetchUnseenReferralsCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [effectiveUserType]);
 
   const filteredItems = useMemo(() => {
     return sidebarItems.filter(item =>
-      item.allowedRoles.includes(session?.user?.accounttype || '')
+      item.allowedRoles.includes(effectiveUserType || '')
     )
-  }, [session?.user?.accounttype])
-  if (status === 'loading') {
+  }, [effectiveUserType])
+  if (effectiveUserType === null) {
     return (
       <Sidebar>
         <SidebarContent className="bg-secondary text-white">
@@ -148,10 +182,6 @@ export function AppSidebar() {
       </Sidebar>
     )
   }
-
-  // const filteredItems = sidebarItems.filter(item =>
-  //   item.allowedRoles.includes(session?.user?.accounttype || '')
-  // )
 
   return (
     <Sidebar>
@@ -190,6 +220,11 @@ export function AppSidebar() {
                             {unseenQuestionnaireCount}
                           </span>
                         )}
+                        {item.title === 'Referrals' && unseenReferralsCount > 0 && (
+                          <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {unseenReferralsCount}
+                          </span>
+                        )}
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -200,7 +235,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {session?.user?.accounttype === 'A' && (
+      {effectiveUserType === 'A' && (
         <SidebarFooter className="bg-secondary">
           <SidebarMenuButton
             asChild

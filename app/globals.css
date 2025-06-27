@@ -161,3 +161,7 @@ html, body {
   scrollbar-width: none;     /* Firefox */
 }
 
+/* In your global CSS */
+input[type="date"].white-calendar::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
