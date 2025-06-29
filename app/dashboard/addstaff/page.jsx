@@ -34,6 +34,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Delete } from "lucide-react";
 import toast from "react-hot-toast";
 import EditUserDialog from "@/components/updateStaff";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
     staffType: z.enum(["T", "C"], {
@@ -50,14 +51,17 @@ const formSchema = z.object({
 export default function StaffForm() {
     const [staff, setStaff] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [loading, setLoading] = useState(true);
     // Add pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5;
+
     useEffect(() => {
         fetchStaff();
     }, []);
 
     async function fetchStaff() {
+        setLoading(true);
         try {
             const response = await fetch("/api/users");
             const result = await response.json();
@@ -86,6 +90,8 @@ export default function StaffForm() {
         } catch (error) {
             console.error("Failed to fetch staff:", error);
             toast.error("Failed to load staff data");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -240,6 +246,154 @@ export default function StaffForm() {
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentRows = staff.slice(indexOfFirstRow, indexOfLastRow);
+
+    if (loading) {
+        return (
+            <div className="p-4 space-y-8">
+                <Card className="p-6 w-full mx-auto">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-wrap gap-4 items-end">
+                            <div className="flex gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="staffType"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Staff Type</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select type" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="T">Technician</SelectItem>
+                                                    <SelectItem value="C">Clinician</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="staffNumber"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Staff Number</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="00001"
+                                                    maxLength={5}
+                                                    pattern="[0-9]*"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <FormField
+                                control={form.control}
+                                name="fullName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Full Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter full name" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter email" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="Enter password"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="flex gap-2">
+                                {!editingId ? (
+                                    <Button type="submit">
+                                        Add Staff
+                                    </Button>
+                                ) : (
+                                    <>
+                                        <Button type="submit">
+                                            Update Staff
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => {
+                                                setEditingId(null);
+                                                form.reset();
+                                            }}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </form>
+                    </Form>
+                </Card>
+                <div className="rounded-md border bg-background/50">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                {[...Array(10)].map((_, i) => (
+                                    <TableHead key={i}>
+                                        <Skeleton className="h-8 w-full" />
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {[...Array(5)].map((_, i) => (
+                                <TableRow key={i}>
+                                    {[...Array(10)].map((_, j) => (
+                                        <TableCell key={j}>
+                                            <Skeleton className="h-6 w-full" />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="p-4 space-y-8">
             <Card className="p-6 w-full mx-auto">
@@ -412,7 +566,7 @@ export default function StaffForm() {
                         ))}
                     </TableBody>
                 </Table>
-                <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="flex items-center justify-end space-x-2 py-4 px-2">
                     <div className="flex-1 text-sm text-muted-foreground">
                         Showing {indexOfFirstRow + 1}-{Math.min(indexOfLastRow, staff.length)} of{" "}
                         {staff.length} patients

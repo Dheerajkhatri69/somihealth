@@ -63,11 +63,25 @@ export default function FollowUp() {
     const [Tloading, setTLoading] = useState(true);
     const router = useRouter();
     const { data: session } = useSession();
+    
+    // Add localStorage states for faster loading
+    const [userType, setUserType] = useState(null);
+    const [userId, setUserId] = useState(null);
+    
     const [viewMode, setViewMode] = useState('assigned'); // 'all' or 'assigned'
 
     const [openDialog, setOpenDialog] = useState(false)
     const [selectedPatientId, setSelectedPatientId] = useState(null)
 
+    // Load user data from localStorage on component mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedUserType = localStorage.getItem('usertype');
+            const storedUserId = localStorage.getItem('userid');
+            if (storedUserType) setUserType(storedUserType);
+            if (storedUserId) setUserId(storedUserId);
+        }
+    }, []);
 
     // Add pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -89,14 +103,14 @@ export default function FollowUp() {
                 let activePatients = patientsData.result.filter(patient => patient.closetickets === false);
 
                 // If user is a clinician, filter based on view mode
-                if (session?.user?.accounttype === 'C') {
+                if (userType === 'C') {
                     if (viewMode === 'assigned') {
                         const assigningRes = await fetch("/api/followupassig");
                         const assigningData = await assigningRes.json();
 
                         if (assigningData.success) {
                             const clinicianAssignments = assigningData.result.filter(
-                                assignment => assignment.cid === session.user.id
+                                assignment => assignment.cid === userId
                             );
                             const assignedPids = clinicianAssignments.map(item => item.pid);
                             activePatients = activePatients.filter(patient =>
@@ -109,14 +123,14 @@ export default function FollowUp() {
                     setCLoading(false);
                 }
                 // If user is a technician, filter only patients they created
-                else if (session?.user?.accounttype === 'T') {
+                else if (userType === 'T') {
                     const creatorRes = await fetch("/api/followupcreatorofp");
                     const creatorData = await creatorRes.json();
 
                     if (creatorData.success) {
                         // Filter creator records for this technician
                         const technicianCreations = creatorData.result.filter(
-                            record => record.tid === session.user.id
+                            record => record.tid === userId
                         );
                         // Get list of patient IDs created by this technician
                         const createdPids = technicianCreations.map(item => item.pid);
@@ -139,12 +153,15 @@ export default function FollowUp() {
             }
         };
 
-        fetchPatients();
-    }, [session, viewMode]); // Add session to dependency array
+        // Only fetch if we have userType
+        if (userType) {
+            fetchPatients();
+        }
+    }, [userType, userId, viewMode]); // Updated dependency array
 
     useEffect(() => {
-        // console.log("dashboard Session user:", session?.user?.accounttype);
-    }, [session]);
+        // console.log("dashboard localStorage user:", userType);
+    }, [userType]);
 
     const [selectedEmail, setSelectedEmail] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -294,7 +311,7 @@ export default function FollowUp() {
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentRows = filteredPatients.slice(indexOfFirstRow, indexOfLastRow);
-    if (session?.user?.accounttype === 'C' && Cloading) {
+    if (userType === 'C' && Cloading) {
         return (
             <div className="overflow-x-auto p-4 space-y-4">
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -328,7 +345,7 @@ export default function FollowUp() {
                 </div>
             </div>
         )
-    } else if (session?.user?.accounttype === 'T' && Tloading) {
+    } else if (userType === 'T' && Tloading) {
         return (
             <div className="overflow-x-auto p-4 space-y-4">
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -366,7 +383,7 @@ export default function FollowUp() {
     return (
         <div className="overflow-x-auto p-4">
             <div className="flex flex-wrap gap-2 mb-4">
-                {session?.user?.accounttype === 'C' && (
+                {userType === 'C' && (
                     <Select value={viewMode} onValueChange={setViewMode}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="View Mode" />
@@ -554,12 +571,12 @@ export default function FollowUp() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                {(userType === 'A' || userType === 'T') && (
                     <FollowupClinicianDropdown selectedPatients={selectedPatients} />
                 )}
             </div>
 
-            {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+            {(userType === 'A' || userType === 'C') && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
                     <div
                         className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
@@ -713,13 +730,13 @@ export default function FollowUp() {
 
                                 <TableHead className="whitespace-nowrap">Follow-Up/Refills</TableHead>
 
-                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                {(userType === 'A' || userType === 'C') && (
                                     <>
                                         <TableHead className="sticky right-[155px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
                                         <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
                                     </>
                                 )}
-                                {session?.user?.accounttype === 'T' && (
+                                {userType === 'T' && (
                                     <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
                                 )}
                                 {/* Add these new headers after existing ones */}
@@ -818,7 +835,7 @@ export default function FollowUp() {
                                     </TableCell>
                                     <TableCell>{patient.followUpRefills ? "Yes" : "No"}</TableCell>
 
-                                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                    {(userType === 'A' || userType === 'C') && (
                                         <>
                                             <TableCell className="sticky right-[155px] z-10 w-[80px] bg-white">
                                                 <Badge
@@ -859,7 +876,7 @@ export default function FollowUp() {
                                             </TableCell>
                                         </>
                                     )}
-                                    {session?.user?.accounttype === 'T' && (
+                                    {userType === 'T' && (
                                         <FollowupClinicianStatusBadge patient={patient} />
                                     )}
                                     {/* <TableCell>{patient.glp1ApprovalLast6Months}</TableCell>
@@ -883,18 +900,18 @@ export default function FollowUp() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-52">
 
-                                                {session?.user?.accounttype === 'T' && (
+                                                {userType === 'T' && (
                                                     <FollowupClinicianAction patient={patient} />
                                                 )}
 
-                                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                                {(userType === 'A' || userType === 'C') && (
                                                     <DropdownMenuItem
                                                         asChild
                                                         disabled={
-                                                            session?.user?.accounttype === 'C' &&
+                                                            userType === 'C' &&
                                                             ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
                                                         }
-                                                        className={`rounded-md ${session?.user?.accounttype === 'C' &&
+                                                        className={`rounded-md ${userType === 'C' &&
                                                             ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
                                                             ? "bg-muted text-muted-foreground cursor-not-allowed"
                                                             : "bg-secondary text-white"
@@ -903,7 +920,7 @@ export default function FollowUp() {
                                                         <Link href={`/dashboard/followup/${patient.authid}`}>Open</Link>
                                                     </DropdownMenuItem>
                                                 )}
-                                                {session?.user?.accounttype === 'A' && (
+                                                {userType === 'A' && (
                                                     <DropdownMenuItem
                                                         onClick={() => {
                                                             setSelectedPatientId(patient.authid)
@@ -979,12 +996,12 @@ export default function FollowUp() {
             </div>
             {/* Add Patient Button */}
             <div className="fixed bottom-4 right-4 flex justify-start items-center gap-4 z-50">
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                {(userType === 'A' || userType === 'T') && (
                     <Link href="/dashboard/addfollowup">
                         <Button className="bg-secondary hover:bg-secondary"><Plus /> Follow Up</Button>
                     </Link>
                 )}
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                {(userType === 'A' || userType === 'C') && (
                     <EmailDialog
                         selectedPatients={selectedPatients}
                         selectedEmail={selectedEmail}

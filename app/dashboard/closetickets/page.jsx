@@ -26,6 +26,8 @@ import {
 import toast from 'react-hot-toast';
 import Link from "next/link";
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+
 const Page = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatients, setSelectedPatients] = useState([]);
@@ -34,13 +36,16 @@ const Page = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const [restoreMessage, setRestoreMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
+  
   // Fetch patients from the API
   useEffect(() => {
     const fetchPatients = async () => {
+      setLoading(true);
       try {
         const res = await fetch('/api/patients');
         const data = await res.json();
@@ -49,6 +54,8 @@ const Page = () => {
         }
       } catch (error) {
         console.error("Failed to fetch patients:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -191,10 +198,101 @@ const Page = () => {
       console.error("Error deleting multiple patients:", error);
     }
   };
+  
   const totalPages = Math.ceil(sortedPatients.length / rowsPerPage);
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = sortedPatients.slice(indexOfFirstRow, indexOfLastRow);
+
+  if (loading) {
+    return (
+      <div className="rounded-md border bg-background/50 p-4">
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-center mb-4">
+          <Skeleton className="h-6 w-32" />
+          <div className="relative w-64">
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+
+        {/* Action Buttons Skeleton */}
+        <div className="flex justify-start gap-2 items-center mb-4">
+          <Skeleton className="h-9 w-32" />
+          <Skeleton className="h-9 w-32" />
+        </div>
+
+        {/* Table Skeleton */}
+        <Table className="min-w-full">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="bg-secondary text-white">
+                <Skeleton className="h-4 w-4 bg-white/20" />
+              </TableHead>
+              <TableHead className="bg-secondary text-white">
+                <Skeleton className="h-4 w-20 bg-white/20" />
+              </TableHead>
+              <TableHead className="bg-secondary text-white">
+                <Skeleton className="h-4 w-16 bg-white/20" />
+              </TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-16" />
+              </TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-32" />
+              </TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-16" />
+              </TableHead>
+              <TableHead className="bg-secondary text-white">
+                <Skeleton className="h-4 w-20 bg-white/20" />
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...Array(5)].map((_, rowIndex) => (
+              <TableRow key={rowIndex}>
+                <TableCell className="bg-white">
+                  <Skeleton className="h-4 w-4" />
+                </TableCell>
+                <TableCell className="bg-white">
+                  <Skeleton className="h-4 w-20" />
+                </TableCell>
+                <TableCell className="bg-white">
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-32" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-40" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-6 w-16 rounded-md" />
+                </TableCell>
+                <TableCell className="bg-white">
+                  <div className="flex flex-wrap gap-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {/* Pagination Skeleton */}
+        <div className="flex items-center justify-between space-x-2 py-4">
+          <Skeleton className="h-4 w-48" />
+          <div className="space-x-2 flex gap-2">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-16" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-md border bg-background/50 p-4">
       <div className="flex justify-between items-center mb-4">

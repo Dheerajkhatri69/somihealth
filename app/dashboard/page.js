@@ -61,9 +61,23 @@ export default function Dashboard() {
     const [Tloading, setTLoading] = useState(true);
     const [ticketFilter, setTicketFilter] = useState('assigned'); // 'all' or 'assigned'
     const { data: session } = useSession();
+    
+    // Add localStorage states for faster loading
+    const [userType, setUserType] = useState(null);
+    const [userId, setUserId] = useState(null);
+    
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 100;
 
+    // Load user data from localStorage on component mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedUserType = localStorage.getItem('usertype');
+            const storedUserId = localStorage.getItem('userid');
+            if (storedUserType) setUserType(storedUserType);
+            if (storedUserId) setUserId(storedUserId);
+        }
+    }, []);
 
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedPatientId, setSelectedPatientId] = useState(null);
@@ -89,13 +103,13 @@ export default function Dashboard() {
 
                 // If user is a clinician, filter only their assigned patients
                 // For clinicians, apply additional filtering based on ticketFilter state
-                if (session?.user?.accounttype === 'C') {
+                if (userType === 'C') {
                     const assigningRes = await fetch("/api/assigning");
                     const assigningData = await assigningRes.json();
 
                     if (assigningData.success) {
                         const clinicianAssignments = assigningData.result.filter(
-                            assignment => assignment.cid === session.user.id
+                            assignment => assignment.cid === userId
                         );
                         const assignedPids = clinicianAssignments.map(item => item.pid);
 
@@ -110,14 +124,14 @@ export default function Dashboard() {
                     }
                 }
                 // If user is a technician, filter only patients they created
-                else if (session?.user?.accounttype === 'T') {
+                else if (userType === 'T') {
                     const creatorRes = await fetch("/api/creatorofp");
                     const creatorData = await creatorRes.json();
 
                     if (creatorData.success) {
                         // Filter creator records for this technician
                         const technicianCreations = creatorData.result.filter(
-                            record => record.tid === session.user.id
+                            record => record.tid === userId
                         );
                         // Get list of patient IDs created by this technician
                         const createdPids = technicianCreations.map(item => item.pid);
@@ -139,12 +153,15 @@ export default function Dashboard() {
             }
         };
 
-        fetchPatients();
-    }, [session, ticketFilter]); // Add session to dependency array
+        // Only fetch if we have userType
+        if (userType) {
+            fetchPatients();
+        }
+    }, [userType, userId, ticketFilter]); // Updated dependency array
 
     useEffect(() => {
-        console.log("dashboard Session user:", session?.user?.accounttype);
-    }, [session]);
+        console.log("dashboard localStorage user:", userType);
+    }, [userType]);
 
     const [selectedEmail, setSelectedEmail] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -314,7 +331,7 @@ export default function Dashboard() {
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentRows = filteredPatients.slice(indexOfFirstRow, indexOfLastRow);
-    if (session?.user?.accounttype === 'C' && Cloading) {
+    if (userType === 'C' && Cloading) {
         return (
             <div className="overflow-x-auto p-4 space-y-4">
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -348,7 +365,7 @@ export default function Dashboard() {
                 </div>
             </div>
         );
-    } else if (session?.user?.accounttype === 'T' && Tloading) {
+    } else if (userType === 'T' && Tloading) {
         return (
             <div className="overflow-x-auto p-4 space-y-4">
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -386,7 +403,7 @@ export default function Dashboard() {
     return (
         <div className="overflow-x-auto p-4">
             <div className="flex flex-wrap gap-2 mb-4">
-                {session?.user?.accounttype === 'C' && (
+                {userType === 'C' && (
                     <Select value={ticketFilter} onValueChange={setTicketFilter}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Filter Tickets" />
@@ -585,12 +602,12 @@ export default function Dashboard() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                {(userType === 'A' || userType === 'T') && (
                     <ClinicianDropdown selectedPatients={selectedPatients} />
                 )}
             </div>
 
-            {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+            {(userType === 'A' || userType === 'C') && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
                     <div
                         className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
@@ -770,14 +787,14 @@ export default function Dashboard() {
                                 {/* Provider Info */}
                                 {/* <TableHead>Provider Comments</TableHead> */}
 
-                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                {(userType === 'A' || userType === 'C') && (
                                     <>
                                         <TableHead className="sticky right-[155px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
                                         <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Outcome</TableHead>
                                     </>
                                 )}
                                 {/* <TableHead>Provider Note</TableHead> */}
-                                {session?.user?.accounttype === 'T' && (
+                                {userType === 'T' && (
                                     <TableHead className="sticky right-[66px] z-10 w-[80px] bg-secondary text-white whitespace-nowrap">Status</TableHead>
                                 )}
                                 <TableHead className="sticky right-0 bg-secondary text-white">Actions</TableHead>
@@ -887,7 +904,7 @@ export default function Dashboard() {
 
                                     <TableCell>{patient.providerComments}</TableCell> */}
 
-                                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                    {(userType === 'A' || userType === 'C') && (
                                         <>
                                             <TableCell className="sticky right-[155px] z-10 w-[80px] bg-white">
                                                 <Badge
@@ -928,7 +945,7 @@ export default function Dashboard() {
                                             </TableCell>
                                         </>
                                     )}
-                                    {session?.user?.accounttype === 'T' && (
+                                    {userType === 'T' && (
                                         <ClinicianStatusBadge patient={patient} />
                                     )}
 
@@ -943,17 +960,17 @@ export default function Dashboard() {
                                             </DropdownMenuTrigger>
 
                                             <DropdownMenuContent align="end" className="w-52">
-                                                {session?.user?.accounttype === 'T' && (
+                                                {userType === 'T' && (
                                                     <ClinicianAction patient={patient} />
                                                 )}
-                                                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                                                {(userType === 'A' || userType === 'C') && (
                                                     <DropdownMenuItem
                                                         asChild
                                                         disabled={
-                                                            session?.user?.accounttype === 'C' &&
+                                                            userType === 'C' &&
                                                             ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
                                                         }
-                                                        className={`rounded-md ${session?.user?.accounttype === 'C' &&
+                                                        className={`rounded-md ${userType === 'C' &&
                                                             ["approved", "denied", "closed", "disqualified"].includes(patient.approvalStatus)
                                                             ? "bg-muted text-muted-foreground cursor-not-allowed"
                                                             : "bg-secondary text-white"
@@ -963,7 +980,7 @@ export default function Dashboard() {
                                                     </DropdownMenuItem>
                                                 )}
 
-                                                {session?.user?.accounttype === 'A' && (
+                                                {userType === 'A' && (
                                                     <DropdownMenuItem
                                                         className="text-destructive"
                                                         onClick={() => {
@@ -1050,12 +1067,12 @@ export default function Dashboard() {
 
             {/* Add Patient Button */}
             <div className="fixed bottom-4 right-4 flex justify-start items-center gap-4 z-50">
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'T') && (
+                {(userType === 'A' || userType === 'T') && (
                     <Link href="/dashboard/addrecord">
                         <Button className="bg-secondary hover:bg-secondary"><Plus /> Add Patient</Button>
                     </Link>
                 )}
-                {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
+                {(userType === 'A' || userType === 'C') && (
                     <EmailDialog
                         selectedPatients={selectedPatients}
                         selectedEmail={selectedEmail}

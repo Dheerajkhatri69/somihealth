@@ -19,6 +19,7 @@ import {
   AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EmailHistoryTable() {
   const [emailHistory, setEmailHistory] = useState([]);
@@ -28,7 +29,7 @@ export default function EmailHistoryTable() {
   const [nameSearch, setNameSearch] = useState("");
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+  const [loading, setLoading] = useState(true);
 
   // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,6 +38,7 @@ export default function EmailHistoryTable() {
   // Fetch API data
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const res = await fetch("/api/emailhis");
         const json = await res.json();
@@ -46,6 +48,8 @@ export default function EmailHistoryTable() {
         }
       } catch (err) {
         console.error("Error fetching email history:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -77,11 +81,62 @@ export default function EmailHistoryTable() {
     setIsDialogOpen(true);
   };
 
-
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+
+  if (loading) {
+    return (
+      <div className="p-4 space-y-4">
+        {/* Header Skeleton */}
+        <Skeleton className="h-8 w-48" />
+
+        {/* Search Filters Skeleton */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <Skeleton className="h-10 w-full md:w-1/4" />
+          <Skeleton className="h-10 w-full md:w-1/4" />
+          <Skeleton className="h-10 w-full md:w-1/4" />
+        </div>
+
+        {/* Table Skeleton */}
+        <div className="border rounded-lg overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-secondary text-white">
+              <TableRow>
+                {[...Array(7)].map((_, i) => (
+                  <TableHead key={i} className="text-white">
+                    <Skeleton className="h-4 w-16 bg-white/20" />
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(5)].map((_, rowIndex) => (
+                <TableRow key={rowIndex}>
+                  {[...Array(7)].map((_, colIndex) => (
+                    <TableCell key={colIndex}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination Skeleton */}
+        <div className="flex items-center justify-between space-x-2 py-4">
+          <Skeleton className="h-4 w-48" />
+          <div className="space-x-2 flex gap-2">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-16" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 space-y-4">
       <h2 className="text-xl font-bold">Email History</h2>

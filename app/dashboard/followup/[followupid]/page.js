@@ -14,6 +14,7 @@ import { Eye, Fullscreen, X, XCircleIcon } from "lucide-react";
 import { upload } from "@imagekit/next";
 import Image from "next/image";
 import UploadFile from "@/components/FileUpload";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function toDateInputValue(dateString) {
     if (!dateString) return '';
@@ -238,7 +239,115 @@ export default function UpdateFollowUp({ params }) {
         }
     };
     if (!formData.authid) {
-        return <div className="p-4 text-yellow-500">loading..</div>;
+        return (
+            <div className="mb-4 p-4">
+                <div className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
+                    {/* Header Skeleton */}
+                    <div className="flex justify-between items-center mb-6">
+                        <Skeleton className="h-8 w-64" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-16" />
+                            <Skeleton className="h-10 w-32" />
+                        </div>
+                    </div>
+
+                    {/* Name Fields Skeleton */}
+                    <div className="flex space-x-4 mb-6">
+                        <div className="space-y-2 flex-1">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2 flex-1">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+
+                    {/* Basic Information Section Skeleton */}
+                    <Skeleton className="h-5 w-32 mb-4" />
+                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                        {[...Array(9)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-16" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Address Section Skeleton */}
+                    <Skeleton className="h-5 w-16 mt-6 mb-4" />
+                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-20" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Vitals Section Skeleton */}
+                    <Skeleton className="h-5 w-12 mt-6 mb-4" />
+                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Medical Information Section Skeleton */}
+                    <Skeleton className="h-5 w-40 mt-6 mb-4" />
+                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-28" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Weight Management Section Skeleton */}
+                    <Skeleton className="h-5 w-36 mt-6 mb-4" />
+                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* GLP-1 Section Skeleton */}
+                    <Skeleton className="h-5 w-24 mt-6 mb-4" />
+                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-36" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Provider Section Skeleton */}
+                    <Skeleton className="h-5 w-32 mt-6 mb-4" />
+                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-28" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Submit Button Skeleton */}
+                    <div className="flex justify-end space-x-4 mt-6">
+                        <Skeleton className="h-10 w-24" />
+                        <Skeleton className="h-10 w-24" />
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
