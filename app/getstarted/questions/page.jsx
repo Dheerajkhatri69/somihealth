@@ -1351,7 +1351,7 @@ export default function PatientRegistrationForm() {
               <h2 className="text-xl font-semibold">Diagnoses</h2>
               <div className="space-y-2">
                 <Label>
-                  Have you ever received any of these diagnoses? <span className="text-red-500">*</span>
+                  Have you ever been diagnosed with any of the following? <span className="text-red-500">*</span>
                   <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
                 </Label>
                 <div className="flex flex-col gap-3">
