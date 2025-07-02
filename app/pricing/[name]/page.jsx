@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 
 const PRODUCTS = {
@@ -135,6 +135,7 @@ const Page = ({ params }) => {
   const name = params.name?.toLowerCase();
   const product = PRODUCTS[name];
   const [selected, setSelected] = useState(null);
+  const summaryRef = useRef(null);
 
   if (!product) {
     return (
@@ -152,6 +153,15 @@ const Page = ({ params }) => {
         link: selected.link,
       }
     : INITIAL_SUMMARY;
+
+  const handleOptionClick = (opt) => {
+    setSelected(opt);
+    if (typeof window !== 'undefined' && window.innerWidth < 768 && summaryRef.current) {
+      setTimeout(() => {
+        summaryRef.current.scrollIntoView({ behavior: 'smooth' });
+      }, 100); // slight delay to ensure state update
+    }
+  };
 
   const handleCheckout = () => {
     if (summary.link) {
@@ -177,7 +187,7 @@ const Page = ({ params }) => {
                 className={`flex flex-col md:flex-row md:items-center md:justify-between border rounded-lg px-4 py-2 transition-all duration-200 cursor-pointer
                   ${selected === opt ? 'bg-blue-100 border-secondary shadow' : 'bg-blue-50 border-blue-200 hover:bg-blue-100'}
                 `}
-                onClick={() => setSelected(opt)}
+                onClick={() => handleOptionClick(opt)}
               >
                 <span className="text-secondary font-medium text-sm md:text-base">{opt.label}</span>
                 <span className="text-secondary font-bold text-base mt-1 md:mt-0">{opt.price}</span>
@@ -186,7 +196,10 @@ const Page = ({ params }) => {
           </ul>
         </div>
         {/* Summary Card */}
-        <div className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col justify-between min-w-[280px] max-w-md mx-auto">
+        <div
+          ref={summaryRef}
+          className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col justify-between min-w-[280px] max-w-md mx-auto"
+        >
           <h3 className="text-secondary text-lg font-bold mb-4">Summary</h3>
           <div className="space-y-2 mb-4">
             <div className="flex justify-between text-gray-700 font-medium">
