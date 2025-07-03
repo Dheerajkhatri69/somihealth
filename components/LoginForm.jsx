@@ -64,6 +64,7 @@ export default function LoginForm() {
         const sessionData = await sessionRes.json();
         if (sessionData?.user?.accounttype) {
           localStorage.setItem('usertype', sessionData.user.accounttype);
+          localStorage.setItem('userid', sessionData.user.id);
         }
         router.push("/dashboard");
       }
