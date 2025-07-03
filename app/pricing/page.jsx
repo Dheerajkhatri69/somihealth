@@ -18,13 +18,13 @@ const ProgressBar = ({ progress }) => {
 
 const PRICING_OPTIONS = [
   {
-    name: 'Semaglutide',
-    img: '/pricing/semaglutide.png',
+    name: 'Compounded Semaglutide',
+    img: '/pricing/semaglutide(1).png',
     href: '/pricing/semaglutide',
     alt: 'Semaglutide',
   },
   {
-    name: 'Tirzepatide',
+    name: 'Compounded Tirzepatide',
     img: '/pricing/tirzepatide.png',
     href: '/pricing/tirzepatide',
     alt: 'Tirzepatide',
@@ -70,7 +70,7 @@ const LandingPagePricing = () => {
             <Link
               key={option.name}
               href={option.href}
-              className={`group flex-1 ${option.name === "Semaglutide" ? "border-l-4" : " border-r-4"} bg-blue-50 hover:bg-blue-100 border border-secondary rounded-xl p-4 flex flex-col items-center transition-all duration-200 shadow-sm hover:shadow-lg cursor-pointer`}
+              className={`group flex-1 ${option.name === "Compounded Semaglutide" ? "border-l-4" : " border-r-4"} bg-blue-50 hover:bg-blue-100 border border-secondary rounded-xl p-4 flex flex-col items-center transition-all duration-200 shadow-sm hover:shadow-lg cursor-pointer`}
             >
               <div className="relative w-20 h-20 md:w-40 md:h-40 mb-2">
                 <Image
@@ -81,7 +81,16 @@ const LandingPagePricing = () => {
                   priority
                 />
               </div>
-              <span className="text-secondary font-bold text-base group-hover:underline">{option.name}</span>
+              <span className="text-secondary font-bold text-sm group-hover:underline">{option.name}</span>
+              <div className="relative w-5 h-5 mt-2">
+                <Image
+                  src="/pricing/check.png"
+                  alt="Guaranteed"
+                  fill
+                  className="rounded-xl object-contain"
+                  priority
+                />
+              </div>
             </Link>
           ))}
         </div>
@@ -94,7 +103,7 @@ const LandingPagePricing = () => {
         </div>
 
         <p className="text-gray-700 mb-2 font-medium text-center">
-          We will refund 100% of your money if our providers determine you are not eligible for GLP-1 weight loss therapy.
+          We will refund 100% of your money if our licensed clinician determine you are not eligible for GLP-1 weight loss therapy.
         </p>
         <div className="relative w-20 h-20 mb-2">
           <Image
