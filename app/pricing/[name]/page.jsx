@@ -147,7 +147,7 @@ const Page = ({ params }) => {
     ? {
         product: product.name,
         reviewFee: 25,
-        price: selected.price,
+        price: `$${parseFloat(selected.price.replace('$', '')) + 25}`,
         quantity: 1,
         label: selected.label,
         link: selected.link,
@@ -175,7 +175,7 @@ const Page = ({ params }) => {
       <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-start justify-center">
         {/* Product Card */}
         <div className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col items-center mb-4 md:mb-0">
-          <div className="relative w-24 h-24 md:w-32 md:h-32 mb-4">
+          <div className="relative w-28 h-28 md:w-36 md:h-36 mb-4">
             <Image src={product.image} alt={product.name} fill className="object-contain rounded-xl" priority />
           </div>
           <h2 className="text-secondary text-xl font-bold mb-2">{product.name}</h2>
