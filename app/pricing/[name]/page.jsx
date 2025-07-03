@@ -24,6 +24,21 @@ const PRODUCTS = {
         link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-c43fe85069db4b6c92731eda4f53e683765f4bbde95b47678f3633e20a7bedb20866f78ab88e4785a285e8a0774f38c4?locale=EN_US',
       },
       {
+        label: '4 Weeks (0.5mg/week) -$190',
+        price: '$190',//done
+        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-9f7e44046a9a480aa227b5b3d5e2de6db5a15752dbc54e06879b3cb2093cd334ad325f14145a405fa994245099c97bf3?locale=EN_US',
+      },
+      {
+        label: '8 Weeks (0.5mg/week) -$249',
+        price: '$249',//done
+        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-160ac4a48a4f4b8a9f3a6458eb8061912e13f84beb8c4b32a51b649552d543d302794d6406704ecb83b9cc342057a935?locale=EN_US',
+      },
+      {
+        label: '13 Weeks (0.5mg/week) -$269',
+        price: '$269',//done
+        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-898cb427d8364771b4079eb135735e142e498620af0c4a78ad700697d4ee1ddd65625d3ee24a4ad8b95ad488e4d080f5?locale=EN_US',
+      },
+      {
         label: '4 Weeks (1mg/week) -$249',
         price: '$249',//done
         link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-1c5a3b2e50b24a2a9436c0efb8aba1697b3effa916914f4cbe882b51edcf126b41af32bef8c44b8bb3a3d1c9a3409c1e?locale=EN_US',
@@ -59,7 +74,7 @@ const PRODUCTS = {
         link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-c9d8275ea51b44be8dd540a5dd2b2121f25ff6c8aa3f47d78ec9923b6efa36392356ff65f4c3422ab820c3e97ecd0812?locale=EN_US',
       },
       {
-        label: '12 Weeks (2.5mg/week) -$520',
+        label: '10 Weeks (2.5mg/week) -$520',
         price: '$520',//done
         link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-b577ae44e7954c96b94d8c0fdc3117f32445dc8091204758a059d7ae474229b907ab48b1a2de46d9be80fb6e1a8737e0?locale=EN_US',
       },
@@ -103,6 +118,11 @@ const PRODUCTS = {
         label: '4 Weeks (7.5mg/Week) -$359',
         price: '$359',//done
         link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-6a036e97c1404706ad91d31837575b6afb5cea32acc04cd1b6a924d6381147b6b1453fc10cdb41c8a91b91b37014160c?locale=EN_US',
+      },
+      {
+        label: '8 Weeks (7.5mg/Week) -$549',
+        price: '$549',//done
+        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-d7a60d8fcf5542fda4237aa81dce9465c704005f790448e1bf9e523c1ee3d07e0b628ffbba974e93b4402e4d1a9b808c?locale=EN_US',
       },
       {
         label: '4 Weeks (10mg/week) -$399',

@@ -105,7 +105,7 @@ const LandingPagePricing = () => {
         <p className="text-gray-700 mb-2 font-medium text-center">
           We will refund 100% of your money if our licensed clinician determine you are not eligible for GLP-1 weight loss therapy.
         </p>
-        <div className="relative w-20 h-20 mb-2">
+        <div className="relative w-28 h-28 mb-2">
           <Image
             src="/pricing/guaranteed.png"
             alt="Guaranteed"
