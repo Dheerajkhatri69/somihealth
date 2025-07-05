@@ -60,7 +60,7 @@ const LandingPagePricing = () => {
 
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
-      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-gray-100 p-6 flex flex-col items-center">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-gray-100 px-6 flex flex-col items-center">
         <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">somi</h1>
         <h2 className="text-secondary font-bold text-xl md:text-2xl mt-2 mb-1 text-center">Ready To Start Your Weight Loss Journey?</h2>
         <h3 className="text-secondary text-lg font-semibold mt-2 mb-4 text-center">View Our Pricing</h3>

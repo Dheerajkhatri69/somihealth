@@ -195,7 +195,9 @@ const Page = ({ params }) => {
 
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
-      <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">somi</h1>
+      <Link href="/pricing" >
+        <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">somi</h1>
+      </Link>
       <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-start justify-center">
         {/* Product Card */}
         <div className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col items-center mb-4 md:mb-0">
@@ -214,7 +216,7 @@ const Page = ({ params }) => {
                 onClick={() => handleOptionClick(opt)}
               >
                 <span className="text-secondary font-medium text-sm md:text-base">{opt.label}</span>
-                <span className="text-secondary font-bold text-base mt-1 md:mt-0">-{opt.price}</span>
+                <span className="text-secondary font-bold text-base mt-1 md:mt-0">{opt.price}</span>
               </li>
             ))}
           </ul>
@@ -249,11 +251,11 @@ const Page = ({ params }) => {
             </div>
             <div className="flex justify-between text-gray-700 font-medium">
               <span className='flex gap-2 items-center'>
-                Quick Approval Fee
+                Clinician Review Fee
                 <div className="relative inline-flex group">
                   <Info size={20} className="cursor-pointer" />
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 hidden group-hover:block w-72 p-3 mb-2 text-sm bg-white rounded shadow-lg border border-gray-200">
-                    Our $25 initial review fee is required for our licensed clinicians to review your health intake form for approval in 24 hours, and also to develop personalized plans that fit your wellness and weight loss goals.
+                    Our $25 Clinician review fee is required for our licensed clinicians to review your health intake form for approval in 24 hours, and also to develop personalized plans that fit your wellness and weight loss goals.
                     <svg className="absolute text-white h-2 left-1/2 top-full -translate-x-1/2" x="0px" y="0px" viewBox="0 0 255 255">
                       <polygon className="fill-current" points="0,0 127.5,127.5 255,0" />
                     </svg>
@@ -287,7 +289,7 @@ const Page = ({ params }) => {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+            {[1, 2, 3, 6, 7, 8].map((num) => (
               <img
                 key={num}
                 src={`/pricing/${num}.png`}
@@ -299,7 +301,7 @@ const Page = ({ params }) => {
           </div>
           <button
             className={`w-full mt-4 rounded-3xl py-4 font-bold text-base shadow transition
-              ${summary.link ? 'bg-[#ff0056] text-white hover:bg-[#ff0056] cursor-pointer' : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
+              ${summary.link ? 'bg-[#0031e3] text-white hover:bg-[#0031e3] cursor-pointer' : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
             onClick={handleCheckout}
             disabled={!summary.link}
           >

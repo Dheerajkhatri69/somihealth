@@ -2337,7 +2337,7 @@ export default function PatientRegistrationForm() {
                         className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
                       />
                       <label htmlFor="agree-to-pay-checkbox" className="text-sm font-bold">
-                        I agree to pay the $25 initial review payment. This will be refunded if our provider determines you are NOT eligible for GLP-1 treatment.
+                        I agree to pay the $25 Clinician review payment. This will be refunded if our provider determines you are NOT eligible for GLP-1 treatment.
                       </label>
                     </div>
                     {errors.agreetopay && (

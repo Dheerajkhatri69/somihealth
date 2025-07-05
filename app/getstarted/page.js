@@ -72,7 +72,7 @@ const LandingPage = () => {
                     </p>
 
                     <p className="text-green-600 font-medium mb-6">
-                        $25 Initial Review Payment
+                        $25 Clinician Review Payment
                     </p>
 
                     <Link href="/getstarted/questions">
