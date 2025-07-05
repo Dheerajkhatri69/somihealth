@@ -81,7 +81,7 @@ const LandingPagePricing = () => {
                   priority
                 />
               </div>
-              <span className="text-secondary font-bold text-sm text-center group-hover:underline">{option.name}</span>
+              <span className="text-secondary font-bold text-sm whitespace-normal md:whitespace-nowrap text-center group-hover:underline">{option.name}</span>
               <div className="relative w-5 h-5 mt-2">
                 <Image
                   src="/pricing/check.png"
