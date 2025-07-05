@@ -103,6 +103,7 @@ export async function POST(request) {
             treatment: body.treatment || false,
             agreetopay: body.agreetopay || false,
             questionnaire: true,
+            PlanPurchased: body.PlanPurchased,
             status: body.status || 'draft',
             createTimeDate: new Date().toISOString()
         });

@@ -91,6 +91,7 @@ export default function PatientUpdateForm({ params }) {
         treatment: false,
         agreetopay: false,
         status: '',
+        PlanPurchased: '',
     });
 
     useEffect(() => {
@@ -172,7 +173,8 @@ export default function PatientUpdateForm({ params }) {
                 file1: formData.prescriptionPhoto,
                 file2: formData.idPhoto,
                 providerComments: formData.comments || '',
-                providerNote: ''
+                providerNote: '',
+                tirzepetidePlanPurchased: formData.PlanPurchased,
             };
 
             // Submit to /api/patients
@@ -352,6 +354,15 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* Basic Information */}
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="space-y-2">
+                        <Label htmlFor="PlanPurchased">Plan Purchased</Label>
+                        <Input
+                            id="PlanPurchased"
+                            name="PlanPurchased"
+                            value={formData.PlanPurchased}
+                            onChange={handleInputChange}
+                        />
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
                         <Input

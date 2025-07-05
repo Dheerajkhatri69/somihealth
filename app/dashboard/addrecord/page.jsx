@@ -690,7 +690,7 @@ export default function PatientForm() {
 
                 {/* Medication Selection */}
                 <div className="space-y-2">
-                    <Label htmlFor="medicine">Medication</Label>
+                    <Label htmlFor="medicine">Preferred GLP-1 Medication</Label>
                     <Select
                         value={formData.medicine}
                         onValueChange={(value) => handleSelectChange('medicine', value)}

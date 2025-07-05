@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import UploadFile from "@/components/FileUpload";
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { ArrowDownWideNarrow } from 'lucide-react';
 
 // Form validation schema
 const formSchema = z.object({
@@ -160,7 +161,7 @@ export default function PatientRegistrationForm() {
   const [fileUrls, setFileUrls] = useState({ file1: '', file2: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [GLPPlan, setGLPPlan] = useState(null);
   const {
     register,
     handleSubmit,
@@ -302,12 +303,24 @@ export default function PatientRegistrationForm() {
     }).catch((err) => console.error("Disqualified state update failed:", err));
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-2">
         <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col items-center">
           <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-4">
+          <h2 className="text-xl md:text-2xl font-semibold text-gray-900 text-center mb-4">
             Based on your response to the previous question, you currently do not meet the criteria for GLP-1 medication.
+            <br />
+            <br />
+            If you&apos;ve made a payment or purchased a plan, 100% of your money will be refunded - No questions asked.
           </h2>
+          <div className="relative w-36 h-36 mb-2">
+            <Image
+              src="/pricing/guaranteed.png"
+              alt="Guaranteed"
+              fill
+              className="rounded-xl object-contain"
+              priority
+            />
+          </div>
           <Button
             variant="outline"
             onClick={() => {
@@ -328,35 +341,76 @@ export default function PatientRegistrationForm() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
           <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
-          <div className="space-y-2 p-4">
-            <div className="relative w-full aspect-square max-w-[300px] mx-auto">
-              <Image
-                src="/getstartedend.jpg"
-                alt="Weight Loss"
-                fill
-                className="rounded-xl object-contain"
-                priority
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
-            </div>
-            <h3 className="text-lg md:text-x text-center">
-              {/* Thanks for filling out your GLP-1 weight loss treatment intake form! */}
-              <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Initial Review payment.</span>
-            </h3>
+          {GLPPlan === 'no' && (
+            <>
+              <div className="space-y-2 p-4">
+                <div className="relative w-full aspect-square max-w-[300px] mx-auto">
+                  <Image
+                    src="/getstartedend.jpg"
+                    alt="Weight Loss"
+                    fill
+                    className="rounded-xl object-contain"
+                    priority
+                    sizes="(max-width: 768px) 100vw, 300px"
+                  />
+                </div>
+                <h3 className="text-lg md:text-x text-center">
+                  {/* Thanks for filling out your GLP-1 weight loss treatment intake form! */}
+                  <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Initial Review payment.</span>
+                </h3>
 
-            <p className="text-gray-600 text-center">
-              <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
-            </p>
-            <p className="text-gray-600 text-center">
-              Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patierice.
-            </p>
-          </div>
-          <Button
-            onClick={() => { window.location.href = 'https://connect.intuit.com/pay/SomiHealth/scs-v1-7cb597849501499f9f119195593be1d6be2309e7d7e848b3b451bfa6260191d54dd7f556dff049078713b75ad2bba03c?locale=EN_US'; }}
-            className="bg-green-400 text-white hover:bg-green-500 rounded-2xl font-bold text-lg px-8 w-[120px]"
-          >
-            Pay Here
-          </Button>
+                <p className="text-gray-600 text-center">
+                  <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
+                </p>
+                <p className="text-gray-600 text-center">
+                  Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patierice.
+                </p>
+              </div>
+              <Button
+                onClick={() => {
+                  window.location.href =
+                    'https://connect.intuit.com/pay/SomiHealth/scs-v1-7cb597849501499f9f119195593be1d6be2309e7d7e848b3b451bfa6260191d54dd7f556dff049078713b75ad2bba03c?locale=EN_US';
+                }}
+                className="bg-green-400 text-white hover:bg-green-500 rounded-2xl font-bold text-lg px-8 w-[120px]"
+              >
+                Pay Here
+              </Button>
+            </>
+          )}
+
+          {GLPPlan === 'yes' && (
+            <>
+              <div className="space-y-2 p-4">
+                <div className="relative w-full aspect-square max-w-[300px] mx-auto">
+                  <Image
+                    src="/getstartedend.jpg"
+                    alt="Weight Loss"
+                    fill
+                    className="rounded-xl object-contain"
+                    priority
+                    sizes="(max-width: 768px) 100vw, 300px"
+                  />
+                </div>
+                <h3 className="text-lg md:text-x text-center">
+                  Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patierice.
+                </h3>
+
+                <p className="text-gray-600 text-center">
+                  <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  window.location.href = 'https://joinsomi.com/';
+                }}
+                className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+              >
+                End
+              </Button>
+            </>
+          )}
+
         </div>
       </div>
     );
@@ -523,6 +577,7 @@ export default function PatientRegistrationForm() {
         idPhoto: fileUrls.file2,
         authid: `P${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`,
         questionnaire: true,
+        PlanPurchased: GLPPlan,
       };
 
       // Make API call to save data
@@ -655,60 +710,85 @@ export default function PatientRegistrationForm() {
           {/* Personal Information segment */}
           {currentSegment === 0 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Let&apos;s get to know you!</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">
-                    First name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="firstName"
-                    {...register('firstName')}
-                  />
-                  {errors.firstName && (
-                    <p className="text-sm text-red-500">{errors.firstName.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">
-                    Last name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="lastName"
-                    {...register('lastName')}
-                  />
-                  {errors.lastName && (
-                    <p className="text-sm text-red-500">{errors.lastName.message}</p>
-                  )}
-                </div>
-              </div>
+              <h2 className="text-xl font-semibold">GLP-1 Plan</h2>
               <div className="space-y-2">
-                <Label htmlFor="phone">
-                  Phone number <span className="text-red-500">*</span>
+                <Label>
+                  Have you purchased a Somi GLP-1 plan? <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  {...register('phone')}
-                />
-                {errors.phone && (
-                  <p className="text-sm text-red-500">{errors.phone.message}</p>
-                )}
+                <div className="flex gap-2 justify-center flex-col items-center">
+                  {['yes', 'no'].map((option, index) => (
+                    <label
+                      key={index}
+                      htmlFor={`glp-${index}`}
+                      className={`flex items-center w-[100px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${GLPPlan === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    >
+                      <input
+                        type="radio"
+                        id={`glp-${index}`}
+                        name="glp-plan"
+                        value={option}
+                        className="hidden"
+                        onChange={() => setGLPPlan(option)}
+                        checked={GLPPlan === option}
+                      />
+                      <span>{option === 'yes' ? 'Yes' : 'No'}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">
-                  Email <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
-              </div>
+
+              {/* Show the heading always */}
+              <h2 className="text-xl font-semibold flex gap-2 items-center">
+                <ArrowDownWideNarrow />Let&apos;s get to know you!
+              </h2>
+
+              {/* Show inputs only after GLPPlan is selected */}
+              {GLPPlan && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">
+                        First name <span className="text-red-500">*</span>
+                      </Label>
+                      <Input id="firstName" {...register('firstName')} />
+                      {errors.firstName && (
+                        <p className="text-sm text-red-500">{errors.firstName.message}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">
+                        Last name <span className="text-red-500">*</span>
+                      </Label>
+                      <Input id="lastName" {...register('lastName')} />
+                      {errors.lastName && (
+                        <p className="text-sm text-red-500">{errors.lastName.message}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">
+                      Phone number <span className="text-red-500">*</span>
+                    </Label>
+                    <Input id="phone" type="tel" {...register('phone')} />
+                    {errors.phone && (
+                      <p className="text-sm text-red-500">{errors.phone.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">
+                      Email <span className="text-red-500">*</span>
+                    </Label>
+                    <Input id="email" type="email" {...register('email')} />
+                    {errors.email && (
+                      <p className="text-sm text-red-500">{errors.email.message}</p>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
+
           )}
 
           {/* Age verification segment */}
@@ -1275,7 +1355,7 @@ export default function PatientRegistrationForm() {
                     'Bariatric surgery less than 6 months ago',
                     'Multiple endocrine neoplasia syndrome type 2 (MEN-2)',
                     'History of medullary thyroid cancer',
-                    'Cancer',
+                    'Cancer (less then 5 years)',
                     'Liver Failure',
                     'Organ Transplant',
                     'None of the above'
@@ -2357,6 +2437,7 @@ export default function PatientRegistrationForm() {
                 <div></div>
                 <Button
                   onClick={handleNext}
+                  disabled={GLPPlan === null}
                   type="button"
                   className="bg-secondary text-white hover:bg-secondary rounded-2xl"
                 >
@@ -2403,7 +2484,7 @@ export default function PatientRegistrationForm() {
                   type="button"
                   className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
                 >
-                  Continue to payment
+                  {GLPPlan === 'yes' ? "Submit" : "Continue to payment"}
                 </Button>
               </div>
             </div>
