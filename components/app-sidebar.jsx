@@ -105,7 +105,7 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenCount, 30000); // Poll every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [effectiveUserType]);
+  }, [effectiveUserType, pathname]);
 
   useEffect(() => {
     if (effectiveUserType === 'A' || effectiveUserType === 'T') {
@@ -124,7 +124,7 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenQuestionnaireCount, 30000);
       return () => clearInterval(interval);
     }
-  }, [effectiveUserType]);
+  }, [effectiveUserType, pathname]);
 
   useEffect(() => {
     if (effectiveUserType === 'A' || effectiveUserType === 'T') {
@@ -143,7 +143,7 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenReferralsCount, 30000);
       return () => clearInterval(interval);
     }
-  }, [effectiveUserType]);
+  }, [effectiveUserType, pathname]);
 
   const filteredItems = useMemo(() => {
     return sidebarItems.filter(item =>
