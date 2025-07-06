@@ -357,14 +357,14 @@ export default function PatientRegistrationForm() {
                 </div>
                 <h3 className="text-lg md:text-x text-center">
                   {/* Thanks for filling out your GLP-1 weight loss treatment intake form! */}
-                  <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Initial Review payment.</span>
+                  <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Clinician Review Fee.</span>
                 </h3>
 
                 <p className="text-gray-600 text-center">
-                  <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
+                  <span className='font-bold'>Note:</span> $25 Clinician review Fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
                 </p>
                 <p className="text-gray-600 text-center">
-                  Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patierice.
+                  Please allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patience.
                 </p>
               </div>
               <Button
@@ -397,11 +397,7 @@ export default function PatientRegistrationForm() {
                 </h3>
 
                 <p className="text-gray-600 text-center">
-                  <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
-                </p>
-
-                <p className="text-gray-600 text-center">
-                  Please Allow up to 24 hours for one of our clinicians to carefully review your submitted form and get back to you. Thanks for your patierice.
+                  Please allow up to 24 hours for one of our clinicians to carefully review your submitted form and get back to you. Thanks for your patience.
                 </p>
               </div>
               <Button
