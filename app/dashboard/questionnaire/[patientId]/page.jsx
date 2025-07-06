@@ -778,18 +778,12 @@ export default function PatientUpdateForm({ params }) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="eatingDisorders">Eating Disorders</Label>
-                            <Select
-                                value={formData.eatingDisorders}
-                                onValueChange={(value) => handleSelectChange('eatingDisorders', value)}
-                            >
-                                <SelectTrigger id="eatingDisorders">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="yes">Yes</SelectItem>
-                                    <SelectItem value="no">No</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <Input
+                            id="heartRate"
+                            name="heartRate"
+                            value={formData.eatingDisorders}
+                            onChange={handleInputChange}
+                        />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="labs">Labs</Label>

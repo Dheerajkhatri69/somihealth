@@ -337,6 +337,7 @@ export default function PatientRegistrationForm() {
 
   // Render success state
   if (showSuccess) {
+    // if (true) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
@@ -392,11 +393,15 @@ export default function PatientRegistrationForm() {
                   />
                 </div>
                 <h3 className="text-lg md:text-x text-center">
-                  Please Allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patierice.
+                  Thank you for completing your GLP-1 Medical Intake form
                 </h3>
 
                 <p className="text-gray-600 text-center">
                   <span className='font-bold'>Note:</span> $25 Initial review fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
+                </p>
+
+                <p className="text-gray-600 text-center">
+                  Please Allow up to 24 hours for one of our clinicians to carefully review your submitted form and get back to you. Thanks for your patierice.
                 </p>
               </div>
               <Button
@@ -1542,6 +1547,7 @@ export default function PatientRegistrationForm() {
                     'GERD',
                     'Stroke',
                     'Reactive airway disease/Asthma',
+                    'Cancer (Greater than 5 years ) in remission',
                     'None of the above'
                   ].map((condition, index) => (
                     <label
@@ -1803,7 +1809,7 @@ export default function PatientRegistrationForm() {
                         type="text"
                         inputMode="numeric"
                         placeholder="MM / DD / YYYY"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        className="bg-gray-50 border border-gray-300 max-w-[180px] text-[16px] text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         {...register('lastInjectionDate')}
                         onChange={(e) => {
                           let value = e.target.value.replace(/\D/g, '');
@@ -2047,12 +2053,17 @@ export default function PatientRegistrationForm() {
                 <Label>
                   Do you have a history of eating disorders? <span className="text-red-500">*</span>
                 </Label>
-                <div className="flex gap-2 justify-center flex-col items-center">
-                  {['yes', 'no'].map((option, index) => (
+                <div className="flex gap-2 justify-center flex-col">
+                  {[
+                    "Anorexia",
+                    "Bulimia",
+                    "Suicidal Ideation",
+                    "None of the above"
+                  ].map((option, index) => (
                     <label
                       key={index}
                       htmlFor={`eating-${index}`}
-                      className={`flex items-center justify-center text-sm w-[100px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('eatingDisorders') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center text-sm w-[160px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('eatingDisorders') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="radio"
@@ -2061,7 +2072,7 @@ export default function PatientRegistrationForm() {
                         className="hidden"
                         {...register('eatingDisorders')}
                       />
-                      <span>{option === 'yes' ? 'Yes' : 'No'}</span>
+                      <span>{option}</span>
                     </label>
                   ))}
                 </div>
