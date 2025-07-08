@@ -24,7 +24,7 @@ const formSchema = z
         firstName: z.string().min(1, "First name is required"),
         lastName: z.string().min(1, "Last name is required"),
         phone: z.string().min(1, "Phone number is required"),
-        email: z.string().email("Invalid email address"),  
+        email: z.string().email("Invalid email address"),
         refFirstName: z.string().min(1, "First name is required"),
         refLastName: z.string().min(1, "Last name is required"),
         refPhone: z.string().min(1, "Phone number is required"),
@@ -279,7 +279,9 @@ export default function PatientRegistrationForm() {
                     {currentSegment === 1 && (
                         <div className="space-y-4">
                             <h2 className="text-l font-semibold">Please provide your Information <span className="text-red-500">*</span></h2>
-                            <p className="text-sm text-gray-600">Receive a $25 gift card when your referral makes a purchase.</p>
+                            {watch('referralSource') === "Friend/Family" && (
+                                <p className="text-sm text-gray-600">Receive a $25 gift card when your referral makes a purchase.</p>
+                            )}
                             <div className="grid grid-cols-2 gap-4">
 
                                 <div className="space-y-2">
