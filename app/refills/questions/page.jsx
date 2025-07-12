@@ -54,8 +54,8 @@ const formSchema = z
     });
 
 const segments = [
-    'personal',
     'glp1ApprovalCheck',
+    'personal',
     'weight',
     'medicationChanges',
     'glp1Preference',
@@ -75,8 +75,6 @@ export default function PatientRegistrationForm() {
     const [currentSegment, setCurrentSegment] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showIneligible, setShowIneligible] = useState(false);
-    const [loadingExistsByEmailPhone, setLoadingExistsByEmailPhone] = useState(false);
-    const [authID, setAuthId] = useState(null);
     const [submissionStatus, setSubmissionStatus] = useState(null);
     const [userSessionId, setUserSessionId] = useState("");
     const [previousBasicData, setPreviousBasicData] = useState(null);
@@ -162,7 +160,7 @@ export default function PatientRegistrationForm() {
 
         const submissionData = {
             ...data,
-            authid: authID,
+            authid: `P${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`,
         };
 
         try {
@@ -236,55 +234,6 @@ export default function PatientRegistrationForm() {
                     }),
                 });
                 return;
-            }
-            if (glp1Approved === 'yes') {
-                setLoadingExistsByEmailPhone(true);
-                // Check patient exists by email or phone
-                const email = watch('email');
-                const phone = watch('phone');
-                try {
-                    const res = await fetch('/api/patients/exists', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, phone })
-                    });
-                    const data = await res.json();
-
-                    if (data?.result?.exists) {
-                        setLoadingExistsByEmailPhone(false);
-                        setAuthId(data?.result?.patient?.authid);
-                        setCurrentSegment((prev) => prev + 1);
-                        return;
-                    } else {
-                        setShowIneligible(true);
-                        fetch("/api/followup/abandoned", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                userSessionId,
-                                firstSegment: previousBasicData,
-                                lastSegmentReached: currentSegment,
-                                state: 1,
-                                timestamp: new Date().toISOString(),
-                            }),
-                        });
-                        return;
-                    }
-                } catch (err) {
-                    setShowIneligible(true);
-                    fetch("/api/followup/abandoned", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            userSessionId,
-                            firstSegment: previousBasicData,
-                            lastSegmentReached: currentSegment,
-                            state: 1,
-                            timestamp: new Date().toISOString(),
-                        }),
-                    });
-                    return;
-                }
             }
         }
 
@@ -376,7 +325,29 @@ export default function PatientRegistrationForm() {
                 )}
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl">
-                    {currentSegment === 0 && (
+                {currentSegment === 0 && (
+                        <>
+                            <Label>Have you been approved for GLP-1 medication within the last 6 months by a Somi Health provider? <span className="text-red-500">*</span></Label>
+                            <div className="flex gap-2 flex-col items-center">
+                                {['yes', 'no'].map((option) => (
+                                    <label key={option} className="radio-style">
+                                        <input
+                                            type="radio"
+                                            value={option}
+                                            {...register('glp1Approved')}
+                                            className="hidden"
+                                        />
+                                        <span className={`flex items-center text-sm justify-center w-[100px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${glp1Approved === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                                            {option.toUpperCase()}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                            {errors.glp1Approved && <p className="text-sm text-red-500">{errors.glp1Approved.message}</p>}
+                        </>
+                    )}
+
+                    {currentSegment === 1 && (
                         <div className="space-y-4">
                             <h2 className="text-l font-semibold">Please provide your information <span className="text-red-500">*</span></h2>
                             <div className="grid grid-cols-2 gap-4">
@@ -412,28 +383,7 @@ export default function PatientRegistrationForm() {
                         </div>
                     )}
 
-                    {currentSegment === 1 && (
-                        <>
-                            <Label>Have you been approved for GLP-1 medication within the last 6 months by a Somi Health provider? <span className="text-red-500">*</span></Label>
-                            <div className="flex gap-2 flex-col items-center">
-                                {['yes', 'no'].map((option) => (
-                                    <label key={option} className="radio-style">
-                                        <input
-                                            type="radio"
-                                            value={option}
-                                            {...register('glp1Approved')}
-                                            className="hidden"
-                                        />
-                                        <span className={`flex items-center text-sm justify-center w-[100px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${glp1Approved === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
-                                            {option.toUpperCase()}
-                                        </span>
-                                    </label>
-                                ))}
-                            </div>
-                            {errors.glp1Approved && <p className="text-sm text-red-500">{errors.glp1Approved.message}</p>}
-                        </>
-                    )}
-
+                    
                     {currentSegment === 2 && (
                         <div className="space-y-2">
                             <Label htmlFor="currentWeight">What&apos;s your current weight? <span className="text-red-500">*</span></Label>
@@ -613,9 +563,8 @@ export default function PatientRegistrationForm() {
                                 type="button"
                                 onClick={goToNextSegment}
                                 className="bg-secondary text-white rounded-2xl"
-                                disabled={loadingExistsByEmailPhone}
                             >
-                                {loadingExistsByEmailPhone ? <><Loader2 size={15} className="animate-spin" /> Continue</> : "Continue"}
+                                Continue
                             </Button>
                         ) : (
                             <Button

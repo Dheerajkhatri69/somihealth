@@ -2237,9 +2237,6 @@ export default function PatientRegistrationForm() {
                 <Label>
                   Please upload a GOVERNMENT-ISSUED photo ID <span className="text-red-500">*</span>
                 </Label>
-                <p className="text-sm text-gray-600 mb-4">
-                  I&apos;m responsible for any co-pays, deductibles, and coinsurance amounts as determined by my insurance plan.
-                </p>
                 <UploadFile
                   onUploadComplete={(url) => {
                     setFileUrls(prev => ({ ...prev, file2: url }));

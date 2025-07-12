@@ -1,14 +1,15 @@
 'use client'
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-import { Info } from 'lucide-react';
+import { ChevronLeft, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import ContactInfoTooltip from '@/components/ContactInfoTooltip';
 
 const PRODUCTS = {
   semaglutide: {
     name: 'Semaglutide',
-    image: '/pricing/semaglutide(1).png',
+    image: '/pricing/semaglutide.png',
     options: [
       {
         label: '4 weeks (0.25mg/week)',
@@ -201,6 +202,15 @@ const Page = ({ params }) => {
       <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-start justify-center">
         {/* Product Card */}
         <div className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col items-center mb-4 md:mb-0">
+          <div className='w-full flex items-start justify-between'>
+            <Link href="/pricing" >
+              <div className='flex text-xs items-center hover:underline text-secondary cursor-pointer'><ChevronLeft size={18} />Back</div>
+            </Link>
+
+            <ContactInfoTooltip />
+          
+          </div>
+
           <div className="relative w-36 h-36 md:w-[180px] md:h-[180px] mb-4">
             <Image src={product.image} alt={product.name} fill className="object-contain rounded-xl" priority />
           </div>

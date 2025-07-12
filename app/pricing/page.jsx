@@ -1,4 +1,6 @@
 "use client";
+import ContactInfoTooltip from '@/components/ContactInfoTooltip';
+import { ChevronLeft, Info } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -19,7 +21,7 @@ const ProgressBar = ({ progress }) => {
 const PRICING_OPTIONS = [
   {
     name: 'Compounded Semaglutide',
-    img: '/pricing/semaglutide(1).png',
+    img: '/pricing/semaglutide.png',
     href: '/pricing/semaglutide',
     alt: 'Semaglutide',
   },
@@ -61,7 +63,18 @@ const LandingPagePricing = () => {
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-gray-100 px-6 flex flex-col items-center">
-        <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">somi</h1>
+        <div className='w-full flex items-start justify-between'>
+
+          <div className='flex text-xs items-center hover:underline text-secondary cursor-pointer mt-2'
+            onClick={() => {
+              window.location.href = "https://joinsomi.com/";
+            }}
+          ><ChevronLeft size={18} />Back</div>
+          <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">somi</h1>
+          <div className='mt-2'>
+            <ContactInfoTooltip />
+          </div>
+        </div>
         <h2 className="text-secondary font-bold text-xl md:text-2xl mt-2 mb-1 text-center">Ready To Start Your Weight Loss Journey?</h2>
         <h3 className="text-secondary text-lg font-semibold mt-2 mb-4 text-center">View Our Pricing</h3>
 
@@ -103,16 +116,27 @@ const LandingPagePricing = () => {
         </div>
 
         <p className="text-gray-700 mb-2 font-medium text-center">
-          We will refund 100% of your money if our licensed clinician determine you are not eligible for GLP-1 weight loss therapy.
+          We will refund 100% of your money if our licensed clinician determines you are not eligible for GLP-1 weight loss therapy.
         </p>
-        <div className="relative w-28 h-28 mb-2">
-          <Image
-            src="/pricing/guaranteed.png"
-            alt="Guaranteed"
-            fill
-            className="rounded-xl object-contain"
-            priority
-          />
+        <div className='flex items-center justify-center gap-4'>
+          <div className="relative w-24 h-24 mb-2">
+            <Image
+              src="/pricing/certified.png"
+              alt="Guaranteed"
+              fill
+              className="rounded-xl object-contain"
+              priority
+            />
+          </div>
+          <div className="relative w-28 h-28 mb-2">
+            <Image
+              src="/pricing/guaranteed.png"
+              alt="Guaranteed"
+              fill
+              className="rounded-xl object-contain"
+              priority
+            />
+          </div>
         </div>
       </div>
     </div>

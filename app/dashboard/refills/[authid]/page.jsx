@@ -166,6 +166,7 @@ export default function FollowUpForm({ params }) {
                     // console.log("data", data.result)
                     setFormData(prev => ({
                         ...prev,
+                        authid: data.result.authid,
                         firstName: data.result.firstName,
                         lastName: data.result.lastName,
                         phone: data.result.phone,
