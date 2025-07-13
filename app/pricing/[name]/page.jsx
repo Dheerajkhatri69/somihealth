@@ -296,13 +296,24 @@ const Page = ({ params }) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 items-center justify-center mt-2 max-w-[300px] sm:max-w-[600px] mx-auto">
-            {[1, 2, 3, 6, 7, 8, 9, 10, 11].map((num) => (
+          <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
+            {[1, 2, 3, 6, 7, 8].map((num) => (
               <img
                 key={num}
                 src={`/pricing/${num}.png`}
                 alt={`Payment method ${num}`}
-                className="h-8 md:h-10 w-[calc(16.666%-8px)] sm:w-[calc(16.666%-16px)] object-contain"
+                className="h-8 md:h-10 object-contain"
+                loading="lazy"
+              />
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
+            {[9, 10, 11].map((num) => (
+              <img
+                key={num}
+                src={`/pricing/${num}.png`}
+                alt={`Payment method ${num}`}
+                className="h-6 md:h-8 object-contain"
                 loading="lazy"
               />
             ))}
