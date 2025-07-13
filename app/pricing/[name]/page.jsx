@@ -206,9 +206,7 @@ const Page = ({ params }) => {
             <Link href="/pricing" >
               <div className='flex text-xs items-center hover:underline text-secondary cursor-pointer'><ChevronLeft size={18} />Back</div>
             </Link>
-
             <ContactInfoTooltip />
-          
           </div>
 
           <div className="relative w-36 h-36 md:w-[180px] md:h-[180px] mb-4">
@@ -298,38 +296,38 @@ const Page = ({ params }) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
-            {[1, 2, 3, 6, 7, 8].map((num) => (
+          <div className="flex flex-wrap gap-2 items-center justify-center mt-2 max-w-[300px] sm:max-w-[600px] mx-auto">
+            {[1, 2, 3, 6, 7, 8, 9, 10, 11].map((num) => (
               <img
                 key={num}
                 src={`/pricing/${num}.png`}
                 alt={`Payment method ${num}`}
-                className="h-8 md:h-10 object-contain"
+                className="h-8 md:h-10 w-[calc(16.666%-8px)] sm:w-[calc(16.666%-16px)] object-contain"
                 loading="lazy"
               />
             ))}
           </div>
           <button
-            className={`w-full mt-4 rounded-3xl py-4 font-bold text-base shadow transition
+            className={`w-full mt-6 rounded-3xl py-4 font-bold text-base shadow transition
               ${summary.link ? 'bg-[#0031e3] text-white hover:bg-[#0031e3] cursor-pointer' : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
             onClick={handleCheckout}
             disabled={!summary.link}
           >
             Checkout {summary.totle ? summary.totle : ''}
           </button>
-          <div className='flex items-center justify-center gap-4 mt-2 text-sm text-gray-600'>
+          {/* <div className='flex items-center justify-center gap-4 mt-2 text-sm text-gray-600'>
             <hr className="w-full" /> or <hr className='w-full' />
-          </div>
-          <div className='text-sm text-gray-600 p-2'>
+          </div> */}
+          <div className='text-sm text-gray-600 mt-6 p-2'>
             <strong>Note:</strong> Once payment has been made, please proceed with the 5-7 mins Intake Questionnaire.
             Get Approval within 24 hours
           </div>
-          <Link href="/getstarted" >
+          {/* <Link href="/getstarted" >
             <button
               className="w-full mt-4 rounded-3xl py-4 font-bold text-base shadow transition bg-green-400 hover:bg-green-300 text-white cursor-pointer">
               Begin Questionnaire
             </button>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>
