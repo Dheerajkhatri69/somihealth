@@ -307,17 +307,21 @@ const Page = ({ params }) => {
               />
             ))}
           </div>
-          <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
-            {[9, 10, 11].map((num) => (
-              <img
-                key={num}
-                src={`/pricing/${num}.png`}
-                alt={`Payment method ${num}`}
-                className="h-6 md:h-8 object-contain"
-                loading="lazy"
-              />
-            ))}
+          <div className='flex justify-center gap-2 items-center'>
+            <div className='mt-2 font-bold text-gray-600'>Financing Available</div>
+            <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
+              {[9, 10, 11].map((num) => (
+                <img
+                  key={num}
+                  src={`/pricing/${num}.png`}
+                  alt={`Payment method ${num}`}
+                  className="h-6 md:h-8 object-contain"
+                  loading="lazy"
+                />
+              ))}
+            </div>
           </div>
+
           <button
             className={`w-full mt-6 rounded-3xl py-4 font-bold text-base shadow transition
               ${summary.link ? 'bg-[#0031e3] text-white hover:bg-[#0031e3] cursor-pointer' : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
