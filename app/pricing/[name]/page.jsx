@@ -95,7 +95,7 @@ const PRODUCTS = {
       {
         label: '8 Weeks (2.5mg and 5mg/week)',
         price: '$359',//done
-        link: 'https://buy.stripe.com/bJe4gAaTk46kfecgDe3ks0f',
+        link: 'https://buy.stripe.com/dRm9AUf9AbyM9TSaeQ3ks0s',
       },
       {
         label: '12 Weeks (2.5mg, 5mg, 7.5mg/week)',
@@ -120,7 +120,7 @@ const PRODUCTS = {
       {
         label: '4 Weeks (7.5mg/Week)',
         price: '$359',//done
-        link: 'https://buy.stripe.com/dRm5kE3qS9qEea8ev63ks0n',
+        link: 'https://buy.stripe.com/eVqdRa6D4byM0jiev63ks0t',
       },
       {
         label: '8 Weeks (7.5mg/Week)',
