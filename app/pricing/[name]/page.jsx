@@ -14,72 +14,72 @@ const PRODUCTS = {
       {
         label: '4 weeks (0.25mg/week)',
         price: '$99',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-5e058e94ee8e4a2387b73ed36045ed4e60ec0ac35ca34e718fcde20d0f2001bc24ebf80a1ccd4f96ba91ae1495a38dbd?locale=EN_US',
+        link: 'https://buy.stripe.com/aFa00kgdE46kd640Eg3ks02',
       },
       {
         label: '8 Weeks (0.25mg and 0.5mg/week)',
         price: '$279',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-1ba9c8e303514285b2b43130b9935c5088b3a6949612404aa4bccf5e8edc3173a442c163001640c78d9e74d2114acd6e?locale=EN_US',
+        link: 'https://buy.stripe.com/dRmeVee5w32gaXW4Uw3ks03',
       },
       {
         label: '12 Weeks (0.25mg, 0.5mg, 1mg/week)',
         price: '$329',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-c43fe85069db4b6c92731eda4f53e683765f4bbde95b47678f3633e20a7bedb20866f78ab88e4785a285e8a0774f38c4?locale=EN_US',
+        link: 'https://buy.stripe.com/dRm6oI2mO8mAc203Qs3ks05',
       },
       {
         label: '4 Weeks (0.5mg/week)',
         price: '$190',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-9f7e44046a9a480aa227b5b3d5e2de6db5a15752dbc54e06879b3cb2093cd334ad325f14145a405fa994245099c97bf3?locale=EN_US',
+        link: 'https://buy.stripe.com/fZu7sM1iK46k5DCbiU3ks0k',
       },
       {
         label: '8 Weeks (0.5mg/week)',
         price: '$249',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-160ac4a48a4f4b8a9f3a6458eb8061912e13f84beb8c4b32a51b649552d543d302794d6406704ecb83b9cc342057a935?locale=EN_US',
+        link: 'https://buy.stripe.com/8x27sM5z046k6HG86I3ks0l',
       },
       {
         label: '13 Weeks (0.5mg/week)',
         price: '$269',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-898cb427d8364771b4079eb135735e142e498620af0c4a78ad700697d4ee1ddd65625d3ee24a4ad8b95ad488e4d080f5?locale=EN_US',
+        link: 'https://buy.stripe.com/aFa14o9Pg1Yc7LKfza3ks0m',
       },
       {
         label: '4 Weeks (1mg/week)',
         price: '$249',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-1c5a3b2e50b24a2a9436c0efb8aba1697b3effa916914f4cbe882b51edcf126b41af32bef8c44b8bb3a3d1c9a3409c1e?locale=EN_US',
+        link: 'https://buy.stripe.com/aFafZi5z00U8fec1Ik3ks06',
       },
       {
         label: '15 Weeks (1mg/week)',
         price: '$339',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-22534b2f956c4da79631a140d92d4785d7457f0834854368b6dfa0d1c51f8e25a0121ca9e6624ba1b552fa3dc41a4a86?locale=EN_US',
+        link: 'https://buy.stripe.com/14A14od1scCQ2rq4Uw3ks07',
       },
       {
         label: '4 Weeks (1.7mg/Week)',
         price: '$269',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-c8d6be1fae0c4a71b2ff33603d85b6832476b889987a4e4886086928030d0c2709ebd46319cd489f8654539e2b191849?locale=EN_US',
+        link: 'https://buy.stripe.com/7sY8wQaTkdGU5DCfza3ks08',
       },
       {
         label: '12 Weeks (1.7mg/week)',
         price: '$379',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-f87d96a3ee32464c853ab02ade053556637274d14bca4b229cf4bd222cb010ba14eff5a20e0349e9a73c3ae54ed3cddc?locale=EN_US',
+        link: 'https://buy.stripe.com/7sY3cwe5w7iw5DC3Qs3ks09',
       },
       {
         label: '5 Weeks (2mg/Week)',
         price: '$299',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-48bdefbbeb18423d90952c7eb5c374d6722d2b9cc3384515be454fc9a744df7f91f57505fc30405fb185a056e20432f1?locale=EN_US',
+        link: 'https://buy.stripe.com/8x214o7H8fP27LK9aM3ks0a',
       },
       {
         label: '12 Weeks (2mg/week)',
         price: '$399',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-59015916459d40e792c1e4c5328ffdee8cb3e6b12fba4cc88b960acb1e02f4b8c00652e402b648a28f5be774c176a624?locale=EN_US',
+        link: 'https://buy.stripe.com/14AbJ21iKgT67LK86I3ks0b',
       },
       {
         label: '4 Weeks (2.5mg/week)',
         price: '$299',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-c9d8275ea51b44be8dd540a5dd2b2121f25ff6c8aa3f47d78ec9923b6efa36392356ff65f4c3422ab820c3e97ecd0812?locale=EN_US',
+        link: 'https://buy.stripe.com/3cI28s6D446k5DC9aM3ks0c',
       },
       {
         label: '10 Weeks (2.5mg/week)',
         price: '$520',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-b577ae44e7954c96b94d8c0fdc3117f32445dc8091204758a059d7ae474229b907ab48b1a2de46d9be80fb6e1a8737e0?locale=EN_US',
+        link: 'https://buy.stripe.com/dRmfZigdEdGU1nmgDe3ks0d',
       },
     ],
   },
@@ -90,57 +90,57 @@ const PRODUCTS = {
       {
         label: '4 weeks (2.5mg/week)',
         price: '$145',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-0f601416e9174332ac03e6ecffc8279f9b1752a32c0b4f77a916c6ff7aba72268dfb1823c44e4af28be78c0b54aa0b28?locale=EN_US',
+        link: 'https://buy.stripe.com/9B67sM0eG5ao5DCfza3ks0e',
       },
       {
         label: '8 Weeks (2.5mg and 5mg/week)',
         price: '$359',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-c5423ed44586466192319dd8856314d7bfd8e39807cd4bf4b5cac95dbb1b53dd990ccbbdc3b64c70bca0980516181b0d?locale=EN_US',
+        link: 'https://buy.stripe.com/bJe4gAaTk46kfecgDe3ks0f',
       },
       {
         label: '12 Weeks (2.5mg, 5mg, 7.5mg/week)',
         price: '$559',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-65cdbeafae6047ae8ac74d8f18dcacb2f743fa585a5c45d1a4f58918651d8ef3d91ae5dbec8b43cdb24d2f6909b92acc?locale=EN_US',
+        link: 'https://buy.stripe.com/00w9AU1iK0U88PO3Qs3ks0g',
       },
       {
         label: '4 Weeks (5mg/Week)',
         price: '$299',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-b66bb5ba00ba414c89478af89f518e10c2ca4e354e4b41658775e056cb940c7302567f109f47496fba84d7544beac123?locale=EN_US',
+        link: 'https://buy.stripe.com/fZu5kE4uW0U8c20dr23ks0h',
       },
       {
         label: '8 Weeks (5mg/Week)',
         price: '$399',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-520d081e60f34a96ba5b24e32e2a2ad359bd4b66bfcf4ce6b43e171d83462e03e9cc161163d44660823f59ead6304868?locale=EN_US',
+        link: 'https://buy.stripe.com/3cI7sM7H846kaXWbiU3ks0i',
       },
       {
         label: '12 Weeks (5mg/Week)',
         price: '$499',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-bdc3f38cf350485a9459091e13e739204a4d625b983d4c5982e1bbd0ce01a91b21f002c5a06c407e85657bd6f166a7e1?locale=EN_US',
+        link: 'https://buy.stripe.com/28EdRa3qSfP2aXW9aM3ks0j',
       },
       {
         label: '4 Weeks (7.5mg/Week)',
         price: '$359',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-6a036e97c1404706ad91d31837575b6afb5cea32acc04cd1b6a924d6381147b6b1453fc10cdb41c8a91b91b37014160c?locale=EN_US',
+        link: 'https://buy.stripe.com/dRm5kE3qS9qEea8ev63ks0n',
       },
       {
         label: '8 Weeks (7.5mg/Week)',
         price: '$549',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-d7a60d8fcf5542fda4237aa81dce9465c704005f790448e1bf9e523c1ee3d07e0b628ffbba974e93b4402e4d1a9b808c?locale=EN_US',
+        link: 'https://buy.stripe.com/aFa00k5z046k3vugDe3ks0r',
       },
       {
         label: '4 Weeks (10mg/week)',
         price: '$399',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-ce1dfc6db1d8416da5b118aef82e67cda1520f36a93b41aaa8b7aab1038f564699405a4ba1b0476f88b19b006f7c45a7?locale=EN_US',
+        link: 'https://buy.stripe.com/9B63cw3qS5aoea85YA3ks0o',
       },
       {
         label: '4 Weeks (12.5mg/week)',
         price: '$449',//done
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-a4f625ce10f44acebfee21a43e7c402fa40155641f2f46fdb869d19626a9fd74ea7303a812ae43ce8c3e1aa872d9f65d?locale=EN_US',
+        link: 'https://buy.stripe.com/fZu28s7H86es4zyaeQ3ks0p',
       },
       {
         label: '4 Weeks (15mg/Week)',
         price: '$499',
-        link: 'https://connect.intuit.com/pay/SomiHealth/scs-v1-79726bd995614e25b932263de893d1bbd6b827c7f5934ebf82128c1ac411e17cd138e8d73b76409bbc9417fc85e83bce?locale=EN_US',
+        link: 'https://buy.stripe.com/00w9AUaTk8mAfecaeQ3ks0q',
       },
     ],
   },
