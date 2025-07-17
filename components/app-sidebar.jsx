@@ -88,38 +88,60 @@ export function AppSidebar() {
   // Use userType from localStorage only
   const effectiveUserType = userType;
 
+  const fetchUnseenCount = async () => {
+    try {
+      const response = await fetch('/api/refills/unseen');
+      const data = await response.json();
+      if (data.success) {
+        setUnseenCount(data.count);
+      }
+    } catch (error) {
+      console.error("Failed to fetch unseen refills count", error);
+    }
+  };
+
+  const fetchUnseenQuestionnaireCount = async () => {
+    try {
+      const response = await fetch('/api/questionnaire/unseen');
+      const data = await response.json();
+      if (data.success) {
+        setUnseenQuestionnaireCount(data.count);
+      }
+    } catch (error) {
+      console.error("Failed to fetch unseen questionnaire count", error);
+    }
+  };
+
+  const fetchUnseenReferralsCount = async () => {
+    try {
+      const response = await fetch('/api/referrals/unseen');
+      const data = await response.json();
+      if (data.success) {
+        setUnseenReferralsCount(data.count);
+      }
+    } catch (error) {
+      console.error("Failed to fetch unseen referrals count", error);
+    }
+  };
+
+  const refetchAllCounts = () => {
+    if (effectiveUserType === 'A' || effectiveUserType === 'T') {
+      fetchUnseenCount();
+      fetchUnseenQuestionnaireCount();
+      fetchUnseenReferralsCount();
+    }
+  };
+
   useEffect(() => {
     if (effectiveUserType === 'A' || effectiveUserType === 'T') {
-      const fetchUnseenCount = async () => {
-        try {
-          const response = await fetch('/api/refills/unseen');
-          const data = await response.json();
-          if (data.success) {
-            setUnseenCount(data.count);
-          }
-        } catch (error) {
-          console.error("Failed to fetch unseen refills count", error);
-        }
-      };
       fetchUnseenCount();
-      const interval = setInterval(fetchUnseenCount, 30000); // Poll every 30 seconds
+      const interval = setInterval(fetchUnseenCount, 30000);
       return () => clearInterval(interval);
     }
   }, [effectiveUserType, pathname]);
 
   useEffect(() => {
     if (effectiveUserType === 'A' || effectiveUserType === 'T') {
-      const fetchUnseenQuestionnaireCount = async () => {
-        try {
-          const response = await fetch('/api/questionnaire/unseen');
-          const data = await response.json();
-          if (data.success) {
-            setUnseenQuestionnaireCount(data.count);
-          }
-        } catch (error) {
-          console.error("Failed to fetch unseen questionnaire count", error);
-        }
-      };
       fetchUnseenQuestionnaireCount();
       const interval = setInterval(fetchUnseenQuestionnaireCount, 30000);
       return () => clearInterval(interval);
@@ -128,22 +150,25 @@ export function AppSidebar() {
 
   useEffect(() => {
     if (effectiveUserType === 'A' || effectiveUserType === 'T') {
-      const fetchUnseenReferralsCount = async () => {
-        try {
-          const response = await fetch('/api/referrals/unseen');
-          const data = await response.json();
-          if (data.success) {
-            setUnseenReferralsCount(data.count);
-          }
-        } catch (error) {
-          console.error("Failed to fetch unseen referrals count", error);
-        }
-      };
       fetchUnseenReferralsCount();
       const interval = setInterval(fetchUnseenReferralsCount, 30000);
       return () => clearInterval(interval);
     }
   }, [effectiveUserType, pathname]);
+
+  useEffect(() => {
+    // Listen for custom event to refresh counts
+    const handler = () => refetchAllCounts();
+    window.addEventListener('refreshSidebarCounts', handler);
+
+    // Listen for window focus to refresh counts
+    window.addEventListener('focus', handler);
+
+    return () => {
+      window.removeEventListener('refreshSidebarCounts', handler);
+      window.removeEventListener('focus', handler);
+    };
+  }, [effectiveUserType]);
 
   const filteredItems = useMemo(() => {
     return sidebarItems.filter(item =>
