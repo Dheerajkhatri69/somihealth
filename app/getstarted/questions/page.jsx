@@ -2488,7 +2488,7 @@ export default function PatientRegistrationForm() {
                   type="button"
                   className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
                 >
-                  {GLPPlan === 'yes' ? "Submit" : "Submit"}
+                  {GLPPlan === 'yes' ? "Submit" : "Continue Payment"}
                 </Button>
               </div>
             </div>
