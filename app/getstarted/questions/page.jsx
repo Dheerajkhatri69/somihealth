@@ -337,7 +337,7 @@ export default function PatientRegistrationForm() {
 
   // Render success state
   if (showSuccess) {
-    // if (true) {
+  // if (true) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
@@ -355,13 +355,13 @@ export default function PatientRegistrationForm() {
                     sizes="(max-width: 768px) 100vw, 300px"
                   />
                 </div>
-                {/* <h3 className="text-lg md:text-x text-center">
+                <h3 className="text-lg md:text-x text-center">
                   <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Clinician Review Fee.</span>
                 </h3>
 
                 <p className="text-gray-600 text-center">
                   <span className='font-bold'>Note:</span> $25 Clinician review Fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
-                </p> */}
+                </p>
                 <p className="text-gray-600 text-center">
                   Please allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patience.
                 </p>
@@ -369,11 +369,11 @@ export default function PatientRegistrationForm() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  window.location.href = 'https://joinsomi.com/';
+                  window.location.href = 'https://buy.stripe.com/8x2cN60eG8mAgigaeQ3ks01';
                 }}
-                className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+                className="bg-green-500 text-white hover:text-white hover:bg-green-500 rounded-2xl"
               >
-                End
+                Pay Here
               </Button>
             </>
           )}
@@ -2046,7 +2046,8 @@ export default function PatientRegistrationForm() {
               <h2 className="text-xl font-semibold">Eating Disorders</h2>
               <div className="space-y-4">
                 <Label>
-                  Do you have a history of eating disorders? <span className="text-red-500">*</span>
+                  {/* Do you have a history of eating disorders? <span className="text-red-500">*</span> */}
+                  Have you ever been diagnosed with any of the following? <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex gap-2 justify-center flex-col">
                   {[

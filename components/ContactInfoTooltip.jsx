@@ -71,7 +71,7 @@ const ContactInfoTooltip = () => {
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500 font-medium min-w-[48px]">Phone:</span>
+                  <span className="text-gray-500 font-medium min-w-[48px]">Text Us:</span>
                   <a 
                     href="tel:+17043866871" 
                     className="text-blue-600 hover:underline hover:text-blue-700 transition-colors font-semibold"

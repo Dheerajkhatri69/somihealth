@@ -1,4 +1,5 @@
 "use client";
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -33,6 +34,39 @@ const LandingPage = () => {
         }, 80); // adjust speed if needed
     }, []);
 
+    useEffect(() => {
+        // Avoid multiple pixel loads
+        if (!window.fbq) {
+            !(function (f, b, e, v, n, t, s) {
+                if (f.fbq) return;
+                n = f.fbq = function () {
+                    n.callMethod
+                        ? n.callMethod.apply(n, arguments)
+                        : n.queue.push(arguments);
+                };
+                if (!f._fbq) f._fbq = n;
+                n.push = n;
+                n.loaded = !0;
+                n.version = "2.0";
+                n.queue = [];
+                t = b.createElement(e);
+                t.async = !0;
+                t.src = v;
+                s = b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t, s);
+            })(
+                window,
+                document,
+                "script",
+                "https://connect.facebook.net/en_US/fbevents.js"
+            );
+
+            fbq("init", "1848512062399758"); // Your Pixel ID
+        }
+
+        fbq("track", "PageView");
+    }, []);
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center p-6 bg-white">
@@ -44,45 +78,62 @@ const LandingPage = () => {
     }
 
     return (
-        <div className="min-h-[100dvh] overflow-hidden flex flex-col items-center justify-center bg-white p-6">
+        <>
+            <Head>
+                {/* For noscript support */}
+                <noscript>
+                    <img
+                        height="1"
+                        width="1"
+                        style={{ display: "none" }}
+                        src="https://www.facebook.com/tr?id=1848512062399758&ev=PageView&noscript=1"
+                        alt="fb-pixel"
+                    />
+                </noscript>
+            </Head>
 
-            <div className="p-6 bg-white rounded-xl overflow-hidden  border border-gray-200 shadow-secondary shadow-2xl ">
+            <main>
+                <div className="min-h-[100dvh] overflow-hidden flex flex-col items-center justify-center bg-white p-6">
 
-                <div className="w-full max-w-2xl text-center">
-                    <h1 className="font-tagesschrift text-6xl md:text-8xl text-secondary font-bold">
-                        somi
-                    </h1>
+                    <div className="p-6 bg-white rounded-xl overflow-hidden  border border-gray-200 shadow-secondary shadow-2xl ">
 
-                    <div className="relative w-[300px] h-[300px] mx-auto">
-                        <Image
-                            src="/getstarted.jpg"
-                            alt="Weight Loss"
-                            fill
-                            className="rounded-xl object-contain"
-                            priority
-                        />
+                        <div className="w-full max-w-2xl text-center">
+                            <h1 className="font-tagesschrift text-6xl md:text-8xl text-secondary font-bold">
+                                somi
+                            </h1>
+
+                            <div className="relative w-[300px] h-[300px] mx-auto">
+                                <Image
+                                    src="/getstarted.jpg"
+                                    alt="Weight Loss"
+                                    fill
+                                    className="rounded-xl object-contain"
+                                    priority
+                                />
+                            </div>
+
+                            <h2 className="text-2xl font-semibold mt-4 mb-2">
+                                Start Your Weight Loss Journey Today!
+                            </h2>
+
+                            <p className="text-gray-700 mb-2">
+                                No hidden fees, No monthly subscription, Free Expedited shipping
+                            </p>
+
+                            <p className="text-green-600 font-medium mb-6">
+                                $25 Clinician Review Fee
+                            </p>
+
+                            <Link href="/getstarted/questions">
+                                <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">
+                                    Let&apos;s Get Started
+                                </button>
+                            </Link>
+                        </div>
                     </div>
-
-                    <h2 className="text-2xl font-semibold mt-4 mb-2">
-                        Start Your Weight Loss Journey Today!
-                    </h2>
-
-                    <p className="text-gray-700 mb-2">
-                        No hidden fees, No monthly subscription, Free Expedited shipping
-                    </p>
-
-                    <p className="text-green-600 font-medium mb-6">
-                        $25 Clinician Review Fee
-                    </p>
-
-                    <Link href="/getstarted/questions">
-                        <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">
-                            Let&apos;s Get Started
-                        </button>
-                    </Link>
                 </div>
-            </div>
-        </div>
+            </main>
+        </>
     );
 };
 
