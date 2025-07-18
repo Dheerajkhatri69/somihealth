@@ -138,7 +138,7 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenCount, 30000);
       return () => clearInterval(interval);
     }
-  }, [effectiveUserType, pathname]);
+  }, [effectiveUserType]);
 
   useEffect(() => {
     if (effectiveUserType === 'A' || effectiveUserType === 'T') {
@@ -146,7 +146,7 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenQuestionnaireCount, 30000);
       return () => clearInterval(interval);
     }
-  }, [effectiveUserType, pathname]);
+  }, [effectiveUserType]);
 
   useEffect(() => {
     if (effectiveUserType === 'A' || effectiveUserType === 'T') {
@@ -154,7 +154,7 @@ export function AppSidebar() {
       const interval = setInterval(fetchUnseenReferralsCount, 30000);
       return () => clearInterval(interval);
     }
-  }, [effectiveUserType, pathname]);
+  }, [effectiveUserType]);
 
   useEffect(() => {
     // Listen for custom event to refresh counts
