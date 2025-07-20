@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 import UploadFile from "@/components/FileUpload";
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { ArrowDownWideNarrow } from 'lucide-react';
+import { ArrowDownWideNarrow, TriangleAlert } from 'lucide-react';
 
 // Form validation schema
 const formSchema = z.object({
@@ -337,7 +337,7 @@ export default function PatientRegistrationForm() {
 
   // Render success state
   if (showSuccess) {
-  // if (true) {
+    // if (true) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
@@ -1006,6 +1006,7 @@ export default function PatientRegistrationForm() {
                     />
                   </div>
                 </div>
+                <div className='text-gray-600 text-sm flex items-center gap-1'><TriangleAlert className='text-gray-700' size={15}/>Please make sure the information provided is accurate.</div>
               </div>
             </div>
           )}
