@@ -1006,7 +1006,11 @@ export default function PatientRegistrationForm() {
                     />
                   </div>
                 </div>
-                <div className='text-gray-600 text-sm flex items-center gap-1'><TriangleAlert className='text-gray-700' size={15}/>Please make sure the information provided is accurate.</div>
+                <p className="text-gray-600 text-sm flex items-center gap-1 sm:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis">
+                  <TriangleAlert className="text-gray-700 flex-shrink-0" size={15} />
+                  <span>Please make sure the information provided is accurate.</span>
+                </p>
+
               </div>
             </div>
           )}
