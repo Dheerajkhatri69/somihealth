@@ -48,7 +48,7 @@ export default function PatientUpdateForm({ params }) {
         city: '',
         state: '',
         zip: '',
-        country: '',
+        country: '',//no
         glp1Preference: '',
         sex: '',
         heightFeet: '',
@@ -59,30 +59,30 @@ export default function PatientUpdateForm({ params }) {
         bloodPressure: '',
         heartRate: '',
         bmi: '',
-        goalBmi: '',
+        goalBmi: '',//no
         allergies: '',
-        conditions: [],
-        familyConditions: [],
+        conditions: [],//no
+        familyConditions: [],//no
         diagnoses: [],
-        weightLossSurgery: [],
-        weightRelatedConditions: [],
-        medications: [],
-        kidneyDisease: '',
+        weightLossSurgery: [],//no
+        weightRelatedConditions: [],//no
+        medications: [],//no
+        kidneyDisease: '',//no
         pastWeightLossMeds: [],
-        diets: [],
+        diets: [],//no
         glp1PastYear: '',
         lastInjectionDate: '',
-        otherConditions: '',
-        currentMedications: '',
+        otherConditions: '',//no
+        currentMedications: '',//no
         surgeries: '',
-        pregnant: '',
-        breastfeeding: '',
-        healthcareProvider: '',
-        eatingDisorders: '',
-        labs: '',
-        glp1Statement: '',
-        glp1DoseInfo: '',
-        agreeTerms: false,
+        pregnant: '',//no
+        breastfeeding: '',//no
+        healthcareProvider: '',//no
+        eatingDisorders: '',//no
+        labs: '',//no
+        glp1Statement: '',//no
+        glp1DoseInfo: '',//no
+        agreeTerms: false,//no
         prescriptionPhoto: '',
         idPhoto: '',
         comments: '',
@@ -175,6 +175,26 @@ export default function PatientUpdateForm({ params }) {
                 providerComments: formData.comments || '',
                 providerNote: '',
                 tirzepetidePlanPurchased: formData.PlanPurchased,
+                // New fields
+                country: formData.country,
+                goalBmi: formData.goalBmi,
+                conditions: formData.conditions,
+                familyConditions: formData.familyConditions,
+                weightLossSurgery: formData.weightLossSurgery,
+                weightRelatedConditions: formData.weightRelatedConditions,
+                medications: formData.medications,
+                kidneyDisease: formData.kidneyDisease,
+                diets: formData.diets,
+                otherConditions: formData.otherConditions,
+                currentMedications: formData.currentMedications,
+                pregnant: formData.pregnant,
+                breastfeeding: formData.breastfeeding,
+                healthcareProvider: formData.healthcareProvider,
+                eatingDisorders: formData.eatingDisorders,
+                labs: formData.labs,
+                glp1Statement: formData.glp1Statement,
+                glp1DoseInfo: formData.glp1DoseInfo,
+                agreeTerms: formData.agreeTerms,
             };
 
             // Submit to /api/patients

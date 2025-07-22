@@ -1,19 +1,34 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
+const routeRoleMap = {
+  "/dashboard/addrecord": ["A", "T"],
+  "/dashboard": ["A", "T", "C"],
+  "/dashboard/followup": ["A", "T", "C"],
+  "/dashboard/questionnaire": ["A", "T"],
+  "/dashboard/abandonment": ["A"],
+  "/dashboard/refills": ["A", "T"],
+  "/dashboard/referrals": ["A"],
+  "/dashboard/emailhistorytable": ["A"],
+  "/dashboard/closetickets": ["A"]
+};
+
 export default withAuth(
   function middleware(req) {
     const accountType = req.nextauth.token?.accounttype;
     const url = req.nextUrl.pathname;
 
-    // Restrict Clinician and Technician from accessing certain routes
-    const restrictedPaths = ["/dashboard/addstaff", "/dashboard/closetickets"];
+    // Find the matching route (exact match or startsWith for subpages)
+    const normalizedUrl = url.split("?")[0].replace(/\/$/, "");
+    const matchedRoute = Object.keys(routeRoleMap).find(route =>
+      normalizedUrl === route || normalizedUrl.startsWith(route + "/")
+    );
 
-    if (
-      restrictedPaths.includes(url) &&
-      (accountType === "C" || accountType === "T")
-    ) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+    if (matchedRoute) {
+      const allowedRoles = routeRoleMap[matchedRoute];
+      if (!allowedRoles.includes(accountType)) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
     }
 
     // Optionally restrict access to unknown account types

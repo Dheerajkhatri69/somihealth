@@ -537,18 +537,29 @@ export default function PatientUpdateForm({ params }) {
                             placeholder="e.g. 32"
                         />
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="goalBmi">Goal BMI</Label>
+                        <Input
+                            id="goalBmi"
+                            name="goalBmi"
+                            value={formData.goalBmi}
+                            onChange={handleInputChange}
+                            placeholder="e.g. 32"
+                        />
+                    </div>
                 </div>
 
                 {/* Address Section */}
                 <h3 className="text-sm font-semibold">Address</h3>
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
-                    {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
+                    {['address1', 'address2', 'city', 'state', 'zip', 'country'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
                                 {field === 'address1' ? 'Address' :
                                     field === 'address2' ? 'Address line 2' :
                                         field === 'city' ? 'City/Town' :
-                                            field === 'state' ? 'State' : 'Zip code'}
+                                            field === 'country' ? 'Country' :
+                                                field === 'state' ? 'State' : 'Zip code'}
                             </Label>
                             <Input
                                 id={field}
@@ -844,7 +855,105 @@ export default function PatientUpdateForm({ params }) {
                         />
                     </div>
                 </div>
+                {/* new field Selection */}
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#eefee2]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="kidneyDisease">Kidney Disease</Label>
+                            <Select value={formData.kidneyDisease || ''} onValueChange={value => handleSelectChange('kidneyDisease', value)}>
+                                <SelectTrigger id="kidneyDisease" className="w-full">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="pregnant">Pregnant</Label>
+                            <Select value={formData.pregnant || ''} onValueChange={value => handleSelectChange('pregnant', value)}>
+                                <SelectTrigger id="pregnant" className="w-full">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="breastfeeding">Breastfeeding</Label>
+                            <Select value={formData.breastfeeding || ''} onValueChange={value => handleSelectChange('breastfeeding', value)}>
+                                <SelectTrigger id="breastfeeding" className="w-full">
+                                    <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="healthcareProvider">Healthcare Provider</Label>
+                            <Input id="healthcareProvider" name="healthcareProvider" value={formData.healthcareProvider || ''} onChange={handleInputChange} placeholder="Healthcare provider" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="eatingDisorders">Eating Disorders</Label>
+                            <Input id="eatingDisorders" name="eatingDisorders" value={formData.eatingDisorders || ''} onChange={handleInputChange} placeholder="Eating disorders" />
+                        </div>
 
+                        <div className="space-y-2">
+                            <Label htmlFor="labs">Labs</Label>
+                            <Input id="labs" name="labs" value={formData.labs || ''} onChange={handleInputChange} placeholder="Labs" />
+                        </div>
+                    </div>
+                </div>
+                {/* new field Selection */}
+                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#e2f7fe]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="conditions">Conditions</Label>
+                            <Textarea id="conditions" name="conditions" value={Array.isArray(formData.conditions) ? formData.conditions.join(', ') : formData.conditions || ''} onChange={handleInputChange} placeholder="Comma separated conditions" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="familyConditions">Family Conditions</Label>
+                            <Textarea id="familyConditions" name="familyConditions" value={Array.isArray(formData.familyConditions) ? formData.familyConditions.join(', ') : formData.familyConditions || ''} onChange={handleInputChange} placeholder="Comma separated family conditions" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="weightLossSurgery">Weight Loss Surgery</Label>
+                            <Textarea id="weightLossSurgery" name="weightLossSurgery" value={Array.isArray(formData.weightLossSurgery) ? formData.weightLossSurgery.join(', ') : formData.weightLossSurgery || ''} onChange={handleInputChange} placeholder="Comma separated surgeries" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="weightRelatedConditions">Weight Related Conditions</Label>
+                            <Textarea id="weightRelatedConditions" name="weightRelatedConditions" value={Array.isArray(formData.weightRelatedConditions) ? formData.weightRelatedConditions.join(', ') : formData.weightRelatedConditions || ''} onChange={handleInputChange} placeholder="Comma separated weight related conditions" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="medications">Medications</Label>
+                            <Textarea id="medications" name="medications" value={Array.isArray(formData.medications) ? formData.medications.join(', ') : formData.medications || ''} onChange={handleInputChange} placeholder="Comma separated medications" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="diets">Diets</Label>
+                            <Textarea id="diets" name="diets" value={Array.isArray(formData.diets) ? formData.diets.join(', ') : formData.diets || ''} onChange={handleInputChange} placeholder="Comma separated diets" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="otherConditions">Other Conditions</Label>
+                            <Textarea id="otherConditions" name="otherConditions" value={formData.otherConditions || ''} onChange={handleInputChange} placeholder="Other conditions" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="currentMedications">Current Medications</Label>
+                            <Textarea id="currentMedications" name="currentMedications" value={formData.currentMedications || ''} onChange={handleInputChange} placeholder="Current medications" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="glp1Statement">GLP-1 Statement</Label>
+                            <Textarea id="glp1Statement" name="glp1Statement" value={formData.glp1Statement || ''} onChange={handleInputChange} placeholder="GLP-1 statement" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="glp1DoseInfo">GLP-1 Dose Info</Label>
+                            <Textarea id="glp1DoseInfo" name="glp1DoseInfo" value={formData.glp1DoseInfo || ''} onChange={handleInputChange} placeholder="GLP-1 dose info" />
+                        </div>
+                    </div>
+                </div>
                 {/* Medication Selection */}
                 <div className="space-y-2">
                     <Label htmlFor="medicine">Preferred GLP-1 Medication</Label>

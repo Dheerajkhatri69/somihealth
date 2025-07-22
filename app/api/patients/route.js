@@ -99,6 +99,26 @@ export async function POST(request) {
             file1: body.file1,
             file2: body.file2,
             questionnaire: body.questionnaire || false,
+            // New fields from questionnaire
+            country: body.country,
+            goalBmi: body.goalBmi,
+            conditions: body.conditions,
+            familyConditions: body.familyConditions,
+            weightLossSurgery: body.weightLossSurgery,
+            weightRelatedConditions: body.weightRelatedConditions,
+            medications: body.medications,
+            kidneyDisease: body.kidneyDisease,
+            diets: body.diets,
+            otherConditions: body.otherConditions,
+            currentMedications: body.currentMedications,
+            pregnant: body.pregnant,
+            breastfeeding: body.breastfeeding,
+            healthcareProvider: body.healthcareProvider,
+            eatingDisorders: body.eatingDisorders,
+            labs: body.labs,
+            glp1Statement: body.glp1Statement,
+            glp1DoseInfo: body.glp1DoseInfo,
+            agreeTerms: body.agreeTerms,
         });
 
         result = await newPatient.save();
@@ -136,6 +156,25 @@ export async function PUT(request) {
                 $set: {
                     ...body,
                     createTimeDate: body.createTimeDate || new Date().toISOString(), // preserve or update time
+                    country: body.country,
+                    goalBmi: body.goalBmi,
+                    conditions: body.conditions,
+                    familyConditions: body.familyConditions,
+                    weightLossSurgery: body.weightLossSurgery,
+                    weightRelatedConditions: body.weightRelatedConditions,
+                    medications: body.medications,
+                    kidneyDisease: body.kidneyDisease,
+                    diets: body.diets,
+                    otherConditions: body.otherConditions,
+                    currentMedications: body.currentMedications,
+                    pregnant: body.pregnant,
+                    breastfeeding: body.breastfeeding,
+                    healthcareProvider: body.healthcareProvider,
+                    eatingDisorders: body.eatingDisorders,
+                    labs: body.labs,
+                    glp1Statement: body.glp1Statement,
+                    glp1DoseInfo: body.glp1DoseInfo,
+                    agreeTerms: body.agreeTerms,
                 }
             },
             { new: true }
