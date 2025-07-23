@@ -701,7 +701,7 @@ export default function FollowUp() {
                                 </TableHead>
 
                                 {/* Updated table headers */}
-                                <TableHead>DOB</TableHead>
+                                <TableHead className="pl-5">DOB</TableHead>
                                 <TableHead>Sex</TableHead>
                                 {/* <TableHead>Height</TableHead>
                                 <TableHead>Weight (lbs)</TableHead> */}
@@ -786,7 +786,7 @@ export default function FollowUp() {
 
                                     {/* Patient Data */}
 
-                                    <TableCell className="whitespace-nowrap">
+                                    <TableCell className="whitespace-nowrap pl-5">
                                         {patient.dob?.split('T')[0]}
                                     </TableCell>
                                     <TableCell>{patient.sex}</TableCell>
