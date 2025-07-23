@@ -90,10 +90,11 @@ export function AppSidebar() {
 
   const fetchUnseenCount = async () => {
     try {
-      const response = await fetch('/api/refills/unseen');
+      const response = await fetch('/api/refills');
       const data = await response.json();
-      if (data.success) {
-        setUnseenCount(data.count);
+      if (data.success && Array.isArray(data.result)) {
+        const unseen = data.result.filter(r => r.seen === false);
+        setUnseenCount(unseen.length);
       }
     } catch (error) {
       console.error("Failed to fetch unseen refills count", error);
@@ -102,10 +103,11 @@ export function AppSidebar() {
 
   const fetchUnseenQuestionnaireCount = async () => {
     try {
-      const response = await fetch('/api/questionnaire/un-seen');
+      const response = await fetch('/api/questionnaire');
       const data = await response.json();
-      if (data.success) {
-        setUnseenQuestionnaireCount(data.count);
+      if (data.success && Array.isArray(data.result)) {
+        const unseen = data.result.filter(q => q.seen === false);
+        setUnseenQuestionnaireCount(unseen.length);
       }
     } catch (error) {
       console.error("Failed to fetch unseen questionnaire count", error);
@@ -114,11 +116,12 @@ export function AppSidebar() {
 
   const fetchUnseenReferralsCount = async () => {
     try {
-      const response = await fetch('/api/referrals/unseen');
+      const response = await fetch('/api/referrals');
       const data = await response.json();
-      if (data.success) {
-        setUnseenReferralsCount(data.count);
-      }
+      // Note: /api/referrals returns { success, referrals }
+      const referrals = data.referrals || [];
+      const unseen = referrals.filter(r => r.seen === false);
+      setUnseenReferralsCount(unseen.length);
     } catch (error) {
       console.error("Failed to fetch unseen referrals count", error);
     }
