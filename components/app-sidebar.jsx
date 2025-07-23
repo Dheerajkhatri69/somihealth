@@ -102,7 +102,7 @@ export function AppSidebar() {
 
   const fetchUnseenQuestionnaireCount = async () => {
     try {
-      const response = await fetch('/api/questionnaire/unseen');
+      const response = await fetch('/api/questionnaire/un-seen');
       const data = await response.json();
       if (data.success) {
         setUnseenQuestionnaireCount(data.count);

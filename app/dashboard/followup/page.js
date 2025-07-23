@@ -216,9 +216,9 @@ export default function FollowUp() {
         };
     };
     const filteredPatients = patients.filter(patient => {
-        const emailMatch = patient.email.toLowerCase().includes(emailFilter.toLowerCase());
+        const emailMatch = patient.email?.toLowerCase().includes(emailFilter.toLowerCase());
         // const pIdMatch = patient.patientId.toLowerCase().includes(pIdFilter.toLowerCase());
-        const pIdMatch = patient.authid.toLowerCase().includes(pIdFilter.toLowerCase());
+        const pIdMatch = patient.authid?.toLowerCase().includes(pIdFilter.toLowerCase());
         const genderMatch = genderFilter === 'all' || patient.sex === genderFilter;
         const dobMatch = dobFilter ? patient.dob === dobFilter : true;
         const cityMatch = cityFilter ? patient.city.toLowerCase().includes(cityFilter.toLowerCase()) : true;
