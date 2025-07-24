@@ -713,7 +713,7 @@ export default function PatientRegistrationForm() {
               <h2 className="text-xl font-semibold">GLP-1 Plan</h2>
               <div className="space-y-2">
                 <Label>
-                  Have you purchased a Somi GLP-1 plan? <span className="text-red-500">*</span>
+                  Did you recently pay for a Somi GLP-1 weight loss medication? <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex gap-2 justify-center flex-col items-center">
                   {['yes', 'no'].map((option, index) => (

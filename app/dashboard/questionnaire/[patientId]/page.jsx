@@ -155,7 +155,7 @@ export default function PatientUpdateForm({ params }) {
                 heartRate: formData.heartRate,
                 medicine: formData.glp1Preference,
                 glpTaken: formData.glp1PastYear,
-                glpRecentInjection: formData.lastInjectionDate?.split('/').map(p => p.trim()).map((v, i) => i < 2 ? v.padStart(2, '0') : v).reverse().join('/').replace(/^(\d{4})\/(\d{2})\/(\d{2})$/, '$3/$2/$1'),
+                glpRecentInjection: formData.lastInjectionDate?.split('/').map(p => p.trim().padStart(2, '0')).reduce((_, __, i, arr) => `${arr[2]}-${arr[0]}-${arr[1]}`),
                 allergyList: formData.allergies,
                 surgeryList: formData.surgeries,
                 diagnosis: formData.diagnoses.join(', '),
