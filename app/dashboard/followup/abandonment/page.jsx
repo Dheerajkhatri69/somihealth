@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 const DashboardStats = () => {
     const [chartData, setChartData] = useState([]);
     const [selectedState, setSelectedState] = useState(0);
-    const [timeRange, setTimeRange] = useState("all");
+    const [timeRange, setTimeRange] = useState("7d");
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const recordsPerPage = 100;
