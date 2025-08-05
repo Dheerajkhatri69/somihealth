@@ -184,7 +184,7 @@ export default function ClientVideoReviews() {
       description:
         "Weekly nudges and clear guidance—no guesswork. I’m the most consistent I’ve ever been.",
       poster: "/hero/v3.png",
-      srcMp4: "/hero/3.mov",
+      srcMp4: "/hero/3.mp4",
     },
     {
       title: "Confidence is back",
