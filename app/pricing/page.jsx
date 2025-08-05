@@ -161,7 +161,7 @@ const LandingPagePricing = () => {
             <div className="flex flex-col items-center mb-4">
 
               <p className="text-gray-700 text-base font-bold text-center">
-                100% Money Back <br /> Guarantee
+                100% Money Back <br /> Guarantee <br/>FSA and HSA Accepted
               </p>
             </div>
 

@@ -36,6 +36,14 @@ module.exports = {
 					DEFAULT: '#2c3a57',
 					foreground: '#2c3a57'
 				},
+				lightprimary: {
+					DEFAULT: '#E9ECF1',
+					foreground: '#E5E5EE'
+				},
+				darkprimary: {
+					DEFAULT: '#364C78',
+					foreground: '#5B88D4'
+				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
@@ -71,6 +79,7 @@ module.exports = {
 			},
 			fontFamily: {
 				tagesschrift: ["Cormorant Garamond", "serif"],
+				SofiaSans: ["Sofia Sans", "sans-serif"],
 			},
 		}
 	},

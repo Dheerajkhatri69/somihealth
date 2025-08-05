@@ -47,8 +47,8 @@ const PRODUCTS = {
         link: 'https://buy.stripe.com/aFafZi5z00U8fec1Ik3ks06',
       },
       {
-        label: '15 Weeks (1mg/week)',
-        price: '$339',//done
+        label: '20 Weeks (1mg/week)',
+        price: '$499',//done
         link: 'https://buy.stripe.com/14A14od1scCQ2rq4Uw3ks07',
       },
       {
@@ -320,6 +320,10 @@ const Page = ({ params }) => {
                 />
               ))}
             </div>
+          </div>
+
+          <div className="px-4 text-sm text-gray-800 text-center mt-4">
+            FSA and HSA Accepted
           </div>
 
           <button

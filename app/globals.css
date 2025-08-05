@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Kenia&family=Monsieur+La+Doulaise&family=Shadows+Into+Light&family=Tagesschrift&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Kenia&family=Monsieur+La+Doulaise&family=Shadows+Into+Light&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&family=Tagesschrift&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -147,21 +148,207 @@ input {
 }
 
 
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-/* Hide scrollbar for all browsers */
-html, body {
-  scrollbar-width: none;     /* Firefox */
+/* Generic animation layer — works on any element */
+.fx86 {
+  position: relative;          /* needed for absolute pseudo-layers */
+  isolation: isolate;          /* keep layers behind content only */
 }
 
-/* In your global CSS */
-input[type="date"].white-calendar::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+/* shared layer styles */
+.fx86::before,
+.fx86::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: -1;                 /* behind content */
+  border-radius: inherit;      /* respects Tailwind rounded-* */
+  pointer-events: none;
+  transition: transform .4s, width .4s, height .4s, border-radius .4s;
+}
+
+/* base layer (can be transparent if you don't want it) */
+.fx86::before {
+  /* cover host by default */
+  inset: 0;
+  background: var(--fx86-base, #2c3a57);   /* override with CSS var */
+}
+
+/* glow layer */
+.fx86::after {
+  width: 35px;
+  height: 35px;
+  transform: translate(10px, 10px);
+  background: var(--fx86-glow, rgba(255,255,255,.15));
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 9999px;       /* pill until hover */
+}
+
+/* interactions */
+.fx86:hover::before {
+  transform: translate(5%, 20%);
+  width: 110%;
+  height: 110%;
+}
+
+.fx86:hover::after {
+  transform: translate(0, 0);
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.fx86:active::after {
+  transition-duration: 0s;
+  transform: translate(0, 5%);
+}
+/* faint outlined letters, no fill */
+.watermark {
+  position: relative;
+  isolation: isolate;
+}
+
+.watermark::before {
+  content: attr(data-text);
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+
+  /* position */
+  left: var(--wm-left, -2rem);
+  top: var(--wm-top, 50%);
+  transform: translateY(-50%) rotate(var(--wm-rotate, 90deg));
+
+  /* look & feel */
+  font-size: var(--wm-size, clamp(84px, 12vw, 220px));
+  font-family: var(--wm-font, inherit);
+  font-weight: var(--wm-weight, 700);
+  letter-spacing: var(--wm-tracking, 0.1em);
+  opacity: var(--wm-opacity, 0.6);
+
+  /* outline + fill */
+  color: var(--wm-fill, transparent); /* set to a color for filled text */
+  -webkit-text-stroke: var(--wm-stroke-w, 1.5px) var(--wm-stroke-c, #dfe8dc);
+          text-stroke: var(--wm-stroke-w, 1.5px) var(--wm-stroke-c, #dfe8dc);
+}
+/* --- Primary button: lift + glow + sheen --- */
+.fx-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.fx-primary::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s, transform .3s;
+  transform: scale(.98);
+  /* soft radial glow from bottom */
+  background: radial-gradient(120% 90% at 50% 120%,
+              rgba(255,255,255,.25) 0%, transparent 65%);
+}
+.fx-primary::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -30%;
+  width: 30%;
+  height: 120%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-130%) rotate(20deg);
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.6), transparent);
+}
+.fx-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -12px rgba(0,0,0,.35);
+}
+.fx-primary:hover::before { opacity: 1; transform: scale(1.02); }
+.fx-primary:hover::after  { opacity: 1; animation: fx-sheen 900ms cubic-bezier(.4,0,.2,1) both; }
+.fx-primary:active { transform: translateY(0); box-shadow: none; }
+
+@keyframes fx-sheen {
+  from { transform: translateX(-130%) rotate(20deg); }
+  to   { transform: translateX(330%)  rotate(20deg); }
+}
+
+/* --- Outline button: inner fill sweep --- */
+.fx-outline {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color .25s ease, border-color .25s ease, transform .2s ease;
+}
+.fx-outline::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--fx-fill, #111);  /* set with style if you want */
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .35s ease;
+}
+.fx-outline:hover {
+  transform: translateY(-1px);
+  color: white; /* text flips to white when fill arrives */
+}
+.fx-outline:hover::before { transform: scaleX(1); }
+.fx-outline:active { transform: translateY(0); }
+
+
+/* CTA pill animation: subtle lift + sheen */
+.btn-hero {
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.btn-hero:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -12px rgba(0,0,0,.35);
+}
+.btn-hero::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -30%;
+  width: 30%;
+  height: 120%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.6), transparent);
+  transform: translateX(-130%) rotate(20deg);
+  opacity: 0;
+}
+.btn-hero:hover::after {
+  opacity: 1;
+  animation: hero-sheen 900ms cubic-bezier(.4,0,.2,1) both;
+}
+.btn-hero:active { transform: translateY(0); box-shadow: none; }
+
+@keyframes hero-sheen {
+  from { transform: translateX(-130%) rotate(20deg); }
+  to   { transform: translateX(330%)  rotate(20deg); }
+}
+@keyframes slide-in-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0%);   opacity: 1; }
+}
+@keyframes slide-out-up {
+  from { transform: translateY(0%);   opacity: 1; }
+  to   { transform: translateY(-100%);opacity: 0; }
+}
+
+.animate-slide-in-up  { animation: slide-in-up  var(--rot-dur,700ms) ease-out both; }
+.animate-slide-out-up { animation: slide-out-up var(--rot-dur,700ms) ease-in  both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in-up,
+  .animate-slide-out-up { animation: none !important; }
 }

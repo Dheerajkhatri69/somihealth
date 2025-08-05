@@ -712,8 +712,9 @@ export default function PatientRegistrationForm() {
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">GLP-1 Plan</h2>
               <div className="space-y-2">
-                <Label>
-                  Did you recently pay for a Somi GLP-1 weight loss medication? <span className="text-red-500">*</span>
+                <Label htmlFor="paid">
+                  If you have paid for your medication pick &quot;YES&quot;.<br />
+                  If you have not paid for your medications pick &quot;NO&quot; <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex gap-2 justify-center flex-col items-center">
                   {['yes', 'no'].map((option, index) => (
