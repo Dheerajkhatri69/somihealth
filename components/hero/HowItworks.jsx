@@ -14,7 +14,7 @@ export default function HowItWorksGnz() {
                 <p className="text-xs font-semibold tracking-[.18em] text-foreground/60">
                     FEEL STRONGER, HEALTHIER, AND MORE CONFIDENT
                 </p>
-                <h2 className="mt-3 font-serif text-3xl font-bold leading-tight sm:text-4xl">
+                <h2 className="mt-3 font-SofiaSans text-3xl font-bold leading-tight sm:text-4xl">
                     How it works <span className="text-secondary">with Somi Health</span>
                 </h2>
             </div>
@@ -50,7 +50,7 @@ export default function HowItWorksGnz() {
                 {/* Optional CTA */}
                 <div className="mt-10 flex justify-center">
                     <Link
-                        href="/get-started"
+                        href="/getstarted"
                         className="fx-primary inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
                     >
                         Start your journey
@@ -92,7 +92,7 @@ function Step({ eyebrow, caption, icon, title, text }) {
                 {/* small notch */}
                 <span className="absolute -top-3 left-1/2 h-6 w-6 bg-lightprimary -translate-x-1/2 rotate-45 rounded-[6px] border border-border bg-card/80 shadow-sm" />
 
-                <h3 className="text-center font-serif text-xl font-semibold">{title}</h3>
+                <h3 className="text-center font-SofiaSans text-xl font-semibold">{title}</h3>
                 <p className="mt-3 text-center text-sm leading-6 text-muted-foreground">{text}</p>
             </div>
         </div>

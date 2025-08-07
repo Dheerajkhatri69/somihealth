@@ -77,7 +77,7 @@ function ReviewCard({ quote, author }) {
 export default function StoriesWithReviews() {
   const headline =
     "Real stories from real patients on their journey to better health.";
-  const cta = { label: "Start Your Journey", href: "/get-started" };
+  const cta = { label: "Start Your Journey", href: "/getstarted" };
 
   const reviews = [
     {

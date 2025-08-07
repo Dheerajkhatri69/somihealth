@@ -294,13 +294,15 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
         <div className="fixed inset-0 z-[60] bg-white">
             {/* Top bar inside overlay */}
             <div className="flex items-center justify-between px-4 py-3 md:px-6">
-                <button onClick={onClose} aria-label="Close menu">
+                <button onClick={onClose} aria-label="Close menu" className="p-2">
                     <CloseIcon />
                 </button>
                 <span className="text-3xl text-secondary font-bold font-SofiaSans tracking-tight">{brand}</span>
                 {/* right icons (placeholders to match screenshot) */}
                 <div className="flex items-center gap-4">
-                    <Sparkles />
+                    <Link href="/getstarted">
+                        <Sparkles />
+                    </Link>
                     <User />
                 </div>
             </div>
@@ -401,7 +403,7 @@ export default function Navbar({ brand = "somi" }) {
                     {/* Right actions (desktop) */}
                     <div className="hidden items-center gap-3 md:flex">
                         <Link
-                            href="/get-started"
+                            href="/getstarted"
                             className="fx-primary rounded-full bg-secondary px-5 py-2 text-sm font-semibold text-white hover:opacity-100"
                         >
                             Get Started
@@ -418,7 +420,9 @@ export default function Navbar({ brand = "somi" }) {
 
                     {/* Right icons (mobile, for visual parity) */}
                     <div className="flex items-center gap-4 md:hidden">
-                        <Sparkles />
+                        <Link href="/getstarted">
+                            <Sparkles />
+                        </Link>
                         <User />
                     </div>
                 </nav>

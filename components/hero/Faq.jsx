@@ -149,7 +149,7 @@ export default function FaqPro() {
                                 </p>
                             </div>
                             <a
-                                href="/contact"
+                                href="/underdevelopmentmainpage/contact"
                                 className="fx-primary  inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60"
                             >
                                 Get in touch

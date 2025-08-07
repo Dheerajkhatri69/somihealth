@@ -44,7 +44,7 @@ export default function SomiFooter() {
                                     Learn More
                                 </Link>
                                 <Link
-                                    href="/get-started"
+                                    href="/getstarted"
                                     className="fx-primary inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-5 py-2 text-sm font-semibold text-white hover:opacity-90"
                                 >
                                     Start Your Journey <ArrowRight className="h-4 w-4" />
@@ -119,9 +119,17 @@ export default function SomiFooter() {
                         <h4 className="mb-3 text-lg font-semibold">Navigation</h4>
                         <ul className="space-y-3 text-sm">
                             <li><FooterLink href="/referrals">Referrals</FooterLink></li>
-                            <li><FooterLink href="/patient-glp1-packet">Patient GLP-1 Packet</FooterLink></li>
-                            <li><FooterLink href="/about">About Us</FooterLink></li>
-                            <li><FooterLink href="/contact">Contact Us</FooterLink></li>
+                            <li>
+                                <FooterLink
+                                    href="/docs/patient-glp1-packet.pdf"
+                                    target="_blank"           // opens in new tab (remove if you want same tab)
+                                    rel="noopener noreferrer" // security hygiene
+                                >
+                                    Patient GLP-1 Packet
+                                </FooterLink>
+                            </li>
+                            <li><FooterLink href="/underdevelopmentmainpage/about">About Us</FooterLink></li>
+                            <li><FooterLink href="/underdevelopmentmainpage/contact">Contact Us</FooterLink></li>
                         </ul>
                     </div>
 
@@ -151,11 +159,11 @@ export default function SomiFooter() {
                         <p className="text-xs text-white/70">Website Designed by --------------</p>
                         {/* <p className="text-xs text-white/70">Website Designed by Dheeraj Khatri</p> */}
                         <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
-                            <li><FooterLink href="/hipaa">HIPAA Privacy</FooterLink></li>
-                            <li><FooterLink href="/terms">Terms of Service</FooterLink></li>
-                            <li><FooterLink href="/shipping-returns">Shipping &amp; Returns</FooterLink></li>
-                            <li><FooterLink href="/telehealth-consent">Telehealth Consent</FooterLink></li>
-                            <li><FooterLink href="/cookies">Cookie Policy</FooterLink></li>
+                            <li><FooterLink href="/underdevelopmentmainpage/footer/hipaa">HIPAA Privacy</FooterLink></li>
+                            <li><FooterLink href="/underdevelopmentmainpage/footer/terms">Terms of Service</FooterLink></li>
+                            <li><FooterLink href="/underdevelopmentmainpage/footer/shipping-returns">Shipping & Returns</FooterLink></li>
+                            <li><FooterLink href="/underdevelopmentmainpage/footer/telehealth-consent">Telehealth Consent</FooterLink></li>
+                            <li><FooterLink href="/underdevelopmentmainpage/footer/cookies">Cookie Policy</FooterLink></li>
                         </ul>
                     </div>
 
