@@ -327,7 +327,7 @@ const Page = ({ params }) => {
             </div>
           </div>
 
-          <div className="px-4 text-sm text-gray-800 text-center mt-4">
+          <div className="px-4 text-sm text-secondary font-bold text-center mt-4">
             FSA and HSA Accepted
           </div>
 
