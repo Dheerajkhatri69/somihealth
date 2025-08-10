@@ -38,8 +38,8 @@ const PRODUCTS = {
       },
       {
         label: '13 Weeks (0.5mg/week)',
-        price: '$269',//done
-        link: 'https://buy.stripe.com/aFa14o9Pg1Yc7LKfza3ks0m',
+        price: '$329',//done
+        link: 'https://buy.stripe.com/14AaEY3qS8mAc20aeQ3ks0L',
       },
       {
         label: '4 Weeks (1mg/week)',
@@ -53,33 +53,33 @@ const PRODUCTS = {
       },
       {
         label: '4 Weeks (1.7mg/Week)',
-        price: '$269',//done
-        link: 'https://buy.stripe.com/7sY8wQaTkdGU5DCfza3ks08',
+        price: '$329',//done
+        link: 'https://buy.stripe.com/14AeVe8LcauI5DC3Qs3ks0M',
       },
       {
         label: '12 Weeks (1.7mg/week)',
-        price: '$379',//done
-        link: 'https://buy.stripe.com/7sY3cwe5w7iw5DC3Qs3ks09',
+        price: '$474',//done
+        link: 'https://buy.stripe.com/6oUfZif9A8mA8POdr23ks0N',
       },
       {
         label: '5 Weeks (2mg/Week)',
-        price: '$299',//done
-        link: 'https://buy.stripe.com/8x214o7H8fP27LK9aM3ks0a',
+        price: '$329',//done
+        link: 'https://buy.stripe.com/8x214o0eGcCQd64gDe3ks0O',
       },
       {
-        label: '12 Weeks (2mg/week)',
-        price: '$399',//done
-        link: 'https://buy.stripe.com/14AbJ21iKgT67LK86I3ks0b',
+        label: '10 Weeks (2mg/week)',
+        price: '$474',//done
+        link: 'https://buy.stripe.com/9B6aEY9Pg0U83vuaeQ3ks0Q',
       },
       {
         label: '4 Weeks (2.5mg/week)',
-        price: '$299',//done
-        link: 'https://buy.stripe.com/3cI28s6D446k5DC9aM3ks0c',
+        price: '$329',//done
+        link: 'https://buy.stripe.com/cNi00k3qSgT60jibiU3ks0P',
       },
       {
-        label: '10 Weeks (2.5mg/week)',
-        price: '$520',//done
-        link: 'https://buy.stripe.com/dRmfZigdEdGU1nmgDe3ks0d',
+        label: '8 Weeks (2.5mg/week)',
+        price: '$474',//done
+        link: 'https://buy.stripe.com/14A8wQ8Lc46kd6472E3ks0R',
       },
     ],
   },
@@ -94,8 +94,8 @@ const PRODUCTS = {
       },
       {
         label: '8 Weeks (2.5mg and 5mg/week)',
-        price: '$359',//done
-        link: 'https://buy.stripe.com/dRm9AUf9AbyM9TSaeQ3ks0s',
+        price: '$379',//done
+        link: 'https://buy.stripe.com/eVqfZi5z08mA5DCev63ks0F',
       },
       {
         label: '12 Weeks (2.5mg, 5mg, 7.5mg/week)',
@@ -114,8 +114,8 @@ const PRODUCTS = {
       },
       {
         label: '12 Weeks (5mg/Week)',
-        price: '$499',//done
-        link: 'https://buy.stripe.com/28EdRa3qSfP2aXW9aM3ks0j',
+        price: '$559',//done
+        link: 'https://buy.stripe.com/5kQbJ28LccCQgigbiU3ks0G',
       },
       {
         label: '4 Weeks (7.5mg/Week)',
@@ -124,8 +124,8 @@ const PRODUCTS = {
       },
       {
         label: '8 Weeks (7.5mg/Week)',
-        price: '$549',//done
-        link: 'https://buy.stripe.com/aFa00k5z046k3vugDe3ks0r',
+        price: '$559',//done
+        link: 'https://buy.stripe.com/aFafZi3qSeKY8PO86I3ks0H',
       },
       {
         label: '4 Weeks (10mg/week)',
@@ -133,14 +133,19 @@ const PRODUCTS = {
         link: 'https://buy.stripe.com/9B63cw3qS5aoea85YA3ks0o',
       },
       {
+        label: '6 Weeks (10mg/week)',
+        price: '$559',//done
+        link: 'https://buy.stripe.com/14AaEY8LcdGUd64biU3ks0K',
+      },
+      {
         label: '4 Weeks (12.5mg/week)',
-        price: '$449',//done
-        link: 'https://buy.stripe.com/fZu28s7H86es4zyaeQ3ks0p',
+        price: '$469',//done
+        link: 'https://buy.stripe.com/bJe28s7H87iw7LK0Eg3ks0I',
       },
       {
         label: '4 Weeks (15mg/Week)',
-        price: '$499',
-        link: 'https://buy.stripe.com/00w9AUaTk8mAfecaeQ3ks0q',
+        price: '$559',
+        link: 'https://buy.stripe.com/5kQ00k4uWdGU3vu9aM3ks0J',
       },
     ],
   },
