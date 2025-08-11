@@ -303,7 +303,9 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     <Link href="/getstarted">
                         <Sparkles />
                     </Link>
-                    <User />
+                    <Link href="/underdevelopmentmainpage/login">
+                        <User />
+                    </Link>
                 </div>
             </div>
 
@@ -409,8 +411,9 @@ export default function Navbar({ brand = "somi" }) {
                             Get Started
                         </Link>
 
+
                         <Link
-                            href="/login"
+                            href="/underdevelopmentmainpage/login"
                             className="fx-outline rounded-full border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-900 hover:border-transparent"
                             style={{ "--fx-fill": "var(--tw-bg-secondary, #16a34a)" }}  // set fill color; or use a hex
                         >
@@ -423,7 +426,9 @@ export default function Navbar({ brand = "somi" }) {
                         <Link href="/getstarted">
                             <Sparkles />
                         </Link>
-                        <User />
+                        <Link href="/underdevelopmentmainpage/login">
+                            <User />
+                        </Link>
                     </div>
                 </nav>
 
