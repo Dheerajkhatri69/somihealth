@@ -4,7 +4,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, Sparkles } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,18 +26,6 @@ export default function LoginPage() {
     const [error, setError] = useState("")
 
     const onSubmit = async (e) => {
-        e.preventDefault()
-        setError("")
-        setLoading(true)
-        try {
-            // TODO: Replace with your API call
-            await new Promise((r) => setTimeout(r, 600)) // mock
-            router.push("/dashboard")
-        } catch {
-            setError("Invalid credentials. Please try again.")
-        } finally {
-            setLoading(false)
-        }
     }
 
     return (

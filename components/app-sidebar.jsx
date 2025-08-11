@@ -14,17 +14,6 @@ import {
   AudioWaveform,
   FilePlus,
   Settings2,
-  PanelBottom,      // Footer
-  Layout,           // Header / Layout
-  FileText,         // Pages
-  Type,             // Typography / Copy
-  Palette,          // Theme
-  Shield,           // Legal
-  Megaphone,        // Announcements
-  Globe,            // SEO
-  Link2,            // Navigation
-  Images,           // Media
-  ChevronRight,
 } from "lucide-react"
 
 import {
@@ -37,18 +26,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from "./ui/collapsible"
 
-// ========= Existing patient section items =========
 const sidebarItems = [
   { title: "Data Form", url: "/dashboard/addrecord", icon: Home, allowedRoles: ["A", "T"] },
   { title: "Dashboard", url: "/dashboard", icon: Inbox, allowedRoles: ["A", "T", "C"] },
@@ -61,41 +41,6 @@ const sidebarItems = [
   { title: "Close tickets", url: "/dashboard/closetickets", icon: Trash, allowedRoles: ["A"] },
 ]
 
-// ========= New frontend controls (Admin-only) =========
-const frontendControls = [
-  {
-    title: "Header & Nav",
-    icon: Layout,
-    base: "/admin/nav",
-    items: [
-      { title: "Navigation", url: "/admin/nav/menus", icon: Link2 },
-      { title: "Branding", url: "/admin/nav/branding", icon: Images },
-      { title: "Top Bar", url: "/admin/nav/topbar", icon: Type },
-    ],
-  },
-  {
-    title: "Homepage",
-    icon: FileText,
-    base: "/admin/home",
-    items: [
-      { title: "Hero", url: "/admin/home/hero", icon: Images },
-      { title: "Highlights", url: "/admin/home/highlights", icon: Type },
-      { title: "CTA Sections", url: "/admin/home/ctas", icon: FileText },
-    ],
-  },
-  {
-    title: "Footer",
-    icon: PanelBottom,
-    base: "/admin/footer",
-    items: [
-      { title: "HIPAA Privacy", url: "/admin/footer/privacy", icon: FileText },
-      { title: "Terms of Service", url: "/admin/footer/terms", icon: FileText },
-      { title: "Shipping & Returns", url: "/admin/footer/refund", icon: FileText },
-      { title: "Telehealth Consent", url: "/admin/footer/disclaimer", icon: FileText },
-    ],
-  },
-]
-
 export function AppSidebar() {
   const pathname = usePathname()
   const [unseenCount, setUnseenCount] = useState(0)
@@ -103,7 +48,6 @@ export function AppSidebar() {
   const [unseenReferralsCount, setUnseenReferralsCount] = useState(0)
   const [userType, setUserType] = useState(null)
 
-  // read role once from localStorage
   useEffect(() => {
     const storedType = typeof window !== "undefined" ? localStorage.getItem("usertype") : null
     if (storedType) setUserType(storedType)
@@ -153,7 +97,6 @@ export function AppSidebar() {
     }
   }
 
-  // polling
   useEffect(() => {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
       fetchUnseenCount()
@@ -192,7 +135,6 @@ export function AppSidebar() {
     return sidebarItems.filter((item) => item.allowedRoles.includes(effectiveUserType || ""))
   }, [effectiveUserType])
 
-  // Loading skeleton
   if (effectiveUserType === null) {
     return (
       <Sidebar>
@@ -225,7 +167,6 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent className="bg-secondary text-white">
-        {/* ===== Section 1: Patient Data Analysis ===== */}
         <SidebarGroup>
           <SidebarGroupLabel className="h-20 flex flex-col items-start">
             <h1 className="font-tagesschrift text-4xl mb-2 text-white z-20 font-bold">somi</h1>
@@ -267,76 +208,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* {effectiveUserType === "A" && (
-          <SidebarGroup>
-            <SidebarGroupLabel>
-              <div className="text-slate-300 text-[1rem]">Frontend Controls</div>
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {frontendControls.map((group) => {
-                  const open = pathname?.startsWith(group.base)
-                  return (
-                    <Collapsible key={group.title} defaultOpen={open} className="group/collapsible">
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton className="text-white">
-                            <group.icon className="size-4" />
-                            <span>{group.title}</span>
-                            <ChevronRight className="ml-auto size-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            {group.items.map((sub) => {
-                              const active = pathname === sub.url
-                              return (
-                                <SidebarMenuSubItem key={sub.title}>
-                                  <SidebarMenuSubButton
-                                    asChild
-                                    isActive={active}
-                                    className={`
-            group/icon
-            !text-white
-            hover:!text-black
-            data-[active=true]:!text-black
-          `}
-                                  >
-                                    <Link href={sub.url} className="flex items-center gap-2">
-                                      <sub.icon
-                                        className={`
-                size-4
-                !text-white
-                group-hover/icon:!text-black
-                transition-colors duration-200
-              `}
-                                      />
-                                      <span
-                                        className={`
-                transition-colors duration-200
-                ${active ? "!text-black" : "!text-white group-hover/icon:!text-black"}
-              `}
-                                      >
-                                        {sub.title}
-                                      </span>
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              )
-                            })}
-                          </SidebarMenuSub>
-
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
-                  )
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )} */}
       </SidebarContent>
 
       {effectiveUserType === "A" && (
