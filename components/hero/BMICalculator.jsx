@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useMemo, useState } from "react";
 
 /* helpers */
@@ -105,18 +106,21 @@ function ResultCard({ title, value, unit = "", help, color }) {
 /* ===== Main calculator ===== */
 export default function BMICalculator() {
     const [unit, setUnit] = useState("lbs");
-    const [weight, setWeight] = useState(153);
-    const [goalWeight, setGoalWeight] = useState(140); // NEW
+    const [weight, setWeight] = useState("153");
+    const [goalWeight, setGoalWeight] = useState("140");
     const [heightFt, setHeightFt] = useState(5);
     const [heightIn, setHeightIn] = useState(6);
 
     const { bmi, goalBmi, canLose } = useMemo(() => {
-        const kgCurrent = unit === "kg" ? weight : lbToKg(weight);
-        const kgGoal = unit === "kg" ? goalWeight : lbToKg(goalWeight);
+        const wNum = parseFloat(weight || "0");
+        const gNum = parseFloat(goalWeight || "0");
         const m = ftInToMeters(heightFt, heightIn);
 
-        const bmiCurrent = kgCurrent / (m * m);
-        const bmiGoal = kgGoal / (m * m);
+        const kgCurrent = unit === "kg" ? wNum : lbToKg(wNum);
+        const kgGoal = unit === "kg" ? gNum : lbToKg(gNum);
+
+        const bmiCurrent = m > 0 ? kgCurrent / (m * m) : 0;
+        const bmiGoal = m > 0 ? kgGoal / (m * m) : 0;
 
         const diffKg = Math.max(0, kgCurrent - kgGoal);
 
@@ -129,141 +133,134 @@ export default function BMICalculator() {
 
     const toggleUnit = () => {
         if (unit === "lbs") {
-            setWeight(Math.round(lbToKg(weight)));
-            setGoalWeight(Math.round(lbToKg(goalWeight)));
+            setWeight(prev => String(Math.round(lbToKg(parseFloat(prev || "0")))));
+            setGoalWeight(prev => String(Math.round(lbToKg(parseFloat(prev || "0")))));
             setUnit("kg");
         } else {
-            setWeight(Math.round(kgToLb(weight)));
-            setGoalWeight(Math.round(kgToLb(goalWeight)));
+            setWeight(prev => String(Math.round(kgToLb(parseFloat(prev || "0")))));
+            setGoalWeight(prev => String(Math.round(kgToLb(parseFloat(prev || "0")))));
             setUnit("lbs");
         }
     };
 
+
     return (
         <section
-            className="relative isolate overflow-hidden bg-darkprimary/80 py-14 text-center watermark p-2"
-            data-text="somi"
-            style={{
-                '--wm-size': '210px',
-                '--wm-stroke-c': '#FFFFFF',
-                '--wm-stroke-w': '2px',
-                '--wm-fill': 'transparent',
-                '--wm-font': '"Sofia Sans", ui-sans-serif',
-                '--wm-weight': 700,
-                '--wm-tracking': '0em',
-                '--wm-opacity': 0.85,
-                '--wm-left': '0rem',
-                '--wm-rotate': '90deg',
-            }}
+            className="relative isolate overflow-hidden bg-[#fffaf6] pt-14 text-center p-2"
+           
         >
-            <h2 className="mx-auto max-w-4xl text-3xl font-bold sm:text-4xl font-SofiaSans text-white">
+            <h2 className="mx-auto max-w-4xl text-3xl font-bold sm:text-4xl font-SofiaSans text-darkprimary">
                 See how much weight you could lose —
                 <br className="hidden sm:inline" />
                 how different life could feel.
             </h2>
-            <p className="mx-auto mt-4 max-w-3xl text-white/80 font-SofiaSans">
+            <p className="mx-auto mt-4 max-w-3xl text-darkprimary/80 font-SofiaSans">
                 Backed by real medicine and real results, somi helps you reach your goals without constant
                 hunger or unsustainable plans. Just choose your starting point to see what’s possible.
             </p>
+            <div className="flex items-center justify-center">
+                <div className="relative w-full max-w-lg z-10 hidden lg:block sm:hidden">
+                    <Image
+                        src="/hero/bmilady.png"
+                        alt="BMI Calculator"
+                        width={500}
+                        height={500}
+                        className="mx-auto bottom-0"
+                    />
+                </div>
+                <div className="relative z-10 mx-auto mt-10 w-full max-w-4xl rounded-xl bg-lightprimary p-6 shadow-md ring-1 ring-black/10 backdrop-blur-md">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {/* current weight */}
+                        <div>
+                            <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Your weight</label>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    min={0}
+                                    step="1"
+                                    inputMode="numeric"
+                                    value={weight}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        if (v === "") { setWeight(""); return; }           // allow clearing
+                                        const n = Number(v);
+                                        if (Number.isNaN(n)) return;                       // ignore bad chars
+                                        setWeight(String(Math.max(0, n)));                 // clamp to 0+, no auto-1
+                                    }}
+                                    onBlur={() => { if (weight === "") setWeight("0"); }}// normalize empty on blur
+                                    className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
+                                />
+                                <button
+                                    onClick={toggleUnit}
+                                    className="rounded-lg border bg-secondary px-3 py-2 text-sm font-medium text-white"
+                                >
+                                    {unit.toUpperCase()}
+                                </button>
+                            </div>
+                        </div>
 
-            <div className="relative z-10 mx-auto mt-10 w-full max-w-4xl rounded-xl bg-white/60 p-6 shadow-md ring-1 ring-black/10 backdrop-blur-md">
-                <div className="grid gap-6 md:grid-cols-2">
-                    {/* current weight */}
-                    <div>
-                        <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Your weight</label>
-                        <div className="flex items-center gap-3">
-                            <input
-                                type="number"
-                                min={1}
-                                value={weight}
-                                onChange={(e) => setWeight(Math.max(1, +e.target.value))}
-                                className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
+                        {/* goal weight (same unit) */}
+                        <div>
+                            <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Goal weight</label>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    min={0}
+                                    step="1"
+                                    inputMode="numeric"
+                                    value={goalWeight}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        if (v === "") { setGoalWeight(""); return; }
+                                        const n = Number(v);
+                                        if (Number.isNaN(n)) return;
+                                        setGoalWeight(String(Math.max(0, n)));
+                                    }}
+                                    onBlur={() => { if (goalWeight === "") setGoalWeight("0"); }}
+                                    className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
+                                />
+                                <span className="text-sm font-semibold text-gray-600">{unit.toUpperCase()}</span>
+                            </div>
+                        </div>
+
+                        {/* height */}
+                        <div className="md:col-span-2 text-left">
+                            <label className="mb-1 block text-sm font-semibold text-gray-700">Your height</label>
+                            <HeightPicker
+                                feet={heightFt}
+                                inches={heightIn}
+                                onFeet={setHeightFt}
+                                onInches={setHeightIn}
                             />
-                            <button
-                                onClick={toggleUnit}
-                                className="rounded-lg border bg-secondary px-3 py-2 text-sm font-medium text-white"
-                            >
-                                {unit.toUpperCase()}
-                            </button>
                         </div>
                     </div>
 
-                    {/* goal weight (same unit) */}
-                    <div>
-                        <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Goal weight</label>
-                        <div className="flex items-center gap-3">
-                            <input
-                                type="number"
-                                min={1}
-                                value={goalWeight}
-                                onChange={(e) => setGoalWeight(Math.max(1, +e.target.value))}
-                                className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
-                            />
-                            <span className="text-sm font-semibold text-gray-600">{unit.toUpperCase()}</span>
-                        </div>
-                    </div>
-
-                    {/* height */}
-                    <div className="md:col-span-2 text-left">
-                        <label className="mb-1 block text-sm font-semibold text-gray-700">Your height</label>
-                        <HeightPicker
-                            feet={heightFt}
-                            inches={heightIn}
-                            onFeet={setHeightFt}
-                            onInches={setHeightIn}
+                    {/* results */}
+                    <div className="mt-8 grid gap-6 md:grid-cols-3">
+                        <ResultCard
+                            title="Your BMI"
+                            value={bmi.toFixed(1)}
+                            help="Body-mass index"
+                            color="bg-white border-t-8 border-secondary"
+                        />
+                        <ResultCard
+                            title="Goal BMI"
+                            value={goalBmi.toFixed(1)}
+                            help="From your goal weight"
+                            color="bg-white border-t-8 border-emerald-700"
+                        />
+                        <ResultCard
+                            title="You could lose up to"
+                            value={Math.max(0, +canLose.toFixed(0))}
+                            unit={unit}
+                            help="Current − Goal"
+                            color="bg-white border-t-8 border-secondary/80"
                         />
                     </div>
-                </div>
 
-                {/* results */}
-                <div className="mt-8 grid gap-6 md:grid-cols-3">
-                    <ResultCard
-                        title="Your BMI"
-                        value={bmi.toFixed(1)}
-                        help="Body-mass index"
-                        color="bg-white border-t-8 border-secondary"
-                    />
-                    <ResultCard
-                        title="Goal BMI"
-                        value={goalBmi.toFixed(1)}
-                        help="From your goal weight"
-                        color="bg-white border-t-8 border-emerald-700"
-                    />
-                    <ResultCard
-                        title="You could lose up to"
-                        value={Math.max(0, +canLose.toFixed(0))}
-                        unit={unit}
-                        help="Current − Goal"
-                        color="bg-white border-t-8 border-secondary/80"
-                    />
                 </div>
 
             </div>
-            <div className="relative mx-auto mt-10 w-full max-w-4xl">
-                {/* light glow */}
-                <span
-                    aria-hidden
-                    className="
-      pointer-events-none absolute
-      bottom-2 right-[-7rem]
-      h-40 w-40 sm:h-56 sm:w-56
-      rounded-full
-      bg-[radial-gradient(closest-side,rgba(255,255,255,.55),rgba(255,255,255,.18),transparent_70%)]
-      blur-2xl opacity-90
-      z-0
-    "
-                />
-                <img
-                    src="/hero/newsemaglutide.png"
-                    alt=""
-                    className="
-      pointer-events-none absolute z-10
-      bottom-0 -right-32
-      w-28 sm:w-32 md:w-36
-    "
-                />
-            </div>
-
         </section>
     );
 }

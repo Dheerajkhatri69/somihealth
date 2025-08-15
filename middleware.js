@@ -1,3 +1,4 @@
+// middleware.js
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
@@ -8,22 +9,37 @@ const routeRoleMap = {
   "/dashboard/questionnaire": ["A", "T"],
   "/dashboard/abandonment": ["A"],
   "/dashboard/refills": ["A", "T"],
+  "/dashboard/followup/abandonment": ["A"],
   "/dashboard/referrals": ["A"],
   "/dashboard/emailhistorytable": ["A"],
-  "/dashboard/closetickets": ["A"]
+  "/dashboard/closetickets": ["A"],
+  "/dashboard/addstaff": ["A"],
 };
 
 export default withAuth(
   function middleware(req) {
-    const accountType = req.nextauth.token?.accounttype;
+    // read both possible casings from your JWT
+    const token = req.nextauth.token || {};
+    const accountType = token.accountType ?? token.accounttype;
+
     const url = req.nextUrl.pathname;
+    const normalizedUrl = url.split("?")[0].replace(/\/$/, ""); // strip trailing slash
 
-    // Find the matching route (exact match or startsWith for subpages)
-    const normalizedUrl = url.split("?")[0].replace(/\/$/, "");
-    const matchedRoute = Object.keys(routeRoleMap).find(route =>
-      normalizedUrl === route || normalizedUrl.startsWith(route + "/")
-    );
+    // 1) exact match first
+    let matchedRoute = routeRoleMap[normalizedUrl] ? normalizedUrl : undefined;
 
+    // 2) else pick LONGEST matching parent (/dashboard/foo/bar -> /dashboard/foo beats /dashboard)
+    if (!matchedRoute) {
+      const candidates = Object.keys(routeRoleMap).filter(
+        (route) => route !== "/" && normalizedUrl.startsWith(route + "/")
+      );
+      if (candidates.length) {
+        candidates.sort((a, b) => b.length - a.length);
+        matchedRoute = candidates[0];
+      }
+    }
+
+    // 3) enforce allowed roles for matched route
     if (matchedRoute) {
       const allowedRoles = routeRoleMap[matchedRoute];
       if (!allowedRoles.includes(accountType)) {
@@ -31,7 +47,7 @@ export default withAuth(
       }
     }
 
-    // Optionally restrict access to unknown account types
+    // 4) optionally block unknown account types
     if (!["A", "C", "T"].includes(accountType)) {
       return NextResponse.redirect(new URL("/", req.url));
     }
@@ -46,5 +62,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard", "/dashboard/:path*"],
 };

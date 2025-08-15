@@ -13,7 +13,7 @@ export default function WeightLossPlansV3() {
       currency: "$",
       price: 99,
       per: "/Month",
-      primary: { label: "Get approval now", href: "/getstarted" },
+      primary: { label: "Get Started", href: "/getstarted" },
       secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/semaglutide" },
     },
     {
@@ -24,32 +24,63 @@ export default function WeightLossPlansV3() {
       currency: "$",
       price: 145,
       per: "/Month",
-      primary: { label: "Get approval now", href: "/getstarted" },
+      primary: { label: "Get Started", href: "/getstarted" },
+      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/tirzepatide" },
+    },
+    {
+      name: "Compounded Semaglutide",
+      img: "/hero/newsemaglutide.png",
+      imgAlt: "Somi Compounded Semaglutide vial",
+      priceLabel: "Starting At",
+      currency: "$",
+      price: 99,
+      per: "/Month",
+      primary: { label: "Get Started", href: "/getstarted" },
+      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/semaglutide" },
+    },
+    {
+      name: "Compounded Tirzepatide",
+      img: "/hero/newtirzepatide.png",
+      imgAlt: "Somi Compounded Tirzepatide vial",
+      priceLabel: "Starting At",
+      currency: "$",
+      price: 145,
+      per: "/Month",
+      primary: { label: "Get Started", href: "/getstarted" },
+      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/tirzepatide" },
+    },
+    {
+      name: "Compounded Tirzepatide",
+      img: "/hero/newtirzepatide.png",
+      imgAlt: "Somi Compounded Tirzepatide vial",
+      priceLabel: "Starting At",
+      currency: "$",
+      price: 145,
+      per: "/Month",
+      primary: { label: "Get Started", href: "/getstarted" },
       secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/tirzepatide" },
     },
   ];
 
   return (
     <section className="w-full py-10 sm:py-12">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <h2 className="mb-6 text-center text-2xl font-bold sm:text-3xl">
-          Weight Loss Plans
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <h2 className=" text-center text-2xl font-bold sm:text-3xl">
+          Plans
         </h2>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 ">
           {plans.map((p, i) => (
             <CardContainer key={i} className="w-full">
               <CardBody
                 className="
                   group/card relative w-full rounded-2xl
-                  bg-lightprimary-foreground shadow-sm ring-1 ring-black/5
+                  bg-darkprimary-foreground/20 shadow-sm ring-1 ring-black/5
                   flex flex-col items-center justify-between
                   p-6 sm:p-7
-                  min-h-[420px] sm:min-h-[460px] md:min-h-[500px]
+                  min-h-[340px] sm:min-h-[380px] md:min-h-[420px]
                 "
               >
-                {/* top accent */}
-                <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-secondary/70 via-secondary to-secondary/70 opacity-80" />
 
                 {/* TOP */}
                 <div className="z-10 w-full text-center">
@@ -78,10 +109,10 @@ export default function WeightLossPlansV3() {
 
                 {/* MIDDLE (bigger vial) */}
                 <CardItem
-                  translateZ={60}
+                  translateZ={20}
                   className="relative z-10 row-start-2 flex items-center justify-center pt-2 pb-3"
                 >
-                  <div className="relative w-28 sm:w-32 md:w-40">
+                  <div className="relative w-24 sm:w-28 md:w-32">
                     <span className="vial-shadow pointer-events-none absolute bottom-1 left-1/2 h-3 w-2/3 -translate-x-1/2 rounded-full" />
                     <img
                       src={p.img}
@@ -93,12 +124,12 @@ export default function WeightLossPlansV3() {
                 </CardItem>
 
                 {/* BOTTOM */}
-                <div className="z-10 mt-1 flex flex-col items-center justify-center gap-2 sm:flex-row">
+                <div className="z-10 mt-1 flex flex-col items-center justify-center gap-2 sm:flex-col lg:flex-row">
                   <CardItem
                     translateZ={10}
                     as={Link}
                     href={p.primary.href}
-                    className="btn-hero inline-flex h-12 min-w-[200px] items-center justify-center gap-2 rounded-full bg-secondary px-5 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60"
+                    className="btn-hero inline-flex h-12 min-w-[200px] md:min-w-[160px] items-center justify-center gap-2 rounded-full bg-darkprimary px-5 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60"
                   >
                     {p.primary.label}
                     <ArrowRight />
@@ -108,7 +139,7 @@ export default function WeightLossPlansV3() {
                     translateZ={10}
                     as={Link}
                     href={p.secondary.href}
-                    className="fx86 inline-flex h-12 min-w-[200px] items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                    className="fx86 inline-flex h-12 min-w-[200px] md:min-w-[160px] items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
                     style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                   >
                     {p.secondary.label}

@@ -39,7 +39,7 @@ export default function ProductCard({ item, ctaHref }) {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
                     href={item.href}
-                    className="btn-hero inline-flex w-full items-center justify-center rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+                    className="btn-hero inline-flex w-full items-center justify-center rounded-full bg-darkprimary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
                 >
                     Learn More
                 </Link>

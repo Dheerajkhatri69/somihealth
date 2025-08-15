@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowDownNarrowWide, Menu, Plus, StepBack, StepForward, Timer } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Select,
     SelectContent,
@@ -63,11 +63,11 @@ export default function FollowUp() {
     const [Tloading, setTLoading] = useState(true);
     const router = useRouter();
     const { data: session } = useSession();
-    
+
     // Add localStorage states for faster loading
     const [userType, setUserType] = useState(null);
     const [userId, setUserId] = useState(null);
-    
+
     const [viewMode, setViewMode] = useState('assigned'); // 'all' or 'assigned'
 
     const [openDialog, setOpenDialog] = useState(false)
@@ -82,6 +82,27 @@ export default function FollowUp() {
             if (storedUserId) setUserId(storedUserId);
         }
     }, []);
+    const [clinicians, setClinicians] = useState([]);
+    const [assignedPatients, setAssignedPatients] = useState([]);
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const userRes = await fetch("/api/users");
+                const userData = await userRes.json();
+                const clinicianList = userData.result?.filter(user => user.accounttype === "C") || [];
+                setClinicians(clinicianList);
+                const assignRes = await fetch("/api/followupassig");
+                const assignData = await assignRes.json();
+                setAssignedPatients(assignData.result);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                toast.error("Failed to load data");
+            }
+        }
+
+        fetchData();
+    }, []);
+
 
     // Add pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -204,6 +225,50 @@ export default function FollowUp() {
 
     const [selectedStatus, setSelectedStatus] = useState('all');
 
+    const [clinicianFilter, setClinicianFilter] = useState("all");
+
+    // Map clinician id → Set(patient ids)
+    const cidToPidSet = useMemo(() => {
+        const map = new Map();
+        assignedPatients.forEach(a => {
+            if (!a?.cid || !a?.pid) return;
+            if (!map.has(a.cid)) map.set(a.cid, new Set());
+            map.get(a.cid).add(String(a.pid).toLowerCase());
+        });
+        return map;
+    }, [assignedPatients]);
+
+    // Set of all assigned patient IDs
+    const allAssignedPids = useMemo(() => {
+        const set = new Set();
+        assignedPatients.forEach(a => {
+            if (a?.pid) set.add(String(a.pid).toLowerCase());
+        });
+        return set;
+    }, [assignedPatients]);
+
+    const getPatientPid = p => String(p.patientId ?? p.pid ?? p.authid ?? "").toLowerCase();
+
+    const [fromDateStr, setFromDateStr] = useState(""); // "MM / DD / YYYY"
+    const [toDateStr, setToDateStr] = useState("");     // "MM / DD / YYYY"
+    const MDY_REGEX = /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/;
+
+    function parseMDYToUTC(dateStr, endOfDay = false) {
+        if (!dateStr || !MDY_REGEX.test(dateStr)) return null;
+        const [mm, dd, yyyy] = dateStr.split("/").map((s) => parseInt(s.trim(), 10));
+        return new Date(Date.UTC(yyyy, mm - 1, dd, endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0, endOfDay ? 999 : 0));
+    }
+
+    function isWithinRange(isoZ, fromUtc, toUtc) {
+        const t = new Date(isoZ).getTime(); // ISO with Z is UTC
+        if (Number.isNaN(t)) return false;
+        const lo = fromUtc ? fromUtc.getTime() : -Infinity;
+        const hi = toUtc ? toUtc.getTime() : +Infinity;
+        return t >= lo && t <= hi; // inclusive
+    }
+    const fromUtc = useMemo(() => parseMDYToUTC(fromDateStr, false), [fromDateStr]);
+    const toUtc = useMemo(() => parseMDYToUTC(toDateStr, true), [toDateStr]);
+
     // Add this status counter function
     const getStatusCounts = (patients) => {
         return {
@@ -240,10 +305,19 @@ export default function FollowUp() {
             (tirzepatideUnitFilter === 'all' || patient.tirzepatideUnit === tirzepatideUnitFilter)
         );
 
+        const clinicianMatch =
+            clinicianFilter === "all"
+                ? true
+                : clinicianFilter === "unassigned"
+                    ? !allAssignedPids.has(getPatientPid(patient))
+                    : cidToPidSet.get(clinicianFilter)?.has(getPatientPid(patient)) ?? false;
+
+        const createDateRangeMatch = isWithinRange(patient.createTimeDate, fromUtc, toUtc);
+
         const createDateMatch = createDateFilter ? patient.createTimeDate.split('T')[0] === createDateFilter : true;
 
         return emailMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
-            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch;
+            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch;
     });
 
     const statusCounts = getStatusCounts(filteredPatients);
@@ -423,10 +497,10 @@ export default function FollowUp() {
                     <input
                         type="date"
                         value={createDateFilter}
-                        onChange={(e) => setCreateDateFilter(e.target.value)}       
+                        onChange={(e) => setCreateDateFilter(e.target.value)}
                         className="w-full border rounded-xl bg-secondary text-white border-none white-calendar h-9 p-2"
                     />
-                    <Button 
+                    <Button
                         className="bg-secondary hover:bg-secondary-foreground h-full rounded-r-full rounded-l-full"
                         type="button"
                         onClick={() => setCreateDateFilter("")}
@@ -574,6 +648,136 @@ export default function FollowUp() {
                 {(userType === 'A' || userType === 'T') && (
                     <FollowupClinicianDropdown selectedPatients={selectedPatients} />
                 )}
+
+                {(userType === 'A') && (
+                    <Select value={clinicianFilter} onValueChange={setClinicianFilter}>
+                        <SelectTrigger className="w-[280px]">
+                            <SelectValue placeholder="Clinician" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="unassigned">Unassigned</SelectItem>
+                            {clinicians.map(c => (
+                                <SelectItem key={c.id} value={c.id}>
+                                    {c.fullname} ({c.id})
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
+                <div className="flex items-center">
+                    {/* From date */}
+                    <input
+                        id="fromDate"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="MM / DD / YYYY"
+                        className="bg-gray-50 border-secondary border-l-2 border-0 focus:outline-none focus:border-l-4 duration-150 ease-in-out text-gray-900 text-sm rounded-l-md block w-32 p-1.5"
+                        value={fromDateStr}
+                        onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+
+                            if (e.nativeEvent.inputType === 'deleteContentBackward') {
+                                e.target.value = value;
+                                setFromDateStr(e.target.value);
+                                return;
+                            }
+
+                            if (value.length <= 8) {
+                                let formatted = value;
+                                if (value.length > 4) {
+                                    formatted = `${value.slice(0, 2)} / ${value.slice(2, 4)} / ${value.slice(4)}`;
+                                } else if (value.length > 2) {
+                                    formatted = `${value.slice(0, 2)} / ${value.slice(2)}`;
+                                }
+                                e.target.value = formatted;
+                            }
+
+                            if (value.length >= 2) {
+                                const month = parseInt(value.slice(0, 2));
+                                if (month > 12) {
+                                    e.target.value = `12 / ${value.slice(2)}`;
+                                }
+                            }
+
+                            if (value.length >= 4) {
+                                const month = parseInt(value.slice(0, 2));
+                                const day = parseInt(value.slice(2, 4));
+                                const maxDay = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+                                if (day > maxDay) {
+                                    e.target.value = `${value.slice(0, 2)} / ${maxDay} / ${value.slice(4)}`;
+                                }
+                            }
+                            setFromDateStr(e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') e.preventDefault();
+                            if ([8, 46, 9, 27, 13].includes(e.keyCode)) return;
+                            if ((e.ctrlKey || e.metaKey) && [65, 67, 86, 88].includes(e.keyCode)) return;
+                            if ([35, 36, 37, 39].includes(e.keyCode)) return;
+                            if (!/^\d$/.test(e.key)) e.preventDefault();
+                        }}
+                    />
+
+                    {/* TO divider */}
+                    <div className="bg-secondary text-white text-xs px-2 py-1 border-t border-b border-gray-300">
+                        TO
+                    </div>
+                    {/* To date */}
+                    <input
+                        id="toDate"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="MM / DD / YYYY"
+                        className="bg-gray-50 border-secondary border-r-2 border-0 focus:outline-none focus:border-r-4 duration-150 ease-in-out text-gray-900 text-sm rounded-r-md block w-32 p-1.5"
+                        value={toDateStr}
+                        onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+
+                            if (e.nativeEvent.inputType === 'deleteContentBackward') {
+                                e.target.value = value;
+                                setToDateStr(e.target.value);
+                                return;
+                            }
+
+                            if (value.length <= 8) {
+                                let formatted = value;
+                                if (value.length > 4) {
+                                    formatted = `${value.slice(0, 2)} / ${value.slice(2, 4)} / ${value.slice(4)}`;
+                                } else if (value.length > 2) {
+                                    formatted = `${value.slice(0, 2)} / ${value.slice(2)}`;
+                                }
+                                e.target.value = formatted;
+                            }
+
+                            if (value.length >= 2) {
+                                const month = parseInt(value.slice(0, 2));
+                                if (month > 12) {
+                                    e.target.value = `12 / ${value.slice(2)}`;
+                                }
+                            }
+
+                            if (value.length >= 4) {
+                                const month = parseInt(value.slice(0, 2));
+                                const day = parseInt(value.slice(2, 4));
+                                const maxDay = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+                                if (day > maxDay) {
+                                    e.target.value = `${value.slice(0, 2)} / ${maxDay} / ${value.slice(4)}`;
+                                }
+                            }
+                            setToDateStr(e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') e.preventDefault();
+                            if ([8, 46, 9, 27, 13].includes(e.keyCode)) return;
+                            if ((e.ctrlKey || e.metaKey) && [65, 67, 86, 88].includes(e.keyCode)) return;
+                            if ([35, 36, 37, 39].includes(e.keyCode)) return;
+                            if (!/^\d$/.test(e.key)) e.preventDefault();
+                        }}
+                    />
+
+                </div>
+
             </div>
 
             {(userType === 'A' || userType === 'C') && (

@@ -16,7 +16,8 @@ import {
     SelectItem,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+    import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const DashboardStats = () => {
     const [chartData, setChartData] = useState([]);
@@ -24,6 +25,7 @@ const DashboardStats = () => {
     const [timeRange, setTimeRange] = useState("7d");
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
     const recordsPerPage = 100;
 
     useEffect(() => {
@@ -50,7 +52,7 @@ const DashboardStats = () => {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [selectedState, timeRange]);
+    }, [selectedState, timeRange, searchTerm]);
 
     const getFilteredDataByDate = () => {
         if (timeRange === "all") return chartData;
@@ -63,7 +65,17 @@ const DashboardStats = () => {
     };
 
     const dateFilteredData = getFilteredDataByDate();
-    const filtered = dateFilteredData.filter((d) => d.state === selectedState);
+
+    const searchFilteredData = dateFilteredData.filter((item) => {
+        const term = searchTerm.toLowerCase();
+        return (
+            item.name.toLowerCase().includes(term) ||
+            item.email.toLowerCase().includes(term) ||
+            item.phone.toLowerCase().includes(term)
+        );
+    });
+
+    const filtered = searchFilteredData.filter((d) => d.state === selectedState);
     const pageCount = Math.ceil(filtered.length / recordsPerPage);
     const paginatedData = filtered.slice(
         (currentPage - 1) * recordsPerPage,
@@ -79,21 +91,32 @@ const DashboardStats = () => {
     return (
         <Card className="m-4 p-4">
             {/* Filter Dropdown */}
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-between mb-4">
                 {loading ? (
-                    <Skeleton className="w-[160px] h-10 rounded-md" />
+                    <>
+                        <Skeleton className="w-[160px] h-10 rounded-md" />
+                        <Skeleton className="w-[260px] h-10 rounded-md" />
+                    </>
                 ) : (
-                    <Select value={timeRange} onValueChange={setTimeRange}>
-                        <SelectTrigger className="w-[160px]">
-                            <SelectValue placeholder="Filter Days" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="7d">Last 7 days</SelectItem>
-                            <SelectItem value="30d">Last 30 days</SelectItem>
-                            <SelectItem value="90d">Last 90 days</SelectItem>
-                            <SelectItem value="all">All Time</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <>
+                        <Input
+                            placeholder="Search by name, Phone number, or email..."
+                            className="max-w-xs"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <Select value={timeRange} onValueChange={setTimeRange}>
+                            <SelectTrigger className="w-[160px]">
+                                <SelectValue placeholder="Filter Days" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="7d">Last 7 days</SelectItem>
+                                <SelectItem value="30d">Last 30 days</SelectItem>
+                                <SelectItem value="90d">Last 90 days</SelectItem>
+                                <SelectItem value="all">All Time</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </>
                 )}
             </div>
 
@@ -101,34 +124,33 @@ const DashboardStats = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 {loading
                     ? Array.from({ length: 3 }).map((_, i) => (
-                          <Skeleton key={i} className="h-[100px] w-full rounded-xl" />
-                      ))
+                        <Skeleton key={i} className="h-[100px] w-full rounded-xl" />
+                    ))
                     : [0, 1, 2].map((state) => (
-                          <Card
-                              key={state}
-                              onClick={() => setSelectedState(state)}
-                              className={`cursor-pointer shadow hover:shadow-md ${state===0 ? "bg-yellow-200":""} ${state===1 ? "bg-red-200":""} ${state===2 ? "bg-green-200":""} ${
-                                  selectedState === state ? "border-l-8 border-secondary" : ""
-                              }`}
-                          >
-                              <CardHeader className="text-center">
-                                  <CardTitle>
-                                      {state === 0
-                                          ? "LEAVE BETWEEN"
-                                          : state === 1
-                                          ? "KICKED OUT"
-                                          : "FILLED"}
-                                  </CardTitle>
-                                  <CardDescription className="text-3xl font-bold text-secondary">
-                                      {state === 0
-                                          ? counts.leaveBetween
-                                          : state === 1
-                                          ? counts.kickedOut
-                                          : counts.filled}
-                                  </CardDescription>
-                              </CardHeader>
-                          </Card>
-                      ))}
+                        <Card
+                            key={state}
+                            onClick={() => setSelectedState(state)}
+                            className={`cursor-pointer shadow hover:shadow-md ${state === 0 ? "bg-yellow-200" : ""} ${state === 1 ? "bg-red-200" : ""} ${state === 2 ? "bg-green-200" : ""} ${selectedState === state ? "border-l-8 border-secondary" : ""
+                                }`}
+                        >
+                            <CardHeader className="text-center">
+                                <CardTitle>
+                                    {state === 0
+                                        ? "LEAVE BETWEEN"
+                                        : state === 1
+                                            ? "KICKED OUT"
+                                            : "FILLED"}
+                                </CardTitle>
+                                <CardDescription className="text-3xl font-bold text-secondary">
+                                    {state === 0
+                                        ? counts.leaveBetween
+                                        : state === 1
+                                            ? counts.kickedOut
+                                            : counts.filled}
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    ))}
             </div>
 
             {/* Table */}
@@ -147,27 +169,27 @@ const DashboardStats = () => {
                         <tbody>
                             {loading
                                 ? Array.from({ length: 3 }).map((_, idx) => (
-                                      <tr key={idx} className="border-b">
-                                          <td colSpan={5} className="px-4 py-2">
-                                              <Skeleton className="h-10 w-full rounded-md" />
-                                          </td>
-                                      </tr>
-                                  ))
+                                    <tr key={idx} className="border-b">
+                                        <td colSpan={5} className="px-4 py-2">
+                                            <Skeleton className="h-10 w-full rounded-md" />
+                                        </td>
+                                    </tr>
+                                ))
                                 : paginatedData.map((user, idx) => (
-                                      <tr key={idx} className="border-b">
-                                          <td className="px-4 py-2">{user.name}</td>
-                                          <td className="px-4 py-2">{user.email}</td>
-                                          <td className="px-4 py-2">{user.phone}</td>
-                                          <td className="px-4 py-2">
-                                              {new Date(user.date).toLocaleString("en-US", {
-                                                  year: "numeric",
-                                                  month: "short",
-                                                  day: "numeric",
-                                              })}
-                                          </td>
-                                          <td className="px-4 py-2">{user.segment}</td>
-                                      </tr>
-                                  ))}
+                                    <tr key={idx} className="border-b">
+                                        <td className="px-4 py-2">{user.name}</td>
+                                        <td className="px-4 py-2">{user.email}</td>
+                                        <td className="px-4 py-2">{user.phone}</td>
+                                        <td className="px-4 py-2">
+                                            {new Date(user.date).toLocaleString("en-US", {
+                                                year: "numeric",
+                                                month: "short",
+                                                day: "numeric",
+                                            })}
+                                        </td>
+                                        <td className="px-4 py-2">{user.segment}</td>
+                                    </tr>
+                                ))}
                             {!loading && paginatedData.length === 0 && (
                                 <tr>
                                     <td colSpan="5" className="text-center text-muted py-4">

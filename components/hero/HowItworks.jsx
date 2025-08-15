@@ -14,8 +14,8 @@ export default function HowItWorksGnz() {
                 <p className="text-xs font-semibold tracking-[.18em] text-foreground/60">
                     FEEL STRONGER, HEALTHIER, AND MORE CONFIDENT
                 </p>
-                <h2 className="mt-3 font-SofiaSans text-3xl font-bold leading-tight sm:text-4xl">
-                    How it works <span className="text-secondary">with Somi Health</span>
+                <h2 className="mt-3 font-SofiaSans text-3xl font-bold leading-tight sm:text-4xl text-darkprimary">
+                    How it works <span className="text-darkprimary">with Somi Health</span>
                 </h2>
             </div>
 
@@ -51,7 +51,7 @@ export default function HowItWorksGnz() {
                 <div className="mt-10 flex justify-center">
                     <Link
                         href="/getstarted"
-                        className="fx-primary inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
+                        className="fx-primary inline-flex items-center gap-2 rounded-full bg-darkprimary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
                     >
                         Start your journey
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -82,18 +82,18 @@ function Step({ eyebrow, caption, icon, title, text }) {
 
             {/* icon bubble (floats above the card) */}
             <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2">
-                <div className="grid h-12 w-12 place-items-center rounded-full bg-secondary text-white shadow-md ring-2 ring-white/80">
+                <div className="grid h-12 w-12 place-items-center rounded-full bg-darkprimary text-white shadow-md ring-2 ring-white/80">
                     {icon}
                 </div>
             </div>
 
             {/* card */}
-            <div className="relative rounded-2xl bg-lightprimary h-[200px] border border-border bg-card/70 px-6 pb-6 pt-10 shadow-sm backdrop-blur transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
+            <div className="relative rounded-2xl bg-darkprimary h-[200px] border border-border bg-card/70 px-6 pb-6 pt-10 shadow-sm backdrop-blur transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
                 {/* small notch */}
-                <span className="absolute -top-3 left-1/2 h-6 w-6 bg-lightprimary -translate-x-1/2 rotate-45 rounded-[6px] border border-border bg-card/80 shadow-sm" />
+                <span className="absolute -top-3 left-1/2 h-6 w-6 bg-darkprimary border-darkprimary -translate-x-1/2 rotate-45 rounded-[6px] border border-border bg-card/80 shadow-sm" />
 
-                <h3 className="text-center font-SofiaSans text-xl font-semibold">{title}</h3>
-                <p className="mt-3 text-center text-sm leading-6 text-muted-foreground">{text}</p>
+                <h3 className="text-center font-SofiaSans text-xl font-semibold text-white">{title}</h3>
+                <p className="mt-3 text-center text-sm leading-6 text-muted-foreground text-slate-300">{text}</p>
             </div>
         </div>
     );

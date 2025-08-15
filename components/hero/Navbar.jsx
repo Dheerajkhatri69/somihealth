@@ -123,6 +123,17 @@ function MegaPanel({ menuKey, onNavigate }) {
                             <ArrowRight />
                         </span>
                     </Link>
+                    <Link
+                        href={"/underdevelopmentmainpage/healthcoach"}
+                        onClick={onNavigate}
+                        className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                    >
+                        Health Coach
+                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                            <ArrowRight />
+                        </span>
+                    </Link>
                 </div>
 
                 {/* Treatments */}
@@ -171,7 +182,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                             <Link
                                 href={data.cta.button.href}
                                 onClick={onNavigate}
-                                className="fx86 inline-flex items-center gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                                className="fx86 inline-flex items-center gap-3 font-SofiaSans  rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                                 style={{ "--fx86-base": "transparent" }}
                             >
                                 {data.cta.button.label}
@@ -234,7 +245,17 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     <ArrowRight />
                 </span>
             </Link>
-
+            <Link
+                href={"/underdevelopmentmainpage/healthcoach"}
+                onClick={onNavigate}
+                className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+            >
+                Health Coach
+                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                    <ArrowRight />
+                </span>
+            </Link>
             {/* Treatments */}
             <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
             <ul className="mt-4 space-y-6">
@@ -246,7 +267,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                         <Link href={t.href} onClick={onNavigate} className="flex items-center gap-3 font-SofiaSans text-lg font-medium">
                             <span>{t.label}</span>
                             {t.badge && (
-                                <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-white">NEW</span>
+                                <span className="rounded-full bg-darkprimary px-2 py-0.5 text-xs font-semibold text-white">NEW</span>
                             )}
                         </Link>
                     </li>
@@ -266,7 +287,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
 
                 {/* title – top-left */}
                 <div className="absolute left-4 top-4 right-4">
-                    <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
+                    <div className="whitespace-pre-line text-xl font-SofiaSans font-bold tracking-tight text-white drop-shadow">
                         {MENUS[stage].cta.title}
                     </div>
                 </div>
@@ -276,7 +297,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     <Link
                         href={MENUS[stage].cta.button.href}
                         onClick={onNavigate}
-                        className="fx86 inline-flex items-center gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                        className="fx86 inline-flex items-center font-SofiaSans gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         style={{ "--fx86-base": "transparent" }}
                     >
                         {MENUS[stage].cta.button.label}
@@ -297,7 +318,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                 <button onClick={onClose} aria-label="Close menu" className="p-2">
                     <CloseIcon />
                 </button>
-                <span className="text-3xl text-secondary font-bold font-SofiaSans tracking-tight">{brand}</span>
+                <span className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight">{brand}</span>
                 {/* right icons (placeholders to match screenshot) */}
                 <div className="flex items-center gap-4">
                     <Link href="/getstarted">
@@ -378,7 +399,7 @@ export default function Navbar({ brand = "somi" }) {
                     </button>
 
                     {/* Brand centered on mobile, left on desktop */}
-                    <Link href="/underdevelopmentmainpage" className="text-3xl text-secondary font-bold font-SofiaSans tracking-tight md:order-none">
+                    <Link href="/underdevelopmentmainpage" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
                         {brand}
                     </Link>
 
@@ -406,7 +427,7 @@ export default function Navbar({ brand = "somi" }) {
                     <div className="hidden items-center gap-3 md:flex">
                         <Link
                             href="/getstarted"
-                            className="fx-primary rounded-full bg-secondary px-5 py-2 text-sm font-semibold text-white hover:opacity-100"
+                            className="fx-primary rounded-full font-SofiaSans bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-100"
                         >
                             Get Started
                         </Link>
@@ -414,7 +435,7 @@ export default function Navbar({ brand = "somi" }) {
 
                         <Link
                             href="/underdevelopmentmainpage/login"
-                            className="fx-outline rounded-full border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-900 hover:border-transparent"
+                            className="fx-outline rounded-full font-SofiaSans border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-900 hover:border-transparent"
                             style={{ "--fx-fill": "var(--tw-bg-secondary, #16a34a)" }}  // set fill color; or use a hex
                         >
                             Login

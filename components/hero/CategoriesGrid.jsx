@@ -28,12 +28,12 @@ function CategoryCard({ title, img, href, label = "Learn More", comingSoon = fal
             <img src={img} alt="" className="w-full h-full max-h-[500px] object-cover" />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/0 to-black/70" />
             <div className="absolute left-6 top-6">
-                <h3 className="text-2xl font-semibold text-white drop-shadow">{title}</h3>
+                <h3 className="text-2xl font-semibold font-SofiaSans text-white drop-shadow">{title}</h3>
             </div>
             <div className="absolute bottom-4 left-4">
                 {comingSoon ? (
                     <span
-                        className="fx86 inline-flex items-center gap-3 rounded-full bg-secondary px-5 py-2 font-semibold text-white"
+                        className="fx86 inline-flex items-center gap-3 rounded-full bg-darkprimary px-5 py-2 font-semibold text-white"
                         style={{ "--fx86-base": "transparent" }}
                         aria-disabled="true"
                     >
@@ -42,7 +42,7 @@ function CategoryCard({ title, img, href, label = "Learn More", comingSoon = fal
                 ) : (
                     <Link
                         href={href}
-                        className="fx86 inline-flex items-center gap-3 hover:bg-transparent rounded-full bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                        className="fx86 inline-flex items-center gap-3 font-SofiaSans hover:bg-transparent rounded-full bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         style={{ "--fx86-base": "transparent" }}
                     >
                         {label} <ArrowRight />
@@ -90,24 +90,6 @@ export default function CategoriesGrid() {
                     }}
         >
             <div className="mx-auto max-w-7xl px-4 md:px-6">
-                <div
-                    className="watermark"
-                    data-text="somi"
-                    style={{
-                        '--wm-size': '120px',     // text size
-                        '--wm-stroke-c': '#364c781d',                   // outline color
-                        '--wm-stroke-w': '2px',                       // outline width
-                        '--wm-fill': 'transparent',                   // set e.g. 'rgba(0,0,0,.06)' for filled text
-                        '--wm-font': '"Sofia Sans", ui-sans-serif',      // font family
-                        '--wm-weight': 700,                           // font weight
-                        '--wm-tracking': '0em',                    // letter spacing
-                        '--wm-opacity': 1,                         // overall opacity
-                        '--wm-left': '0rem',                         // horizontal offset
-                        '--wm-top': '-3rem',                         // horizontal offset
-                        '--wm-rotate': '0deg',                       // rotate; use '0deg' for horizontal
-                    }}
-                >
-                </div>
 
                 {/* Mobile: horizontal slider (1 per view) */}
                 <div className="lg:hidden">

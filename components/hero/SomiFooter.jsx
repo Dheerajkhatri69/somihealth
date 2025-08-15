@@ -3,17 +3,20 @@
 import Link from "next/link";
 import React from "react";
 import { Instagram, Facebook, Phone, MapPin, Mail } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
+import { SiIndeed } from "react-icons/si";
+import Image from "next/image";
 /** Footer — “somi” version inspired by your screenshot */
 export default function SomiFooter() {
     return (
         <footer className="relative mt-20 w-full text-white"
             style={{
-                backgroundImage: "linear-gradient(#FFFFFF 0 230px, #2c3a57 230px 100%)",
+                backgroundImage: "linear-gradient(#FFFFFF 0 230px, #364C78 230px 100%)",
             }}
         >
             {/* === TOP CTA CARD === */}
             <section className="mx-auto -mt-24 max-w-6xl px-4 md:px-6">
-                <div className="rounded-2xl bg-lightprimary p-6 shadow-2xl ring-1 ring-white/10 sm:p-8 md:p-10">
+                <div className="rounded-2xl bg-lightprimary pt-6 px-6 shadow-2xl ring-1 ring-white/10 sm:pt-8 sm:px-8 md:pt-10 md:px-10">
                     <div className="grid items-center gap-6 md:grid-cols-2">
                         {/* Left copy */}
                         <div className="text-secondary">
@@ -39,13 +42,13 @@ export default function SomiFooter() {
                                     href="/learn-more"
                                     // className="inline-flex items-center justify-center rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white ring-1 ring-white/15 hover:bg-white/15"
                                     className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary hover:text-lightprimary px-10 py-2 text-base font-semibold shadow-sm md:w-auto"
-                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#2c3a57" }}
+                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#364C78" }}
                                 >
                                     Learn More
                                 </Link>
                                 <Link
                                     href="/getstarted"
-                                    className="fx-primary inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-5 py-2 text-sm font-semibold text-white hover:opacity-90"
+                                    className="fx-primary inline-flex items-center justify-center gap-2 rounded-full bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-90"
                                 >
                                     Start Your Journey <ArrowRight className="h-4 w-4" />
                                 </Link>
@@ -53,11 +56,15 @@ export default function SomiFooter() {
                         </div>
 
                         {/* Right bottle image (replace src) */}
+
+
                         <div className="relative flex items-center justify-center">
-                            <img
-                                src="/hero/newsemaglutide.png" // <- replace with your image path
-                                alt="Compounded Semaglutide vial"
-                                className="h-72 w-auto object-contain md:h-80"
+                            <Image
+                                src="/hero/footer.png"
+                                alt="Footer Image"
+                                width={400}
+                                height={400}
+                                className="mx-auto"
                             />
                         </div>
                     </div>
@@ -67,13 +74,12 @@ export default function SomiFooter() {
 
             {/* === MAIN FOOTER === */}
             <div className="mx-auto max-w-6xl px-4 pb-10 pt-16 md:px-6">
-                <div className="grid gap-10 md:grid-cols-3">
+                <div className="flex flex-col justify-between md:flex-row gap-10 md:gap-10 lg:gap-16">
                     {/* Brand + blurb + socials + badges */}
                     <div>
-                        <div className="text-3xl font-extrabold tracking-tight">somi</div>
+                        <div className="text-5xl font-extrabold font-tagesschrift tracking-tight">somi</div>
                         <p className="mt-4 max-w-sm text-sm text-white/80">
-                            Somi Health offers personalized, clinically guided weight loss
-                            solutions to help you achieve lasting results and feel your best.
+                            Look Batter, Feel Better, Live Better.
                         </p>
 
                         {/* Socials (Lucide) */}
@@ -92,28 +98,51 @@ export default function SomiFooter() {
                             >
                                 <Facebook className="h-5 w-5" />
                             </Link>
+                            <Link
+                                href="https://tiktok.com"
+                                aria-label="Facebook"
+                                className="rounded-full p-2 text-white/80 ring-1 ring-white/20 hover:text-white"
+                            >
+                                <FaTiktok className="h-5 w-5" />
+                            </Link>
+                            <Link
+                                href="https://tiktok.com"
+                                aria-label="Facebook"
+                                className="rounded-full p-2 text-white/80 ring-1 ring-white/20 hover:text-white"
+                            >
+                                <SiIndeed className="h-5 w-5" />
+                            </Link>
+
                         </div>
 
-                        {/* Badges (swap src paths) */}
-                        <div className="mt-6 flex items-center gap-6">
-                            <img
-                                src="/hero/legitscript-badge.png"
-                                alt="LegitScript Certified"
-                                className="h-12 w-auto"
-                            />
-                            <img
-                                src="/hero/us-badge.png"
-                                alt="Compounded in the USA"
-                                className="h-8 w-auto"
-                            />
-                            <img
-                                src="/hero/hipaa-badge.png"
-                                alt="HIPAA Compliant"
-                                className="h-8 w-auto"
-                            />
-                        </div>
+                        <h4 className="my-3 text-lg font-semibold">Contact Information</h4>
+                        <ul className="space-y-3 text-sm text-white/85">
+                            <li className="flex items-start gap-3">
+                                <Phone className="mt-0.5 h-4 w-4 flex-none text-white/70" />
+                                <span>(704) 386-6871</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <MapPin className="mt-0.5 h-4 w-4 flex-none text-white/70" />
+                                <span>4111 E. Rose Lake Dr. Charlotte, NC 28217</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Mail className="mt-0.5 h-4 w-4 flex-none text-white/70" />
+                                <span>info@joinsomi.com</span>
+                            </li>
+                        </ul>
                     </div>
-
+                    <div >
+                        <img
+                            src="/hero/legitscript-badge.png"
+                            alt="LegitScript Certified"
+                            className="h-20 mb-4 w-auto hover:scale-105 transition-transform duration-200"
+                        />
+                        <img
+                            src="/hero/hipaa-badge.png"
+                            alt="hipaa-badge"
+                            className="h-20 w-auto hover:scale-105 transition-transform duration-200"
+                        />
+                    </div>
                     {/* Navigation */}
                     <div>
                         <h4 className="mb-3 text-lg font-semibold">Navigation</h4>
@@ -132,33 +161,9 @@ export default function SomiFooter() {
                             <li><FooterLink href="/underdevelopmentmainpage/contact">Contact Us</FooterLink></li>
                         </ul>
                     </div>
-
-                    {/* Contact Information */}
                     <div>
-                        <h4 className="mb-3 text-lg font-semibold">Contact Information</h4>
+                        <h4 className="mb-3 text-lg font-semibold">Legal</h4>
                         <ul className="space-y-3 text-sm text-white/85">
-                            <li className="flex items-start gap-3">
-                                <Phone className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>(704) 386-6871</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <MapPin className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>4111 E. Rose Lake Dr. Charlotte, NC 28217</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <Mail className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>info@joinsomi.com</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                {/* Bottom legal row */}
-                <div className="mt-10 border-t border-white/15 pt-6">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <p className="text-xs text-white/70">Website Designed by --------------</p>
-                        {/* <p className="text-xs text-white/70">Website Designed by Dheeraj Khatri</p> */}
-                        <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
                             <li><FooterLink href="/underdevelopmentmainpage/footer/hipaa">HIPAA Privacy</FooterLink></li>
                             <li><FooterLink href="/underdevelopmentmainpage/footer/terms">Terms of Service</FooterLink></li>
                             <li><FooterLink href="/underdevelopmentmainpage/footer/shipping-returns">Shipping & Returns</FooterLink></li>
@@ -167,10 +172,9 @@ export default function SomiFooter() {
                         </ul>
                     </div>
 
-                    <div className="mt-4 text-xs text-white/70">
-                        © {new Date().getFullYear()}, Somi. All rights reserved
-                    </div>
                 </div>
+
+
             </div>
         </footer>
     );

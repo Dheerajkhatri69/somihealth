@@ -146,14 +146,14 @@ function ReviewVideoCard({
       {/* Top-left: subtitle + title */}
       <div className="absolute left-5 top-5 right-5">
         {subtitle && (
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/80">{subtitle}</div>
+          <div className="text-xs font-semibold font-SofiaSans uppercase tracking-wide text-white/80">{subtitle}</div>
         )}
-        <h3 className="mt-1 text-xl font-bold text-white drop-shadow">{title}</h3>
+        <h3 className="mt-1 text-xl font-bold font-SofiaSans text-white drop-shadow">{title}</h3>
       </div>
 
       {/* Bottom-left: description */}
       <div className="absolute bottom-5 left-5 right-6">
-        <p className="max-w-[85%] text-sm text-white/90">{description}</p>
+        <p className="max-w-[85%] text-sm font-SofiaSans text-white/90">{description}</p>
       </div>
     </div>
   );
@@ -210,7 +210,7 @@ export default function ClientVideoReviews() {
     for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
     return out;
   }, []);
-  const pages = React.useMemo(() => chunk(videos, 4), [videos, chunk]);
+  const pages = React.useMemo(() => chunk(videos, 2), [videos, chunk]);
 
   /* Mobile carousel control (play the active) */
   const [apiMobile, setApiMobile] = React.useState(null);
@@ -338,7 +338,7 @@ export default function ClientVideoReviews() {
             <CarouselContent>
               {pages.map((page, pageIndex) => (
                 <CarouselItem key={`page-${pageIndex}`} className="basis-full">
-                  <div className="grid grid-cols-4 gap-6 md:gap-8">
+                  <div className="grid grid-cols-2 gap-6 md:gap-8">
                     {page.map((v, idx) => (
                       <ReviewVideoCard key={`${v.title}-${idx}`} {...v} autoPlay onOpen={openVideo} />
                     ))}

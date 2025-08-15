@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function CompoundedExplainer() {
     return (
         <section
@@ -21,10 +23,10 @@ export default function CompoundedExplainer() {
                     "linear-gradient(#FFFFFF 0 230px, #E9ECF1 230px 100%)",
             }}
         >
-            <div className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-14">
+            <div className="mx-auto max-w-7xl px-4 md:px-6 pt-10 md:pt-14">
 
                 {/* Content grid */}
-                <div className="mt-6 grid items-start gap-8 md:mt-8 md:grid-cols-2 md:gap-12" >
+                <div className="mt-6 grid items-center gap-8 md:mt-8 md:grid-cols-2 md:gap-12" >
 
                     {/* Right copy */}
                     <div className="text-[15px] leading-7 text-gray-700 sm:text-base">
@@ -48,14 +50,14 @@ export default function CompoundedExplainer() {
                         </p>
                     </div>
                     {/* Left image (replace the src) */}
-                    <div>
-                        <div className="overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
-                            <img
-                                src="/hero/compounded-glp1.png" /* <-- replace this path */
-                                alt="Compounded GLP-1 vials and syringe"
-                                className="block h-auto w-full object-cover"
-                            />
-                        </div>
+                    <div className="relative w-full max-w-lg z-10 hidden sm:block">
+                        <Image
+                            src="/hero/bmilady.png"
+                            alt="BMI Calculator"
+                            width={500}
+                            height={500}
+                            className="mx-auto bottom-0"
+                        />
                     </div>
 
                 </div>

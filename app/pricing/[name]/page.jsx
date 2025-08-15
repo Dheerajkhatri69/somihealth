@@ -47,9 +47,9 @@ const PRODUCTS = {
         link: 'https://buy.stripe.com/aFafZi5z00U8fec1Ik3ks06',
       },
       {
-        label: '20 Weeks (1mg/week)',
-        price: '$499',//done
-        link: 'https://buy.stripe.com/14A14od1scCQ2rq4Uw3ks07',
+        label: '12 Weeks (1mg/week)',
+        price: '$369',//done
+        link: 'https://buy.stripe.com/aFaeVe1iK5ao3vu72E3ks0S',
       },
       {
         label: '4 Weeks (1.7mg/Week)',

@@ -1,17 +1,25 @@
-"use client";;
+"use client";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+
+const hexToRgba = (hex, a = 1) => {
+  const h = hex.replace("#", "");
+  const bigint = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16);
+  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
 
 export const Tabs = ({
   tabs: propTabs,
   containerClassName,
   activeTabClassName,
   tabClassName,
-  contentClassName
+  contentClassName,
 }) => {
   const [active, setActive] = useState(propTabs[0]);
   const [tabs, setTabs] = useState(propTabs);
+  const [hovering, setHovering] = useState(false);
 
   const moveSelectedTabToTop = (idx) => {
     const newTabs = [...propTabs];
@@ -21,61 +29,71 @@ export const Tabs = ({
     setActive(newTabs[0]);
   };
 
-  const [hovering, setHovering] = useState(false);
-
   return (
     <>
       <div
         className={cn(
-          "flex flex-row items-center justify-start [perspective:1000px] relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full",
+          "flex flex-row items-center justify-center [perspective:1000px] relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full gap-2",
           containerClassName
-        )}>
-        {propTabs.map((tab, idx) => (
-          <button
-            key={tab.title}
-            onClick={() => {
-              moveSelectedTabToTop(idx);
-            }}
-            onMouseEnter={() => setHovering(true)}
-            onMouseLeave={() => setHovering(false)}
-            className={cn("relative px-4 py-2 rounded-full", tabClassName)}
-            style={{
-              transformStyle: "preserve-3d",
-            }}>
-            {active.value === tab.value && (
-              <motion.div
-                layoutId="clickedbutton"
-                transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
-                className={cn(
-                  "absolute inset-0 bg-gray-200 dark:bg-zinc-800 rounded-full ",
-                  activeTabClassName
-                )} />
-            )}
+        )}
+      >
+        {propTabs.map((tab, idx) => {
+          // strong accent + light bg (or auto-generate light bg from accent)
+          const accent = tab.color || "#3B82F6";
+          const lightBg = tab.bg || hexToRgba(accent, 0.16);     // normal state
+          const lightBgActive = tab.bgActive || hexToRgba(accent, 0.28); // active pill
 
-            <span className="relative block text-black dark:text-white">
-              {tab.title}
-            </span>
-          </button>
-        ))}
+          const isActive = active.value === tab.value;
+
+          return (
+            <button
+              key={tab.title}
+              onClick={() => moveSelectedTabToTop(idx)}
+              onMouseEnter={() => setHovering(true)}
+              onMouseLeave={() => setHovering(false)}
+              className={cn(
+                "relative px-4 py-2 rounded-full border transition-colors",
+                tabClassName
+              )}
+              style={{
+                borderColor: accent,
+                background: lightBg, // light bg even when not active
+              }}
+            >
+              {/* Active pill uses the *same* light color (a bit stronger) */}
+              {isActive && (
+                <motion.div
+                  layoutId="clickedbutton"
+                  transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
+                  className={cn("absolute inset-0 rounded-full", activeTabClassName)}
+                  style={{ background: lightBgActive }}
+                />
+              )}
+
+              <span
+                className="relative block font-medium"
+                style={{ color: isActive ? accent : accent }}
+              >
+                {tab.title}
+              </span>
+            </button>
+          );
+        })}
       </div>
+
       <FadeInDiv
         tabs={tabs}
         active={active}
         key={active.value}
         hovering={hovering}
-        className={cn("mt-32", contentClassName)} />
+        className={cn("mt-32", contentClassName)}
+      />
     </>
   );
 };
 
-export const FadeInDiv = ({
-  className,
-  tabs,
-  hovering
-}) => {
-  const isActive = (tab) => {
-    return tab.value === tabs[0].value;
-  };
+export const FadeInDiv = ({ className, tabs, hovering }) => {
+  const isActive = (tab) => tab.value === tabs[0].value;
   return (
     <div className="relative w-full h-full">
       {tabs.map((tab, idx) => (
@@ -88,10 +106,9 @@ export const FadeInDiv = ({
             zIndex: -idx,
             opacity: idx < 3 ? 1 - idx * 0.1 : 0,
           }}
-          animate={{
-            y: isActive(tab) ? [0, 40, 0] : 0,
-          }}
-          className={cn("w-full h-full absolute top-0 left-0", className)}>
+          animate={{ y: isActive(tab) ? [0, 40, 0] : 0 }}
+          className={cn("w-full h-full absolute top-0 left-0", className)}
+        >
           {tab.content}
         </motion.div>
       ))}
