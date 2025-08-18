@@ -119,6 +119,10 @@ export default function PatientUpdateForm({ params }) {
         Reasonclosetickets: '',
         file1: '',
         file2: '',
+        followUp: '', // new field
+        refillReminder: '', // new field
+        followUpInterval: '', // for select
+        refillReminderInterval: '', // for select
     });
     const [images, setImages] = useState([
         { file: null, preview: null },
@@ -162,7 +166,21 @@ export default function PatientUpdateForm({ params }) {
     useEffect(() => {
         const patient = patients.find(p => p.authid === params.patientId);
         if (patient) {
-            setFormData(prev => ({ ...prev, ...patient }));
+            // Extract interval from followUp and refillReminder
+            let followUpInterval = '';
+            if (patient.followUp && patient.followUp.includes('_')) {
+                followUpInterval = patient.followUp.split('_')[1];
+            }
+            let refillReminderInterval = '';
+            if (patient.refillReminder && patient.refillReminder.includes('_')) {
+                refillReminderInterval = patient.refillReminder.split('_')[1];
+            }
+            setFormData(prev => ({
+                ...prev,
+                ...patient,
+                followUpInterval,
+                refillReminderInterval,
+            }));
             // Set file URLs
             setFileUrls({
                 file1: patient.file1 || '',
@@ -190,6 +208,20 @@ export default function PatientUpdateForm({ params }) {
     const handleInputChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
+
+    // Helper to calculate future date string
+    function getFutureDateString(interval) {
+        if (!interval || interval === 'None') return '';
+        const now = new Date();
+        let days = 0;
+        if (interval.endsWith('d')) {
+            days = parseInt(interval.replace('d', ''), 10);
+        } else if (interval.endsWith('w')) {
+            days = parseInt(interval.replace('w', ''), 10) * 7;
+        }
+        const future = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+        return `${future.toISOString()}_${interval}`;
+    }
 
     const handleSelectChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -235,8 +267,13 @@ export default function PatientUpdateForm({ params }) {
             .filter(img => img.preview)
             .map(img => img.preview);
 
+        // Calculate followUp and refillReminder values
+        const followUp = getFutureDateString(formData.followUpInterval);
+        const refillReminder = getFutureDateString(formData.refillReminderInterval);
         const submissionData = {
             ...formData,
+            followUp,
+            refillReminder,
             images: imageUrls,
             file1: fileUrls.file1,
             file2: fileUrls.file2
@@ -1151,6 +1188,55 @@ export default function PatientUpdateForm({ params }) {
                             </Select>
                         </div>
                     </div>
+                </div>
+
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <div className="space-y-2 ">
+                            <Label>Follow Up</Label>
+                            <div className="flex gap-2">
+                                <Select
+                                    value={formData.followUpInterval}
+                                    onValueChange={(value) => handleSelectChange('followUpInterval', value)}
+                                >
+                                    <SelectTrigger className="w-1/2">
+                                        <SelectValue placeholder="Select interval" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="7d">7 Days</SelectItem>
+                                        <SelectItem value="14d">14 Days</SelectItem>
+                                        <SelectItem value="30d">30 Days</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Refill Reminder</Label>
+                            <div className="flex gap-2">
+                                <Select
+                                    value={formData.refillReminderInterval}
+                                    onValueChange={(value) => handleSelectChange('refillReminderInterval', value)}
+                                >
+                                    <SelectTrigger className="w-1/2">
+                                        <SelectValue placeholder="Select interval" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="4w">4 weeks</SelectItem>
+                                        <SelectItem value="5w">5 weeks</SelectItem>
+                                        <SelectItem value="6w">6 weeks</SelectItem>
+                                        <SelectItem value="8w">8 weeks</SelectItem>
+                                        <SelectItem value="10w">10 weeks</SelectItem>
+                                        <SelectItem value="12w">12 weeks</SelectItem>
+                                        <SelectItem value="13w">13 weeks</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 {/* Open sheet */}
                 {(session?.user?.accounttype === 'C') && (

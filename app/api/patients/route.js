@@ -119,6 +119,9 @@ export async function POST(request) {
             glp1Statement: body.glp1Statement,
             glp1DoseInfo: body.glp1DoseInfo,
             agreeTerms: body.agreeTerms,
+            // New fields for follow up and refill reminder
+            followUp: body.followUp,
+            refillReminder: body.refillReminder,
         });
 
         result = await newPatient.save();
@@ -175,6 +178,9 @@ export async function PUT(request) {
                     glp1Statement: body.glp1Statement,
                     glp1DoseInfo: body.glp1DoseInfo,
                     agreeTerms: body.agreeTerms,
+                    // New fields for follow up and refill reminder
+                    followUp: body.followUp,
+                    refillReminder: body.refillReminder,
                 }
             },
             { new: true }

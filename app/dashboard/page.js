@@ -53,6 +53,7 @@ import TimeSensitiveCell from "@/components/timer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DiagnosisCell } from "@/components/diagnosisCell";
 import { ClinicianAction, ClinicianStatusBadge } from "@/components/clinicianStatusBadge";
+import PillSelect from "@/components/follow_refills";
 
 export default function Dashboard() {
     const [patients, setPatients] = useState([]);
@@ -228,6 +229,51 @@ export default function Dashboard() {
     const [selectedImageInfo, setSelectedImageInfo] = useState(null);
     const [clinicianFilter, setClinicianFilter] = useState("all");
 
+    // Add state for new filters
+    const [followUpFilter, setFollowUpFilter] = useState('all');
+    const [refillReminderFilter, setRefillReminderFilter] = useState('all');
+
+    // Helper to extract interval
+    function extractInterval(val) {
+        if (!val) return '';
+        const parts = val.split('_');
+        return parts.length > 1 ? parts[1] : '';
+    }
+
+    function extractDate(val) {
+        if (!val) return null;
+        const parts = val.split('_');
+        return parts.length > 1 ? new Date(parts[0]) : null;
+    }
+    function isFollowUpExpired(val) {
+        const date = extractDate(val);
+        if (!date) return false;
+        return date < new Date();
+    }
+    function isRefillReminderDue(val) {
+        const date = extractDate(val);
+        if (!date) return false;
+        const now = new Date();
+        const oneWeekBefore = new Date(date.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return now >= oneWeekBefore && now <= date;
+    }
+
+    // Count patients for each interval
+    const followUpCounts = patients.reduce((acc, patient) => {
+        if (isFollowUpExpired(patient.followUp)) {
+            const interval = extractInterval(patient.followUp);
+            if (interval) acc[interval] = (acc[interval] || 0) + 1;
+        }
+        return acc;
+    }, {});
+    const refillReminderCounts = patients.reduce((acc, patient) => {
+        if (isRefillReminderDue(patient.refillReminder)) {
+            const interval = extractInterval(patient.refillReminder);
+            if (interval) acc[interval] = (acc[interval] || 0) + 1;
+        }
+        return acc;
+    }, {});
+
     // Map clinician id → Set(patient ids)
     const cidToPidSet = useMemo(() => {
         const map = new Map();
@@ -316,8 +362,16 @@ export default function Dashboard() {
         const createDateRangeMatch = isWithinRange(patient.createTimeDate, fromUtc, toUtc);
 
         const createDateMatch = createDateFilter ? patient.createTimeDate.split('T')[0] === createDateFilter : true;
+        const followUpExpired = isFollowUpExpired(patient.followUp);
+        const followUpMatch =
+            followUpFilter === 'all' ||
+            (followUpExpired && extractInterval(patient.followUp) === followUpFilter);
+        const refillDue = isRefillReminderDue(patient.refillReminder);
+        const refillReminderMatch =
+            refillReminderFilter === 'all' ||
+            (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
         return emailMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
-            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch;
+            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch && followUpMatch && refillReminderMatch;
     });
 
     const statusCounts = getStatusCounts(filteredPatients);
@@ -329,7 +383,61 @@ export default function Dashboard() {
                 : [...prev, patientId]
         );
     };
+    // Helper to calculate new date string
+    function getFutureDateString(interval) {
+        if (!interval || interval === 'None') return '';
+        const now = new Date();
+        let days = 0;
+        if (interval.endsWith('d')) {
+            days = parseInt(interval.replace('d', ''), 10);
+        } else if (interval.endsWith('w')) {
+            days = parseInt(interval.replace('w', ''), 10) * 7;
+        }
+        const future = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+        return `${future.toISOString()}_${interval}`;
+    }
 
+    // Add loading state for resolve actions
+    const [resolveLoading, setResolveLoading] = useState({});
+
+    // Handler for resolving follow up
+    async function handleResolveFollowUp(patient) {
+        const interval = extractInterval(patient.followUp);
+        if (!interval) return;
+        setResolveLoading(prev => ({ ...prev, [patient.authid + '_followup']: true }));
+        const newFollowUp = getFutureDateString(interval);
+        try {
+            await fetch('/api/patients', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...patient, followUp: newFollowUp }),
+            });
+            // Optionally, refetch patients here
+            if (typeof fetchPatients === 'function') fetchPatients();
+            else window.location.reload();
+        } finally {
+            setResolveLoading(prev => ({ ...prev, [patient.authid + '_followup']: false }));
+        }
+    }
+    // Handler for resolving refill reminder
+    async function handleResolveRefillReminder(patient) {
+        const interval = extractInterval(patient.refillReminder);
+        if (!interval) return;
+        setResolveLoading(prev => ({ ...prev, [patient.authid + '_refill']: true }));
+        const newRefillReminder = getFutureDateString(interval);
+        try {
+            await fetch('/api/patients', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...patient, refillReminder: newRefillReminder }),
+            });
+            // Optionally, refetch patients here
+            if (typeof fetchPatients === 'function') fetchPatients();
+            else window.location.reload();
+        } finally {
+            setResolveLoading(prev => ({ ...prev, [patient.authid + '_refill']: false }));
+        }
+    }
     // Add this effect for indeterminate state
     useEffect(() => {
         if (checkboxRef.current) {
@@ -693,6 +801,54 @@ export default function Dashboard() {
                         </SelectContent>
                     </Select>
                 )}
+                {/* <Select value={followUpFilter} onValueChange={setFollowUpFilter}>
+                    <SelectTrigger className="w-[160px] relative">
+                        <SelectValue placeholder="Follow Up" />
+                        {followUpFilter !== 'all' && followUpCounts[followUpFilter] > 0 && (
+                            <span className="absolute top-0 right-0 bg-blue-500 text-white rounded-full px-2 text-xs">
+                                {followUpCounts[followUpFilter]}
+                            </span>
+                        )}
+                    </SelectTrigger>
+                    <SelectContent>
+                        {['7d', '14d', '30d', 'None'].map(opt => (
+                            <SelectItem key={opt} value={opt}>
+                                {opt === 'None' ? 'None' : opt.replace('d', ' Days')}
+                                {followUpCounts[opt] > 0 && (
+                                    <span className="ml-2 bg-blue-500 text-white rounded-full px-2 text-xs">
+                                        {followUpCounts[opt]}
+                                    </span>
+                                )}
+                            </SelectItem>
+                        ))}
+                        <SelectItem value="all">All</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                <Select value={refillReminderFilter} onValueChange={setRefillReminderFilter}>
+                    <SelectTrigger className="w-[160px] relative">
+                        <SelectValue placeholder="Refill Reminder" />
+                        {refillReminderFilter !== 'all' && refillReminderCounts[refillReminderFilter] > 0 && (
+                            <span className="absolute top-0 right-0 bg-green-500 text-white rounded-full px-2 text-xs">
+                                {refillReminderCounts[refillReminderFilter]}
+                            </span>
+                        )}
+                    </SelectTrigger>
+                    <SelectContent>
+                        {['4w', '5w', '6w', '8w', '10w', '12w', '13w', 'None'].map(opt => (
+                            <SelectItem key={opt} value={opt}>
+                                {opt === 'None' ? 'None' : opt.replace('w', ' weeks')}
+                                {refillReminderCounts[opt] > 0 && (
+                                    <span className="ml-2 bg-green-500 text-white rounded-full px-2 text-xs">
+                                        {refillReminderCounts[opt]}
+                                    </span>
+                                )}
+                            </SelectItem>
+                        ))}
+                        <SelectItem value="all">All</SelectItem>
+                    </SelectContent>
+                </Select> */}
+
                 <div className="flex items-center">
                     {/* From date */}
                     <input
@@ -805,78 +961,115 @@ export default function Dashboard() {
                     />
 
                 </div>
-
             </div>
+            {
+                (userType === 'A' || userType === 'C') && (
+                    <div className="flex flex-wrap gap-4 mb-1 px-2 ">
+                        <PillSelect
+                            value={followUpFilter}
+                            onChange={setFollowUpFilter}
+                            options={["7d", "14d", "30d", "None", "all"]}
+                            counts={followUpCounts}
+                            labelPrefix="Follow Up"
+                            formatUnit="d"
+                            tone={{
+                                bg: "bg-cyan-200 text-cyan-900",
+                                text: "text-cyan-900",
+                                badge: "bg-cyan-600 text-white",
+                            }}
+                            placeholder="Follow Up"
+                            showTotal   // ✅ this makes it show total count instead of per-option
+                        />
 
-            {(userType === 'A' || userType === 'C') && (
-                <div className="flex flex-wrap gap-4 mb-4 p-2 ">
-                    <div
-                        className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
-                        onClick={() => setApprovalFilter('all')}
-                    >
-                        <span className="text-sm font-medium">All Patients</span>
-                        <Badge
-                            variant="outline"
-                            className="absolute -top-2 -right-2 py-1 bg-secondary-foreground text-white rounded-full text-sm"
-                        >
-                            {statusCounts.all}
-                        </Badge>
+                        <PillSelect
+                            value={refillReminderFilter}
+                            onChange={setRefillReminderFilter}
+                            options={["4w", "5w", "6w", "8w", "10w", "12w", "13w", "None", "all"]}
+                            counts={refillReminderCounts}
+                            labelPrefix="Refill"
+                            formatUnit="w"
+                            tone={{
+                                bg: "bg-slate-200 text-slate-900",
+                                text: "text-slate-900",
+                                badge: "bg-slate-700 text-white",
+                            }}
+                            placeholder="Refill Reminder"
+                            showTotal   // ✅ this makes it show total count instead of per-option
+                        />
                     </div>
-
-                    <div
-                        className="relative flex items-center gap-2 px-5 py-2 bg-blue-300 text-blue-foreground rounded-full cursor-pointer"
-                        onClick={() => setApprovalFilter('')}
-
-                    >
-                        <span className="text-sm font-medium">Awaiting</span>
-                        <Badge
-                            variant="outline"
-                            className="absolute -top-2 -right-2 py-1 bg-blue-500 rounded-full text-sm"
+                )
+            }
+            {
+                (userType === 'A' || userType === 'C') && (
+                    <div className="flex flex-wrap gap-4 mb-4 p-2 ">
+                        <div
+                            className="relative flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-full cursor-pointer"
+                            onClick={() => setApprovalFilter('all')}
                         >
-                            {statusCounts.awaiting}
-                        </Badge>
-                    </div>
+                            <span className="text-sm font-medium">All Patients</span>
+                            <Badge
+                                variant="outline"
+                                className="absolute -top-2 -right-2 py-1 bg-secondary-foreground text-white rounded-full text-sm"
+                            >
+                                {statusCounts.all}
+                            </Badge>
+                        </div>
 
-                    <div
-                        className="relative flex items-center gap-2 px-5 py-2 bg-yellow-200 text-yellow-900 rounded-full cursor-pointer"
-                        onClick={() => setApprovalFilter('pending')}
-                    >
-                        <span className="text-sm font-medium">Pending</span>
-                        <Badge
-                            variant="outline"
-                            className="absolute -top-2 -right-2 py-1 bg-yellow-500 rounded-full text-sm"
-                        >
-                            {statusCounts.pending}
-                        </Badge>
-                    </div>
+                        <div
+                            className="relative flex items-center gap-2 px-5 py-2 bg-blue-300 text-blue-foreground rounded-full cursor-pointer"
+                            onClick={() => setApprovalFilter('')}
 
-                    <div
-                        className="relative flex items-center gap-2 px-5 py-2 bg-green-200 text-green-900 rounded-full cursor-pointer"
-                        onClick={() => setApprovalFilter('approved')}
-                    >
-                        <span className="text-sm font-medium">Approved</span>
-                        <Badge
-                            variant="outline"
-                            className="absolute -top-2 -right-2 py-1 bg-green-500 rounded-full text-sm"
                         >
-                            {statusCounts.approved}
-                        </Badge>
-                    </div>
+                            <span className="text-sm font-medium">Awaiting</span>
+                            <Badge
+                                variant="outline"
+                                className="absolute -top-2 -right-2 py-1 bg-blue-500 rounded-full text-sm"
+                            >
+                                {statusCounts.awaiting}
+                            </Badge>
+                        </div>
 
-                    <div
-                        className="relative flex items-center gap-2 px-5 py-2 bg-purple-200 text-purple-900 rounded-full cursor-pointer"
-                        onClick={() => setApprovalFilter('disqualified')}
-                    >
-                        <span className="text-sm font-medium">Disqualified</span>
-                        <Badge
-                            variant="outline"
-                            className="absolute -top-2 -right-2 py-1 bg-purple-500 rounded-full text-sm"
+                        <div
+                            className="relative flex items-center gap-2 px-5 py-2 bg-yellow-200 text-yellow-900 rounded-full cursor-pointer"
+                            onClick={() => setApprovalFilter('pending')}
                         >
-                            {statusCounts.disqualified}
-                        </Badge>
+                            <span className="text-sm font-medium">Pending</span>
+                            <Badge
+                                variant="outline"
+                                className="absolute -top-2 -right-2 py-1 bg-yellow-500 rounded-full text-sm"
+                            >
+                                {statusCounts.pending}
+                            </Badge>
+                        </div>
+
+                        <div
+                            className="relative flex items-center gap-2 px-5 py-2 bg-green-200 text-green-900 rounded-full cursor-pointer"
+                            onClick={() => setApprovalFilter('approved')}
+                        >
+                            <span className="text-sm font-medium">Approved</span>
+                            <Badge
+                                variant="outline"
+                                className="absolute -top-2 -right-2 py-1 bg-green-500 rounded-full text-sm"
+                            >
+                                {statusCounts.approved}
+                            </Badge>
+                        </div>
+
+                        <div
+                            className="relative flex items-center gap-2 px-5 py-2 bg-purple-200 text-purple-900 rounded-full cursor-pointer"
+                            onClick={() => setApprovalFilter('disqualified')}
+                        >
+                            <span className="text-sm font-medium">Disqualified</span>
+                            <Badge
+                                variant="outline"
+                                className="absolute -top-2 -right-2 py-1 bg-purple-500 rounded-full text-sm"
+                            >
+                                {statusCounts.disqualified}
+                            </Badge>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <div className="rounded-md border bg-background/50">
                 {loading ? (
@@ -1181,6 +1374,26 @@ export default function Dashboard() {
                                                     </DropdownMenuItem>
                                                 )}
 
+                                                {followUpFilter !== 'all' && (
+                                                    <Button
+                                                        className="bg-green-200 text-black mt-2 text-sm flex justify-start w-full pl-2 hover:bg-green-300"
+                                                        disabled={resolveLoading[patient.authid + '_followup']}
+                                                        onClick={() => handleResolveFollowUp(patient)}
+                                                    >
+                                                        {resolveLoading[patient.authid + '_followup'] ? 'Resolving...' : 'Follow Up Resolve'}
+                                                    </Button>
+                                                )}
+
+                                                {refillReminderFilter !== 'all' && (
+                                                    <Button
+                                                        className="bg-green-200 text-black mt-2 text-sm flex justify-start w-full pl-2 hover:bg-green-300"
+                                                        disabled={resolveLoading[patient.authid + '_refill']}
+                                                        onClick={() => handleResolveRefillReminder(patient)}
+                                                    >
+                                                        {resolveLoading[patient.authid + '_refill'] ? 'Resolving...' : 'Refill Reminder Resolve'}
+                                                    </Button>
+                                                )}
+
                                                 {userType === 'A' && (
                                                     <DropdownMenuItem
                                                         className="text-destructive"
@@ -1336,6 +1549,6 @@ export default function Dashboard() {
             </AlertDialog>
             {/* Email Dialog */}
 
-        </div>
+        </div >
     );
 }
