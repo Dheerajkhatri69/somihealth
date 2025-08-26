@@ -209,18 +209,11 @@ export default function PatientUpdateForm({ params }) {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    // Helper to calculate future date string
+    // Helper to generate date string using current date (no future offset)
     function getFutureDateString(interval) {
         if (!interval || interval === 'None') return '';
         const now = new Date();
-        let days = 0;
-        if (interval.endsWith('d')) {
-            days = parseInt(interval.replace('d', ''), 10);
-        } else if (interval.endsWith('w')) {
-            days = parseInt(interval.replace('w', ''), 10) * 7;
-        }
-        const future = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-        return `${future.toISOString()}_${interval}`;
+        return `${now.toISOString()}_${interval}`;
     }
 
     const handleSelectChange = (name, value) => {

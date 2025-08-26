@@ -134,6 +134,25 @@ function MegaPanel({ menuKey, onNavigate }) {
                             <ArrowRight />
                         </span>
                     </Link>
+                    {
+                        data.discover.label === "Weight Loss" && (
+                            <>
+                                <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
+                                <Link
+                                    href={"/refills"}
+                                    onClick={onNavigate}
+                                    className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                                >
+                                    Refills
+                                    <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                        <ArrowRight />
+                                    </span>
+                                </Link>
+                            </>
+                        )
+                    }
+
                 </div>
 
                 {/* Treatments */}
@@ -226,7 +245,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
     );
 
     const detail = stage ? (
-        <div className="py-3 px-6 overflow-y-auto h-[calc(100vh-56px)]">
+        <div className="py-3 pb-10 px-6 overflow-y-auto h-[calc(100vh-56px)]">
             {/* Back */}
             <button onClick={() => setStage(null)} className="mb-4 inline-flex items-center gap-2 text-sm font-semibold">
                 <BackIcon /> Back
@@ -256,6 +275,25 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     <ArrowRight />
                 </span>
             </Link>
+
+            {
+                MENUS[stage].discover.label === "Weight Loss" && (
+                    <>
+                        <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
+                        <Link
+                            href={"/refills"}
+                            onClick={onNavigate}
+                            className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                            style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                        >
+                            Refills
+                            <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                <ArrowRight />
+                            </span>
+                        </Link>
+                    </>
+                )
+            }
             {/* Treatments */}
             <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
             <ul className="mt-4 space-y-6">

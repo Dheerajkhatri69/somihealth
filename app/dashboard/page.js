@@ -254,8 +254,7 @@ export default function Dashboard() {
         const date = extractDate(val);
         if (!date) return false;
         const now = new Date();
-        const oneWeekBefore = new Date(date.getTime() - 7 * 24 * 60 * 60 * 1000);
-        return now >= oneWeekBefore && now <= date;
+        return now >= date; // Due on or after the set date
     }
 
     // Count patients for each interval
@@ -383,18 +382,11 @@ export default function Dashboard() {
                 : [...prev, patientId]
         );
     };
-    // Helper to calculate new date string
+    // Helper to generate date string using current date (no future offset)
     function getFutureDateString(interval) {
         if (!interval || interval === 'None') return '';
         const now = new Date();
-        let days = 0;
-        if (interval.endsWith('d')) {
-            days = parseInt(interval.replace('d', ''), 10);
-        } else if (interval.endsWith('w')) {
-            days = parseInt(interval.replace('w', ''), 10) * 7;
-        }
-        const future = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-        return `${future.toISOString()}_${interval}`;
+        return `${now.toISOString()}_${interval}`;
     }
 
     // Add loading state for resolve actions
@@ -412,9 +404,6 @@ export default function Dashboard() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...patient, followUp: newFollowUp }),
             });
-            // Optionally, refetch patients here
-            if (typeof fetchPatients === 'function') fetchPatients();
-            else window.location.reload();
         } finally {
             setResolveLoading(prev => ({ ...prev, [patient.authid + '_followup']: false }));
         }
@@ -431,9 +420,6 @@ export default function Dashboard() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...patient, refillReminder: newRefillReminder }),
             });
-            // Optionally, refetch patients here
-            if (typeof fetchPatients === 'function') fetchPatients();
-            else window.location.reload();
         } finally {
             setResolveLoading(prev => ({ ...prev, [patient.authid + '_refill']: false }));
         }
@@ -488,24 +474,6 @@ export default function Dashboard() {
         }
     };
 
-    const [selectedMessage, setSelectedMessage] = useState('');
-    const [selectedTemplate, setSelectedTemplate] = useState('');
-
-    // Add this array of predefined messages
-    const preDefinedMessages = [
-        {
-            title: 'Appointment Reminder',
-            content: 'Dear Patient,\n\nThis is a reminder about your upcoming appointment on...'
-        },
-        {
-            title: 'Test Results',
-            content: 'Dear Patient,\n\nYour recent test results are now available...'
-        },
-        {
-            title: 'Prescription Refill',
-            content: 'Dear Patient,\n\nYour prescription refill has been approved...'
-        }
-    ];
     const totalPages = Math.ceil(filteredPatients.length / rowsPerPage);
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -801,54 +769,6 @@ export default function Dashboard() {
                         </SelectContent>
                     </Select>
                 )}
-                {/* <Select value={followUpFilter} onValueChange={setFollowUpFilter}>
-                    <SelectTrigger className="w-[160px] relative">
-                        <SelectValue placeholder="Follow Up" />
-                        {followUpFilter !== 'all' && followUpCounts[followUpFilter] > 0 && (
-                            <span className="absolute top-0 right-0 bg-blue-500 text-white rounded-full px-2 text-xs">
-                                {followUpCounts[followUpFilter]}
-                            </span>
-                        )}
-                    </SelectTrigger>
-                    <SelectContent>
-                        {['7d', '14d', '30d', 'None'].map(opt => (
-                            <SelectItem key={opt} value={opt}>
-                                {opt === 'None' ? 'None' : opt.replace('d', ' Days')}
-                                {followUpCounts[opt] > 0 && (
-                                    <span className="ml-2 bg-blue-500 text-white rounded-full px-2 text-xs">
-                                        {followUpCounts[opt]}
-                                    </span>
-                                )}
-                            </SelectItem>
-                        ))}
-                        <SelectItem value="all">All</SelectItem>
-                    </SelectContent>
-                </Select>
-
-                <Select value={refillReminderFilter} onValueChange={setRefillReminderFilter}>
-                    <SelectTrigger className="w-[160px] relative">
-                        <SelectValue placeholder="Refill Reminder" />
-                        {refillReminderFilter !== 'all' && refillReminderCounts[refillReminderFilter] > 0 && (
-                            <span className="absolute top-0 right-0 bg-green-500 text-white rounded-full px-2 text-xs">
-                                {refillReminderCounts[refillReminderFilter]}
-                            </span>
-                        )}
-                    </SelectTrigger>
-                    <SelectContent>
-                        {['4w', '5w', '6w', '8w', '10w', '12w', '13w', 'None'].map(opt => (
-                            <SelectItem key={opt} value={opt}>
-                                {opt === 'None' ? 'None' : opt.replace('w', ' weeks')}
-                                {refillReminderCounts[opt] > 0 && (
-                                    <span className="ml-2 bg-green-500 text-white rounded-full px-2 text-xs">
-                                        {refillReminderCounts[opt]}
-                                    </span>
-                                )}
-                            </SelectItem>
-                        ))}
-                        <SelectItem value="all">All</SelectItem>
-                    </SelectContent>
-                </Select> */}
-
                 <div className="flex items-center">
                     {/* From date */}
                     <input

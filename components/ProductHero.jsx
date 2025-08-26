@@ -18,7 +18,7 @@ export default function ProductHero({ product }) {
         <section className="grid items-start gap-10 md:grid-cols-2">
             {/* Image / soft panel */}
             <div
-                className="rounded-3xl p-6 md:p-10 bg-lightprimary"
+                className="rounded-3xl p-6 md:p-10 bg-darkprimary-foreground/20"
             >
                 <div className="relative mx-auto aspect-[4/3] max-w-md">
                     <Image
