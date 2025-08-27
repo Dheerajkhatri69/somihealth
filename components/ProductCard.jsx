@@ -24,12 +24,12 @@ export default function ProductCard({ item, ctaHref }) {
             )}
 
             <div className="flex justify-center py-6">
-                <div className="relative h-48 w-40 md:h-56 md:w-48">
+                <div className="relative h-40 w-40 md:h-52 md:w-48">
                     <Image
                         src={item.img}
                         alt={item.label}
                         fill
-                        className="object-contain drop-shadow-sm"
+                        className="object-contain rotate-45 drop-shadow-sm"
                         sizes="(max-width: 768px) 160px, 200px"
                         priority={false}
                     />

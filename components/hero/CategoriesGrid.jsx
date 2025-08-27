@@ -99,22 +99,7 @@ export default function CategoriesGrid() {
     }, [api]);
 
     return (
-        <section
-            className="w-full watermark bg-[#F4F4F8] py-10 sm:py-14"
-            data-text="somi"
-            style={{
-                '--wm-size': '250px',
-                '--wm-stroke-c': '#364c781d',
-                '--wm-stroke-w': '2px',
-                '--wm-fill': 'transparent',
-                '--wm-font': '"Sofia Sans", ui-sans-serif',
-                '--wm-weight': 700,
-                '--wm-tracking': '0em',
-                '--wm-opacity': 1,
-                '--wm-left': '-11rem',
-                '--wm-rotate': '90deg',
-            }}
-        >
+        <section className="w-full watermark bg-[#F4F4F8] py-10 sm:py-14" >
             <div className="mx-auto max-w-7xl px-4 md:px-6">
 
                 {/* Mobile: horizontal slider (1 per view) */}

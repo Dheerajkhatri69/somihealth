@@ -73,7 +73,7 @@ export default function SomiFooter() {
             </section>
 
             {/* === MAIN FOOTER === */}
-            <div className="mx-auto max-w-6xl px-4 pb-10 pt-16 md:px-6">
+            <div className="mx-auto max-w-6xl px-4 pb-10 pt-24 md:px-6">
                 <div className="flex flex-col justify-between md:flex-row gap-10 md:gap-10 lg:gap-16">
                     {/* Brand + blurb + socials + badges */}
                     <div>

@@ -117,7 +117,7 @@ export default function WeightLossPlansV3() {
                     <img
                       src={p.img}
                       alt={p.imgAlt || p.name}
-                      className="vial-img mx-auto block rotate-45 h-auto w-full select-none transition-transform duration-300 ease-out group-hover/card:-translate-y-0.5 group-hover/card:scale-[1.06]"
+                      className="vial-img mx-auto block h-auto w-full select-none transition-transform duration-300 ease-out group-hover/card:-translate-y-0.5 group-hover/card:scale-[1.06]"
                       draggable="false"
                     />
                   </div>
