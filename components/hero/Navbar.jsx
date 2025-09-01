@@ -58,6 +58,19 @@ const MENUS = {
             img: "/hero/thired1.png",
         },
     },
+    "General+Health": {
+        discover: { label: "General+Health", href: "/underdevelopmentmainpage/general-health" },
+        treatments: [
+            { label: "Hormone Support", href: "/underdevelopmentmainpage/strength-vitality/hormone", img: "/hero/tirzepatide.png" },
+            { label: "Muscle Recovery", href: "/underdevelopmentmainpage/strength-vitality/recovery", img: "/hero/tirzepatide.png" },
+            { label: "Performance Pack", href: "/underdevelopmentmainpage/strength-vitality/performance", img: "/hero/tirzepatide.png" },
+        ],
+        cta: {
+            title: "Stronger.\nFitter.",
+            button: { label: "Get Started", href: "/getstarted" },
+            img: "/hero/thired1.png",
+        },
+    },
 };
 
 /* =================== ICONS =================== */
