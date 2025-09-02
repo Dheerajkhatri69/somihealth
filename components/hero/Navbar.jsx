@@ -1,77 +1,9 @@
 "use client";
 
-import { Sparkles, User } from "lucide-react";
+import { ArrowRightIcon, Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-
-/* =================== MENU CONTENT =================== */
-const MENUS = {
-    "Weight Loss": {
-        discover: { label: "Weight Loss", href: "/underdevelopmentmainpage/weight-loss" },
-        treatments: [
-            { label: "Compounded Semaglutide", href: "/underdevelopmentmainpage/weight-loss/semaglutide", img: "/hero/semaglutide.png" },
-            { label: "Compounded Tirzepatide", href: "/underdevelopmentmainpage/weight-loss/tirzepatide", img: "/hero/tirzepatide.png" },
-            { label: "Oral Semaglutide", href: "/underdevelopmentmainpage/weight-loss/oral-semaglutide", img: "/hero/tirzepatide.png", badge: "NEW" },
-        ],
-        cta: {
-            title: "Personalized\nWeight Loss",
-            button: { label: "Get Started", href: "/getstarted" },
-            img: "/hero/getstarted1.png",
-        },
-    },
-    "Longevity": {
-        discover: { label: "Longevity", href: "/underdevelopmentmainpage/longevity" },
-        treatments: [
-            { label: "B‑12 Shots", href: "/underdevelopmentmainpage/energy-mood/b12", img: "/hero/tirzepatide.png" },
-            { label: "Vitamin IV", href: "/underdevelopmentmainpage/energy-mood/iv", img: "/hero/tirzepatide.png" },
-            { label: "Stress Support", href: "/underdevelopmentmainpage/energy-mood/stress", img: "/hero/tirzepatide.png" },
-        ],
-        cta: {
-            title: "Boost Energy\n& Mood",
-            button: { label: "Get Started", href: "/getstarted" },
-            img: "/hero/second1.png",
-        },
-    },
-    "Sexual Health": {
-        discover: { label: "Sexual Health", href: "/underdevelopmentmainpage/sexual-health" },
-        treatments: [
-            { label: "Hormone Support", href: "/underdevelopmentmainpage/strength-vitality/hormone", img: "/hero/tirzepatide.png" },
-            { label: "Muscle Recovery", href: "/underdevelopmentmainpage/strength-vitality/recovery", img: "/hero/tirzepatide.png" },
-            { label: "Performance Pack", href: "/underdevelopmentmainpage/strength-vitality/performance", img: "/hero/tirzepatide.png" },
-        ],
-        cta: {
-            title: "Stronger.\nFitter.",
-            button: { label: "Get Started", href: "/getstarted" },
-            img: "/hero/thired1.png",
-        },
-    },
-    "Skin+Hair": {
-        discover: { label: "Skin+Hair", href: "/underdevelopmentmainpage/Skin-Hair" },
-        treatments: [
-            { label: "Hormone Support", href: "/underdevelopmentmainpage/strength-vitality/hormone", img: "/hero/tirzepatide.png" },
-            { label: "Muscle Recovery", href: "/underdevelopmentmainpage/strength-vitality/recovery", img: "/hero/tirzepatide.png" },
-            { label: "Performance Pack", href: "/underdevelopmentmainpage/strength-vitality/performance", img: "/hero/tirzepatide.png" },
-        ],
-        cta: {
-            title: "Stronger.\nFitter.",
-            button: { label: "Get Started", href: "/getstarted" },
-            img: "/hero/thired1.png",
-        },
-    },
-    "General+Health": {
-        discover: { label: "General+Health", href: "/underdevelopmentmainpage/general-health" },
-        treatments: [
-            { label: "Hormone Support", href: "/underdevelopmentmainpage/strength-vitality/hormone", img: "/hero/tirzepatide.png" },
-            { label: "Muscle Recovery", href: "/underdevelopmentmainpage/strength-vitality/recovery", img: "/hero/tirzepatide.png" },
-            { label: "Performance Pack", href: "/underdevelopmentmainpage/strength-vitality/performance", img: "/hero/tirzepatide.png" },
-        ],
-        cta: {
-            title: "Stronger.\nFitter.",
-            button: { label: "Get Started", href: "/getstarted" },
-            img: "/hero/thired1.png",
-        },
-    },
-};
+import { MENUS, getNavbarItems } from "@/lib/menus";
 
 /* =================== ICONS =================== */
 const Chevron = ({ open }) => (
@@ -122,110 +54,211 @@ function MegaPanel({ menuKey, onNavigate }) {
                     }}
                 >
                 </div>
-                {/* Discover */}
-                <div className="md:col-span-3">
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Discover</div>
-                    <Link
-                        href={data.discover.href}
-                        onClick={onNavigate}
-                        className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                    >
-                        {data.discover.label}
-                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                            <ArrowRight />
-                        </span>
-                    </Link>
-                    <Link
-                        href={"/underdevelopmentmainpage/healthcoach"}
-                        onClick={onNavigate}
-                        className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                    >
-                        Health Coach
-                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                            <ArrowRight />
-                        </span>
-                    </Link>
-                    {
-                        data.discover.label === "Weight Loss" && (
-                            <>
-                                <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
-                                <Link
-                                    href={"/refills"}
-                                    onClick={onNavigate}
-                                    className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                                >
-                                    Refills
-                                    <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                                        <ArrowRight />
-                                    </span>
-                                </Link>
-                            </>
-                        )
-                    }
+                {data.type === "categorized" ? (
+                    <>
+                        {/* Direct Primary Care */}
 
-                </div>
+                        <div className="md:col-span-3">
+                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Direct Primary Care</div>
+                            <ul className="mt-4 space-y-2">
+                                {data.categories[0]?.items.map((item) => (
+                                    <li key={item.label}>
+                                        <Link
+                                            href={item.href}
+                                            onClick={onNavigate}
+                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                        >
+                                            {/* Label */}
+                                            <span className="text-lg font-SofiaSans">
+                                                {item.label}
+                                            </span>
 
-                {/* Treatments */}
-                <div className="md:col-span-4">
-                    <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
-                    <ul className="mt-4 space-y-5">
-                        {data.treatments.map((t) => (
-                            <li key={t.label}>
-                                <Link href={t.href} onClick={onNavigate} className="group flex items-center gap-4 rounded-xl p-2 border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary">
-                                    <div className="flex h-10 w-10 items-center justify-center">
-                                        <img src={t.img} alt="" className="h-10 w-10 object-contain" />
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg font-SofiaSans font-medium text-gray-900">{t.label}</span>
-                                        {t.badge && (
-                                            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-white">NEW</span>
-                                        )}
-                                    </div>
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                                            {/* Arrow (rotates + nudges on hover) */}
+                                            <ArrowRightIcon
+                                                className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                                            />
 
-                {/* CTA */}
-                <div className="md:col-span-4">
-                    <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
-                    <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                        <img src={data.cta.img} alt="" className="h-full w-full object-cover" />
-
-                        {/* subtle gradient to improve readability */}
-                        <div
-                            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
-                            aria-hidden="true"
-                        />
-
-                        {/* title – top-left */}
-                        <div className="absolute left-4 top-4 right-4">
-                            <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
-                                {data.cta.title}
-                            </div>
+                                            {/* Animated underline (grows from left on hover) */}
+                                            <span
+                                                aria-hidden="true"
+                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
+                                            />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
 
-                        {/* button – bottom-left */}
-                        <div className="absolute bottom-4 left-4">
+                        {/* Same-day Care */}
+                        <div className="md:col-span-4">
+                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Same-day Care</div>
+                            <ul className="mt-4 space-y-2">
+                                {data.categories[1]?.items.map((item) => (
+                                    <li key={item.label}>
+                                        <Link
+                                            href={item.href}
+                                            onClick={onNavigate}
+                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                        >
+                                            {/* Label */}
+                                            <span className="text-lg font-SofiaSans">
+                                                {item.label}
+                                            </span>
+
+                                            {/* Arrow (rotates + nudges on hover) */}
+                                            <ArrowRightIcon
+                                                className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                                            />
+
+                                            {/* Animated underline (grows from left on hover) */}
+                                            <span
+                                                aria-hidden="true"
+                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
+                                            />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Medication Refill */}
+                        <div className="md:col-span-4">
+                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Medication Refill</div>
+                            <ul className="mt-4 space-y-2">
+                                {data.categories[2]?.items.map((item) => (
+                                    <li key={item.label}>
+                                        <Link
+                                            href={item.href}
+                                            onClick={onNavigate}
+                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                        >
+                                            {/* Label */}
+                                            <span className="text-lg font-SofiaSans">
+                                                {item.label}
+                                            </span>
+
+                                            {/* Arrow (rotates + nudges on hover) */}
+                                            <ArrowRightIcon
+                                                className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                                            />
+
+                                            {/* Animated underline (grows from left on hover) */}
+                                            <span
+                                                aria-hidden="true"
+                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
+                                            />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {/* Discover */}
+                        <div className="md:col-span-3">
+                            <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Discover</div>
                             <Link
-                                href={data.cta.button.href}
+                                href={data.discover.href}
                                 onClick={onNavigate}
-                                className="fx86 inline-flex items-center gap-3 font-SofiaSans  rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                                style={{ "--fx86-base": "transparent" }}
+                                className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                             >
-                                {data.cta.button.label}
-                                <span className="inline-flex h-7 w-7 items-center justify-center">
+                                {data.discover.label}
+                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
                                     <ArrowRight />
                                 </span>
                             </Link>
+                            <Link
+                                href={"/underdevelopmentmainpage/healthcoach"}
+                                onClick={onNavigate}
+                                className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                            >
+                                Health Coach
+                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                    <ArrowRight />
+                                </span>
+                            </Link>
+                            {
+                                data.discover.label === "Weight Loss" && (
+                                    <>
+                                        <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
+                                        <Link
+                                            href={"/refills"}
+                                            onClick={onNavigate}
+                                            className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                            style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                                        >
+                                            Refills
+                                            <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                                <ArrowRight />
+                                            </span>
+                                        </Link>
+                                    </>
+                                )
+                            }
                         </div>
-                    </div>
 
-                </div>
+                        {/* Treatments */}
+                        <div className="md:col-span-4">
+                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
+                            <ul className="mt-4 space-y-5">
+                                {data.treatments.map((t) => (
+                                    <li key={t.label}>
+                                        <Link href={t.href} onClick={onNavigate} className="group flex items-center gap-4 rounded-xl p-2 border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary">
+                                            <div className="flex h-10 w-10 items-center justify-center">
+                                                <img src={t.img} alt="" className="h-10 w-10 object-contain" />
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-lg font-SofiaSans font-medium text-gray-900">{t.label}</span>
+                                                {t.badge && (
+                                                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-white">NEW</span>
+                                                )}
+                                            </div>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* CTA */}
+                        <div className="md:col-span-4">
+                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
+                            <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
+                                <img src={data.cta.img} alt="" className="h-full w-full object-cover" />
+
+                                {/* subtle gradient to improve readability */}
+                                <div
+                                    className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
+                                    aria-hidden="true"
+                                />
+
+                                {/* title – top-left */}
+                                <div className="absolute left-4 top-4 right-4">
+                                    <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
+                                        {data.cta.title}
+                                    </div>
+                                </div>
+
+                                {/* button – bottom-left */}
+                                <div className="absolute bottom-4 left-4">
+                                    <Link
+                                        href={data.cta.button.href}
+                                        onClick={onNavigate}
+                                        className="fx86 inline-flex items-center gap-3 font-SofiaSans  rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                                        style={{ "--fx86-base": "transparent" }}
+                                    >
+                                        {data.cta.button.label}
+                                        <span className="inline-flex h-7 w-7 items-center justify-center">
+                                            <ArrowRight />
+                                        </span>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
@@ -244,7 +277,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
 
     const root = (
         <div className="p-5">
-            {Object.keys(MENUS).map((k) => (
+            {getNavbarItems().map(({ key: k }) => (
                 <button
                     key={k}
                     onClick={() => setStage(k)}
@@ -264,100 +297,196 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                 <BackIcon /> Back
             </button>
 
-            {/* Discover Pill */}
-            <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Discover</div>
-            <Link
-                href={MENUS[stage].discover.href}
-                onClick={onNavigate}
-                className="fx86 inline-flex w-full items-center font-SofiaSans justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-            >
-                {MENUS[stage].discover.label}
-                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                    <ArrowRight />
-                </span>
-            </Link>
-            <Link
-                href={"/underdevelopmentmainpage/healthcoach"}
-                onClick={onNavigate}
-                className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-            >
-                Health Coach
-                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                    <ArrowRight />
-                </span>
-            </Link>
+            {MENUS[stage].type === "categorized" ? (
+                <>
+                    {/* Direct Primary Care */}
+                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Direct Primary Care</div>
+                    <ul className="space-y-3 mb-8">
+                        {MENUS[stage].categories[0]?.items.map((item) => (
+                            <li key={item.label}>
+                                <Link
+                                    href={item.href}
+                                    onClick={onNavigate}
+                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                >
+                                    {/* Label */}
+                                    <span className="text-lg font-SofiaSans">
+                                        {item.label}
+                                    </span>
 
-            {
-                MENUS[stage].discover.label === "Weight Loss" && (
-                    <>
-                        <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
-                        <Link
-                            href={"/refills"}
-                            onClick={onNavigate}
-                            className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                            style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                        >
-                            Refills
-                            <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                                <ArrowRight />
-                            </span>
-                        </Link>
-                    </>
-                )
-            }
-            {/* Treatments */}
-            <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
-            <ul className="mt-4 space-y-6">
-                {MENUS[stage].treatments.map((t) => (
-                    <li key={t.label} className="flex items-center gap-4">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100">
-                            <img src={t.img} alt="" className="h-12 w-12 object-contain" />
-                        </div>
-                        <Link href={t.href} onClick={onNavigate} className="flex items-center gap-3 font-SofiaSans text-lg font-medium">
-                            <span>{t.label}</span>
-                            {t.badge && (
-                                <span className="rounded-full bg-darkprimary px-2 py-0.5 text-xs font-semibold text-white">NEW</span>
-                            )}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
+                                    {/* Arrow (rotates + nudges on hover) */}
+                                    <ArrowRightIcon
+                                        className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                                    />
 
-            {/* CTA */}
-            <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
-            <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                <img src={MENUS[stage].cta.img} alt="" className="h-full w-full object-cover" />
+                                    {/* Animated underline (grows from left on hover) */}
+                                    <span
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
+                                    />
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
 
-                {/* subtle gradient to improve readability */}
-                <div
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
-                    aria-hidden="true"
-                />
+                    {/* Same-day Care */}
+                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Same-day Care</div>
+                    <ul className="space-y-3 mb-8">
+                        {MENUS[stage].categories[1]?.items.map((item) => (
+                            <li key={item.label}>
+                                <Link
+                                    href={item.href}
+                                    onClick={onNavigate}
+                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                >
+                                    {/* Label */}
+                                    <span className="text-lg font-SofiaSans">
+                                        {item.label}
+                                    </span>
 
-                {/* title – top-left */}
-                <div className="absolute left-4 top-4 right-4">
-                    <div className="whitespace-pre-line text-xl font-SofiaSans font-bold tracking-tight text-white drop-shadow">
-                        {MENUS[stage].cta.title}
-                    </div>
-                </div>
+                                    {/* Arrow (rotates + nudges on hover) */}
+                                    <ArrowRightIcon
+                                        className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                                    />
 
-                {/* button – bottom-left */}
-                <div className="absolute bottom-4 left-4">
+                                    {/* Animated underline (grows from left on hover) */}
+                                    <span
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
+                                    />
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* Medication Refill */}
+                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Medication Refill</div>
+                    <ul className="space-y-3">
+                        {MENUS[stage].categories[2]?.items.map((item) => (
+                            <li key={item.label}>
+                                <Link
+                                    href={item.href}
+                                    onClick={onNavigate}
+                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                >
+                                    {/* Label */}
+                                    <span className="text-lg font-SofiaSans">
+                                        {item.label}
+                                    </span>
+
+                                    {/* Arrow (rotates + nudges on hover) */}
+                                    <ArrowRightIcon
+                                        className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                                    />
+
+                                    {/* Animated underline (grows from left on hover) */}
+                                    <span
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
+                                    />
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            ) : (
+                <>
+                    {/* Discover Pill */}
+                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Discover</div>
                     <Link
-                        href={MENUS[stage].cta.button.href}
+                        href={MENUS[stage].discover.href}
                         onClick={onNavigate}
-                        className="fx86 inline-flex items-center font-SofiaSans gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                        style={{ "--fx86-base": "transparent" }}
+                        className="fx86 inline-flex w-full items-center font-SofiaSans justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                     >
-                        {MENUS[stage].cta.button.label}
-                        <span className="inline-flex h-7 w-7 items-center justify-center">
+                        {MENUS[stage].discover.label}
+                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
                             <ArrowRight />
                         </span>
                     </Link>
-                </div>
-            </div>
+                    <Link
+                        href={"/underdevelopmentmainpage/healthcoach"}
+                        onClick={onNavigate}
+                        className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                    >
+                        Health Coach
+                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                            <ArrowRight />
+                        </span>
+                    </Link>
+
+                    {
+                        MENUS[stage].discover.label === "Weight Loss" && (
+                            <>
+                                <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
+                                <Link
+                                    href={"/refills"}
+                                    onClick={onNavigate}
+                                    className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                                >
+                                    Refills
+                                    <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                        <ArrowRight />
+                                    </span>
+                                </Link>
+                            </>
+                        )
+                    }
+                    {/* Treatments */}
+                    <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
+                    <ul className="mt-4 space-y-6">
+                        {MENUS[stage].treatments.map((t) => (
+                            <li key={t.label} className="flex items-center gap-4">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100">
+                                    <img src={t.img} alt="" className="h-12 w-12 object-contain" />
+                                </div>
+                                <Link href={t.href} onClick={onNavigate} className="flex items-center gap-3 font-SofiaSans text-lg font-medium">
+                                    <span>{t.label}</span>
+                                    {t.badge && (
+                                        <span className="rounded-full bg-darkprimary px-2 py-0.5 text-xs font-semibold text-white">NEW</span>
+                                    )}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* CTA */}
+                    <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
+                    <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
+                        <img src={MENUS[stage].cta.img} alt="" className="h-full w-full object-cover" />
+
+                        {/* subtle gradient to improve readability */}
+                        <div
+                            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
+                            aria-hidden="true"
+                        />
+
+                        {/* title – top-left */}
+                        <div className="absolute left-4 top-4 right-4">
+                            <div className="whitespace-pre-line text-xl font-SofiaSans font-bold tracking-tight text-white drop-shadow">
+                                {MENUS[stage].cta.title}
+                            </div>
+                        </div>
+
+                        {/* button – bottom-left */}
+                        <div className="absolute bottom-4 left-4">
+                            <Link
+                                href={MENUS[stage].cta.button.href}
+                                onClick={onNavigate}
+                                className="fx86 inline-flex items-center font-SofiaSans gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                                style={{ "--fx86-base": "transparent" }}
+                            >
+                                {MENUS[stage].cta.button.label}
+                                <span className="inline-flex h-7 w-7 items-center justify-center">
+                                    <ArrowRight />
+                                </span>
+                            </Link>
+                        </div>
+                    </div>
+                </>
+            )}
 
         </div>
     ) : null;
@@ -428,7 +557,7 @@ export default function Navbar({ brand = "somi" }) {
         };
     }, []);
 
-    const topItems = Object.keys(MENUS);
+    const topItems = getNavbarItems().map(item => item.key);
 
     return (
         <header className="sticky top-0 z-50 bg-white">

@@ -46,11 +46,31 @@ export default function ProductTypePage({ params }) {
                 <div className="mx-auto max-w-6xl py-12 font-SofiaSans md:py-16">
                     <SectionHeader title={title} />
 
-                    <div className="mt-10 grid gap-6 md:mt-14 md:grid-cols-3">
-                        {menu.treatments.map((item) => (
-                            <ProductCard key={item.href} item={item} ctaHref={menu.cta?.button?.href || "#"} />
-                        ))}
-                    </div>
+                    {menu.type === "categorized" ? (
+                        <div className="mt-10 space-y-12 md:mt-14">
+                            {menu.categories.map((category, index) => (
+                                <div key={index}>
+                                    <h2 className="text-2xl font-bold text-darkprimary mb-6">{category.title}</h2>
+                                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                        {category.items.map((item) => (
+                                            <ProductCard 
+                                                key={item.href} 
+                                                item={item} 
+                                                ctaHref={menu.cta?.button?.href || "#"}
+                                                isLink={item.isLink}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="mt-10 grid gap-6 md:mt-14 md:grid-cols-3">
+                            {menu.treatments.map((item) => (
+                                <ProductCard key={item.href} item={item} ctaHref={menu.cta?.button?.href || "#"} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </main>
             <ClientVideoReviews />

@@ -2,65 +2,11 @@
 
 import Link from "next/link";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+import { getPlanItems } from "@/lib/products";
 
 export default function WeightLossPlansV3() {
-  const plans = [
-    {
-      name: "Compounded Semaglutide",
-      img: "/hero/newsemaglutide.png",
-      imgAlt: "Somi Compounded Semaglutide vial",
-      priceLabel: "Starting At",
-      currency: "$",
-      price: 99,
-      per: "/Month",
-      primary: { label: "Get Started", href: "/getstarted" },
-      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/semaglutide" },
-    },
-    {
-      name: "Compounded Tirzepatide",
-      img: "/hero/newtirzepatide.png",
-      imgAlt: "Somi Compounded Tirzepatide vial",
-      priceLabel: "Starting At",
-      currency: "$",
-      price: 145,
-      per: "/Month",
-      primary: { label: "Get Started", href: "/getstarted" },
-      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/tirzepatide" },
-    },
-    {
-      name: "Compounded Semaglutide",
-      img: "/hero/newsemaglutide.png",
-      imgAlt: "Somi Compounded Semaglutide vial",
-      priceLabel: "Starting At",
-      currency: "$",
-      price: 99,
-      per: "/Month",
-      primary: { label: "Get Started", href: "/getstarted" },
-      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/semaglutide" },
-    },
-    {
-      name: "Compounded Tirzepatide",
-      img: "/hero/newtirzepatide.png",
-      imgAlt: "Somi Compounded Tirzepatide vial",
-      priceLabel: "Starting At",
-      currency: "$",
-      price: 145,
-      per: "/Month",
-      primary: { label: "Get Started", href: "/getstarted" },
-      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/tirzepatide" },
-    },
-    {
-      name: "Compounded Tirzepatide",
-      img: "/hero/newtirzepatide.png",
-      imgAlt: "Somi Compounded Tirzepatide vial",
-      priceLabel: "Starting At",
-      currency: "$",
-      price: 145,
-      per: "/Month",
-      primary: { label: "Get Started", href: "/getstarted" },
-      secondary: { label: "Learn More", href: "/underdevelopmentmainpage/weight-loss/tirzepatide" },
-    },
-  ];
+  // Use the helper function from lib/products.js
+  const plans = getPlanItems();
 
   return (
     <section className="w-full py-10 sm:py-12">

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import WeightLossPlansV3 from "./WeightLossPlans";
+import { getGridItems } from "@/lib/menus";
 
 /* ---------- Icon ---------- */
 function ArrowRight() {
@@ -88,13 +89,8 @@ const CategoryCard = React.memo(function CategoryCard({
 
 /* ---------- Grid + Mobile/Desktop carousels ---------- */
 export default function CategoriesGrid() {
-    const items = [
-        { title: "Weight Loss", img: "/hero/1.jpg", href: "/underdevelopmentmainpage/weight-loss" },
-        { title: "Longevity", img: "/hero/2.png", href: "/underdevelopmentmainpage/longevity" },
-        { title: "Sexual Health", img: "/hero/3.png", href: "/underdevelopmentmainpage/sexual-health" },
-        { title: "Skin+Hair", img: "/hero/4.jpg", href: "/underdevelopmentmainpage/skin-hair" },
-        { title: "General Health", img: "/hero/4.jpg", href: "/underdevelopmentmainpage/general-health" },
-    ];
+    // Use the helper function from lib/menus.js
+    const items = getGridItems();
 
     const showStaticDesktop = items.length <= 4;
     const firstFour = React.useMemo(() => items.slice(0, 4), [items]);
@@ -139,7 +135,7 @@ export default function CategoriesGrid() {
                         setApi={setMobileApi}
                         opts={{ align: "start", loop: true }}
                         plugins={prefersReducedMotion ? [] : [autoplayPlugin]}
-                        className="w-full overscroll-x-contain"
+                        className="w-full overscroll-x-contain relative"
                     >
                         <CarouselContent
                             className="touch-pan-y -ml-2 [transform:translateZ(0)]"
@@ -161,8 +157,12 @@ export default function CategoriesGrid() {
                             ))}
                         </CarouselContent>
 
-                        <CarouselPrevious className="left-2" />
-                        <CarouselNext className="right-2" />
+                        {items.length > 1 && (
+                            <>
+                                <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
+                                <CarouselNext className="right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
+                            </>
+                        )}
                     </Carousel>
 
                     {/* Dots */}
@@ -200,7 +200,7 @@ export default function CategoriesGrid() {
                         <Carousel
                             opts={{ align: "start", loop: true }}
                             plugins={prefersReducedMotion ? [] : [autoplayPlugin]}
-                            className="w-full"
+                            className="w-full relative"
                         >
                             <CarouselContent
                                 className="touch-pan-y -ml-2 [transform:translateZ(0)]"
@@ -220,9 +220,12 @@ export default function CategoriesGrid() {
                                     </CarouselItem>
                                 ))}
                             </CarouselContent>
-
-                            <CarouselPrevious className="left-2" />
-                            <CarouselNext className="right-2" />
+                            {items.length > 4 && (
+                                <>
+                                    <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
+                                    <CarouselNext className="right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
+                                </>
+                            )}
                         </Carousel>
                     </div>
                 )}
