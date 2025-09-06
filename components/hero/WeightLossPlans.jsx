@@ -1,22 +1,88 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
-import { getPlanItems } from "@/lib/products";
+import { useWebsiteData } from "@/contexts/WebsiteDataContext";
+import { LoadingPage, WeightLossPlansSkeleton } from "@/components/LoadingSkeleton";
 
 export default function WeightLossPlansV3() {
-  // Use the helper function from lib/products.js
-  const plans = getPlanItems();
+  const { data, isLoading, error } = useWebsiteData();
+  
+  // Get all products from database that are marked for plans
+  const plans = React.useMemo(() => {
+    if (!data?.products) return [];
+    
+    // Get all products from all categories
+    const allProducts = Object.values(data.products).flat();
+       
+    const filteredProducts = allProducts
+      .filter(product => product.showInPlans === true); // Only show products where showInPlans is explicitly true
+    
+    
+    return filteredProducts.map(product => ({
+        name: product.label,
+        img: product.heroImage,
+        imgAlt: product.shortLabel,
+        priceLabel: "Starting At",
+        currency: "$",
+        price: product.price,
+        per: product.unit,
+        primary: { label: "Get Started", href: "/getstarted" },
+        secondary: { label: "Learn More", href: `/underdevelopmentmainpage/${product.category}/${product.slug}` }
+      }));
+  }, [data]);
+  
+  // Show error state if data fails to load
+  if (error) {
+    return (
+      <section className="w-full py-10 sm:py-12">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to load plans</h2>
+            <p className="text-gray-600 mb-4">Please try refreshing the page.</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="rounded-md bg-darkprimary px-4 py-2 text-white hover:bg-darkprimary/90"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+  
+  // Show empty state if no plans available
+  if (!isLoading && plans.length === 0) {
+    return (
+      <section className="w-full py-10 sm:py-12">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">No plans available</h2>
+            <p className="text-gray-600 mb-4">Check back later for our latest offerings.</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="w-full py-10 sm:py-12">
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <h2 className=" text-center text-2xl font-bold sm:text-3xl">
-          Plans
-        </h2>
+    <LoadingPage isLoading={isLoading} fallback={<WeightLossPlansSkeleton />}>
+      <section className="w-full py-10 sm:py-12">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <h2 className=" text-center text-2xl font-bold sm:text-3xl">
+            Plans
+          </h2>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 ">
-          {plans.map((p, i) => (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 ">
+            {plans.map((p, i) => (
             <CardContainer key={i} className="w-full">
               <CardBody
                 className="
@@ -94,23 +160,24 @@ export default function WeightLossPlansV3() {
               </CardBody>
             </CardContainer>
           ))}
+          </div>
         </div>
-      </div>
 
-      {/* helpers */}
-      <style jsx>{`
-        .vial-shadow {
-          background: radial-gradient(closest-side, rgba(0, 0, 0, 0.28), transparent);
-          opacity: 0.9;
-          transform: translateY(6px) scale(0.85);
-        }
-        @media (hover: none) {
-          .vial-img {
-            transform: none !important;
+        {/* helpers */}
+        <style jsx>{`
+          .vial-shadow {
+            background: radial-gradient(closest-side, rgba(0, 0, 0, 0.28), transparent);
+            opacity: 0.9;
+            transform: translateY(6px) scale(0.85);
           }
-        }
-      `}</style>
-    </section>
+          @media (hover: none) {
+            .vial-img {
+              transform: none !important;
+            }
+          }
+        `}</style>
+      </section>
+    </LoadingPage>
   );
 }
 

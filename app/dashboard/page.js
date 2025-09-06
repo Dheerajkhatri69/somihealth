@@ -329,6 +329,11 @@ export default function Dashboard() {
     };
     const filteredPatients = patients.filter(patient => {
         const emailMatch = patient.email.toLowerCase().includes(emailFilter.toLowerCase());
+        const nameMatch = emailFilter === '' || 
+            patient.firstName.toLowerCase().includes(emailFilter.toLowerCase()) ||
+            patient.lastName.toLowerCase().includes(emailFilter.toLowerCase()) ||
+            `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(emailFilter.toLowerCase());
+        const emailOrNameMatch = emailMatch || nameMatch;
         // const pIdMatch = patient.patientId.toLowerCase().includes(pIdFilter.toLowerCase());
         const pIdMatch = patient.authid.toLowerCase().includes(pIdFilter.toLowerCase());
         const genderMatch = genderFilter === 'all' || patient.sex === genderFilter;
@@ -369,7 +374,7 @@ export default function Dashboard() {
         const refillReminderMatch =
             refillReminderFilter === 'all' ||
             (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
-        return emailMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
+        return emailOrNameMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
             medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch && followUpMatch && refillReminderMatch;
     });
 
@@ -394,32 +399,54 @@ export default function Dashboard() {
 
     // Handler for resolving follow up
     async function handleResolveFollowUp(patient) {
-        const interval = extractInterval(patient.followUp);
-        if (!interval) return;
         setResolveLoading(prev => ({ ...prev, [patient.authid + '_followup']: true }));
-        const newFollowUp = getFutureDateString(interval);
         try {
-            await fetch('/api/patients', {
+            const response = await fetch('/api/patients', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...patient, followUp: newFollowUp }),
+                body: JSON.stringify({ ...patient, followUp: "" }),
             });
+            const data = await response.json();
+            if (data.success) {
+                toast.success(`Follow up cleared for ${patient.firstName} ${patient.lastName}`);
+                // Update the patient in the local state
+                setPatients(prev => prev.map(p => 
+                    p.authid === patient.authid 
+                        ? { ...p, followUp: "" }
+                        : p
+                ));
+            } else {
+                toast.error(data.result?.message || 'Failed to clear follow up');
+            }
+        } catch (error) {
+            toast.error('Error clearing follow up: ' + error.message);
         } finally {
             setResolveLoading(prev => ({ ...prev, [patient.authid + '_followup']: false }));
         }
     }
     // Handler for resolving refill reminder
     async function handleResolveRefillReminder(patient) {
-        const interval = extractInterval(patient.refillReminder);
-        if (!interval) return;
         setResolveLoading(prev => ({ ...prev, [patient.authid + '_refill']: true }));
-        const newRefillReminder = getFutureDateString(interval);
         try {
-            await fetch('/api/patients', {
+            const response = await fetch('/api/patients', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...patient, refillReminder: newRefillReminder }),
+                body: JSON.stringify({ ...patient, refillReminder: "" }),
             });
+            const data = await response.json();
+            if (data.success) {
+                toast.success(`Refill reminder cleared for ${patient.firstName} ${patient.lastName}`);
+                // Update the patient in the local state
+                setPatients(prev => prev.map(p => 
+                    p.authid === patient.authid 
+                        ? { ...p, refillReminder: "" }
+                        : p
+                ));
+            } else {
+                toast.error(data.result?.message || 'Failed to clear refill reminder');
+            }
+        } catch (error) {
+            toast.error('Error clearing refill reminder: ' + error.message);
         } finally {
             setResolveLoading(prev => ({ ...prev, [patient.authid + '_refill']: false }));
         }
@@ -568,7 +595,7 @@ export default function Dashboard() {
                     onChange={(e) => setPIdFilter(e.target.value)}
                 />
                 <Input
-                    placeholder="Filter emails..."
+                    placeholder="Filter by email or name..."
                     className="max-w-sm"
                     value={emailFilter}
                     onChange={(e) => setEmailFilter(e.target.value)}

@@ -3,7 +3,8 @@
 import { ArrowRightIcon, Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { MENUS, getNavbarItems } from "@/lib/menus";
+import { useWebsiteData } from "@/contexts/WebsiteDataContext";
+import { NavbarSkeleton, MegaPanelSkeleton } from "@/components/LoadingSkeleton";
 
 /* =================== ICONS =================== */
 const Chevron = ({ open }) => (
@@ -29,7 +30,10 @@ const BackIcon = () => (
 
 /* =================== DESKTOP MEGA PANEL =================== */
 function MegaPanel({ menuKey, onNavigate }) {
-    const data = MENUS[menuKey];
+    const { getMenuBySlug, isLoading } = useWebsiteData();
+    const data = getMenuBySlug(menuKey);
+
+    if (isLoading) return <MegaPanelSkeleton />;
     if (!data) return null;
 
     return (
@@ -73,11 +77,6 @@ function MegaPanel({ menuKey, onNavigate }) {
                                                 {item.label}
                                             </span>
 
-                                            {/* Arrow (rotates + nudges on hover) */}
-                                            <ArrowRightIcon
-                                                className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                                            />
-
                                             {/* Animated underline (grows from left on hover) */}
                                             <span
                                                 aria-hidden="true"
@@ -90,7 +89,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                         </div>
 
                         {/* Same-day Care */}
-                        <div className="md:col-span-4">
+                        <div className="md:col-span-3">
                             <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Same-day Care</div>
                             <ul className="mt-4 space-y-2">
                                 {data.categories[1]?.items.map((item) => (
@@ -104,11 +103,6 @@ function MegaPanel({ menuKey, onNavigate }) {
                                             <span className="text-lg font-SofiaSans">
                                                 {item.label}
                                             </span>
-
-                                            {/* Arrow (rotates + nudges on hover) */}
-                                            <ArrowRightIcon
-                                                className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                                            />
 
                                             {/* Animated underline (grows from left on hover) */}
                                             <span
@@ -137,11 +131,6 @@ function MegaPanel({ menuKey, onNavigate }) {
                                                 {item.label}
                                             </span>
 
-                                            {/* Arrow (rotates + nudges on hover) */}
-                                            <ArrowRightIcon
-                                                className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                                            />
-
                                             {/* Animated underline (grows from left on hover) */}
                                             <span
                                                 aria-hidden="true"
@@ -151,6 +140,37 @@ function MegaPanel({ menuKey, onNavigate }) {
                                     </li>
                                 ))}
                             </ul>
+                            <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
+                                <img src={data.cta.img} alt="" className="h-full w-full object-cover" />
+
+                                {/* subtle gradient to improve readability */}
+                                <div
+                                    className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
+                                    aria-hidden="true"
+                                />
+                                <div className="absolute left-4 top-4 right-4">
+                                    <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
+                                        {String(data?.cta?.title ?? '').replace(/\\n/g, '\n')}
+                                    </div>
+                                </div>
+
+
+
+                                {/* button – bottom-left */}
+                                <div className="absolute bottom-4 left-4">
+                                    <Link
+                                        href={data.cta.button.href}
+                                        onClick={onNavigate}
+                                        className="fx86 inline-flex items-center gap-3 font-SofiaSans  rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                                        style={{ "--fx86-base": "transparent" }}
+                                    >
+                                        {data.cta.button.label}
+                                        <span className="inline-flex h-7 w-7 items-center justify-center">
+                                            <ArrowRight />
+                                        </span>
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </>
                 ) : (
@@ -237,7 +257,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                                 {/* title – top-left */}
                                 <div className="absolute left-4 top-4 right-4">
                                     <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
-                                        {data.cta.title}
+                                        {String(data?.cta?.title ?? '').replace(/\\n/g, '\n')}
                                     </div>
                                 </div>
 
@@ -266,6 +286,8 @@ function MegaPanel({ menuKey, onNavigate }) {
 
 /* =================== MOBILE OVERLAY (two-stage) =================== */
 function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "somi" }) {
+    const { getNavbarItems, getMenuBySlug, isLoading } = useWebsiteData();
+
     // lock scroll while open
     useEffect(() => {
         if (open) document.body.style.overflow = "hidden";
@@ -275,18 +297,30 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
 
     if (!open) return null;
 
+    const navbarItems = getNavbarItems();
+    const menuData = stage ? getMenuBySlug(stage) : null;
+
     const root = (
         <div className="p-5">
-            {getNavbarItems().map(({ key: k }) => (
-                <button
-                    key={k}
-                    onClick={() => setStage(k)}
-                    className="flex w-full font-SofiaSans items-center justify-between rounded-lg px-2 py-5 text-left text-xl font-semibold"
-                >
-                    <span>{k}</span>
-                    <ArrowRight />
-                </button>
-            ))}
+            {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex w-full items-center justify-between rounded-lg px-2 py-5">
+                        <div className="h-6 w-32 rounded bg-gray-200 animate-pulse" />
+                        <div className="h-6 w-6 rounded bg-gray-200 animate-pulse" />
+                    </div>
+                ))
+            ) : (
+                navbarItems.map(({ key: k, menu }) => (
+                    <button
+                        key={k}
+                        onClick={() => setStage(k)}
+                        className="flex w-full font-SofiaSans items-center justify-between rounded-lg px-2 py-5 text-left text-xl font-semibold"
+                    >
+                        <span>{menu.name}</span>
+                        <ArrowRight />
+                    </button>
+                ))
+            )}
         </div>
     );
 
@@ -297,12 +331,25 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                 <BackIcon /> Back
             </button>
 
-            {MENUS[stage].type === "categorized" ? (
+            {isLoading ? (
+                <div className="space-y-6">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="space-y-4">
+                            <div className="h-4 w-32 rounded bg-gray-200 animate-pulse" />
+                            <div className="space-y-2">
+                                {Array.from({ length: 4 }).map((_, j) => (
+                                    <div key={j} className="h-8 w-full rounded bg-gray-200 animate-pulse" />
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : menuData?.type === "categorized" ? (
                 <>
                     {/* Direct Primary Care */}
                     <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Direct Primary Care</div>
                     <ul className="space-y-3 mb-8">
-                        {MENUS[stage].categories[0]?.items.map((item) => (
+                        {menuData.categories[0]?.items.map((item) => (
                             <li key={item.label}>
                                 <Link
                                     href={item.href}
@@ -313,11 +360,6 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                     <span className="text-lg font-SofiaSans">
                                         {item.label}
                                     </span>
-
-                                    {/* Arrow (rotates + nudges on hover) */}
-                                    <ArrowRightIcon
-                                        className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                                    />
 
                                     {/* Animated underline (grows from left on hover) */}
                                     <span
@@ -332,7 +374,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     {/* Same-day Care */}
                     <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Same-day Care</div>
                     <ul className="space-y-3 mb-8">
-                        {MENUS[stage].categories[1]?.items.map((item) => (
+                        {menuData.categories[1]?.items.map((item) => (
                             <li key={item.label}>
                                 <Link
                                     href={item.href}
@@ -343,11 +385,6 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                     <span className="text-lg font-SofiaSans">
                                         {item.label}
                                     </span>
-
-                                    {/* Arrow (rotates + nudges on hover) */}
-                                    <ArrowRightIcon
-                                        className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                                    />
 
                                     {/* Animated underline (grows from left on hover) */}
                                     <span
@@ -362,7 +399,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     {/* Medication Refill */}
                     <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Medication Refill</div>
                     <ul className="space-y-3">
-                        {MENUS[stage].categories[2]?.items.map((item) => (
+                        {menuData.categories[2]?.items.map((item) => (
                             <li key={item.label}>
                                 <Link
                                     href={item.href}
@@ -373,12 +410,6 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                     <span className="text-lg font-SofiaSans">
                                         {item.label}
                                     </span>
-
-                                    {/* Arrow (rotates + nudges on hover) */}
-                                    <ArrowRightIcon
-                                        className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-45 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                                    />
-
                                     {/* Animated underline (grows from left on hover) */}
                                     <span
                                         aria-hidden="true"
@@ -388,18 +419,49 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                             </li>
                         ))}
                     </ul>
+                    <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
+                        <img src={menuData.cta?.img} alt="" className="h-full w-full object-cover" />
+
+                        {/* subtle gradient to improve readability */}
+                        <div
+                            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
+                            aria-hidden="true"
+                        />
+
+                        {/* title – top-left */}
+                        <div className="absolute left-4 top-4 right-4">
+                            <div className="whitespace-pre-line text-xl font-SofiaSans font-bold tracking-tight text-white drop-shadow">
+                                {String(menuData?.cta?.title ?? '').replace(/\\n/g, '\n')}
+                            </div>
+                        </div>
+
+                        {/* button – bottom-left */}
+                        <div className="absolute bottom-4 left-4">
+                            <Link
+                                href={menuData.cta?.button?.href}
+                                onClick={onNavigate}
+                                className="fx86 inline-flex items-center font-SofiaSans gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                                style={{ "--fx86-base": "transparent" }}
+                            >
+                                {menuData.cta?.button?.label}
+                                <span className="inline-flex h-7 w-7 items-center justify-center">
+                                    <ArrowRight />
+                                </span>
+                            </Link>
+                        </div>
+                    </div>
                 </>
             ) : (
                 <>
                     {/* Discover Pill */}
                     <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Discover</div>
                     <Link
-                        href={MENUS[stage].discover.href}
+                        href={menuData.discover?.href}
                         onClick={onNavigate}
                         className="fx86 inline-flex w-full items-center font-SofiaSans justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
                         style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                     >
-                        {MENUS[stage].discover.label}
+                        {menuData.discover?.label}
                         <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
                             <ArrowRight />
                         </span>
@@ -417,7 +479,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     </Link>
 
                     {
-                        MENUS[stage].discover.label === "Weight Loss" && (
+                        menuData.discover?.label === "Weight Loss" && (
                             <>
                                 <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
                                 <Link
@@ -437,7 +499,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     {/* Treatments */}
                     <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
                     <ul className="mt-4 space-y-6">
-                        {MENUS[stage].treatments.map((t) => (
+                        {menuData.treatments?.map((t) => (
                             <li key={t.label} className="flex items-center gap-4">
                                 <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100">
                                     <img src={t.img} alt="" className="h-12 w-12 object-contain" />
@@ -455,7 +517,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     {/* CTA */}
                     <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
                     <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                        <img src={MENUS[stage].cta.img} alt="" className="h-full w-full object-cover" />
+                        <img src={menuData.cta?.img} alt="" className="h-full w-full object-cover" />
 
                         {/* subtle gradient to improve readability */}
                         <div
@@ -466,19 +528,19 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                         {/* title – top-left */}
                         <div className="absolute left-4 top-4 right-4">
                             <div className="whitespace-pre-line text-xl font-SofiaSans font-bold tracking-tight text-white drop-shadow">
-                                {MENUS[stage].cta.title}
+                                {String(menuData?.cta?.title ?? '').replace(/\\n/g, '\n')}
                             </div>
                         </div>
 
                         {/* button – bottom-left */}
                         <div className="absolute bottom-4 left-4">
                             <Link
-                                href={MENUS[stage].cta.button.href}
+                                href={menuData.cta?.button?.href}
                                 onClick={onNavigate}
                                 className="fx86 inline-flex items-center font-SofiaSans gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                                 style={{ "--fx86-base": "transparent" }}
                             >
-                                {MENUS[stage].cta.button.label}
+                                {menuData.cta?.button?.label}
                                 <span className="inline-flex h-7 w-7 items-center justify-center">
                                     <ArrowRight />
                                 </span>
@@ -531,6 +593,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
 
 /* =================== NAVBAR (white bar) =================== */
 export default function Navbar({ brand = "somi" }) {
+    const { getNavbarItems, isLoading } = useWebsiteData();
     const [openMenu, setOpenMenu] = useState(null); // desktop
     const [mobileOpen, setMobileOpen] = useState(false);
     const [mobileStage, setMobileStage] = useState(null); // null | key
@@ -557,7 +620,11 @@ export default function Navbar({ brand = "somi" }) {
         };
     }, []);
 
-    const topItems = getNavbarItems().map(item => item.key);
+    const navbarItems = getNavbarItems();
+
+    if (isLoading) {
+        return <NavbarSkeleton />;
+    }
 
     return (
         <header className="sticky top-0 z-50 bg-white">
@@ -585,7 +652,7 @@ export default function Navbar({ brand = "somi" }) {
 
                     {/* Desktop Nav */}
                     <div className="hidden items-center gap-2 md:flex">
-                        {topItems.map((key) => {
+                        {navbarItems.map(({ key, menu }) => {
                             const isOpen = openMenu === key;
                             return (
                                 <button
@@ -596,7 +663,7 @@ export default function Navbar({ brand = "somi" }) {
                     ${isOpen ? "text-darkprimary" : "text-gray-900 hover:bg-gray-100"}`}
                                     aria-expanded={isOpen}
                                 >
-                                    {key}
+                                    {menu.name}
                                     <Chevron open={isOpen} />
                                 </button>
                             );

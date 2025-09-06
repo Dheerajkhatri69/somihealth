@@ -1,5 +1,7 @@
 // app/[productType]/page.jsx
-import { getMenuBySlug } from "@/lib/menus";
+'use client';
+
+import { useWebsiteData } from "@/contexts/WebsiteDataContext";
 import SectionHeader from "@/components/SectionHeader";
 import ProductCard from "@/components/ProductCard";
 import { notFound } from "next/navigation";
@@ -10,23 +12,21 @@ import { TabsDemo } from "@/components/hero/Results";
 import FaqPro from "@/components/hero/Faq";
 import SomiFooter from "@/components/hero/SomiFooter";
 import Navbar from "@/components/hero/Navbar";
+import { LoadingPage, PageLoadingSkeleton } from "@/components/LoadingSkeleton";
 
 export default function ProductTypePage({ params }) {
     const { productType } = params;
-    const res = getMenuBySlug(productType);
+    const { getMenuBySlug, isLoading, error } = useWebsiteData();
 
-    if (!res) return notFound();
+    const menu = getMenuBySlug(productType);
 
-    const { key, menu } = res;
+    if (!isLoading && !menu) return notFound();
 
     // Headline logic (adjust per category if you want)
-    const title =
-        key === "Weight Loss"
-            ? "Science Backed GLP-1 Medications"
-            : `${menu.discover.label} Treatments`;
+    const title = menu ? `${menu.discover?.label || menu.name}` : "Loading...";
 
     return (
-        <>
+        <LoadingPage isLoading={isLoading} fallback={<PageLoadingSkeleton />}>
             <Navbar />
             <main className="px-4 md:px-6 watermark"
                 data-text="somi"
@@ -46,13 +46,13 @@ export default function ProductTypePage({ params }) {
                 <div className="mx-auto max-w-6xl py-12 font-SofiaSans md:py-16">
                     <SectionHeader title={title} />
 
-                    {menu.type === "categorized" ? (
+                    {menu?.type === "categorized" ? (
                         <div className="mt-10 space-y-12 md:mt-14">
-                            {menu.categories.map((category, index) => (
+                            {menu.categories?.map((category, index) => (
                                 <div key={index}>
                                     <h2 className="text-2xl font-bold text-darkprimary mb-6">{category.title}</h2>
                                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                        {category.items.map((item) => (
+                                        {category.items?.map((item) => (
                                             <ProductCard 
                                                 key={item.href} 
                                                 item={item} 
@@ -66,7 +66,7 @@ export default function ProductTypePage({ params }) {
                         </div>
                     ) : (
                         <div className="mt-10 grid gap-6 md:mt-14 md:grid-cols-3">
-                            {menu.treatments.map((item) => (
+                            {menu?.treatments?.map((item) => (
                                 <ProductCard key={item.href} item={item} ctaHref={menu.cta?.button?.href || "#"} />
                             ))}
                         </div>
@@ -79,7 +79,6 @@ export default function ProductTypePage({ params }) {
             <TabsDemo />
             <FaqPro />
             <SomiFooter />
-        </>
-
+        </LoadingPage>
     );
 }

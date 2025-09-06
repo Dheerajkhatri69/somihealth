@@ -14,6 +14,12 @@ import {
   AudioWaveform,
   FilePlus,
   Settings2,
+  Globe,
+  ShoppingCart,
+  HelpCircle,
+  Contact,
+  Footprints,
+  RectangleEllipsis,
 } from "lucide-react"
 
 import {
@@ -39,6 +45,15 @@ const sidebarItems = [
   { title: "Referrals", url: "/dashboard/referrals", icon: Settings2, allowedRoles: ["A"] },
   { title: "Email History", url: "/dashboard/emailhistorytable", icon: History, allowedRoles: ["A"] },
   { title: "Close tickets", url: "/dashboard/closetickets", icon: Trash, allowedRoles: ["A"] },
+]
+
+const frontendItems = [
+  { title: "Website Home", url: "/dashboard/websitehome", icon: Globe, allowedRoles: ["A"] },
+  { title: "Products", url: "/dashboard/products", icon: ShoppingCart, allowedRoles: ["A"] },
+  { title: "FAQ Component", url: "/dashboard/faq", icon: HelpCircle, allowedRoles: ["A"] },
+  { title: "Footer", url: "/dashboard/footerUI", icon: Footprints, allowedRoles: ["A"] },
+  { title: "Contact Forms/UI", url: "/dashboard/contactForms", icon: Contact, allowedRoles: ["A"] },
+  { title: "About UI", url: "/dashboard/aboutUI", icon: RectangleEllipsis, allowedRoles: ["A"] },
 ]
 
 export function AppSidebar() {
@@ -135,6 +150,10 @@ export function AppSidebar() {
     return sidebarItems.filter((item) => item.allowedRoles.includes(effectiveUserType || ""))
   }, [effectiveUserType])
 
+  const filteredFrontendItems = useMemo(() => {
+    return frontendItems.filter((item) => item.allowedRoles.includes(effectiveUserType || ""))
+  }, [effectiveUserType])
+
   if (effectiveUserType === null) {
     return (
       <Sidebar>
@@ -166,7 +185,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarContent className="bg-secondary text-white">
+      <SidebarContent className="bg-secondary text-white"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
         <SidebarGroup>
           <SidebarGroupLabel className="h-20 flex flex-col items-start">
             <h1 className="font-tagesschrift text-4xl mb-2 text-white z-20 font-bold">somi</h1>
@@ -208,6 +229,33 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Frontend Website Section */}
+
+        {effectiveUserType === "A" && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-slate-300 text-sm font-medium">
+              Frontend Website
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filteredFrontendItems.map((item) => {
+                  const isActive = pathname === item.url || (item.url.includes('#') && pathname === item.url.split('#')[0])
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild className={isActive ? "bg-white text-black" : ""}>
+                        <Link href={item.url} className="flex items-center gap-2">
+                          <item.icon size={20} />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       {effectiveUserType === "A" && (

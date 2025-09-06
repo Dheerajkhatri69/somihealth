@@ -79,27 +79,88 @@ export default function StoriesWithReviews() {
     "Real stories from real patients on their journey to better health.";
   const cta = { label: "Start Your Journey", href: "/getstarted" };
 
-  const reviews = [
-    {
-      quote:
-        "I wasn't ready for injections and honestly didn't think oral semaglutide would do much, but I’ve been really surprised. Lost about 8 lbs in a month and I just… forget to snack.",
-      author: "Amanda W.",
-    },
-    {
-      quote:
-        "My provider adjusted the plan twice and it kept working. Shipping was fast and support replied within a day. The app reminders helped me stay consistent even on busy weeks.",
-      author: "Rahul S.",
-    },
-    {
-      quote:
-        "Checked in every month and stayed consistent. I have more energy than I did last year, and the nutrition tips actually fit my life—no weird rules or all-or-nothing thinking.",
-      author: "Sofia M.",
-    },
-  ];
+  const [reviews, setReviews] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  async function fetchReviews() {
+    try {
+      const res = await fetch('/api/reviews', { cache: 'no-store' });
+      const data = await res.json();
+
+      if (data?.success) {
+        setReviews(data.result);
+      } else {
+        // Fallback to default reviews if API fails
+        setReviews([
+          {
+            quote:
+              "I wasn't ready for injections and honestly didn't think oral semaglutide would do much, but I've been really surprised. Lost about 8 lbs in a month and I just… forget to snack.",
+            author: "Amanda W.",
+          },
+          {
+            quote:
+              "My provider adjusted the plan twice and it kept working. Shipping was fast and support replied within a day. The app reminders helped me stay consistent even on busy weeks.",
+            author: "Rahul S.",
+          },
+          {
+            quote:
+              "Checked in every month and stayed consistent. I have more energy than I did last year, and the nutrition tips actually fit my life—no weird rules or all-or-nothing thinking.",
+            author: "Sofia M.",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      // Use default reviews on error
+      setReviews([
+        {
+          quote:
+            "I wasn't ready for injections and honestly didn't think oral semaglutide would do much, but I've been really surprised. Lost about 8 lbs in a month and I just… forget to snack.",
+          author: "Amanda W.",
+        },
+        {
+          quote:
+            "My provider adjusted the plan twice and it kept working. Shipping was fast and support replied within a day. The app reminders helped me stay consistent even on busy weeks.",
+          author: "Rahul S.",
+        },
+        {
+          quote:
+            "Checked in every month and stayed consistent. I have more energy than I did last year, and the nutrition tips actually fit my life—no weird rules or all-or-nothing thinking.",
+          author: "Sofia M.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const [i, setI] = React.useState(0);
   const prev = () => setI((p) => (p - 1 + reviews.length) % reviews.length);
   const next = () => setI((p) => (p + 1) % reviews.length);
+
+  if (loading) {
+    return (
+      <section className="relative isolate w-full bg-lightprimary-foreground py-10 sm:py-14">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="rounded-3xl bg-darkprimary px-5 py-8 sm:px-8 sm:py-10">
+            <div className="grid items-start gap-8 md:grid-cols-2 md:gap-10">
+              <div>
+                <div className="h-12 w-3/4 bg-white/20 animate-pulse rounded mb-6" />
+                <div className="h-12 w-48 bg-white/20 animate-pulse rounded" />
+              </div>
+              <div className="md:ml-auto">
+                <div className="h-64 w-full bg-white/20 animate-pulse rounded-2xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative isolate w-full bg-lightprimary-foreground py-10 sm:py-14">

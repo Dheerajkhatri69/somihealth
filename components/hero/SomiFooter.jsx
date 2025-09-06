@@ -1,13 +1,67 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Instagram, Facebook, Phone, MapPin, Mail } from "lucide-react";
 import { FaTiktok } from "react-icons/fa";
 import { SiIndeed } from "react-icons/si";
 import Image from "next/image";
-/** Footer — “somi” version inspired by your screenshot */
+
+/** Footer — "somi" version inspired by your screenshot */
 export default function SomiFooter() {
+  const [footerData, setFooterData] = useState({
+    ctaTitle: 'Start your health journey now',
+    ctaDescription: 'Somi Health offers personalized, clinically guided weight loss solutions to help you achieve lasting results and feel your best.',
+    ctaBenefits: [],
+    ctaLearnMoreText: 'Learn More',
+    ctaLearnMoreLink: '/learn-more',
+    ctaStartJourneyText: 'Start Your Journey',
+    ctaStartJourneyLink: '/getstarted',
+    ctaImage: '/hero/footer.png',
+    brandName: 'somi',
+    brandTagline: 'Look Better, Feel Better, Live Better.',
+    socialLinks: [],
+    contactInfo: {
+      phone: '(704) 386-6871',
+      address: '4111 E. Rose Lake Dr. Charlotte, NC 28217',
+      email: 'info@joinsomi.com'
+    },
+    badges: [],
+    navigationLinks: [],
+    legalLinks: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch footer data from API
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const response = await fetch('/api/footer');
+        if (response.ok) {
+          const data = await response.json();
+          setFooterData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching footer data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFooterData();
+  }, []);
+
+  if (loading) {
+    return (
+      <footer className="relative mt-20 w-full text-white bg-gray-800">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
     return (
         <footer className="relative mt-20 w-full text-white"
             style={{
@@ -21,36 +75,31 @@ export default function SomiFooter() {
                         {/* Left copy */}
                         <div className="text-secondary">
                             <h3 className="text-3xl font-extrabold font-SofiaSans leading-snug sm:text-4xl">
-                                Start your <br /> health journey <br /> now
+                                {footerData.ctaTitle}
                             </h3>
 
                             <ul className="mt-6 space-y-3 text-sm sm:text-base">
-                                {[
-                                    "Somi Health offers personalized, clinically guided weight loss",
-                                    "weight loss solutions to help you achieve lasting results and feel your best.",
-                                    "Find a plan personalized for your goals",
-                                ].map((t) => (
-                                    <li key={t} className="flex items-start gap-3">
+                                {footerData.ctaBenefits.map((benefit, index) => (
+                                    <li key={index} className="flex items-start gap-3">
                                         <CheckCircle className="mt-0.5 h-5 w-5 flex-none text-emerald-400" />
-                                        <span className="text-secondary/90">{t}</span>
+                                        <span className="text-secondary/90">{benefit.text}</span>
                                     </li>
                                 ))}
                             </ul>
 
                             <div className="mt-6 flex flex-wrap gap-3">
                                 <Link
-                                    href="/learn-more"
-                                    // className="inline-flex items-center justify-center rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white ring-1 ring-white/15 hover:bg-white/15"
+                                    href={footerData.ctaLearnMoreLink}
                                     className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary hover:text-lightprimary px-10 py-2 text-base font-semibold shadow-sm md:w-auto"
                                     style={{ "--fx86-base": "transparent", "--fx86-glow": "#364C78" }}
                                 >
-                                    Learn More
+                                    {footerData.ctaLearnMoreText}
                                 </Link>
                                 <Link
-                                    href="/getstarted"
+                                    href={footerData.ctaStartJourneyLink}
                                     className="fx-primary inline-flex items-center justify-center gap-2 rounded-full bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-90"
                                 >
-                                    Start Your Journey <ArrowRight className="h-4 w-4" />
+                                    {footerData.ctaStartJourneyText} <ArrowRight className="h-4 w-4" />
                                 </Link>
                             </div>
                         </div>
@@ -60,7 +109,7 @@ export default function SomiFooter() {
 
                         <div className="relative flex items-center justify-center">
                             <Image
-                                src="/hero/footer.png"
+                                src={footerData.ctaImage}
                                 alt="Footer Image"
                                 width={400}
                                 height={400}
@@ -77,98 +126,90 @@ export default function SomiFooter() {
                 <div className="flex flex-col justify-between md:flex-row gap-10 md:gap-10 lg:gap-16">
                     {/* Brand + blurb + socials + badges */}
                     <div>
-                        <div className="text-5xl font-extrabold font-tagesschrift tracking-tight">somi</div>
+                        <div className="text-5xl font-extrabold font-tagesschrift tracking-tight">{footerData.brandName}</div>
                         <p className="mt-4 max-w-sm text-sm text-white/80">
-                            Look Batter, Feel Better, Live Better.
+                            {footerData.brandTagline}
                         </p>
 
                         {/* Socials (Lucide) */}
                         <div className="mt-4 flex items-center gap-3">
-                            <Link
-                                href="https://instagram.com"
-                                aria-label="Instagram"
-                                className="rounded-full p-2 text-white/80 ring-1 ring-white/20 hover:text-white"
-                            >
-                                <Instagram className="h-5 w-5" />
-                            </Link>
-                            <Link
-                                href="https://facebook.com"
-                                aria-label="Facebook"
-                                className="rounded-full p-2 text-white/80 ring-1 ring-white/20 hover:text-white"
-                            >
-                                <Facebook className="h-5 w-5" />
-                            </Link>
-                            <Link
-                                href="https://tiktok.com"
-                                aria-label="Facebook"
-                                className="rounded-full p-2 text-white/80 ring-1 ring-white/20 hover:text-white"
-                            >
-                                <FaTiktok className="h-5 w-5" />
-                            </Link>
-                            <Link
-                                href="https://tiktok.com"
-                                aria-label="Facebook"
-                                className="rounded-full p-2 text-white/80 ring-1 ring-white/20 hover:text-white"
-                            >
-                                <SiIndeed className="h-5 w-5" />
-                            </Link>
+                            {footerData.socialLinks.map((social, index) => {
+                                const getIcon = (platform) => {
+                                    switch (platform) {
+                                        case 'instagram': return <Instagram className="h-5 w-5" />;
+                                        case 'facebook': return <Facebook className="h-5 w-5" />;
+                                        case 'tiktok': return <FaTiktok className="h-5 w-5" />;
+                                        case 'indeed': return <SiIndeed className="h-5 w-5" />;
+                                        default: return null;
+                                    }
+                                };
 
+                                return (
+                                    <Link
+                                        key={index}
+                                        href={social.url}
+                                        aria-label={social.ariaLabel}
+                                        className="rounded-full p-2 text-white/80 ring-1 ring-white/20 hover:text-white"
+                                    >
+                                        {getIcon(social.platform)}
+                                    </Link>
+                                );
+                            })}
                         </div>
 
                         <h4 className="my-3 text-lg font-semibold">Contact Information</h4>
                         <ul className="space-y-3 text-sm text-white/85">
                             <li className="flex items-start gap-3">
                                 <Phone className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>(704) 386-6871</span>
+                                <span>{footerData.contactInfo.phone}</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>4111 E. Rose Lake Dr. Charlotte, NC 28217</span>
+                                <span>{footerData.contactInfo.address}</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <Mail className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>info@joinsomi.com</span>
+                                <span>{footerData.contactInfo.email}</span>
                             </li>
                         </ul>
                     </div>
-                    <div >
-                        <img
-                            src="/hero/legitscript-badge.png"
-                            alt="LegitScript Certified"
-                            className="h-20 mb-4 w-auto hover:scale-105 transition-transform duration-200"
-                        />
-                        <img
-                            src="/hero/hipaa-badge.png"
-                            alt="hipaa-badge"
-                            className="h-20 w-auto hover:scale-105 transition-transform duration-200"
-                        />
+                    <div>
+                        {footerData.badges.map((badge, index) => (
+                            <img
+                                key={index}
+                                src={badge.image}
+                                alt={badge.alt}
+                                className="h-20 mb-4 w-auto hover:scale-105 transition-transform duration-200"
+                            />
+                        ))}
                     </div>
                     {/* Navigation */}
                     <div>
                         <h4 className="mb-3 text-lg font-semibold">Navigation</h4>
                         <ul className="space-y-3 text-sm">
-                            <li><FooterLink href="/referrals">Referrals</FooterLink></li>
-                            <li>
-                                <FooterLink
-                                    href="/docs/patient-glp1-packet.pdf"
-                                    target="_blank"           // opens in new tab (remove if you want same tab)
-                                    rel="noopener noreferrer" // security hygiene
-                                >
-                                    Patient GLP-1 Packet
-                                </FooterLink>
-                            </li>
-                            <li><FooterLink href="/underdevelopmentmainpage/about">About Us</FooterLink></li>
-                            <li><FooterLink href="/underdevelopmentmainpage/contact">Contact Us</FooterLink></li>
+                            {footerData.navigationLinks.map((link, index) => (
+                                <li key={index}>
+                                    <FooterLink 
+                                        href={link.href}
+                                        target={link.target}
+                                        rel={link.rel}
+                                    >
+                                        {link.text}
+                                    </FooterLink>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                     <div>
                         <h4 className="mb-3 text-lg font-semibold">Legal</h4>
                         <ul className="space-y-3 text-sm text-white/85">
-                            <li><FooterLink href="/underdevelopmentmainpage/footer/hipaa">HIPAA Privacy</FooterLink></li>
-                            <li><FooterLink href="/underdevelopmentmainpage/footer/terms">Terms of Service</FooterLink></li>
-                            <li><FooterLink href="/underdevelopmentmainpage/footer/shipping-returns">Shipping & Returns</FooterLink></li>
-                            <li><FooterLink href="/underdevelopmentmainpage/footer/telehealth-consent">Telehealth Consent</FooterLink></li>
-                            <li><FooterLink href="/underdevelopmentmainpage/footer/cookies">Cookie Policy</FooterLink></li>
+                            {footerData.legalLinks.map((link, index) => (
+                                <li key={index}>
+                                    <FooterLink href={link.href}>
+                                        {link.text}
+                                    </FooterLink>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 

@@ -1,4 +1,5 @@
 import { AuthProvider } from "./Providers";
+import WebsiteDataProviderWrapper from "@/components/WebsiteDataProvider";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
@@ -17,7 +18,11 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         <Toaster position="top-center" />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <WebsiteDataProviderWrapper>
+            {children}
+          </WebsiteDataProviderWrapper>
+        </AuthProvider>
       </body>
     </html>
   );

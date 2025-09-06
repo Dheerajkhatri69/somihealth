@@ -154,18 +154,57 @@ export function RotatingLine({
 
 
 export default function Hero() {
+    const [heroText, setHeroText] = useState({
+        mainTitle: 'Look Better, Feel Better, Live Better.',
+        rotatingLines: [
+            'No hidden fees. No hassle. Just results.',
+            'Custom plans. Real help. Real care.',
+        ]
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchHeroText();
+    }, []);
+
+    async function fetchHeroText() {
+        try {
+            const res = await fetch('/api/hero-text', { cache: 'no-store' });
+            const data = await res.json();
+
+            if (data?.success) {
+                setHeroText(data.result);
+            }
+        } catch (error) {
+            console.error('Error fetching hero text:', error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if (loading) {
+        return (
+            <section className="w-full py-16 sm:py-24">
+                <div className="mx-auto text-center font-SofiaSans">
+                    <div className="h-10 w-1/4 mx-auto bg-gray-200 animate-pulse rounded" />
+                    <div className="mt-4 h-10 w-2/3 mx-auto bg-gray-200 animate-pulse rounded" />
+                    <div className="mt-8 flex justify-center">
+                        <div className="h-12 w-48 bg-gray-200 animate-pulse rounded-full" />
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section className="w-full py-16 sm:py-24">
             <div className="mx-auto text-center font-SofiaSans">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-darkprimary">
-                    Look Batter, Feel Better, Live Better.
+                    {heroText.mainTitle}
                 </h1>
 
                 <RotatingLine
-                    lines={[
-                        "No hidden fees. No hassle. Just results.",
-                        "Custom plans. Real help. Real care.",
-                    ]}
+                    lines={heroText.rotatingLines}
                     interval={2200}   // faster swap
                     duration={450}    // faster animation
                     className="text-3xl sm:text-4xl md:text-5xl text-[#D0E7F7]"

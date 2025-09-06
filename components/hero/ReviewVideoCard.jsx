@@ -161,40 +161,98 @@ function ReviewVideoCard({
 
 /* ---------- Reviews (Carousel on mobile, 4-up paged Carousel on laptop/desktop) ---------- */
 export default function ClientVideoReviews() {
-  const videos = [
-    {
-      title: "Down 18% in 4 months",
-      subtitle: "Semaglutide · Ayesha",
-      description:
-        "I finally stopped yo-yo dieting. The check-ins kept me on track and the shipping was seamless.",
-      poster: "/hero/v1.png",
-      srcMp4: "/hero/1.mov",
-    },
-    {
-      title: "More energy, less stress",
-      subtitle: "Tirzepatide · David",
-      description:
-        "Super simple. The plan fit my routine and I didn’t feel alone in the process.",
-      poster: "/hero/v2.png",
-      srcMp4: "/hero/2.mp4",
-    },
-    {
-      title: "Real results that last",
-      subtitle: "Semaglutide · Sara",
-      description:
-        "Weekly nudges and clear guidance—no guesswork. I’m the most consistent I’ve ever been.",
-      poster: "/hero/v3.png",
-      srcMp4: "/hero/3.mp4",
-    },
-    {
-      title: "Confidence is back",
-      subtitle: "Tirzepatide · Hamza",
-      description:
-        "The plan was realistic. I followed it, the weight came off, and I feel great.",
-      poster: "/hero/v4.png",
-      srcMp4: "/hero/4.mov",
-    },
-  ];
+  const [videos, setVideos] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  async function fetchVideos() {
+    try {
+      const res = await fetch('/api/review-videos', { cache: 'no-store' });
+      const data = await res.json();
+
+      if (data?.success) {
+        setVideos(data.result);
+      } else {
+        // Fallback to default videos if API fails
+        setVideos([
+          {
+            title: "Down 18% in 4 months",
+            subtitle: "Semaglutide · Ayesha",
+            description:
+              "I finally stopped yo-yo dieting. The check-ins kept me on track and the shipping was seamless.",
+            poster: "/hero/v1.png",
+            srcMp4: "/hero/1.mov",
+          },
+          {
+            title: "More energy, less stress",
+            subtitle: "Tirzepatide · David",
+            description:
+              "Super simple. The plan fit my routine and I didn't feel alone in the process.",
+            poster: "/hero/v2.png",
+            srcMp4: "/hero/2.mp4",
+          },
+          {
+            title: "Real results that last",
+            subtitle: "Semaglutide · Sara",
+            description:
+              "Weekly nudges and clear guidance—no guesswork. I'm the most consistent I've ever been.",
+            poster: "/hero/v3.png",
+            srcMp4: "/hero/3.mp4",
+          },
+          {
+            title: "Confidence is back",
+            subtitle: "Tirzepatide · Hamza",
+            description:
+              "The plan was realistic. I followed it, the weight came off, and I feel great.",
+            poster: "/hero/v4.png",
+            srcMp4: "/hero/4.mov",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+      // Use default videos on error
+      setVideos([
+        {
+          title: "Down 18% in 4 months",
+          subtitle: "Semaglutide · Ayesha",
+          description:
+            "I finally stopped yo-yo dieting. The check-ins kept me on track and the shipping was seamless.",
+          poster: "/hero/v1.png",
+          srcMp4: "/hero/1.mov",
+        },
+        {
+          title: "More energy, less stress",
+          subtitle: "Tirzepatide · David",
+          description:
+            "Super simple. The plan fit my routine and I didn't feel alone in the process.",
+          poster: "/hero/v2.png",
+          srcMp4: "/hero/2.mp4",
+        },
+        {
+          title: "Real results that last",
+          subtitle: "Semaglutide · Sara",
+          description:
+            "Weekly nudges and clear guidance—no guesswork. I'm the most consistent I've ever been.",
+          poster: "/hero/v3.png",
+          srcMp4: "/hero/3.mp4",
+        },
+        {
+          title: "Confidence is back",
+          subtitle: "Tirzepatide · Hamza",
+          description:
+            "The plan was realistic. I followed it, the weight came off, and I feel great.",
+          poster: "/hero/v4.png",
+          srcMp4: "/hero/4.mov",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   // Lightbox state
   const [open, setOpen] = React.useState(false);
@@ -243,6 +301,25 @@ export default function ClientVideoReviews() {
     apiDesk.on("select", onSelect);
     return () => apiDesk.off("select", onSelect);
   }, [apiDesk]);
+
+  if (loading) {
+    return (
+      <section className="w-full py-10 sm:py-14">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <header className="mb-6 flex items-end justify-between gap-4">
+            <h2 className="text-2xl font-SofiaSans font-bold sm:text-3xl">
+              From stuck to thriving.
+            </h2>
+          </header>
+          <div className="space-y-4">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="h-64 w-full bg-gray-200 animate-pulse rounded-2xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full py-10 sm:py-14">

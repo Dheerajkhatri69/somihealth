@@ -111,6 +111,32 @@ export default function BMICalculator() {
     const [heightFt, setHeightFt] = useState(5);
     const [heightIn, setHeightIn] = useState(6);
 
+    const [content, setContent] = useState({
+        title: 'See how much weight you could lose — how different life could feel.',
+        description: 'Backed by real medicine and real results, somi helps you reach your goals without constant hunger or unsustainable plans. Just choose your starting point to see what\'s possible.',
+        image: '/hero/bmilady.png'
+    });
+    const [loading, setLoading] = useState(true);
+
+    React.useEffect(() => {
+        fetchContent();
+    }, []);
+
+    async function fetchContent() {
+        try {
+            const res = await fetch('/api/bmi-content', { cache: 'no-store' });
+            const data = await res.json();
+
+            if (data?.success) {
+                setContent(data.result);
+            }
+        } catch (error) {
+            console.error('Error fetching BMI content:', error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const { bmi, goalBmi, canLose } = useMemo(() => {
         const wNum = parseFloat(weight || "0");
         const gNum = parseFloat(goalWeight || "0");
@@ -144,24 +170,30 @@ export default function BMICalculator() {
     };
 
 
+    if (loading) {
+        return (
+            <section className="relative isolate overflow-hidden bg-[#fffaf6] pt-14 text-center p-2">
+                <div className="h-12 w-3/4 mx-auto bg-gray-200 animate-pulse rounded mb-4" />
+                <div className="h-6 w-2/3 mx-auto bg-gray-200 animate-pulse rounded mb-8" />
+                <div className="h-96 w-full max-w-4xl mx-auto bg-gray-200 animate-pulse rounded-xl" />
+            </section>
+        );
+    }
+
     return (
         <section
             className="relative isolate overflow-hidden bg-[#fffaf6] pt-14 text-center p-2"
-           
         >
             <h2 className="mx-auto max-w-4xl text-3xl font-bold sm:text-4xl font-SofiaSans text-darkprimary">
-                See how much weight you could lose —
-                <br className="hidden sm:inline" />
-                how different life could feel.
+                {content.title}
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-darkprimary/80 font-SofiaSans">
-                Backed by real medicine and real results, somi helps you reach your goals without constant
-                hunger or unsustainable plans. Just choose your starting point to see what’s possible.
+                {content.description}
             </p>
             <div className="flex items-center justify-center">
                 <div className="relative w-full max-w-lg z-10 hidden lg:block sm:hidden">
                     <Image
-                        src="/hero/bmilady.png"
+                        src={content.image}
                         alt="BMI Calculator"
                         width={500}
                         height={500}

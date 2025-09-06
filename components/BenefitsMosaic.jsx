@@ -62,12 +62,23 @@ export default function BenefitsMosaic({
 }) {
   const { leftTiles = [], rightCards = [] } = data;
 
-  // dynamic image from data
-  const dynamicFromData = leftTiles.find((t) => t?.type === "image") || FALLBACK;
+  // dynamic image from data - get the first image tile
+  const dynamicFromData = leftTiles.find((t) => t?.type === "image" && t?.src) || FALLBACK;
 
   // construct 6-image list (5 fixed + 1 dynamic)
+  // Use uploaded images from leftTiles if available, otherwise use fixed images
+  const uploadedImages = leftTiles.filter(t => t?.type === "image" && t?.src);
   const six = Array.from({ length: 6 }, (_, i) => {
     if (i === dynamicIndex) return dynamicFromData;
+    
+    // Use uploaded images first, then fall back to fixed images
+    if (uploadedImages[i]) {
+      return {
+        src: uploadedImages[i].src,
+        alt: uploadedImages[i].alt || "Uploaded image"
+      };
+    }
+    
     const fixedMap = [0, 1, 2, 3, 4, null];
     const j = fixedMap[i];
     return j !== null ? FIXED_LEFT_IMAGES[j] : FALLBACK;

@@ -1,43 +1,55 @@
 "use client";
 
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 
 /** Pro FAQ (single-open, smooth slide animation) */
 export default function FaqPro() {
-  const heading =
-    "Find clear, honest answers about our medical weight loss treatments";
-  const subheading = "Your Questions, Answered— Every Step of the Way.";
-
-  const faqs = [
-    {
-      q: "How do I get started with Somi Health’s weight loss program?",
-      a: "You can begin by completing a quick 7-minute questionnaire, which gathers important information about your medical history, health status, and weight loss goals.",
-    },
-    {
-      q: "What happens after I submit the questionnaire?",
-      a: "Once you complete the form, our licensed Nurse Practitioner will review your information to determine your eligibility for GLP-1 or GIP/GLP-1 treatment.",
-    },
-    {
-      q: "How long does it take to receive my medication?",
-      a: "After approval, your prescription is sent to the pharmacy, and you will receive your medication within 2–5 days, along with complete usage instructions.",
-    },
-    {
-      q: "Are the medications safe and effective?",
-      a: "Yes, the medications we use, including Compounded Semaglutide and Compounded Tirzepatide, are clinically proven to be safe and effective when prescribed and monitored by a healthcare provider.",
-    },
-    {
-      q: "What are the benefits of using Somi Health’s medical weight loss services?",
-      a: "We provide regular health monitoring, personalized treatment plans, reduced risk of side effects, and continuous support from our healthcare team throughout your journey.",
-    },
-    {
-      q: "How much weight can I expect to lose with Compounded Tirzepatide?",
-      a: "Studies show that patients using Compounded Tirzepatide can expect a weight loss of approximately 20%–30% of their starting body weight with consistent use and proper medical supervision.",
-    },
-  ];
-
+  const [faqData, setFaqData] = useState({
+    heading: "Find clear, honest answers about our medical weight loss treatments",
+    subheading: "Your Questions, Answered— Every Step of the Way.",
+    faqs: [],
+    benefits: [],
+    footerTitle: "Still have questions?",
+    footerDescription: "Cant find the answer youre looking for? Please chat to our friendly team.",
+    footerButtonText: "Get in touch",
+    footerButtonLink: "/underdevelopmentmainpage/contact"
+  });
+  const [loading, setLoading] = useState(true);
+  
   // Single-open accordion
   const [openIdx, setOpenIdx] = useState(0);
   const toggle = (idx) => setOpenIdx((prev) => (prev === idx ? null : idx));
+
+  // Fetch FAQ data from API
+  useEffect(() => {
+    const fetchFAQData = async () => {
+      try {
+        const response = await fetch('/api/faq');
+        if (response.ok) {
+          const data = await response.json();
+          setFaqData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching FAQ data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFAQData();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="relative isolate w-full overflow-hidden py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   // Animated answer (max-height + translate + fade)
   function Answer({ isOpen, id, labelledBy, children }) {
@@ -82,24 +94,18 @@ export default function FaqPro() {
             <span className="border-darkprimary border-2 inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-1 text-lg font-semibold text-secondary">
               <ShieldIcon className="h-5 w-5" /> FAQ
             </span>
-            <h2 className="mt-3 text-2xl font-bold sm:text-3xl">{heading}</h2>
+            <h2 className="mt-3 text-2xl font-bold sm:text-3xl">{faqData.heading}</h2>
             <p className="mt-2 text-sm font-semibold text-secondary sm:text-lg">
-              {subheading}
+              {faqData.subheading}
             </p>
 
             <ul className="mt-5 space-y-2 text-base text-gray-600">
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-emerald-600" />
-                Trusted clinical guidance
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-emerald-600" />
-                Transparent process & pricing
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-emerald-600" />
-                Fast 2–5 day delivery after approval
-              </li>
+              {faqData.benefits.map((benefit, index) => (
+                <li key={index} className="flex items-center gap-2">
+                  <CheckIcon className="h-5 w-5 text-emerald-600" />
+                  {benefit.text}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -114,7 +120,7 @@ export default function FaqPro() {
               <div className="h-1 w-full bg-gradient-to-r from-secondary/70 via-secondary to-secondary/70" />
 
               <ul className="divide-y">
-                {faqs.map((item, idx) => {
+                {faqData.faqs.map((item, idx) => {
                   const isOpen = openIdx === idx;
                   const panelId = `faq-panel-${idx}`;
                   const btnId = `faq-button-${idx}`;
@@ -133,14 +139,14 @@ export default function FaqPro() {
                       >
                         <span className="mt-2 block h-2 w-2 flex-shrink-0 rounded-full bg-secondary/70" />
                         <span className="flex-1 pr-6 text-base font-semibold sm:text-lg font-SofiaSans">
-                          {item.q}
+                          {item.question}
                         </span>
                         <PlusMinusIcon open={isOpen} />
                       </button>
 
                       {/* Keep mounted so close animates too */}
                       <Answer isOpen={isOpen} id={panelId} labelledBy={btnId}>
-                        {item.a}
+                        {item.answer}
                       </Answer>
                     </li>
                   );
@@ -152,18 +158,17 @@ export default function FaqPro() {
             <div className="mt-6 flex flex-col items-start justify-between gap-4 rounded-2xl bg-white p-5 shadow-lg ring-1 ring-black/5 sm:flex-row sm:items-center sm:p-6">
               <div>
                 <h3 className="text-base font-semibold text-gray-900">
-                  Still have questions?
+                  {faqData.footerTitle}
                 </h3>
                 <p className="mt-1 text-sm text-gray-600">
-                  Cant find the answer youre looking for? Please chat to our
-                  friendly team.
+                  {faqData.footerDescription}
                 </p>
               </div>
               <a
-                href="/underdevelopmentmainpage/contact"
+                href={faqData.footerButtonLink}
                 className="fx-primary inline-flex items-center gap-2 rounded-full bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60"
               >
-                Get in touch
+                {faqData.footerButtonText}
                 <ArrowRight />
               </a>
             </div>

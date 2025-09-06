@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,18 +16,55 @@ import {
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 
-const Schema = z.object({
-  firstName: z.string().min(1, "Required"),
-  lastName: z.string().optional(),
-  email: z.string().email("Enter a valid email"),
-  phone: z.string().min(1, "Required"),
-  interestedIn: z.string().min(1, "Required"),
-  comments: z.string().max(600, "Max 600 characters").optional(),
-});
-
-export default function ContactFormShadcn() {
+export default function ContactFormShadcn({ settings = null }) {
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState(null);
+  const [formSettings, setFormSettings] = useState(settings);
+
+  // Fetch settings if not provided
+  useEffect(() => {
+    if (!settings) {
+      fetchSettings();
+    }
+  }, [settings]);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/contact-form-settings');
+      const data = await res.json();
+      if (data.success) {
+        setFormSettings(data.result);
+      }
+    } catch (error) {
+      console.error('Error fetching form settings:', error);
+    }
+  };
+
+  // Create dynamic schema based on settings
+  const createSchema = () => {
+    const baseSchema = {
+      firstName: z.string().min(1, "Required"),
+      email: z.string().email("Enter a valid email"),
+      phone: z.string().min(1, "Required"),
+      interestedIn: z.string().min(1, "Required"),
+    };
+
+    if (formSettings?.config?.requireLastName) {
+      baseSchema.lastName = z.string().min(1, "Required");
+    } else {
+      baseSchema.lastName = z.string().optional();
+    }
+
+    if (formSettings?.config?.requireComments) {
+      baseSchema.comments = z.string().min(1, "Required");
+    } else {
+      baseSchema.comments = z.string().max(formSettings?.fields?.comments?.maxLength || 600, `Max ${formSettings?.fields?.comments?.maxLength || 600} characters`).optional();
+    }
+
+    return z.object(baseSchema);
+  };
+
+  const Schema = createSchema();
 
   const form = useForm({
     resolver: zodResolver(Schema),
@@ -36,7 +73,7 @@ export default function ContactFormShadcn() {
       lastName: "",
       email: "",
       phone: "",
-      interestedIn: "Medical Weight Loss",
+      interestedIn: formSettings?.fields?.interestedIn?.options?.[0]?.value || "Medical Weight Loss",
       comments: "",
     },
   });
@@ -52,19 +89,59 @@ export default function ContactFormShadcn() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      if (!res.ok) throw new Error("Failed");
-      setStatus({ ok: true, msg: "Thanks! We’ll get back to you shortly." });
-      form.reset();
-    } catch {
-      setStatus({ ok: false, msg: "Something went wrong. Please try again." });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        setStatus({ 
+          ok: true, 
+          msg: formSettings?.messages?.success || "Thanks! We'll get back to you shortly." 
+        });
+        form.reset();
+      } else {
+        throw new Error(data.message || "Failed");
+      }
+    } catch (error) {
+      setStatus({ 
+        ok: false, 
+        msg: formSettings?.messages?.error || "Something went wrong. Please try again." 
+      });
     } finally {
       setSubmitting(false);
     }
   }
 
+  // Don't render if settings are not loaded
+  if (!formSettings) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded mb-6"></div>
+          <div className="space-y-4">
+            <div className="h-10 bg-gray-200 rounded"></div>
+            <div className="h-10 bg-gray-200 rounded"></div>
+            <div className="h-10 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-      <h2 className="text-2xl font-semibold text-slate-900">Contact Us Form</h2>
+    <div 
+      className="rounded-2xl border bg-white p-6 shadow-sm md:p-8"
+      style={{
+        backgroundColor: formSettings.styling?.backgroundColor || '#ffffff',
+        borderColor: formSettings.styling?.borderColor || '#e2e8f0',
+        color: formSettings.styling?.textColor || '#0f172a'
+      }}
+    >
+      <h2 
+        className="text-2xl font-semibold"
+        style={{ color: formSettings.styling?.textColor || '#0f172a' }}
+      >
+        {formSettings.title || 'Contact Us Form'}
+      </h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 grid gap-4">
@@ -76,10 +153,13 @@ export default function ContactFormShadcn() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Name <span className="text-red-500">*</span>
+                    {formSettings.fields?.firstName?.label || 'Name'} <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="First" {...field} />
+                    <Input 
+                      placeholder={formSettings.fields?.firstName?.placeholder || 'First'} 
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -91,9 +171,15 @@ export default function ContactFormShadcn() {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="invisible">Last</FormLabel>
+                  <FormLabel className={formSettings.config?.requireLastName ? "" : "invisible"}>
+                    {formSettings.fields?.lastName?.label || 'Last'} 
+                    {formSettings.config?.requireLastName && <span className="text-red-500">*</span>}
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Last" {...field} />
+                    <Input 
+                      placeholder={formSettings.fields?.lastName?.placeholder || 'Last'} 
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,10 +195,14 @@ export default function ContactFormShadcn() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Email <span className="text-red-500">*</span>
+                    {formSettings.fields?.email?.label || 'Email'} <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="you@example.com" {...field} />
+                    <Input 
+                      type="email" 
+                      placeholder={formSettings.fields?.email?.placeholder || 'you@example.com'} 
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,10 +215,14 @@ export default function ContactFormShadcn() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Phone <span className="text-red-500">*</span>
+                    {formSettings.fields?.phone?.label || 'Phone'} <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input type="tel" placeholder="(704) 386-6871" {...field} />
+                    <Input 
+                      type="tel" 
+                      placeholder={formSettings.fields?.phone?.placeholder || '(704) 386-6871'} 
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,7 +237,7 @@ export default function ContactFormShadcn() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  I am interested in: <span className="text-red-500">*</span>
+                  {formSettings.fields?.interestedIn?.label || 'I am interested in:'} <span className="text-red-500">*</span>
                 </FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
@@ -152,9 +246,17 @@ export default function ContactFormShadcn() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Medical Weight Loss">Medical Weight Loss</SelectItem>
-                    <SelectItem value="Hormone Therapy">Hormone Therapy</SelectItem>
-                    <SelectItem value="General Question">General Question</SelectItem>
+                    {formSettings.fields?.interestedIn?.options?.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    )) || (
+                      <>
+                        <SelectItem value="Medical Weight Loss">Medical Weight Loss</SelectItem>
+                        <SelectItem value="Hormone Therapy">Hormone Therapy</SelectItem>
+                        <SelectItem value="General Question">General Question</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -168,28 +270,41 @@ export default function ContactFormShadcn() {
             name="comments"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Comments</FormLabel>
+                <FormLabel>
+                  {formSettings.fields?.comments?.label || 'Comments'}
+                  {formSettings.config?.requireComments && <span className="text-red-500">*</span>}
+                </FormLabel>
                 <p className="text-sm text-slate-500">
-                  Please let us know what’s on your mind. Have a question for us? Ask away.
+                  {formSettings.fields?.comments?.description || 'Please let us know what\'s on your mind. Have a question for us? Ask away.'}
                 </p>
                 <FormControl>
                   <Textarea
                     rows={6}
-                    maxLength={600}
-                    placeholder=""
+                    maxLength={formSettings.fields?.comments?.maxLength || 600}
+                    placeholder={formSettings.fields?.comments?.placeholder || ''}
                     {...field}
                   />
                 </FormControl>
-                <div className="text-xs text-slate-500">{charCount} of 600 max characters</div>
+                <div className="text-xs text-slate-500">
+                  {charCount} of {formSettings.fields?.comments?.maxLength || 600} max characters
+                </div>
                 <FormMessage />
               </FormItem>
             )}
           />
 
           {/* Submit */}
-          <Button type="submit" disabled={submitting} className="mt-2 inline-flex items-center gap-2">
+          <Button 
+            type="submit" 
+            disabled={submitting} 
+            className="mt-2 inline-flex items-center gap-2"
+            style={{ backgroundColor: formSettings.styling?.primaryColor || '#3b82f6' }}
+          >
             <Send className="h-4 w-4" />
-            {submitting ? "Sending…" : "Send message"}
+            {submitting 
+              ? (formSettings.submitButton?.loadingText || "Sending…") 
+              : (formSettings.submitButton?.text || "Send message")
+            }
           </Button>
 
           {status && (
