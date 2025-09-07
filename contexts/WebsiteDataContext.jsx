@@ -25,10 +25,13 @@ export function WebsiteDataProvider({ children }) {
     setError(null);
 
     try {
-      const response = await fetch('/api/website-data', {
+      // Add timestamp to force cache busting on Netlify
+      const timestamp = Date.now();
+      const response = await fetch(`/api/website-data?t=${timestamp}`, {
         cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
 
@@ -59,6 +62,13 @@ export function WebsiteDataProvider({ children }) {
 
   // Refresh data function
   const refreshData = useCallback(() => {
+    fetchData(true);
+  }, [fetchData]);
+
+  // Clear cache and force refresh (useful after dashboard updates)
+  const clearCacheAndRefresh = useCallback(() => {
+    setData(null);
+    setLastFetch(0);
     fetchData(true);
   }, [fetchData]);
 
@@ -95,6 +105,7 @@ export function WebsiteDataProvider({ children }) {
     isLoading,
     error,
     refreshData,
+    clearCacheAndRefresh,
     getMenuBySlug,
     getProduct,
     getNavbarItems,

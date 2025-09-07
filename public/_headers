@@ -1,0 +1,8 @@
+/api/website-data
+  Cache-Control: public, max-age=300, s-maxage=300, stale-while-revalidate=60
+  CDN-Cache-Control: max-age=300
+
+/api/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0

@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[headers]]
+  for = "/api/website-data"
+  [headers.values]
+    Cache-Control = "public, max-age=300, s-maxage=300, stale-while-revalidate=60"
+    CDN-Cache-Control = "max-age=300"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[build.environment]
+  NODE_VERSION = "18"

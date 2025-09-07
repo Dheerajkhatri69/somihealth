@@ -10,17 +10,27 @@ let cache = {
   timestamp: 0
 };
 
-export async function GET() {
+export async function GET(request) {
   try {
     await connectMongoDB();
 
-    // Check if we have valid cached data
+    // Get URL parameters to check for cache busting
+    const { searchParams } = new URL(request.url);
+    const forceRefresh = searchParams.get('force') === 'true' || searchParams.get('t');
+
+    // Check if we have valid cached data (skip cache if force refresh)
     const now = Date.now();
-    if (cache.data && (now - cache.timestamp) < CACHE_DURATION) {
+    if (!forceRefresh && cache.data && (now - cache.timestamp) < CACHE_DURATION) {
       return NextResponse.json({
         success: true,
         result: cache.data,
         cached: true
+      }, {
+        headers: {
+          'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60',
+          'CDN-Cache-Control': 'max-age=300',
+          'Vercel-CDN-Cache-Control': 'max-age=300'
+        }
       });
     }
 
@@ -91,6 +101,12 @@ export async function GET() {
       success: true,
       result: responseData,
       cached: false
+    }, {
+      headers: {
+        'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60',
+        'CDN-Cache-Control': 'max-age=300',
+        'Vercel-CDN-Cache-Control': 'max-age=300'
+      }
     });
 
   } catch (error) {
