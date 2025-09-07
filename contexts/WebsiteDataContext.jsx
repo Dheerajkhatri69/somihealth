@@ -8,68 +8,63 @@ export function WebsiteDataProvider({ children }) {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [lastFetch, setLastFetch] = useState(0);
 
-  // Cache duration: 5 minutes
-  const CACHE_DURATION = 5 * 60 * 1000;
-
-  const fetchData = useCallback(async (forceRefresh = false) => {
-    const now = Date.now();
-    
-    // Check if we have valid cached data and not forcing refresh
-    if (!forceRefresh && data && (now - lastFetch) < CACHE_DURATION) {
-      return;
-    }
-
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Add timestamp to force cache busting on Netlify
-      const timestamp = Date.now();
-      const response = await fetch(`/api/website-data?t=${timestamp}`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
+      // Fetch menus and products in parallel
+      const [menusResponse, productsResponse] = await Promise.all([
+        fetch('/api/menus', { cache: 'no-store' }),
+        fetch('/api/products', { cache: 'no-store' })
+      ]);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!menusResponse.ok) {
+        throw new Error(`Menus API error: ${menusResponse.status}`);
       }
 
-      const result = await response.json();
+      if (!productsResponse.ok) {
+        throw new Error(`Products API error: ${productsResponse.status}`);
+      }
+
+      const [menusResult, productsResult] = await Promise.all([
+        menusResponse.json(),
+        productsResponse.json()
+      ]);
       
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to fetch data');
+      if (!menusResult.success) {
+        throw new Error(menusResult.message || 'Failed to fetch menus');
       }
 
-      setData(result.result);
-      setLastFetch(now);
+      if (!productsResult.success) {
+        throw new Error(productsResult.message || 'Failed to fetch products');
+      }
+
+      // Transform the data to match the expected structure
+      const responseData = {
+        menus: menusResult.result,
+        products: productsResult.result,
+        navbarItems: menusResult.result.filter(menu => menu.showInNavbar)
+      };
+
+      setData(responseData);
     } catch (err) {
       console.error('Error fetching website data:', err);
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [data, lastFetch, CACHE_DURATION]);
+  }, []);
 
   // Initial data fetch
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // Refresh data function
   const refreshData = useCallback(() => {
-    fetchData(true);
-  }, [fetchData]);
-
-  // Clear cache and force refresh (useful after dashboard updates)
-  const clearCacheAndRefresh = useCallback(() => {
-    setData(null);
-    setLastFetch(0);
-    fetchData(true);
+    fetchData();
   }, [fetchData]);
 
   // Get menu by slug
@@ -81,7 +76,7 @@ export function WebsiteDataProvider({ children }) {
   // Get product by category and slug
   const getProduct = useCallback((category, slug) => {
     if (!data?.products?.[category]) return null;
-    return data.products[category].find(product => product.slug === slug) || null;
+    return data.products[category][slug] || null;
   }, [data]);
 
   // Get navbar items
@@ -105,7 +100,6 @@ export function WebsiteDataProvider({ children }) {
     isLoading,
     error,
     refreshData,
-    clearCacheAndRefresh,
     getMenuBySlug,
     getProduct,
     getNavbarItems,

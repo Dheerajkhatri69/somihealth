@@ -13,8 +13,13 @@ export default function WeightLossPlansV3() {
   const plans = React.useMemo(() => {
     if (!data?.products) return [];
     
-    // Get all products from all categories
-    const allProducts = Object.values(data.products).flat();
+    // Get all products from all categories (products are grouped by category -> slug)
+    const allProducts = [];
+    Object.values(data.products).forEach(categoryProducts => {
+      Object.values(categoryProducts).forEach(product => {
+        allProducts.push(product);
+      });
+    });
        
     const filteredProducts = allProducts
       .filter(product => product.showInPlans === true); // Only show products where showInPlans is explicitly true
