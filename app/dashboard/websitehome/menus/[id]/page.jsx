@@ -150,11 +150,11 @@ export default function MenuDetailPage() {
     try {
       const payload = {
         ...formData,
-        slug: formData.slug || slugify(formData.name),
-        // For categorized menus, provide default discover values
+        slug: slugify(formData.name),
+        // For categorized menus, provide default discover values; for simple, default href from slug
         discover: formData.type === 'categorized' 
           ? { label: '', href: '' }
-          : formData.discover,
+          : { label: formData.discover.label, href: `/underdevelopmentmainpage/${slugify(formData.name)}` },
       };
 
       const hasId = isValidObjectId(recordId);
@@ -262,10 +262,10 @@ export default function MenuDetailPage() {
             <div className="md:col-span-1">
               <Label className="text-sm font-medium">Slug</Label>
               <Input
-                value={formData.slug}
-                onChange={(e) => handleInputChange('slug', e.target.value)}
-                placeholder="Auto from name if empty"
-                className="mt-1"
+                value={slugify(formData.name)}
+                readOnly
+                placeholder="Auto from name"
+                className="mt-1 bg-gray-50"
               />
             </div>
             <div className="md:col-span-1">
@@ -332,10 +332,10 @@ export default function MenuDetailPage() {
                 <div>
                   <Label className="text-sm font-medium">Href *</Label>
                   <Input
-                    value={formData.discover.href}
-                    onChange={(e) => handleInputChange('discover.href', e.target.value)}
+                    value={`/underdevelopmentmainpage/${slugify(formData.name)}`}
+                    readOnly
                     required
-                    className="mt-1"
+                    className="mt-1 bg-gray-50"
                   />
                 </div>
               </div>

@@ -70,7 +70,7 @@ export default function SomiFooter() {
         >
             {/* === TOP CTA CARD === */}
             <section className="mx-auto -mt-24 max-w-6xl px-4 md:px-6">
-                <div className="rounded-2xl bg-lightprimary pt-6 px-6 shadow-2xl ring-1 ring-white/10 sm:pt-8 sm:px-8 md:pt-10 md:px-10">
+                <div className="rounded-2xl bg-lightprimary p-6 shadow-2xl ring-1 ring-white/10 sm:pt-8 sm:px-8 md:pt-10 md:px-10">
                     <div className="grid items-center gap-6 md:grid-cols-2">
                         {/* Left copy */}
                         <div className="text-secondary">
@@ -113,7 +113,7 @@ export default function SomiFooter() {
                                 alt="Footer Image"
                                 width={400}
                                 height={400}
-                                className="mx-auto"
+                                className="mx-auto rounded-2xl"
                             />
                         </div>
                     </div>

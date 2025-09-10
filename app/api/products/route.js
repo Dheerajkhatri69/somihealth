@@ -10,6 +10,16 @@ async function connectDB() {
   }
 }
 
+// Normalize text into a URL-safe slug
+function slugify(text = '') {
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-') // replace any non-alnum run with '-'
+    .replace(/^-+|-+$/g, '')     // trim leading/trailing '-'
+    .replace(/-+/g, '-');        // collapse multiple '-'
+}
+
 function isValidObjectId(v) {
   return /^[a-f0-9]{24}$/i.test(String(v || ''));
 }
@@ -73,6 +83,10 @@ export async function POST(request) {
 
     // Basic validation
     const required = ['category', 'slug', 'label', 'shortLabel', 'heroImage', 'price', 'unit', 'description'];
+    // Auto slug from label if slug is empty
+    if (!body.slug && body.label) {
+      body.slug = slugify(body.label);
+    }
     const missing = required.filter((k) => body[k] === undefined || body[k] === null || body[k] === '');
     if (missing.length) {
       return NextResponse.json({ success: false, message: `Missing fields: ${missing.join(', ')}` }, { status: 400 });
@@ -115,6 +129,10 @@ export async function PUT(request) {
 
       // Get old product before update to check for category change
       oldProduct = await Product.findOne(selector).lean();
+      // Auto slug from label if slug missing in update
+      if ((!body.update.slug || body.update.slug === '') && body.update.label) {
+        body.update.slug = slugify(body.update.label);
+      }
       result = await Product.findOneAndUpdate(selector, body.update, { new: true, runValidators: true });
       if (!result) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
     } else {
@@ -127,12 +145,21 @@ export async function PUT(request) {
       if (typeof id === 'string' && id.includes('::')) {
         const [category, slug] = id.split('::');
         oldProduct = await Product.findOne({ category, slug }).lean();
+        if ((!updateData.slug || updateData.slug === '') && updateData.label) {
+          updateData.slug = slugify(updateData.label);
+        }
         result = await Product.findOneAndUpdate({ category, slug }, updateData, { new: true, runValidators: true });
       } else if (isValidObjectId(id)) {
         oldProduct = await Product.findById(id).lean();
+        if ((!updateData.slug || updateData.slug === '') && updateData.label) {
+          updateData.slug = slugify(updateData.label);
+        }
         result = await Product.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
       } else {
         oldProduct = await Product.findOne({ slug: id }).lean();
+        if ((!updateData.slug || updateData.slug === '') && updateData.label) {
+          updateData.slug = slugify(updateData.label);
+        }
         result = await Product.findOneAndUpdate({ slug: id }, updateData, { new: true, runValidators: true });
       }
 
@@ -141,6 +168,11 @@ export async function PUT(request) {
 
     // Handle menu treatment sync with category change detection
     await handleMenuTreatmentSync(oldProduct, result);
+    
+    // If product slug changed, update treatment hrefs in all menus
+    if (oldProduct && oldProduct.slug !== result.slug) {
+      await updateTreatmentHrefsForProductSlugChange(oldProduct, result);
+    }
     
     return NextResponse.json({ result, success: true });
   } catch (error) {
@@ -166,6 +198,8 @@ export async function DELETE(request) {
         result = await Product.findOneAndUpdate({ slug: id }, { isActive: false }, { new: true });
       }
       if (!result) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
+      // Ensure removal from menu treatments when deleted via query param
+      await removeProductFromMenuTreatments(result);
       return NextResponse.json({ result, success: true });
     }
 
@@ -198,13 +232,16 @@ export async function DELETE(request) {
   }
 }
 
-// Handle menu treatment sync with category change detection
+// Handle menu treatment sync with category/slug change detection
 async function handleMenuTreatmentSync(oldProduct, newProduct) {
   try {
     const Menu = (await import('@/lib/model/menu')).default;
     
-    // If category changed, remove from old menu first
-    if (oldProduct && oldProduct.category !== newProduct.category) {
+    // If category or slug changed, remove the old entry first to avoid duplicates
+    if (
+      oldProduct &&
+      (oldProduct.category !== newProduct.category || oldProduct.slug !== newProduct.slug)
+    ) {
       await removeProductFromMenuTreatments(oldProduct);
     }
     
@@ -289,5 +326,38 @@ async function syncProductToMenuTreatments(product) {
     await menu.save();
   } catch (error) {
     console.error('Error syncing product to menu treatments:', error);
+  }
+}
+
+// Update treatment hrefs when product slug changes
+async function updateTreatmentHrefsForProductSlugChange(oldProduct, newProduct) {
+  try {
+    const Menu = (await import('@/lib/model/menu')).default;
+    
+    // Find all menus that might have treatments for this product
+    const menus = await Menu.find({ isActive: true });
+    
+    for (const menu of menus) {
+      let needsUpdate = false;
+      
+      // Update treatment hrefs that contain the old product slug
+      menu.treatments = menu.treatments.map(treatment => {
+        if (treatment.href && treatment.href.includes(`/${oldProduct.slug}`)) {
+          needsUpdate = true;
+          return {
+            ...treatment,
+            href: treatment.href.replace(`/${oldProduct.slug}`, `/${newProduct.slug}`)
+          };
+        }
+        return treatment;
+      });
+      
+      if (needsUpdate) {
+        await menu.save();
+        console.log(`Updated treatment hrefs in menu "${menu.name}" for product slug change from ${oldProduct.slug} to ${newProduct.slug}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error updating treatment hrefs for product slug change:', error);
   }
 }

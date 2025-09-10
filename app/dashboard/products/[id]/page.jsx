@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Pencil, DollarSign, Package, Star } from 'lucide-react';
+import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -29,6 +30,20 @@ export default function ProductDetailsPage() {
         }
     }
 
+    async function onDelete() {
+        if (!confirm('Delete this product?')) return;
+        try {
+            const idForDelete = product?._id || product?.id || (product?.category && product?.slug ? `${product.category}::${product.slug}` : routeId);
+            const res = await fetch(`/api/products?id=${encodeURIComponent(idForDelete)}`, { method: 'DELETE' });
+            const j = await res.json();
+            if (!j?.success) throw new Error(j?.message || 'Delete failed');
+            router.push('/dashboard/products');
+        } catch (e) {
+            console.error(e);
+            alert('Error deleting product.');
+        }
+    }
+
     if (loading) return <div className="p-6">Loading…</div>;
     if (!product) return null;
 
@@ -41,12 +56,20 @@ export default function ProductDetailsPage() {
                 <Link href="/dashboard/products" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
                     <ArrowLeft size={16} /> Back
                 </Link>
-                <Link
-                    href={`/dashboard/products/${encodeURIComponent(paramForLinks)}/edit`}
-                    className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-white hover:bg-secondary/90"
-                >
-                    <Pencil size={16} /> Edit
-                </Link>
+                <div className="flex items-center gap-2">
+                    <Link
+                        href={`/dashboard/products/${encodeURIComponent(paramForLinks)}/edit`}
+                        className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-white hover:bg-secondary/90"
+                    >
+                        <Pencil size={16} /> Edit
+                    </Link>
+                    <button
+                        onClick={onDelete}
+                        className="inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100"
+                    >
+                        <Trash size={16} /> Delete
+                    </button>
+                </div>
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">

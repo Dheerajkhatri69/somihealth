@@ -106,8 +106,8 @@ function ResultCard({ title, value, unit = "", help, color }) {
 /* ===== Main calculator ===== */
 export default function BMICalculator() {
     const [unit, setUnit] = useState("lbs");
-    const [weight, setWeight] = useState("153");
-    const [goalWeight, setGoalWeight] = useState("140");
+    const [weight, setWeight] = useState("0");
+    const [goalWeight, setGoalWeight] = useState("0");
     const [heightFt, setHeightFt] = useState(5);
     const [heightIn, setHeightIn] = useState(6);
 
@@ -195,9 +195,9 @@ export default function BMICalculator() {
                     <Image
                         src={content.image}
                         alt="BMI Calculator"
-                        width={500}
-                        height={500}
-                        className="mx-auto bottom-0"
+                        width={400}
+                        height={400}
+                        className="mx-auto bottom-0 rounded-2xl"
                     />
                 </div>
                 <div className="relative z-10 mx-auto mt-10 w-full max-w-4xl rounded-xl bg-lightprimary p-6 shadow-md ring-1 ring-black/10 backdrop-blur-md">

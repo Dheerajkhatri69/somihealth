@@ -50,7 +50,13 @@ export default function EditProductPage() {
       const [parent, child] = field.split('.');
       setFormData((prev) => ({ ...prev, [parent]: { ...prev[parent], [child]: value } }));
     } else {
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      setFormData((prev) => {
+        const next = { ...prev, [field]: value };
+        if (field === 'label' && (!prev.slug || prev.slug.trim() === '')) {
+          next.slug = slugify(value);
+        }
+        return next;
+      });
     }
   }
   function handleBulletChange(index, field, value) {
@@ -70,10 +76,11 @@ export default function EditProductPage() {
     e?.preventDefault?.();
     setSaving(true);
     try {
+      const payload = { ...formData, slug: slugify(formData.label) };
       const res = await fetch('/api/products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: recordId ?? routeId, ...formData }),
+        body: JSON.stringify({ id: recordId ?? routeId, ...payload }),
       });
       const j = await res.json();
       if (!j?.success) throw new Error(j?.message || 'Save failed');
@@ -119,7 +126,7 @@ export default function EditProductPage() {
             </div>
             <div>
               <Label className="text-sm font-medium">Slug *</Label>
-              <Input value={formData.slug} onChange={(e) => handleInputChange('slug', e.target.value)} className="mt-1" required />
+              <Input value={slugify(formData.label)} readOnly className="mt-1 bg-gray-50" required />
             </div>
             <div>
               <Label className="text-sm font-medium">Sort Order</Label>
@@ -605,4 +612,14 @@ function pickFromResult(result, wantedId) {
     }
   }
   return null;
+}
+
+function slugify(s = '') {
+  return s
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
 }

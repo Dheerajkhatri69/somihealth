@@ -67,7 +67,7 @@ export default function CompoundedExplainer() {
                     "linear-gradient(#FFFFFF 0 230px, #E9ECF1 230px 100%)",
             }}
         >
-            <div className="mx-auto max-w-7xl px-4 md:px-6 pt-10 md:pt-14">
+            <div className="mx-auto max-w-7xl p-4 md:p-6 pt-10 md:pt-14">
 
                 {/* Content grid */}
                 <div className="mt-6 grid items-center gap-8 md:mt-8 md:grid-cols-2 md:gap-12" >
@@ -89,7 +89,7 @@ export default function CompoundedExplainer() {
                             alt="Compounded GLP-1"
                             width={500}
                             height={500}
-                            className="mx-auto bottom-0"
+                            className="mx-auto bottom-0 rounded-2xl"
                         />
                     </div>
 

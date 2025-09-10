@@ -33,7 +33,14 @@ export default function NewProductPage() {
       const [parent, child] = field.split('.');
       setFormData((prev) => ({ ...prev, [parent]: { ...prev[parent], [child]: value } }));
     } else {
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      setFormData((prev) => {
+        const next = { ...prev, [field]: value };
+        // Auto-fill slug from label when slug is empty
+        if (field === 'label' && (!prev.slug || prev.slug.trim() === '')) {
+          next.slug = slugify(value);
+        }
+        return next;
+      });
     }
   }
   function handleBulletChange(index, field, value) {
@@ -53,10 +60,11 @@ export default function NewProductPage() {
     e?.preventDefault?.();
     setSaving(true);
     try {
+      const payload = { ...formData, slug: slugify(formData.label) };
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       const j = await res.json();
       if (!j?.success) throw new Error(j?.message || 'Create failed');
@@ -100,7 +108,7 @@ export default function NewProductPage() {
             </div>
             <div>
               <Label className="text-sm font-medium">Slug *</Label>
-              <Input value={formData.slug} onChange={(e) => handleInputChange('slug', e.target.value)} className="mt-1" required />
+              <Input value={slugify(formData.label)} readOnly className="mt-1 bg-gray-50" required />
             </div>
             <div>
               <Label className="text-sm font-medium">Sort Order</Label>
@@ -493,4 +501,14 @@ function toMenuOptions(result) {
   if (!result) return [];
   if (Array.isArray(result)) return result.map(m => ({ value: (m.name || '').toLowerCase().replace(/\s+/g, '-'), label: m.name }));
   return Object.keys(result).map(k => ({ value: k.toLowerCase().replace(/\s+/g, '-'), label: k }));
+}
+
+function slugify(s = '') {
+  return s
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
 }

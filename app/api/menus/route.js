@@ -10,6 +10,15 @@ async function connectDB() {
   }
 }
 
+function slugify(text = '') {
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+}
+
 // GET: Fetch all menus
 export async function GET(request) {
   try {
@@ -75,12 +84,18 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    // For simple menus, discover fields are required
-    if (body.type !== 'categorized' && (!body.discover || !body.discover.label || !body.discover.href)) {
-      return NextResponse.json({ 
-        success: false, 
-        message: 'Discover label and href are required for simple menus' 
-      }, { status: 400 });
+    // Auto slug if missing
+    if (!body.slug && body.name) {
+      body.slug = slugify(body.name);
+    }
+    // For simple menus, discover is required but we can default href
+    if (body.type !== 'categorized') {
+      const computedHref = `/underdevelopmentmainpage/${slugify(body.slug || body.name || '')}`;
+      body.discover = body.discover || {};
+      if (!body.discover.href) body.discover.href = computedHref;
+      if (!body.discover.label) {
+        return NextResponse.json({ success: false, message: 'Discover label is required' }, { status: 400 });
+      }
     }
 
     const newMenu = new Menu(body);
@@ -120,6 +135,21 @@ export async function PUT(request) {
         return NextResponse.json({ success: false, message: 'Invalid selector' }, { status: 400 });
       }
 
+      // Normalize update
+      if ((!body.update.slug || body.update.slug === '') && body.update.name) {
+        body.update.slug = slugify(body.update.name);
+      }
+      if (body.update.type !== 'categorized') {
+        const computedHref = `/underdevelopmentmainpage/${slugify(body.update.slug || body.update.name || '')}`;
+        body.update.discover = body.update.discover || {};
+        if (!body.update.discover.href) body.update.discover.href = computedHref;
+      }
+
+      // Get old menu to check for slug changes
+      const oldMenu = await Menu.findOne(selector).lean();
+      const oldSlug = oldMenu?.slug;
+      const newSlug = body.update.slug;
+
       const result = await Menu.findOneAndUpdate(
         selector,
         body.update,
@@ -129,6 +159,12 @@ export async function PUT(request) {
       if (!result) {
         return NextResponse.json({ success: false, message: 'Menu not found' }, { status: 404 });
       }
+
+      // If slug changed, update all treatment hrefs
+      if (oldSlug && newSlug && oldSlug !== newSlug) {
+        await updateTreatmentHrefsForMenuSlugChange(oldSlug, newSlug);
+      }
+
       return NextResponse.json({ result, success: true });
     }
 
@@ -137,10 +173,30 @@ export async function PUT(request) {
       return NextResponse.json({ success: false, message: 'Menu ID is required' }, { status: 400 });
     }
 
+    // Get old menu to check for slug changes
+    const oldMenu = await Menu.findById(id).lean();
+    const oldSlug = oldMenu?.slug;
+
+    if ((!updateData.slug || updateData.slug === '') && updateData.name) {
+      updateData.slug = slugify(updateData.name);
+    }
+    if (updateData.type !== 'categorized') {
+      const computedHref = `/underdevelopmentmainpage/${slugify(updateData.slug || updateData.name || '')}`;
+      updateData.discover = updateData.discover || {};
+      if (!updateData.discover.href) updateData.discover.href = computedHref;
+    }
+
     const result = await Menu.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
     if (!result) {
       return NextResponse.json({ success: false, message: 'Menu not found' }, { status: 404 });
     }
+
+    // If slug changed, update all treatment hrefs
+    const newSlug = result.slug;
+    if (oldSlug && newSlug && oldSlug !== newSlug) {
+      await updateTreatmentHrefsForMenuSlugChange(oldSlug, newSlug);
+    }
+
     return NextResponse.json({ result, success: true });
   } catch (error) {
     console.error('PUT Menu Error:', error);
@@ -225,5 +281,38 @@ export async function PATCH(request) {
   } catch (error) {
     console.error('PATCH Menus Error:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+  }
+}
+
+// Update treatment hrefs when menu slug changes
+async function updateTreatmentHrefsForMenuSlugChange(oldSlug, newSlug) {
+  try {
+    const Menu = (await import('@/lib/model/menu')).default;
+    
+    // Find all menus that might have treatments with the old slug
+    const menus = await Menu.find({ isActive: true });
+    
+    for (const menu of menus) {
+      let needsUpdate = false;
+      
+      // Update treatment hrefs that contain the old slug
+      menu.treatments = menu.treatments.map(treatment => {
+        if (treatment.href && treatment.href.includes(`/${oldSlug}/`)) {
+          needsUpdate = true;
+          return {
+            ...treatment,
+            href: treatment.href.replace(`/${oldSlug}/`, `/${newSlug}/`)
+          };
+        }
+        return treatment;
+      });
+      
+      if (needsUpdate) {
+        await menu.save();
+        console.log(`Updated treatment hrefs in menu "${menu.name}" from ${oldSlug} to ${newSlug}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error updating treatment hrefs for menu slug change:', error);
   }
 }
