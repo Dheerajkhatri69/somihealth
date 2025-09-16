@@ -14,6 +14,13 @@ const routeRoleMap = {
   "/dashboard/emailhistorytable": ["A"],
   "/dashboard/closetickets": ["A"],
   "/dashboard/addstaff": ["A"],
+  "/dashboard/profile": ["A"],
+  "/dashboard/websitehome": ["A"],
+  "/dashboard/products": ["A"],
+  "/dashboard/faq": ["A"],
+  "/dashboard/footerUI": ["A"],
+  "/dashboard/contactForms": ["A"],
+  "/dashboard/aboutUI": ["A"],
 };
 
 export default withAuth(
