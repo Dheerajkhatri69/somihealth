@@ -1,4 +1,5 @@
 'use client'
+import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -31,6 +32,7 @@ const formSchema = z.object({
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [loginAttempts, setLoginAttempts] = useState(0);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,6 +60,12 @@ export default function LoginForm() {
           : "Invalid ID";
         setMessage(errorMessage);
         setIsDialogOpen(true);
+
+        // Increment attempts only for admin-like IDs (A followed by digits)
+        const isAdminId = /^A\d+$/.test(values.id.trim());
+        if (isAdminId) {
+          setLoginAttempts((prev) => prev + 1);
+        }
       } else {
         // Fetch session to get user type
         const sessionRes = await fetch('/api/auth/session');
@@ -66,6 +74,8 @@ export default function LoginForm() {
           localStorage.setItem('usertype', sessionData.user.accounttype);
           localStorage.setItem('userid', sessionData.user.id);
         }
+        // Reset attempts on success
+        setLoginAttempts(0);
         router.push("/dashboard");
       }
     } catch (error) {
@@ -155,6 +165,26 @@ export default function LoginForm() {
               >
                 {isLoading ? <Loader2 className="animate-spin" /> : "Sign in"}
               </Button>
+
+              {/* Admin-only Forgot Password hint after 3 failed attempts */}
+              {(() => {
+                const currentId = form.getValues("id").trim();
+                const isAdminId = /^A\d+$/.test(currentId);
+                if (isAdminId && loginAttempts >= 3) {
+                  return (
+                    <div className="text-center text-sm text-gray-600">
+                      Having trouble signing in?{' '}
+                      <Link
+                        href={{ pathname: "/adminLogin/forgot", query: currentId ? { id: currentId } : {} }}
+                        className="text-secondary font-medium hover:underline"
+                      >
+                        Forgot password
+                      </Link>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </form>
           </Form>
         </div>
