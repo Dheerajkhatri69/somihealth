@@ -103,7 +103,20 @@ export function WebsiteDataProvider({ children }) {
     getMenuBySlug,
     getProduct,
     getNavbarItems,
-    getGridItems
+    getGridItems,
+    // Product-type content helpers
+    getProTypeHeroBySlug: (slug) => {
+      const menu = getMenuBySlug(slug)
+      return menu?.proTypeHero || null
+    },
+    getExpectSectionBySlug: (slug) => {
+      const menu = getMenuBySlug(slug)
+      return menu?.expectSection || null
+    },
+    getBannerBySlug: (slug) => {
+      const menu = getMenuBySlug(slug)
+      return menu?.banner || null
+    }
   };
 
   return (

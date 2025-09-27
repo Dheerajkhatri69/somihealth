@@ -3,8 +3,7 @@
 
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
 import ProductHero from "@/components/ProductHero";
-import HowItWorks from "@/components/HowItWorks";
-import BenefitsMosaic from "@/components/BenefitsMosaic";
+import HowItWorks, { HOW_IT_WORKS_CONTENT } from "@/components/HowItWorks";
 import { notFound } from "next/navigation";
 import ClientVideoReviews from "@/components/hero/ReviewVideoCard";
 import CompoundedExplainer from "@/components/hero/compounded-glp1";
@@ -14,11 +13,12 @@ import FaqPro from "@/components/hero/Faq";
 import SomiFooter from "@/components/hero/SomiFooter";
 import Navbar from "@/components/hero/Navbar";
 import { LoadingPage, PageLoadingSkeleton } from "@/components/LoadingSkeleton";
+import ProductDetails, { PRODUCT_DETAILS_CONTENT } from "@/components/productDetails";
 
 export default function ProductPage({ params }) {
   const { productType, product } = params;
   const { getProduct, isLoading, error } = useWebsiteData();
-  
+
   const productData = getProduct(productType, product);
 
   if (!isLoading && !productData) return notFound();
@@ -31,8 +31,8 @@ export default function ProductPage({ params }) {
           {productData && (
             <>
               <ProductHero product={productData} />
-              <HowItWorks data={productData.howItWorks} />
-              <BenefitsMosaic data={productData.benefits} />
+              <ProductDetails content={productData.productDetails || PRODUCT_DETAILS_CONTENT} />
+              <HowItWorks content={productData.howItWorksSection || HOW_IT_WORKS_CONTENT} />
             </>
           )}
         </div>

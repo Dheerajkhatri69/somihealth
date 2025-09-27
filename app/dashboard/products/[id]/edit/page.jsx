@@ -302,162 +302,247 @@ export default function EditProductPage() {
             ))}
           </div>
 
-          {/* Benefits Section */}
+          {/* Product Details Section */}
           <div className="border-t pt-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-4">Benefits</h3>
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Product Details</h3>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Title</Label>
+                <Input value={formData.productDetails?.title || ''} onChange={(e) => handleInputChange('productDetails.title', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Introductory Text</Label>
+                <textarea
+                  value={formData.productDetails?.intro || ''}
+                  onChange={(e) => handleInputChange('productDetails.intro', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Breakdown Heading</Label>
+                <Input value={formData.productDetails?.breakdownHeading || ''} onChange={(e) => handleInputChange('productDetails.breakdownHeading', e.target.value)} className="mt-1" />
+              </div>
 
-            {/* Left Tiles */}
-            <div className="mb-6">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Left Tiles (Images Only)</h4>
-              <div className="space-y-4">
-                {formData.benefits?.leftTiles?.map((tile, i) => (
-                  <div key={i} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="font-medium">Tile {i + 1}</h5>
-                      <button type="button" onClick={() => {
-                        const newTiles = [...(formData.benefits?.leftTiles || [])];
-                        newTiles.splice(i, 1);
-                        setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                      }} className="text-red-600 hover:text-red-800">
+              {/* Ingredients List */}
+              <div>
+                <Label className="text-sm font-medium">Ingredients</Label>
+                <div className="mt-1 space-y-2">
+                  {(formData.productDetails?.ingredients || []).map((ingredient, i) => (
+                    <div key={i} className="flex flex-col md:flex-row gap-2">
+                      <Input
+                        value={ingredient.name || ''}
+                        onChange={e => {
+                          const newIngredients = [...(formData.productDetails.ingredients || [])];
+                          newIngredients[i] = { ...newIngredients[i], name: e.target.value };
+                          setFormData(prev => ({
+                            ...prev,
+                            productDetails: { ...prev.productDetails, ingredients: newIngredients }
+                          }));
+                        }}
+                        className="flex-1"
+                        placeholder="Name (e.g., Methionine)"
+                      />
+                      <Input
+                        value={ingredient.desc || ''}
+                        onChange={e => {
+                          const newIngredients = [...(formData.productDetails.ingredients || [])];
+                          newIngredients[i] = { ...newIngredients[i], desc: e.target.value };
+                          setFormData(prev => ({
+                            ...prev,
+                            productDetails: { ...prev.productDetails, ingredients: newIngredients }
+                          }));
+                        }}
+                        className="flex-1"
+                        placeholder="Description"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newIngredients = [...(formData.productDetails.ingredients || [])];
+                          newIngredients.splice(i, 1);
+                          setFormData(prev => ({
+                            ...prev,
+                            productDetails: { ...prev.productDetails, ingredients: newIngredients }
+                          }));
+                        }}
+                        className="rounded-md bg-red-500 px-3 py-1.5 text-sm text-white hover:bg-red-600"
+                      >
                         <X size={16} />
                       </button>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm">Image Upload</Label>
-                        <div className="mt-1">
-                          <UploadMediaLite
-                            file={tile.src}
-                            onUploadComplete={(url) => {
-                              const newTiles = [...(formData.benefits?.leftTiles || [])];
-                              newTiles[i] = { ...newTiles[i], type: 'image', src: url };
-                              setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                            }}
-                            onDelete={() => {
-                              const newTiles = [...(formData.benefits?.leftTiles || [])];
-                              newTiles[i] = { ...newTiles[i], src: '' };
-                              setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <Label className="text-sm">Alt Text</Label>
-                        <Input value={tile.alt || ''} onChange={(e) => {
-                          const newTiles = [...(formData.benefits?.leftTiles || [])];
-                          newTiles[i] = { ...newTiles[i], alt: e.target.value };
-                          setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                        }} className="mt-1" placeholder="Describe the image for accessibility" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <button type="button" onClick={() => {
-                  setFormData(prev => ({
-                    ...prev,
-                    benefits: {
-                      ...prev.benefits,
-                      leftTiles: [...(prev.benefits?.leftTiles || []), { type: 'image', src: '', alt: '' }]
-                    }
-                  }));
-                }} className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200">
-                  Add Left Tile
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      productDetails: {
+                        ...prev.productDetails,
+                        ingredients: [...(prev.productDetails.ingredients || []), { name: '', desc: '' }]
+                      }
+                    }));
+                  }}
+                  className="mt-2 rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                >
+                  Add Ingredient
                 </button>
               </div>
-            </div>
 
-            {/* Right Cards */}
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Right Cards</h4>
-              <div className="space-y-4">
-                {formData.benefits?.rightCards?.map((card, i) => (
-                  <div key={i} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="font-medium">Card {i + 1}</h5>
-                      <button type="button" onClick={() => {
-                        const newCards = [...(formData.benefits?.rightCards || [])];
-                        newCards.splice(i, 1);
-                        setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, rightCards: newCards } }));
-                      }} className="text-red-600 hover:text-red-800">
+              <div>
+                <Label className="text-sm font-medium">Benefits</Label>
+                <textarea
+                  value={formData.productDetails?.benefits?.join('\n') || ''}
+                  onChange={(e) => handleInputChange('productDetails.benefits', e.target.value.split('\n'))}
+                  className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Expectations</Label>
+                <textarea
+                  value={formData.productDetails?.expectations || ''}
+                  onChange={(e) => handleInputChange('productDetails.expectations', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Footnote</Label>
+                <Input value={formData.productDetails?.footnote || ''} onChange={(e) => handleInputChange('productDetails.footnote', e.target.value)} className="mt-1" />
+              </div>
+
+              {/* Product Details Image */}
+              <div>
+                <Label className="text-sm font-medium">Image</Label>
+                <div className="mt-1">
+                  <UploadMediaLite
+                    file={formData.productDetails?.image?.src}
+                    onUploadComplete={(url) => {
+                      setFormData((prev) => ({ ...prev, productDetails: { ...prev.productDetails, image: { ...prev.productDetails.image, src: url } } }));
+                    }}
+                    onDelete={() => {
+                      setFormData((prev) => ({ ...prev, productDetails: { ...prev.productDetails, image: { ...prev.productDetails.image, src: '' } } }));
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* How It Works Section */}
+          <div className="border-t pt-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">How It Works</h3>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Title</Label>
+                <Input value={formData.howItWorksSection?.title || ''} onChange={(e) => handleInputChange('howItWorksSection.title', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Steps</Label>
+                <div className="mt-1 space-y-2">
+                  {(formData.howItWorksSection?.steps || []).map((step, i) => (
+                    <div key={i} className="flex flex-col md:flex-row gap-2">
+                      <Input
+                        type="number"
+                        min={1}
+                        value={step.number || i + 1}
+                        onChange={e => {
+                          const newSteps = [...(formData.howItWorksSection.steps || [])];
+                          newSteps[i] = { ...newSteps[i], number: Number(e.target.value) };
+                          setFormData(prev => ({
+                            ...prev,
+                            howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                          }));
+                        }}
+                        className="w-20"
+                        placeholder="Step #"
+                      />
+                      <Input
+                        value={step.title || ''}
+                        onChange={e => {
+                          const newSteps = [...(formData.howItWorksSection.steps || [])];
+                          newSteps[i] = { ...newSteps[i], title: e.target.value };
+                          setFormData(prev => ({
+                            ...prev,
+                            howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                          }));
+                        }}
+                        className="flex-1"
+                        placeholder="Step Title"
+                      />
+                      <Input
+                        value={step.description || ''}
+                        onChange={e => {
+                          const newSteps = [...(formData.howItWorksSection.steps || [])];
+                          newSteps[i] = { ...newSteps[i], description: e.target.value };
+                          setFormData(prev => ({
+                            ...prev,
+                            howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                          }));
+                        }}
+                        className="flex-1"
+                        placeholder="Step Description"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newSteps = [...(formData.howItWorksSection.steps || [])];
+                          newSteps.splice(i, 1);
+                          setFormData(prev => ({
+                            ...prev,
+                            howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                          }));
+                        }}
+                        className="rounded-md bg-red-500 px-3 py-1.5 text-sm text-white hover:bg-red-600"
+                      >
                         <X size={16} />
                       </button>
                     </div>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-sm">Icon</Label>
-                        <Select
-                          value={card.icon || ""}
-                          onValueChange={(value) => {
-                            const newCards = [...(formData.benefits?.rightCards || [])];
-                            newCards[i] = { ...newCards[i], icon: value };
-                            setFormData((prev) => ({
-                              ...prev,
-                              benefits: { ...prev.benefits, rightCards: newCards },
-                            }));
-                          }}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue
-                              placeholder="Select an icon"
-                              // 👇 custom render for selected value
-                              renderValue={(selected) => {
-                                const option = ICON_OPTIONS.find((o) => o.value === selected);
-                                if (!option) return "Select an icon";
-                                const Icon = LucideIcons[option.value];
-                                return (
-                                  <div className="flex items-center gap-2">
-                                    {Icon && <Icon className="h-4 w-4" />}
-                                    <span>{option.label}</span>
-                                  </div>
-                                );
-                              }}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {ICON_OPTIONS.map((option) => {
-                              const Icon = LucideIcons[option.value];
-                              return (
-                                <SelectItem key={option.value} value={option.value}>
-                                  <div className="flex items-center gap-2">
-                                    {Icon && <Icon className="h-4 w-4" />}
-                                    <span>{option.label}</span>
-                                  </div>
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-sm">Title</Label>
-                        <Input value={card.title || ''} onChange={(e) => {
-                          const newCards = [...(formData.benefits?.rightCards || [])];
-                          newCards[i] = { ...newCards[i], title: e.target.value };
-                          setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, rightCards: newCards } }));
-                        }} className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Body</Label>
-                        <Input value={card.body || ''} onChange={(e) => {
-                          const newCards = [...(formData.benefits?.rightCards || [])];
-                          newCards[i] = { ...newCards[i], body: e.target.value };
-                          setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, rightCards: newCards } }));
-                        }} className="mt-1" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <button type="button" onClick={() => {
-                  setFormData(prev => ({
-                    ...prev,
-                    benefits: {
-                      ...prev.benefits,
-                      rightCards: [...(prev.benefits?.rightCards || []), { icon: '', title: '', body: '' }]
-                    }
-                  }));
-                }} className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200">
-                  Add Right Card
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      howItWorksSection: {
+                        ...prev.howItWorksSection,
+                        steps: [...(prev.howItWorksSection.steps || []), { number: (prev.howItWorksSection.steps?.length || 0) + 1, title: '', description: '' }]
+                      }
+                    }));
+                  }}
+                  className="mt-2 rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                >
+                  Add Step
                 </button>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">CTA Text</Label>
+                <Input value={formData.howItWorksSection?.cta?.text || ''} onChange={(e) => handleInputChange('howItWorksSection.cta.text', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">CTA Link</Label>
+                <Input value={formData.howItWorksSection?.cta?.href || ''} onChange={(e) => handleInputChange('howItWorksSection.cta.href', e.target.value)} className="mt-1" />
+              </div>
+
+              {/* How It Works Image */}
+              <div>
+                <Label className="text-sm font-medium">Image</Label>
+                <div className="mt-1">
+                  <UploadMediaLite
+                    file={formData.howItWorksSection?.image?.src}
+                    onUploadComplete={(url) => {
+                      setFormData((prev) => ({ ...prev, howItWorksSection: { ...prev.howItWorksSection, image: { ...prev.howItWorksSection.image, src: url } } }));
+                    }}
+                    onDelete={() => {
+                      setFormData((prev) => ({ ...prev, howItWorksSection: { ...prev.howItWorksSection, image: { ...prev.howItWorksSection.image, src: '' } } }));
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -508,8 +593,25 @@ const EMPTY = () => ({
     primary: { label: 'Get Started', href: '/getstarted' },
     secondary: { label: 'Learn More', href: '/learn-more' }
   },
-  howItWorks: { heading: '', intro: '' },
-  benefits: { leftTiles: [], rightCards: [] },
+  productDetails: {
+    title: '',
+    introTitle: '',
+    intro: '',
+    breakdownHeading: '',
+    ingredients: [],
+    benefitsHeading: '',
+    benefits: [],
+    expectationsHeading: '',
+    expectations: '',
+    footnote: '',
+    image: { src: '', alt: '' }
+  },
+  howItWorksSection: {
+    title: '',
+    steps: [],
+    cta: { text: '', href: '' },
+    image: { src: '', alt: '' }
+  },
   isActive: true,
   sortOrder: 0,
 });
@@ -542,7 +644,8 @@ function hydrate(p) {
     ...EMPTY(),
     ...p,
     bullets: Array.isArray(p.bullets) ? p.bullets : [],
-    benefits: { leftTiles: p?.benefits?.leftTiles || [], rightCards: p?.benefits?.rightCards || [] },
+    productDetails: p?.productDetails || EMPTY().productDetails,
+    howItWorksSection: p?.howItWorksSection || EMPTY().howItWorksSection,
     ctas: p?.ctas || { primary: { label: 'Get Started', href: '/getstarted' }, secondary: { label: 'Learn More', href: '/learn-more' } },
     howItWorks: p?.howItWorks || { heading: '', intro: '' },
   };

@@ -51,6 +51,12 @@ export async function GET() {
                             icon: "ShieldCheck"
                         }
                     ],
+                    header: {
+                        eyebrow: 'Feel stronger, healthier, and more confident',
+                        headlineLeft: 'How it works',
+                        headlineRight: 'at Somi Health'
+                    },
+                    image: '/hero/bmilady.png',
                     watermark: {
                         text: 'somi',
                         size: '160px',

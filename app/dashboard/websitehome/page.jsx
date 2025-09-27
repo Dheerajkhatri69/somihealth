@@ -6,6 +6,8 @@ import { Plus, Eye, Edit, Save, X, Play, Trash2 } from 'lucide-react';
 import VideoUpload from '@/components/VideoUpload';
 import UploadMediaLite from '@/components/UploadMediaLite';
 import Image from 'next/image';
+import * as LucideIcons from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function WebsiteHome() {
     const [menus, setMenus] = useState([]);
@@ -64,14 +66,14 @@ export default function WebsiteHome() {
     // Compounded Content state
     const [compoundedContent, setCompoundedContent] = useState({
         title: 'What are Compounded GLP-1 Medications?',
-        description: 'Compounded GLP-1 medications are personalized versions of treatments like Semaglutide or Tirzepatide. They\'re made by licensed compounding pharmacies based on a prescription from a qualified healthcare provider. They contain the same active ingredient as the branded medications, but are compounded to offer a more personalized and often more accessible option.',
+        tabs: [],
         image: '/hero/bmilady.png'
     });
     const [compoundedLoading, setCompoundedLoading] = useState(true);
     const [isEditingCompounded, setIsEditingCompounded] = useState(false);
     const [editingCompounded, setEditingCompounded] = useState({
         title: '',
-        description: '',
+        tabs: [],
         image: ''
     });
     const [showCompoundedImageUpload, setShowCompoundedImageUpload] = useState(false);
@@ -498,7 +500,7 @@ export default function WebsiteHome() {
     function startEditingCompounded() {
         setEditingCompounded({
             title: compoundedContent.title,
-            description: compoundedContent.description,
+            tabs: Array.isArray(compoundedContent.tabs) ? [...compoundedContent.tabs] : [],
             image: compoundedContent.image
         });
         setIsEditingCompounded(true);
@@ -508,7 +510,7 @@ export default function WebsiteHome() {
         setIsEditingCompounded(false);
         setEditingCompounded({
             title: '',
-            description: '',
+            tabs: [],
             image: ''
         });
         setShowCompoundedImageUpload(false);
@@ -523,7 +525,7 @@ export default function WebsiteHome() {
                 },
                 body: JSON.stringify({
                     title: editingCompounded.title,
-                    description: editingCompounded.description,
+                    tabs: editingCompounded.tabs,
                     image: editingCompounded.image,
                     isActive: true
                 }),
@@ -535,7 +537,7 @@ export default function WebsiteHome() {
                 setIsEditingCompounded(false);
                 setEditingCompounded({
                     title: '',
-                    description: '',
+                    tabs: [],
                     image: ''
                 });
             } else {
@@ -552,6 +554,33 @@ export default function WebsiteHome() {
         const needle = q.trim().toLowerCase();
         return menus.filter((m) => (m.name || '').toLowerCase().includes(needle));
     }, [menus, q]);
+
+    // Icon options for compounded tabs
+    const COMPOUNDED_ICON_OPTIONS = [
+        { value: 'Beaker', label: 'Beaker' },
+        { value: 'ShieldCheck', label: 'ShieldCheck' },
+        { value: 'BadgeDollarSign', label: 'Badge Dollar Sign' },
+        { value: 'Check', label: 'Check' },
+        { value: 'Star', label: 'Star' },
+        { value: 'Heart', label: 'Heart' },
+        { value: 'Shield', label: 'Shield' },
+        { value: 'Zap', label: 'Zap' },
+        { value: 'Award', label: 'Award' },
+        { value: 'Clock', label: 'Clock' },
+        { value: 'Users', label: 'Users' },
+        { value: 'TrendingUp', label: 'Trending Up' },
+        { value: 'Target', label: 'Target' },
+        { value: 'Rocket', label: 'Rocket' },
+        { value: 'Lock', label: 'Lock' },
+        { value: 'Globe', label: 'Globe' },
+        { value: 'Gift', label: 'Gift' },
+        { value: 'DollarSign', label: 'Dollar Sign' },
+        { value: 'Calendar', label: 'Calendar' },
+        { value: 'Bell', label: 'Bell' },
+        { value: 'Bookmark', label: 'Bookmark' },
+        { value: 'Camera', label: 'Camera' },
+        { value: 'Code', label: 'Code' }
+    ];
 
     return (
         <div className="p-4">
@@ -1280,17 +1309,93 @@ export default function WebsiteHome() {
                                         />
                                     </div>
 
+                                    {/* Tabs editor */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Description
-                                        </label>
-                                        <textarea
-                                            value={editingCompounded.description}
-                                            onChange={(e) => setEditingCompounded(prev => ({ ...prev, description: e.target.value }))}
-                                            rows={4}
-                                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Enter description..."
-                                        />
+                                        <div className="flex items-center justify-between mb-2">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Tabs ({editingCompounded.tabs.length})
+                                            </label>
+                                            <button
+                                                onClick={() => setEditingCompounded(prev => ({ ...prev, tabs: [...prev.tabs, { icon: 'Beaker', subtitle: '', description: '' }] }))}
+                                                className="text-xs text-blue-600 hover:text-blue-700"
+                                            >
+                                                + Add Tab
+                                            </button>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {editingCompounded.tabs.map((t, i) => (
+                                                <div key={i} className="border border-gray-200 rounded-lg p-3">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="text-sm font-medium text-gray-900">Tab {i + 1}</span>
+                                                        <button
+                                                            onClick={() => setEditingCompounded(prev => ({ ...prev, tabs: prev.tabs.filter((_, idx) => idx !== i) }))}
+                                                            className="text-red-600 hover:text-red-700"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                        <div>
+                                                            <label className="block text-xs font-medium text-gray-600 mb-1">Icon</label>
+                                                            <Select
+                                                                value={t.icon || ""}
+                                                                onValueChange={(value) => setEditingCompounded(prev => ({ ...prev, tabs: prev.tabs.map((tab, idx) => idx === i ? { ...tab, icon: value } : tab) }))}
+                                                            >
+                                                                <SelectTrigger className="mt-1">
+                                                                    <SelectValue
+                                                                        placeholder="Select an icon"
+                                                                        renderValue={(selected) => {
+                                                                            const option = COMPOUNDED_ICON_OPTIONS.find((o) => o.value === selected);
+                                                                            if (!option) return "Select an icon";
+                                                                            const Icon = LucideIcons[option.value];
+                                                                            return (
+                                                                                <div className="flex items-center gap-2">
+                                                                                    {Icon && <Icon className="h-4 w-4" />}
+                                                                                    <span>{option.label}</span>
+                                                                                </div>
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {COMPOUNDED_ICON_OPTIONS.map((option) => {
+                                                                        const Icon = LucideIcons[option.value];
+                                                                        return (
+                                                                            <SelectItem key={option.value} value={option.value}>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    {Icon && <Icon className="h-4 w-4" />}
+                                                                                    <span>{option.label}</span>
+                                                                                </div>
+                                                                            </SelectItem>
+                                                                        );
+                                                                    })}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="md:col-span-2">
+                                                            <label className="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
+                                                            <input
+                                                                type="text"
+                                                                value={t.subtitle}
+                                                                onChange={(e) => setEditingCompounded(prev => ({ ...prev, tabs: prev.tabs.map((tab, idx) => idx === i ? { ...tab, subtitle: e.target.value } : tab) }))}
+                                                                className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                placeholder="e.g., Provider-Prescribed"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-2">
+                                                        <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                                                        <textarea
+                                                            rows={3}
+                                                            value={t.description}
+                                                            onChange={(e) => setEditingCompounded(prev => ({ ...prev, tabs: prev.tabs.map((tab, idx) => idx === i ? { ...tab, description: e.target.value } : tab) }))}
+                                                            className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            placeholder="Detail for this tab"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     <div>
@@ -1360,10 +1465,21 @@ export default function WebsiteHome() {
                                         </div>
 
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-                                            <p className="text-gray-700 bg-gray-50 p-3 rounded-md">
-                                                {compoundedContent.description}
-                                            </p>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Tabs ({compoundedContent.tabs?.length || 0})</h3>
+                                            <div className="space-y-2">
+                                                {compoundedContent.tabs?.map((tab, index) => (
+                                                    <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs text-gray-500">#{index + 1}</span>
+                                                            <span className="text-sm font-medium text-gray-900">{tab.subtitle}</span>
+                                                            {tab.icon && (
+                                                                <span className="text-xs text-gray-500">({tab.icon})</span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-sm text-gray-700 mt-1">{tab.description}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
 
                                         <div>

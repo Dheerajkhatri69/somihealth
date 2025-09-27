@@ -17,6 +17,7 @@ const routeRoleMap = {
   "/dashboard/profile": ["A"],
   "/dashboard/websitehome": ["A"],
   "/dashboard/products": ["A"],
+  "/dashboard/gh-content": ["A"],
   "/dashboard/faq": ["A"],
   "/dashboard/footerUI": ["A"],
   "/dashboard/contactForms": ["A"],

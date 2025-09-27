@@ -52,6 +52,10 @@ export async function GET(request) {
       cta: menu.cta,
       mainPanelImg: menu.mainPanelImg,
       type: menu.type,
+      // include product type page content blocks (aligned to components)
+      proTypeHero: menu.proTypeHero || { eyebrow: '', headingLine1: '', lines: [], body: '', ctaText: '', heroImage: '', heroAlt: '', disclaimer: '' },
+      expectSection: menu.expectSection || { title: '', image: { src: '', alt: '', ratio: '' }, items: [] },
+      banner: menu.banner || { image: { src: '', alt: '' }, headline: { line1: '', line2: '' }, cta: { text: '', href: '' }, footnote: '' },
       sortOrder: menu.sortOrder,
     }));
 

@@ -82,7 +82,10 @@ export async function POST(request) {
     const body = await request.json();
 
     // Basic validation
-    const required = ['category', 'slug', 'label', 'shortLabel', 'heroImage', 'price', 'unit', 'description'];
+    const required = [
+      'category', 'slug', 'label', 'shortLabel', 'heroImage', 'price', 'unit', 'description',
+      'productDetails', 'howItWorksSection'
+    ];
     // Auto slug from label if slug is empty
     if (!body.slug && body.label) {
       body.slug = slugify(body.label);

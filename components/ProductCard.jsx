@@ -27,7 +27,7 @@ export default function ProductCard({ item, ctaHref, isLink = false }) {
             {/* Image section - only show if item has an image */}
             {item.img && (
                 <div className="flex justify-center py-6">
-                    <div className="relative h-40 w-40 md:h-52 md:w-48">
+                    <div className="relative h-52 w-52 md:h-60 md:w-64">
                         <Image
                             src={item.img}
                             alt={item.label}

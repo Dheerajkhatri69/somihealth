@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Edit, Save, X, Plus, Trash2 } from 'lucide-react';
+import UploadMediaLite from '@/components/UploadMediaLite';
 
 export default function ResultsManagement() {
     const [content, setContent] = useState({
@@ -20,7 +21,13 @@ export default function ResultsManagement() {
             left: '0rem',
             top: '8rem',
             rotate: '0deg'
-        }
+        },
+        header: {
+            eyebrow: '',
+            headlineLeft: '',
+            headlineRight: ''
+        },
+        image: ''
     });
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -39,7 +46,13 @@ export default function ResultsManagement() {
             left: '',
             top: '',
             rotate: ''
-        }
+        },
+        header: {
+            eyebrow: '',
+            headlineLeft: '',
+            headlineRight: ''
+        },
+        image: ''
     });
 
     useEffect(() => {
@@ -65,7 +78,9 @@ export default function ResultsManagement() {
     function startEditing() {
         setEditingContent({
             tabs: [...content.tabs],
-            watermark: { ...content.watermark }
+            watermark: { ...content.watermark },
+            header: { ...content.header },
+            image: content.image || ''
         });
         setIsEditing(true);
     }
@@ -87,7 +102,13 @@ export default function ResultsManagement() {
                 left: '',
                 top: '',
                 rotate: ''
-            }
+            },
+            header: {
+                eyebrow: '',
+                headlineLeft: '',
+                headlineRight: ''
+            },
+            image: ''
         });
     }
 
@@ -197,7 +218,9 @@ export default function ResultsManagement() {
                         left: '',
                         top: '',
                         rotate: ''
-                    }
+                    },
+                    header: { eyebrow: '', headlineLeft: '', headlineRight: '' },
+                    image: ''
                 });
             } else {
                 alert('Error saving content: ' + data.message);
@@ -410,6 +433,56 @@ export default function ResultsManagement() {
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+
+                            {/* Header & Image */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="border border-gray-200 rounded-lg p-4">
+                                    <h3 className="font-semibold text-gray-900 mb-3">Header</h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Eyebrow</label>
+                                            <input
+                                                type="text"
+                                                value={editingContent.header.eyebrow}
+                                                onChange={(e) => setEditingContent(prev => ({ ...prev, header: { ...prev.header, eyebrow: e.target.value } }))}
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Feel stronger, healthier, and more confident"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Headline Left</label>
+                                            <input
+                                                type="text"
+                                                value={editingContent.header.headlineLeft}
+                                                onChange={(e) => setEditingContent(prev => ({ ...prev, header: { ...prev.header, headlineLeft: e.target.value } }))}
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="How it works"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Headline Right</label>
+                                            <input
+                                                type="text"
+                                                value={editingContent.header.headlineRight}
+                                                onChange={(e) => setEditingContent(prev => ({ ...prev, header: { ...prev.header, headlineRight: e.target.value } }))}
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="at Somi Health"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="border border-gray-2 00 rounded-lg p-4">
+                                    <h3 className="font-semibold text-gray-900 mb-3">Main Image</h3>
+                                    <div className="space-y-3">
+                                        <UploadMediaLite
+                                            file={editingContent.image}
+                                            onUploadComplete={(url) => setEditingContent(prev => ({ ...prev, image: url }))}
+                                            onDelete={() => setEditingContent(prev => ({ ...prev, image: '' }))}
+                                        />
+                                        <p className="text-xs text-gray-500">Upload an image; the URL will be stored and used by the Results section.</p>
+                                    </div>
                                 </div>
                             </div>
 

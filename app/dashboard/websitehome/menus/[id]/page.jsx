@@ -11,6 +11,8 @@ import { Label } from '@/components/ui/label';
 import UploadMediaLite from '@/components/UploadMediaLite';
 import Image from 'next/image';
 
+/* ================= schema-aligned defaults (with legacy fallback in mergeDefaults) ================= */
+// <<< NEW: fully align to mongoose schema
 const EMPTY_FORM = {
   name: '',
   slug: '',
@@ -18,10 +20,32 @@ const EMPTY_FORM = {
   type: 'simple',
   discover: { label: '', href: '' },
   treatments: [],
-  categories: [], // [{ title:'', items:[{label:'', href:'', isLink:false}] }]
+  categories: [],
   cta: { title: '', button: { label: 'Get Started', href: '/getstarted' }, img: '' },
-  mainPanelImg: '', // New field for main panel image
+  mainPanelImg: '',
+  proTypeHero: {
+    eyebrow: '',
+    headingLine1: '',
+    lines: [],                 // array of strings
+    body: '',
+    ctaText: '',
+    heroImage: '',
+    heroAlt: '',
+    disclaimer: '',
+  },
+  expectSection: {
+    title: '',
+    image: { src: '', alt: '', ratio: '' },
+    items: [],                 // [{heading:'', description:''}]
+  },
+  banner: {
+    image: { src: '', alt: '' },
+    headline: { line1: '', line2: '' },
+    cta: { text: '', href: '' },
+    footnote: '',
+  },
   sortOrder: 0,
+  isActive: true,
 };
 
 export default function MenuDetailPage() {
@@ -34,7 +58,7 @@ export default function MenuDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
-  const [recordId, setRecordId] = useState(null); // actual _id from DB (used for PUT/DELETE)
+  const [recordId, setRecordId] = useState(null);
 
   const isValidObjectId = (v) => /^[a-f0-9]{24}$/i.test(String(v || ''));
 
@@ -48,12 +72,8 @@ export default function MenuDetailPage() {
       try {
         const m = await loadMenuByAnyKey(menuKey);
         if (!m) throw new Error('Menu not found');
-
-        // capture only a REAL ObjectId; never fall back to name/slug
         setRecordId(isValidObjectId(m?._id) ? m._id : null);
-
-        // merge with safe defaults to avoid undefined in controlled inputs
-        setFormData(mergeDefaults(EMPTY_FORM, m));
+        setFormData(mergeDefaults(EMPTY_FORM, m)); // <<< NEW: robust, schema-aligned merge + legacy mapping
       } catch (e) {
         console.error(e);
         alert('Failed to load menu.');
@@ -73,8 +93,18 @@ export default function MenuDetailPage() {
   /* ---------- helpers (local) ---------- */
   function handleInputChange(field, value) {
     if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData((prev) => ({ ...prev, [parent]: { ...prev[parent], [child]: value } }));
+      const path = field.split('.');
+      setFormData((prev) => {
+        const draft = { ...prev };
+        let cur = draft;
+        for (let i = 0; i < path.length - 1; i++) {
+          const key = path[i];
+          cur[key] = cur[key] ?? {};
+          cur = cur[key];
+        }
+        cur[path[path.length - 1]] = value;
+        return draft;
+      });
     } else {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
@@ -131,6 +161,7 @@ export default function MenuDetailPage() {
     setFormData((p) => ({ ...p, categories: cats }));
   }
 
+  // <<< NEW: hero/expect/banner image handling per schema fields
   function handleImageUpload(field, imageUrl) {
     if (field === 'cta.img') {
       setFormData((prev) => ({ ...prev, cta: { ...prev.cta, img: imageUrl } }));
@@ -141,7 +172,32 @@ export default function MenuDetailPage() {
       const draft = [...(formData.treatments || [])];
       draft[idx] = { ...draft[idx], img: imageUrl };
       setFormData((prev) => ({ ...prev, treatments: draft }));
+    } else if (field === 'proTypeHero.heroImage') {
+      setFormData((prev) => ({ ...prev, proTypeHero: { ...prev.proTypeHero, heroImage: imageUrl } }));
+    } else if (field === 'expectSection.image.src') {
+      setFormData((prev) => ({
+        ...prev,
+        expectSection: { ...prev.expectSection, image: { ...(prev.expectSection?.image || {}), src: imageUrl } },
+      }));
+    } else if (field === 'banner.image.src') {
+      setFormData((prev) => ({
+        ...prev,
+        banner: { ...prev.banner, image: { ...(prev.banner?.image || {}), src: imageUrl } },
+      }));
     }
+  }
+
+  // <<< NEW: lines array helpers
+  function addHeroLine() {
+    setFormData((p) => ({ ...p, proTypeHero: { ...p.proTypeHero, lines: [...(p.proTypeHero?.lines || []), ''] } }));
+  }
+  function updateHeroLine(i, value) {
+    const lines = [...(formData.proTypeHero?.lines || [])];
+    lines[i] = value;
+    setFormData((p) => ({ ...p, proTypeHero: { ...p.proTypeHero, lines } }));
+  }
+  function removeHeroLine(i) {
+    setFormData((p) => ({ ...p, proTypeHero: { ...p.proTypeHero, lines: (p.proTypeHero?.lines || []).filter((_, idx) => idx !== i) } }));
   }
 
   async function saveMenu(e) {
@@ -151,17 +207,17 @@ export default function MenuDetailPage() {
       const payload = {
         ...formData,
         slug: slugify(formData.name),
-        // For categorized menus, provide default discover values; for simple, default href from slug
-        discover: formData.type === 'categorized' 
-          ? { label: '', href: '' }
-          : { label: formData.discover.label, href: `/underdevelopmentmainpage/${slugify(formData.name)}` },
+        // For simple menus ensure discover href defaulting (API also guards)
+        discover:
+          formData.type === 'categorized'
+            ? { label: '', href: '' }
+            : {
+              label: formData.discover?.label || '',
+              href: `/underdevelopmentmainpage/${slugify(formData.name)}`,
+            },
       };
 
       const hasId = isValidObjectId(recordId);
-      // If we DON'T have an ObjectId, we still send PUT but with slug/name,
-      // only if the backend supports it. For safety, we fallback to POST otherwise.
-      // Below we optimistically call PUT when not new, sending a 'selector' that
-      // includes _id (if valid), else slug, else name.
       const selector = hasId
         ? { _id: recordId }
         : formData.slug
@@ -171,10 +227,7 @@ export default function MenuDetailPage() {
             : null;
 
       const method = isNew ? 'POST' : selector ? 'PUT' : 'POST';
-      const body =
-        method === 'PUT'
-          ? { selector, update: payload }
-          : payload;
+      const body = method === 'PUT' ? { selector, update: payload } : payload;
 
       const res = await fetch('/api/menus', {
         method,
@@ -249,6 +302,7 @@ export default function MenuDetailPage() {
           <h2 className="text-base font-semibold text-gray-900">Basic Information</h2>
         </div>
         <div className="p-6 space-y-6">
+          {/* --- top row --- */}
           <div className="grid md:grid-cols-3 gap-4">
             <div className="md:col-span-1">
               <Label className="text-sm font-medium">Name *</Label>
@@ -261,12 +315,7 @@ export default function MenuDetailPage() {
             </div>
             <div className="md:col-span-1">
               <Label className="text-sm font-medium">Slug</Label>
-              <Input
-                value={slugify(formData.name)}
-                readOnly
-                placeholder="Auto from name"
-                className="mt-1 bg-gray-50"
-              />
+              <Input value={slugify(formData.name)} readOnly placeholder="Auto from name" className="mt-1 bg-gray-50" />
             </div>
             <div className="md:col-span-1">
               <Label className="text-sm font-medium">Sort Order</Label>
@@ -316,6 +365,212 @@ export default function MenuDetailPage() {
             </div>
           </div>
 
+          {/* ================= Pro Type Hero (schema-aligned) ================= */}
+          <div className="border-t pt-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Pro Type Hero</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm">Eyebrow</Label>
+                <Input value={formData.proTypeHero.eyebrow} onChange={(e) => handleInputChange('proTypeHero.eyebrow', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm">Heading (Line 1)</Label>
+                <Input value={formData.proTypeHero.headingLine1} onChange={(e) => handleInputChange('proTypeHero.headingLine1', e.target.value)} className="mt-1" />
+              </div>
+
+              {/* Lines array */}
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-sm">Additional Heading Lines</Label>
+                  <button type="button" onClick={addHeroLine} className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-white hover:bg-secondary/80">
+                    <Plus size={16} /> Add Line
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {(formData.proTypeHero.lines || []).map((ln, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Input value={ln} onChange={(e) => updateHeroLine(i, e.target.value)} placeholder={`Line ${i + 1}`} />
+                      <button type="button" onClick={() => removeHeroLine(i)} className="rounded-md border px-2 text-red-600 hover:bg-red-50">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <Label className="text-sm">Body</Label>
+                <textarea rows={3} value={formData.proTypeHero.body} onChange={(e) => handleInputChange('proTypeHero.body', e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 p-2" />
+              </div>
+
+              <div>
+                <Label className="text-sm">CTA Text</Label>
+                <Input value={formData.proTypeHero.ctaText} onChange={(e) => handleInputChange('proTypeHero.ctaText', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm">Hero Alt</Label>
+                <Input value={formData.proTypeHero.heroAlt} onChange={(e) => handleInputChange('proTypeHero.heroAlt', e.target.value)} className="mt-1" />
+              </div>
+
+              <div className="md:col-span-2">
+                <Label className="text-sm">Hero Image</Label>
+                <div className="mt-1">
+                  <UploadMediaLite
+                    onUploadComplete={(url) => handleImageUpload('proTypeHero.heroImage', url)}
+                    onDelete={() => handleInputChange('proTypeHero.heroImage', '')}
+                    file={formData.proTypeHero.heroImage || ''}
+                  />
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <Label className="text-sm">Disclaimer</Label>
+                <textarea rows={2} value={formData.proTypeHero.disclaimer} onChange={(e) => handleInputChange('proTypeHero.disclaimer', e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 p-2" />
+              </div>
+            </div>
+          </div>
+
+          {/* ================= Expect Section (schema-aligned) ================= */}
+          <div className="border-t pt-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Expect Section</h3>
+                <p className="text-sm text-gray-500">Manage title, image (src/alt/ratio) and items (heading + description).</p>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    expectSection: {
+                      ...prev.expectSection,
+                      items: [...(prev.expectSection?.items || []), { heading: '', description: '' }],
+                    },
+                  }))
+                }
+                className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-white hover:bg-secondary/80"
+              >
+                <Plus size={16} /> Add Item
+              </button>
+            </div>
+
+            <div className="mb-3">
+              <Label className="text-sm">Section Title</Label>
+              <Input value={formData.expectSection.title} onChange={(e) => handleInputChange('expectSection.title', e.target.value)} className="mt-1" />
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-3 mb-4">
+              <div className="md:col-span-2">
+                <Label className="text-sm">Section Image</Label>
+                <div className="mt-1">
+                  <UploadMediaLite
+                    onUploadComplete={(url) => handleImageUpload('expectSection.image.src', url)}
+                    onDelete={() => handleInputChange('expectSection.image.src', '')}
+                    file={formData.expectSection.image?.src || ''}
+                  />
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm">Image Alt</Label>
+                <Input value={formData.expectSection.image?.alt || ''} onChange={(e) => handleInputChange('expectSection.image.alt', e.target.value)} className="mt-1" />
+                <Label className="text-sm mt-3 block">Image Ratio (e.g., 16/9)</Label>
+                <Input value={formData.expectSection.image?.ratio || ''} onChange={(e) => handleInputChange('expectSection.image.ratio', e.target.value)} className="mt-1" />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {(formData.expectSection.items || []).map((it, i) => (
+                <div key={i} className="rounded-lg border border-gray-200 p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <h4 className="font-medium text-gray-900">Item {i + 1}</h4>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          expectSection: { ...prev.expectSection, items: (prev.expectSection.items || []).filter((_, idx) => idx !== i) },
+                        }))
+                      }
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Heading</Label>
+                      <Input
+                        value={it.heading || ''}
+                        onChange={(e) => {
+                          const items = [...(formData.expectSection?.items || [])];
+                          items[i] = { ...items[i], heading: e.target.value };
+                          setFormData((prev) => ({ ...prev, expectSection: { ...prev.expectSection, items } }));
+                        }}
+                        className="mt-1 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Description</Label>
+                      <Input
+                        value={it.description || ''}
+                        onChange={(e) => {
+                          const items = [...(formData.expectSection?.items || [])];
+                          items[i] = { ...items[i], description: e.target.value };
+                          setFormData((prev) => ({ ...prev, expectSection: { ...prev.expectSection, items } }));
+                        }}
+                        className="mt-1 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ================= Banner (schema-aligned) ================= */}
+          <div className="border-t pt-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Banner</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <Label className="text-sm">Banner Image</Label>
+                <div className="mt-1">
+                  <UploadMediaLite
+                    onUploadComplete={(url) => handleImageUpload('banner.image.src', url)}
+                    onDelete={() => handleInputChange('banner.image.src', '')}
+                    file={formData.banner.image?.src || ''}
+                  />
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm">Image Alt</Label>
+                <Input value={formData.banner.image?.alt || ''} onChange={(e) => handleInputChange('banner.image.alt', e.target.value)} className="mt-1" />
+              </div>
+
+              <div>
+                <Label className="text-sm">Headline Line 1</Label>
+                <Input value={formData.banner.headline?.line1 || ''} onChange={(e) => handleInputChange('banner.headline.line1', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm">Headline Line 2</Label>
+                <Input value={formData.banner.headline?.line2 || ''} onChange={(e) => handleInputChange('banner.headline.line2', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm">CTA Text</Label>
+                <Input value={formData.banner.cta?.text || ''} onChange={(e) => handleInputChange('banner.cta.text', e.target.value)} className="mt-1" />
+              </div>
+              <div className="md:col-span-2">
+                <Label className="text-sm">CTA Link</Label>
+                <Input value={formData.banner.cta?.href || ''} onChange={(e) => handleInputChange('banner.cta.href', e.target.value)} className="mt-1" />
+              </div>
+
+              <div className="md:col-span-3">
+                <Label className="text-sm">Footnote</Label>
+                <textarea rows={2} value={formData.banner.footnote || ''} onChange={(e) => handleInputChange('banner.footnote', e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 p-2" />
+              </div>
+            </div>
+          </div>
+
+          {/* Discover for simple menus */}
           {formData.type !== 'categorized' && (
             <div className="border-t pt-6">
               <h3 className="text-base font-semibold text-gray-900 mb-4">Discover</h3>
@@ -342,6 +597,7 @@ export default function MenuDetailPage() {
             </div>
           )}
 
+          {/* Auto Treatments (unchanged render; editing not exposed) */}
           <div className="border-t pt-6">
             <div className="mb-4">
               <h3 className="text-base font-semibold text-gray-900">Auto Treatments</h3>
@@ -360,11 +616,11 @@ export default function MenuDetailPage() {
                       {t.img && (
                         <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-white">
                           <Image
-                            src={t.img}                // <-- use src, not href
+                            src={t.img}
                             alt={t.label}
-                            fill                              // fills the parent box
+                            fill
                             sizes="40px"
-                            className="object-contain"        // show full image without cropping
+                            className="object-contain"
                           />
                         </div>
                       )}
@@ -379,7 +635,6 @@ export default function MenuDetailPage() {
                         </div>
                         <p className="text-sm text-gray-600 truncate">{t.href}</p>
                       </div>
-
                     </div>
                   </div>
                 ))}
@@ -387,6 +642,7 @@ export default function MenuDetailPage() {
             )}
           </div>
 
+          {/* Categories (unchanged UI shape; aligns to schema) */}
           {formData.type === 'categorized' && (
             <div className="border-t pt-6">
               <div className="mb-4 flex items-center justify-between">
@@ -404,21 +660,13 @@ export default function MenuDetailPage() {
                 <div key={cIdx} className="mb-4 rounded-xl border border-gray-200 p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <h4 className="font-medium text-gray-900">Category {cIdx + 1}</h4>
-                    <button
-                      type="button"
-                      onClick={() => removeCategory(cIdx)}
-                      className="text-red-600 hover:text-red-800"
-                    >
+                    <button type="button" onClick={() => removeCategory(cIdx)} className="text-red-600 hover:text-red-800">
                       <X size={18} />
                     </button>
                   </div>
                   <div className="mb-3">
                     <Label className="text-sm">Title</Label>
-                    <Input
-                      value={cat.title || ''}
-                      onChange={(e) => handleCategoryChange(cIdx, 'title', e.target.value)}
-                      className="mt-1"
-                    />
+                    <Input value={cat.title || ''} onChange={(e) => handleCategoryChange(cIdx, 'title', e.target.value)} className="mt-1" />
                   </div>
 
                   <div>
@@ -437,30 +685,18 @@ export default function MenuDetailPage() {
                       <div key={iIdx} className="mb-2 rounded-lg border border-gray-200 p-3">
                         <div className="mb-2 flex items-center justify-between">
                           <span className="text-sm font-medium">Item {iIdx + 1}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeCategoryItem(cIdx, iIdx)}
-                            className="text-red-600 hover:text-red-800"
-                          >
+                          <button type="button" onClick={() => removeCategoryItem(cIdx, iIdx)} className="text-red-600 hover:text-red-800">
                             <X size={16} />
                           </button>
                         </div>
                         <div className="grid md:grid-cols-2 gap-3">
                           <div>
                             <Label className="text-xs">Label</Label>
-                            <Input
-                              value={it.label || ''}
-                              onChange={(e) => handleCategoryChange(cIdx, `item.${iIdx}.label`, e.target.value)}
-                              className="mt-1 text-sm"
-                            />
+                            <Input value={it.label || ''} onChange={(e) => handleCategoryChange(cIdx, `item.${iIdx}.label`, e.target.value)} className="mt-1 text-sm" />
                           </div>
                           <div>
                             <Label className="text-xs">Href</Label>
-                            <Input
-                              value={it.href || ''}
-                              onChange={(e) => handleCategoryChange(cIdx, `item.${iIdx}.href`, e.target.value)}
-                              className="mt-1 text-sm"
-                            />
+                            <Input value={it.href || ''} onChange={(e) => handleCategoryChange(cIdx, `item.${iIdx}.href`, e.target.value)} className="mt-1 text-sm" />
                           </div>
                         </div>
                         <div className="mt-2 flex items-center gap-2">
@@ -481,6 +717,7 @@ export default function MenuDetailPage() {
             </div>
           )}
 
+          {/* CTA (unchanged) */}
           <div className="border-t pt-6">
             <h3 className="text-base font-semibold text-gray-900 mb-4">Call to Action</h3>
             <div className="grid md:grid-cols-2 gap-4">
@@ -506,8 +743,7 @@ export default function MenuDetailPage() {
               </div>
             </div>
             <div className="mt-3 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
-              <strong>Default Button:</strong> “{formData.cta.button?.label || 'Get Started'}” →{' '}
-              {formData.cta.button?.href || '/getstarted'}
+              <strong>Default Button:</strong> “{formData.cta.button?.label || 'Get Started'}” → {formData.cta.button?.href || '/getstarted'}
             </div>
           </div>
         </div>
@@ -542,28 +778,99 @@ function slugify(s = '') {
     .replace(/-+/g, '-');
 }
 
-/** Safely merge defaults into possibly sparse API object */
+/** Safely merge defaults into possibly sparse/legacy API object */
+// <<< NEW: map legacy fields -> schema fields for backward compatibility
 function mergeDefaults(defaults, data) {
+  const legacyPro = (data && data.proTypeHero) || {};
+  const legacyBanner = (data && data.banner) || {};
+  const legacyExpect = (data && data.expectSection) || {};
+
+  // Legacy → New mapping (no TS types in .jsx)
+  const mappedPro = {
+    eyebrow: legacyPro.eyebrow ?? '',
+    headingLine1: legacyPro.headingLine1 ?? legacyPro.title ?? '',
+    lines: Array.isArray(legacyPro.lines) ? legacyPro.lines : [],
+    body: legacyPro.body ?? legacyPro.subtitle ?? '',
+    ctaText: legacyPro.ctaText ?? (legacyPro.cta && legacyPro.cta.label) ?? '',
+    heroImage: legacyPro.heroImage ?? legacyPro.image ?? '',
+    heroAlt: legacyPro.heroAlt ?? '',
+    disclaimer: legacyPro.disclaimer ?? '',
+  };
+
+  const mappedExpect = {
+    title: legacyExpect.title ?? '',
+    image: {
+      src: (legacyExpect.image && legacyExpect.image.src) ?? '',
+      alt: (legacyExpect.image && legacyExpect.image.alt) ?? '',
+      ratio: (legacyExpect.image && legacyExpect.image.ratio) ?? '',
+    },
+    items: Array.isArray(legacyExpect.items)
+      ? legacyExpect.items.map((it) => ({
+        heading: (it && (it.heading ?? it.title)) || '',
+        description: (it && it.description) || '',
+      }))
+      : [],
+  };
+
+  const mappedBanner = {
+    image: {
+      src:
+        (legacyBanner.image && legacyBanner.image.src) ??
+        legacyBanner.image ??
+        '',
+      alt: (legacyBanner.image && legacyBanner.image.alt) ?? '',
+    },
+    headline: {
+      line1:
+        (legacyBanner.headline && legacyBanner.headline.line1) ??
+        legacyBanner.title ??
+        '',
+      line2:
+        (legacyBanner.headline && legacyBanner.headline.line2) ??
+        legacyBanner.description ??
+        '',
+    },
+    cta: {
+      text:
+        (legacyBanner.cta && legacyBanner.cta.text) ??
+        (legacyBanner.cta && legacyBanner.cta.label) ??
+        '',
+      href: (legacyBanner.cta && legacyBanner.cta.href) ?? '',
+    },
+    footnote: legacyBanner.footnote ?? '',
+  };
+
   return {
     ...defaults,
     ...data,
-    discover: { ...defaults.discover, ...(data?.discover || {}) },
+    discover: { ...defaults.discover, ...((data && data.discover) || {}) },
     cta: {
       ...defaults.cta,
-      ...(data?.cta || {}),
-      button: { ...defaults.cta.button, ...(data?.cta?.button || {}) },
+      ...((data && data.cta) || {}),
+      button: {
+        ...defaults.cta.button,
+        ...(((data && data.cta) && data.cta.button) || {}),
+      },
     },
-    treatments: Array.isArray(data?.treatments) ? data.treatments : [],
-    categories: Array.isArray(data?.categories) ? data.categories : [],
-    mainPanelImg: data?.mainPanelImg || '',
+    treatments: Array.isArray(data && data.treatments) ? data.treatments : [],
+    categories: Array.isArray(data && data.categories) ? data.categories : [],
+    mainPanelImg: (data && data.mainPanelImg) || '',
+    proTypeHero: mappedPro,
+    expectSection: mappedExpect,
+    banner: mappedBanner,
+    sortOrder:
+      Number.isFinite(data && data.sortOrder) ? data.sortOrder : defaults.sortOrder,
+    isActive:
+      typeof (data && data.isActive) === 'boolean'
+        ? data.isActive
+        : defaults.isActive,
   };
 }
 
-/** Load by id/name/slug, handling multiple API shapes & cache */
+/** Load by id/name/slug, handling multiple API shapes & cache (unchanged) */
 async function loadMenuByAnyKey(key) {
   const idOrName = key;
 
-  // 1) Try GET by id
   try {
     const r = await fetch(`/api/menus?id=${encodeURIComponent(idOrName)}`, { cache: 'no-store' });
     const j = await r.json();
@@ -573,7 +880,6 @@ async function loadMenuByAnyKey(key) {
     }
   } catch { }
 
-  // 2) Fallback: fetch all and find by _id, name, or slug
   try {
     const rAll = await fetch('/api/menus', { cache: 'no-store' });
     const jAll = await rAll.json();
@@ -588,7 +894,6 @@ async function loadMenuByAnyKey(key) {
   return null;
 }
 
-/** Convert result to array if it’s an object keyed by name */
 function toArray(result) {
   if (!result) return [];
   if (Array.isArray(result)) return result;
@@ -598,11 +903,9 @@ function toArray(result) {
   return [];
 }
 
-/** Pick a single menu out of {result} regardless of shape */
 function pickFromResult(result, wantedKey) {
   if (!result) return null;
 
-  // if already a single menu object
   if (
     typeof result === 'object' &&
     !Array.isArray(result) &&
@@ -611,7 +914,6 @@ function pickFromResult(result, wantedKey) {
     return result;
   }
 
-  // object keyed by name or id
   if (typeof result === 'object' && !Array.isArray(result)) {
     if (result[wantedKey]) {
       const m = result[wantedKey];
@@ -621,7 +923,6 @@ function pickFromResult(result, wantedKey) {
     if (byId) return byId;
   }
 
-  // array
   if (Array.isArray(result)) {
     return result.find((m) => m._id === wantedKey || m.name === wantedKey || m.slug === wantedKey) || null;
   }

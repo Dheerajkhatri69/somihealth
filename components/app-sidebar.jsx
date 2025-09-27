@@ -50,6 +50,7 @@ const sidebarItems = [
 const frontendItems = [
   { title: "Website Home", url: "/dashboard/websitehome", icon: Globe, allowedRoles: ["A"] },
   { title: "Products", url: "/dashboard/products", icon: ShoppingCart, allowedRoles: ["A"] },
+  { title: "GH Content", url: "/dashboard/gh-content", icon: ShoppingCart, allowedRoles: ["A"] },
   { title: "FAQ Component", url: "/dashboard/faq", icon: HelpCircle, allowedRoles: ["A"] },
   { title: "Footer", url: "/dashboard/footerUI", icon: Footprints, allowedRoles: ["A"] },
   { title: "Contact Forms/UI", url: "/dashboard/contactForms", icon: Contact, allowedRoles: ["A"] },

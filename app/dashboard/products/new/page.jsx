@@ -9,8 +9,57 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import UploadMediaLite from '@/components/UploadMediaLite';
-import * as LucideIcons from "lucide-react";
+import toast, { Toaster } from 'react-hot-toast';
 
+// ---------- helpers (single definitions) ----------
+function toMenuOptions(result) {
+  if (!result) return [];
+  if (Array.isArray(result)) return result.map(m => ({ value: (m.name || '').toLowerCase().replace(/\s+/g, '-'), label: m.name }));
+  return Object.keys(result).map(k => ({ value: k.toLowerCase().replace(/\s+/g, '-'), label: k }));
+}
+
+function slugify(s = '') {
+  return s
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+}
+
+const EMPTY = () => ({
+  category: '', slug: '', showInPlans: true, label: '', shortLabel: '', heroImage: '',
+  price: 0, unit: '', inStock: true, ratingLabel: '', trustpilot: '',
+  bullets: [], description: '',
+  ctas: {
+    primary: { label: 'Get Started', href: '/getstarted' },
+    secondary: { label: 'Learn More', href: '/learn-more' }
+  },
+  productDetails: {
+    title: '',
+    introTitle: '',
+    intro: '',
+    breakdownHeading: '',
+    ingredients: [],
+    benefitsHeading: '',
+    benefits: [],
+    expectationsHeading: '',
+    expectations: '',
+    footnote: '',
+    image: { src: '', alt: '' }
+  },
+  howItWorksSection: {
+    title: '',
+    steps: [],
+    cta: { text: '', href: '' },
+    image: { src: '', alt: '' }
+  },
+  isActive: true,
+  sortOrder: 0,
+});
+
+// ---------- component ----------
 export default function NewProductPage() {
   const router = useRouter();
   const [formData, setFormData] = useState(EMPTY());
@@ -24,6 +73,7 @@ export default function NewProductPage() {
         setMenus(toMenuOptions(m?.result));
       } catch (e) {
         console.error(e);
+        toast.error('Failed to load menus');
       }
     })();
   }, []);
@@ -31,11 +81,10 @@ export default function NewProductPage() {
   function handleInputChange(field, value) {
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
-      setFormData((prev) => ({ ...prev, [parent]: { ...prev[parent], [child]: value } }));
+      setFormData(prev => ({ ...prev, [parent]: { ...prev[parent], [child]: value } }));
     } else {
-      setFormData((prev) => {
+      setFormData(prev => {
         const next = { ...prev, [field]: value };
-        // Auto-fill slug from label when slug is empty
         if (field === 'label' && (!prev.slug || prev.slug.trim() === '')) {
           next.slug = slugify(value);
         }
@@ -43,21 +92,17 @@ export default function NewProductPage() {
       });
     }
   }
-  function handleBulletChange(index, field, value) {
-    const draft = [...(formData.bullets || [])];
-    draft[index] = { ...draft[index], [field]: value };
-    setFormData((p) => ({ ...p, bullets: draft }));
+
+  function handleImageUpload(_, url) {
+    setFormData(p => ({ ...p, heroImage: url }));
   }
-  function addBullet() {
-    setFormData((p) => ({ ...p, bullets: [...(p.bullets || []), { icon: '', text: '' }] }));
-  }
-  function removeBullet(i) {
-    setFormData((p) => ({ ...p, bullets: (p.bullets || []).filter((_, idx) => idx !== i) }));
-  }
-  function handleImageUpload(_, url) { setFormData((p) => ({ ...p, heroImage: url })); }
 
   async function save(e) {
     e?.preventDefault?.();
+    if (!formData.label || !formData.shortLabel || !formData.category || !formData.heroImage || !formData.unit) {
+      toast.error('Please fill all required fields');
+      return;
+    }
     setSaving(true);
     try {
       const payload = { ...formData, slug: slugify(formData.label) };
@@ -68,10 +113,11 @@ export default function NewProductPage() {
       });
       const j = await res.json();
       if (!j?.success) throw new Error(j?.message || 'Create failed');
+      toast.success('Product created');
       router.push('/dashboard/products');
     } catch (e) {
       console.error(e);
-      alert('Error creating product.');
+      toast.error(e.message || 'Error creating product');
     } finally {
       setSaving(false);
     }
@@ -79,6 +125,7 @@ export default function NewProductPage() {
 
   return (
     <div className="w-full mx-auto p-6">
+      <Toaster position="top-right" />
       <div className="mb-6 flex items-center justify-between">
         <Link href="/dashboard/products" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
           <ArrowLeft size={16} /> Back to list
@@ -91,7 +138,7 @@ export default function NewProductPage() {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Same field set as Edit page (kept concise) */}
+          {/* Category / Slug / Sort */}
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <Label className="text-sm font-medium">Category *</Label>
@@ -116,6 +163,7 @@ export default function NewProductPage() {
             </div>
           </div>
 
+          {/* Labels */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium">Product Label *</Label>
@@ -127,6 +175,7 @@ export default function NewProductPage() {
             </div>
           </div>
 
+          {/* Switches */}
           <div className="grid md:grid-cols-3 gap-4">
             <div className="flex items-center gap-2">
               <Switch id="show-in-plans" checked={!!formData.showInPlans} onCheckedChange={(v) => handleInputChange('showInPlans', v)} />
@@ -138,6 +187,7 @@ export default function NewProductPage() {
             </div>
           </div>
 
+          {/* Price / Unit / RatingLabel */}
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <Label className="text-sm font-medium">Price *</Label>
@@ -153,6 +203,7 @@ export default function NewProductPage() {
             </div>
           </div>
 
+          {/* Hero image */}
           <div>
             <Label className="text-sm font-medium">Hero Image *</Label>
             <div className="mt-1">
@@ -160,6 +211,7 @@ export default function NewProductPage() {
             </div>
           </div>
 
+          {/* Description */}
           <div>
             <Label className="text-sm font-medium">Description *</Label>
             <textarea value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 p-2" rows={4} required />
@@ -171,7 +223,7 @@ export default function NewProductPage() {
             <Input value={formData.trustpilot} onChange={(e) => handleInputChange('trustpilot', e.target.value)} className="mt-1" placeholder="https://trustpilot.com/reviews/..." />
           </div>
 
-          {/* CTAs Section */}
+          {/* CTAs */}
           <div className="border-t pt-6">
             <h3 className="text-base font-semibold text-gray-900 mb-4">Call to Action Buttons</h3>
             <div className="grid md:grid-cols-2 gap-6">
@@ -204,232 +256,240 @@ export default function NewProductPage() {
             </div>
           </div>
 
-          {/* How It Works Section */}
+          {/* Product Details */}
           <div className="border-t pt-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-4">How It Works</h3>
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Product Details Section</h3>
             <div className="space-y-4">
               <div>
-                <Label className="text-sm font-medium">Heading</Label>
-                <Input value={formData.howItWorks?.heading || ''} onChange={(e) => handleInputChange('howItWorks.heading', e.target.value)} className="mt-1" />
+                <Label className="text-sm font-medium">Title</Label>
+                <Input value={formData.productDetails?.title || ''} onChange={e => handleInputChange('productDetails.title', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Intro Title</Label>
+                <Input value={formData.productDetails?.introTitle || ''} onChange={e => handleInputChange('productDetails.introTitle', e.target.value)} className="mt-1" />
               </div>
               <div>
                 <Label className="text-sm font-medium">Introduction Text</Label>
-                <textarea value={formData.howItWorks?.intro || ''} onChange={(e) => handleInputChange('howItWorks.intro', e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 p-2" rows={3} />
+                <textarea value={formData.productDetails?.intro || ''} onChange={e => handleInputChange('productDetails.intro', e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 p-2" rows={3} />
               </div>
-            </div>
-          </div>
+              <div>
+                <Label className="text-sm font-medium">Breakdown Heading</Label>
+                <Input value={formData.productDetails?.breakdownHeading || ''} onChange={e => handleInputChange('productDetails.breakdownHeading', e.target.value)} className="mt-1" />
+              </div>
 
-          {/* Key Features */}
-          <div className="border-t pt-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Key Features</h3>
-              <button type="button" onClick={addBullet} className="rounded-md bg-secondary px-3 py-1.5 text-sm text-white hover:bg-secondary/90">
-                Add Feature
-              </button>
-            </div>
-            {(formData.bullets || []).map((b, i) => (
-              <div key={i} className="mb-3 rounded-lg border border-gray-200 p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <h4 className="font-medium">Feature {i + 1}</h4>
-                  <button type="button" onClick={() => removeBullet(i)} className="text-red-600 hover:text-red-800">
-                    <X size={18} />
-                  </button>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm">Icon</Label>
-                    <Select
-                      value={b.icon || ""}
-                      onValueChange={(value) => handleBulletChange(i, "icon", value)}
+              {/* Ingredients */}
+              <div>
+                <Label className="text-sm font-medium">Ingredients</Label>
+                {(formData.productDetails?.ingredients || []).map((ingredient, i) => (
+                  <div key={i} className="flex flex-col md:flex-row gap-2 mb-2">
+                    <Input
+                      value={ingredient.name || ''}
+                      onChange={e => {
+                        const newIngredients = [...(formData.productDetails.ingredients || [])];
+                        newIngredients[i] = { ...newIngredients[i], name: e.target.value };
+                        setFormData(prev => ({
+                          ...prev,
+                          productDetails: { ...prev.productDetails, ingredients: newIngredients }
+                        }));
+                      }}
+                      className="flex-1 mt-1"
+                      placeholder="Name (e.g., Methionine)"
+                    />
+                    <Input
+                      value={ingredient.desc || ''}
+                      onChange={e => {
+                        const newIngredients = [...(formData.productDetails.ingredients || [])];
+                        newIngredients[i] = { ...newIngredients[i], desc: e.target.value };
+                        setFormData(prev => ({
+                          ...prev,
+                          productDetails: { ...prev.productDetails, ingredients: newIngredients }
+                        }));
+                      }}
+                      className="flex-1 mt-1"
+                      placeholder="Description"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newIngredients = [...(formData.productDetails.ingredients || [])];
+                        newIngredients.splice(i, 1);
+                        setFormData(prev => ({
+                          ...prev,
+                          productDetails: { ...prev.productDetails, ingredients: newIngredients }
+                        }));
+                      }}
+                      className="text-red-600 hover:text-red-800"
                     >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue
-                          placeholder="Select an icon"
-                          // 👇 custom render for selected value
-                          renderValue={(selected) => {
-                            const option = ICON_OPTIONS.find((o) => o.value === selected);
-                            if (!option) return "Select an icon";
-                            const Icon = LucideIcons[option.value];
-                            return (
-                              <div className="flex items-center gap-2">
-                                {Icon && <Icon className="h-4 w-4" />}
-                                <span>{option.label}</span>
-                              </div>
-                            );
-                          }}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ICON_OPTIONS.map((option) => {
-                          const Icon = LucideIcons[option.value];
-                          return (
-                            <SelectItem key={option.value} value={option.value}>
-                              <div className="flex items-center gap-2">
-                                {Icon && <Icon className="h-4 w-4" />}
-                                <span>{option.label}</span>
-                              </div>
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
+                      <X size={16} />
+                    </button>
                   </div>
-                  <div>
-                    <Label className="text-sm">Text</Label>
-                    <Input value={b.text || ''} onChange={(e) => handleBulletChange(i, 'text', e.target.value)} className="mt-1" placeholder="e.g., Fast shipping" />
-                  </div>
-                </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      productDetails: {
+                        ...prev.productDetails,
+                        ingredients: [...(prev.productDetails.ingredients || []), { name: '', desc: '' }]
+                      }
+                    }));
+                  }}
+                  className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                >
+                  Add Ingredient
+                </button>
               </div>
-            ))}
+
+              {/* Benefits */}
+              <div>
+                <Label className="text-sm font-medium">Benefits</Label>
+                {(formData.productDetails?.benefits || []).map((benefit, i) => (
+                  <div key={i} className="flex items-center gap-2 mb-2">
+                    <Input
+                      value={benefit}
+                      onChange={e => {
+                        const newBenefits = [...(formData.productDetails.benefits || [])];
+                        newBenefits[i] = e.target.value;
+                        setFormData(prev => ({ ...prev, productDetails: { ...prev.productDetails, benefits: newBenefits } }));
+                      }}
+                      className="flex-1 mt-1"
+                      placeholder="e.g., Improves health, Boosts energy"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newBenefits = [...(formData.productDetails.benefits || [])];
+                        newBenefits.splice(i, 1);
+                        setFormData(prev => ({ ...prev, productDetails: { ...prev.productDetails, benefits: newBenefits } }));
+                      }}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      productDetails: {
+                        ...prev.productDetails,
+                        benefits: [...(prev.productDetails.benefits || []), '']
+                      }
+                    }));
+                  }}
+                  className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                >
+                  Add Benefit
+                </button>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Expectations Heading</Label>
+                <Input value={formData.productDetails?.expectationsHeading || ''} onChange={e => handleInputChange('productDetails.expectationsHeading', e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Expectations Text</Label>
+                <textarea value={formData.productDetails?.expectations || ''} onChange={e => handleInputChange('productDetails.expectations', e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 p-2" rows={3} />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Footnote</Label>
+                <Input value={formData.productDetails?.footnote || ''} onChange={e => handleInputChange('productDetails.footnote', e.target.value)} className="mt-1" />
+              </div>
+            </div>
           </div>
 
-          {/* Benefits Section */}
+          {/* How It Works */}
           <div className="border-t pt-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-4">Benefits</h3>
-
-            {/* Left Tiles */}
-            <div className="mb-6">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Left Tiles (Images Only)</h4>
-              <div className="space-y-4">
-                {formData.benefits?.leftTiles?.map((tile, i) => (
-                  <div key={i} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="font-medium">Tile {i + 1}</h5>
-                      <button type="button" onClick={() => {
-                        const newTiles = [...(formData.benefits?.leftTiles || [])];
-                        newTiles.splice(i, 1);
-                        setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                      }} className="text-red-600 hover:text-red-800">
-                        <X size={16} />
-                      </button>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm">Image Upload</Label>
-                        <div className="mt-1">
-                          <UploadMediaLite
-                            file={tile.src}
-                            onUploadComplete={(url) => {
-                              const newTiles = [...(formData.benefits?.leftTiles || [])];
-                              newTiles[i] = { ...newTiles[i], type: 'image', src: url };
-                              setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                            }}
-                            onDelete={() => {
-                              const newTiles = [...(formData.benefits?.leftTiles || [])];
-                              newTiles[i] = { ...newTiles[i], src: '' };
-                              setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <Label className="text-sm">Alt Text</Label>
-                        <Input value={tile.alt || ''} onChange={(e) => {
-                          const newTiles = [...(formData.benefits?.leftTiles || [])];
-                          newTiles[i] = { ...newTiles[i], alt: e.target.value };
-                          setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, leftTiles: newTiles } }));
-                        }} className="mt-1" placeholder="Describe the image for accessibility" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <button type="button" onClick={() => {
-                  setFormData(prev => ({ 
-                    ...prev, 
-                    benefits: { 
-                      ...prev.benefits, 
-                      leftTiles: [...(prev.benefits?.leftTiles || []), { type: 'image', src: '', alt: '' }] 
-                    } 
-                  }));
-                }} className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200">
-                  Add Left Tile
-                </button>
+            <h3 className="text-base font-semibold text-gray-900 mb-4">How It Works Section</h3>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Title</Label>
+                <Input value={formData.howItWorksSection?.title || ''} onChange={e => handleInputChange('howItWorksSection.title', e.target.value)} className="mt-1" />
               </div>
-            </div>
-
-            {/* Right Cards */}
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Right Cards</h4>
-              <div className="space-y-4">
-                {formData.benefits?.rightCards?.map((card, i) => (
-                  <div key={i} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="font-medium">Card {i + 1}</h5>
-                      <button type="button" onClick={() => {
-                        const newCards = [...(formData.benefits?.rightCards || [])];
-                        newCards.splice(i, 1);
-                        setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, rightCards: newCards } }));
-                      }} className="text-red-600 hover:text-red-800">
-                        <X size={16} />
-                      </button>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-sm">Icon</Label>
-                        <Select
-                          value={card.icon || ""}
-                          onValueChange={(value) => {
-                            const newCards = [...(formData.benefits?.rightCards || [])];
-                            newCards[i] = { ...newCards[i], icon: value };
-                            setFormData((prev) => ({
-                              ...prev,
-                              benefits: { ...prev.benefits, rightCards: newCards },
-                            }));
-                          }}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Select an icon" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {ICON_OPTIONS.map((option) => {
-                              const Icon = LucideIcons[option.value];
-                              return (
-                                <SelectItem key={option.value} value={option.value}>
-                                  <div className="flex items-center gap-2">
-                                    {Icon && <Icon className="h-4 w-4" />}
-                                    <span>{option.label}</span>
-                                  </div>
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-sm">Title</Label>
-                        <Input value={card.title || ''} onChange={(e) => {
-                          const newCards = [...(formData.benefits?.rightCards || [])];
-                          newCards[i] = { ...newCards[i], title: e.target.value };
-                          setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, rightCards: newCards } }));
-                        }} className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Body</Label>
-                        <Input value={card.body || ''} onChange={(e) => {
-                          const newCards = [...(formData.benefits?.rightCards || [])];
-                          newCards[i] = { ...newCards[i], body: e.target.value };
-                          setFormData(prev => ({ ...prev, benefits: { ...prev.benefits, rightCards: newCards } }));
-                        }} className="mt-1" />
-                      </div>
-                    </div>
+              <div>
+                <Label className="text-sm font-medium">Steps</Label>
+                {(formData.howItWorksSection?.steps || []).map((step, i) => (
+                  <div key={i} className="flex flex-col md:flex-row gap-2 mb-2">
+                    <Input
+                      type="number"
+                      min={1}
+                      value={step.number ?? i + 1}
+                      onChange={e => {
+                        const newSteps = [...(formData.howItWorksSection.steps || [])];
+                        newSteps[i] = { ...newSteps[i], number: Number(e.target.value) };
+                        setFormData(prev => ({
+                          ...prev,
+                          howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                        }));
+                      }}
+                      className="w-20 mt-1"
+                      placeholder="Step #"
+                    />
+                    <Input
+                      value={step.title || ''}
+                      onChange={e => {
+                        const newSteps = [...(formData.howItWorksSection.steps || [])];
+                        newSteps[i] = { ...newSteps[i], title: e.target.value };
+                        setFormData(prev => ({
+                          ...prev,
+                          howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                        }));
+                      }}
+                      className="flex-1 mt-1"
+                      placeholder="Step Title"
+                    />
+                    <Input
+                      value={step.description || ''}
+                      onChange={e => {
+                        const newSteps = [...(formData.howItWorksSection.steps || [])];
+                        newSteps[i] = { ...newSteps[i], description: e.target.value };
+                        setFormData(prev => ({
+                          ...prev,
+                          howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                        }));
+                      }}
+                      className="flex-1 mt-1"
+                      placeholder="Step Description"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newSteps = [...(formData.howItWorksSection.steps || [])];
+                        newSteps.splice(i, 1);
+                        setFormData(prev => ({
+                          ...prev,
+                          howItWorksSection: { ...prev.howItWorksSection, steps: newSteps }
+                        }));
+                      }}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
                 ))}
-                <button type="button" onClick={() => {
-                  setFormData(prev => ({
-                    ...prev,
-                    benefits: {
-                      ...prev.benefits,
-                      rightCards: [...(prev.benefits?.rightCards || []), { icon: '', title: '', body: '' }]
-                    }
-                  }));
-                }} className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200">
-                  Add Right Card
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      howItWorksSection: {
+                        ...prev.howItWorksSection,
+                        steps: [...(prev.howItWorksSection.steps || []), { number: (prev.howItWorksSection.steps?.length || 0) + 1, title: '', description: '' }]
+                      }
+                    }));
+                  }}
+                  className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                >
+                  Add Step
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Status Toggle */}
+          {/* Status */}
           <div className="border-t pt-6">
             <div className="flex items-center gap-2">
               <Switch id="is-active" checked={!!formData.isActive} onCheckedChange={(v) => handleInputChange('isActive', v)} />
@@ -454,61 +514,4 @@ export default function NewProductPage() {
       </form>
     </div>
   );
-}
-
-/* helpers */
-const EMPTY = () => ({
-  category: '', slug: '', showInPlans: true, label: '', shortLabel: '', heroImage: '',
-  price: 0, unit: '', inStock: true, ratingLabel: '', trustpilot: '',
-  bullets: [], description: '',
-  ctas: {
-    primary: { label: 'Get Started', href: '/getstarted' },
-    secondary: { label: 'Learn More', href: '/learn-more' }
-  },
-  howItWorks: { heading: '', intro: '' },
-  benefits: {
-    leftTiles: [],
-    rightCards: []
-  },
-  isActive: true,
-  sortOrder: 0,
-});
-
-// Icon options for selection
-const ICON_OPTIONS = [
-  { value: 'Check', label: 'Check' },
-  { value: 'Star', label: 'Star' },
-  { value: 'Heart', label: 'Heart' },
-  { value: 'Shield', label: 'Shield' },
-  { value: 'Zap', label: 'Zap' },
-  { value: 'Award', label: 'Award' },
-  { value: 'Clock', label: 'Clock' },
-  { value: 'Users', label: 'Users' },
-  { value: 'TrendingUp', label: 'Trending Up' },
-  { value: 'Target', label: 'Target' },
-  { value: 'Rocket', label: 'Rocket' },
-  { value: 'Lock', label: 'Lock' },
-  { value: 'Globe', label: 'Globe' },
-  { value: 'Gift', label: 'Gift' },
-  { value: 'DollarSign', label: 'Dollar Sign' },
-  { value: 'Calendar', label: 'Calendar' },
-  { value: 'Bell', label: 'Bell' },
-  { value: 'Bookmark', label: 'Bookmark' },
-  { value: 'Camera', label: 'Camera' },
-  { value: 'Code', label: 'Code' }
-];
-function toMenuOptions(result) {
-  if (!result) return [];
-  if (Array.isArray(result)) return result.map(m => ({ value: (m.name || '').toLowerCase().replace(/\s+/g, '-'), label: m.name }));
-  return Object.keys(result).map(k => ({ value: k.toLowerCase().replace(/\s+/g, '-'), label: k }));
-}
-
-function slugify(s = '') {
-  return s
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-+/g, '-');
 }

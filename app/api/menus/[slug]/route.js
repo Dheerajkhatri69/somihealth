@@ -36,16 +36,24 @@ export async function GET(request, { params }) {
       }, { status: 404 });
     }
 
-    // Transform data to match the expected format
+    // Transform data to match the expected format and include product-type content
     const result = {
-      key: menu.name,
+      key: menu.slug,
       menu: {
+        _id: menu._id,
+        name: menu.name,
+        slug: menu.slug,
         showInNavbar: menu.showInNavbar,
         discover: menu.discover,
         treatments: menu.treatments || [],
         categories: menu.categories || [],
         cta: menu.cta,
-        type: menu.type
+        mainPanelImg: menu.mainPanelImg,
+        type: menu.type,
+        proTypeHero: menu.proTypeHero || { eyebrow: '', headingLine1: '', lines: [], body: '', ctaText: '', heroImage: '', heroAlt: '', disclaimer: '' },
+        expectSection: menu.expectSection || { title: '', image: { src: '', alt: '', ratio: '' }, items: [] },
+        banner: menu.banner || { image: { src: '', alt: '' }, headline: { line1: '', line2: '' }, cta: { text: '', href: '' }, footnote: '' },
+        sortOrder: menu.sortOrder,
       }
     };
 

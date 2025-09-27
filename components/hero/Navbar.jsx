@@ -63,6 +63,17 @@ function MegaPanel({ menuKey, onNavigate }) {
                         {/* Direct Primary Care */}
 
                         <div className="md:col-span-3">
+                            <Link
+                                href={`/underdevelopmentmainpage/${data.slug}`}
+                                onClick={onNavigate}
+                                className="fx86 inline-flex font-SofiaSans w-full items-center mb-4 justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                            >
+                                {data.name}
+                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                    <ArrowRight />
+                                </span>
+                            </Link>
                             <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Direct Primary Care</div>
                             <ul className="mt-4 space-y-2">
                                 {data.categories[0]?.items.map((item) => (
@@ -189,35 +200,36 @@ function MegaPanel({ menuKey, onNavigate }) {
                                     <ArrowRight />
                                 </span>
                             </Link>
-                            <Link
-                                href={"/underdevelopmentmainpage/healthcoach"}
-                                onClick={onNavigate}
-                                className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                            >
-                                Health Coach
-                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                                    <ArrowRight />
-                                </span>
-                            </Link>
                             {
                                 data.discover.label === "Weight Loss" && (
                                     <>
-                                        <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
                                         <Link
-                                            href={"/refills"}
+                                            href={"/underdevelopmentmainpage/healthcoach"}
                                             onClick={onNavigate}
                                             className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
                                             style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                                         >
-                                            Refills
+                                            Health Coach
                                             <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
                                                 <ArrowRight />
                                             </span>
                                         </Link>
+                                        <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
                                     </>
                                 )
                             }
+                            <Link
+                                href={"/refills"}
+                                onClick={onNavigate}
+                                className="fx86 inline-flex mt-4 min-w-[200px] font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                            >
+                                Refills
+                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                    <ArrowRight />
+                                </span>
+                            </Link>
+
                         </div>
 
                         {/* Treatments */}
@@ -227,8 +239,8 @@ function MegaPanel({ menuKey, onNavigate }) {
                                 {data.treatments.map((t) => (
                                     <li key={t.label}>
                                         <Link href={t.href} onClick={onNavigate} className="group flex items-center gap-4 rounded-xl p-2 border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary">
-                                            <div className="flex h-10 w-10 items-center justify-center">
-                                                <img src={t.img} alt="" className="h-10 w-10 object-contain" />
+                                            <div className="flex h-12 w-12 items-center justify-center">
+                                                <img src={t.img} alt="" className="h-12 w-12 object-contain" />
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <span className="text-lg font-SofiaSans font-medium text-gray-900">{t.label}</span>
@@ -347,6 +359,17 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
             ) : menuData?.type === "categorized" ? (
                 <>
                     {/* Direct Primary Care */}
+                    <Link
+                        href={`/underdevelopmentmainpage/${menuData.slug}`}
+                        onClick={onNavigate}
+                        className="fx86 inline-flex font-SofiaSans w-full items-center mb-4 justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                    >
+                        {menuData.name}
+                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                            <ArrowRight />
+                        </span>
+                    </Link>
                     <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Direct Primary Care</div>
                     <ul className="space-y-3 mb-8">
                         {menuData.categories[0]?.items.map((item) => (

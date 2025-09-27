@@ -35,7 +35,11 @@ export async function GET(request) {
       return NextResponse.json({ 
         result: {
           title: 'What are Compounded GLP-1 Medications?',
-          description: 'Compounded GLP-1 medications are personalized versions of treatments like Semaglutide or Tirzepatide. They\'re made by licensed compounding pharmacies based on a prescription from a qualified healthcare provider. They contain the same active ingredient as the branded medications, but are compounded to offer a more personalized and often more accessible option.',
+          tabs: [
+            { icon: 'Beaker', subtitle: 'Personalized Medication', description: 'Compounded GLP-1 medications are tailored versions of Semaglutide or Tirzepatide prepared by licensed pharmacies.' },
+            { icon: 'ShieldCheck', subtitle: 'Provider-Prescribed', description: 'Dispensed based on prescriptions from qualified healthcare providers for safety and efficacy.' },
+            { icon: 'BadgeDollarSign', subtitle: 'Accessible Options', description: 'Offer a more personalized and often more accessible alternative to branded medications.' }
+          ],
           image: '/hero/bmilady.png',
           isActive: true
         }, 
@@ -65,10 +69,10 @@ export async function POST(request) {
     const body = await request.json();
     
     // Validate required fields
-    if (!body.title || !body.description || !body.image) {
+    if (!body.title || !Array.isArray(body.tabs) || !body.image) {
       return NextResponse.json({ 
         success: false, 
-        message: 'Title, description, and image are required' 
+        message: 'Title, tabs array, and image are required' 
       }, { status: 400 });
     }
 

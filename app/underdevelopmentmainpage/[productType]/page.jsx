@@ -13,6 +13,9 @@ import FaqPro from "@/components/hero/Faq";
 import SomiFooter from "@/components/hero/SomiFooter";
 import Navbar from "@/components/hero/Navbar";
 import { LoadingPage, PageLoadingSkeleton } from "@/components/LoadingSkeleton";
+import ProTypeHero from "@/components/hero/proTypeHero";
+import ExpectSection from "@/components/hero/ExpectSection";
+import Banner from "@/components/hero/banner";
 
 export default function ProductTypePage({ params }) {
     const { productType } = params;
@@ -43,9 +46,17 @@ export default function ProductTypePage({ params }) {
                     '--wm-rotate': '90deg',                       // rotate; use '0deg' for horizontal
                 }}
             >
-                <div className="mx-auto max-w-6xl py-12 font-SofiaSans md:py-16">
-                    <SectionHeader title={title} />
-
+                <div className="mx-auto max-w-6xl font-SofiaSans ">
+                    <ProTypeHero content={{
+                        eyebrow: menu?.proTypeHero?.eyebrow || '',
+                        headingLine1: menu?.proTypeHero?.headingLine1 || '',
+                        lines: Array.isArray(menu?.proTypeHero?.lines) ? menu.proTypeHero.lines : [],
+                        body: menu?.proTypeHero?.body || '',
+                        ctaText: menu?.proTypeHero?.ctaText || 'Get started',
+                        heroImage: menu?.proTypeHero?.heroImage || '',
+                        heroAlt: menu?.proTypeHero?.heroAlt || 'Hero image',
+                        disclaimer: menu?.proTypeHero?.disclaimer || '',
+                    }} />
                     {menu?.type === "categorized" ? (
                         <div className="mt-10 space-y-12 md:mt-14">
                             {menu.categories?.map((category, index) => (
@@ -53,9 +64,9 @@ export default function ProductTypePage({ params }) {
                                     <h2 className="text-2xl font-bold text-darkprimary mb-6">{category.title}</h2>
                                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                                         {category.items?.map((item) => (
-                                            <ProductCard 
-                                                key={item.href} 
-                                                item={item} 
+                                            <ProductCard
+                                                key={item.href}
+                                                item={item}
                                                 ctaHref={menu.cta?.button?.href || "#"}
                                                 isLink={item.isLink}
                                             />
@@ -71,6 +82,17 @@ export default function ProductTypePage({ params }) {
                             ))}
                         </div>
                     )}
+                    <ExpectSection content={{
+                        title: menu?.expectSection?.title || '',
+                        image: menu?.expectSection?.image,
+                        items: (menu?.expectSection?.items || []).map(it => ({ heading: it.heading || it.title, description: it.description })),
+                    }} />
+                    <Banner content={{
+                        image: { src: menu?.banner?.image?.src || '', alt: menu?.banner?.image?.alt || '' },
+                        headline: { line1: menu?.banner?.headline?.line1 || '', line2: menu?.banner?.headline?.line2 || '' },
+                        cta: { text: menu?.banner?.cta?.text || 'Get started', href: menu?.banner?.cta?.href || '#' },
+                        footnote: menu?.banner?.footnote || ''
+                    }} />
                 </div>
             </main>
             <ClientVideoReviews />
