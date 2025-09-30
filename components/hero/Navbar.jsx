@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRightIcon, Sparkles, User } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
@@ -328,7 +328,11 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                         onClick={() => setStage(k)}
                         className="flex w-full font-SofiaSans items-center justify-between rounded-lg px-2 py-5 text-left text-xl font-semibold"
                     >
-                        <span>{menu.name}</span>
+                        <span>
+                            {
+                                menu.name === "Skin Hair" ? "Skin+Hair" : menu.name
+                            }
+                        </span>
                         <ArrowRight />
                     </button>
                 ))
@@ -686,7 +690,9 @@ export default function Navbar({ brand = "somi" }) {
                     ${isOpen ? "text-darkprimary" : "text-gray-900 hover:bg-gray-100"}`}
                                     aria-expanded={isOpen}
                                 >
-                                    {menu.name}
+                                    {
+                                        menu.name === "Skin Hair" ? "Skin+Hair" : menu.name
+                                    }
                                     <Chevron open={isOpen} />
                                 </button>
                             );

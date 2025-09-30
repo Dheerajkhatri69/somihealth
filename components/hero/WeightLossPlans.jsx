@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
@@ -61,6 +61,25 @@ export default function WeightLossPlans() {
     []
   );
 
+  const [ph, setPh] = useState({ title: '', subtitle: '' });
+  const [phLoading, setPhLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const r = await fetch('/api/planheader', { cache: 'no-store' });
+        const j = await r.json();
+        if (mounted && j?.success) setPh({ title: j.result?.title, subtitle: j.result?.subtitle });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (mounted) setPhLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
   if (error) {
     return (
       <section className="w-full py-10 sm:py-12">
@@ -103,10 +122,24 @@ export default function WeightLossPlans() {
     <LoadingPage isLoading={isLoading} fallback={<WeightLossPlansSkeleton />}>
       <section className="w-full mt-20">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <h2 className="text-center font-SofiaSans text-2xl font-bold sm:text-3xl">Wellness Plan designed by clinicians to optimize your health.</h2>
-          <div className="flex justify-center">
-            <p className="text-gray-600 mb-4 text-center max-w-2xl">Your journey deserves more than one-size-fits-all. Find the tailored medication plan built to support your goals.</p>
-          </div>
+          {phLoading ? (
+            <div className="animate-pulse text-center">
+              <div className="mx-auto h-6 w-3/4 max-w-xl rounded bg-slate-200" />
+              <div className="mx-auto mt-3 h-4 w-5/6 max-w-2xl rounded bg-slate-200" />
+            </div>
+          ) : (
+            <>
+              <h2 className="text-center font-SofiaSans text-2xl font-bold sm:text-3xl">
+                {ph.title || 'Wellness Plan designed by clinicians to optimize your health.'}
+              </h2>
+              <div className="flex justify-center">
+                <p className="text-gray-600 mb-4 text-center max-w-2xl">
+                  {ph.subtitle || 'Your journey deserves more than one-size-fits-all. Find the tailored medication plan built to support your goals.'}
+                </p>
+              </div>
+            </>
+          )}
+
           {plans.length >= 3 ? (
             <div>
               <Carousel
