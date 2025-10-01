@@ -2,7 +2,6 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, Info } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import ContactInfoTooltip from '@/components/ContactInfoTooltip';
 
@@ -256,7 +255,6 @@ const Page = ({ params }) => {
         </div>
         {/* Summary Card */}
         <div
-          ref={summaryRef}
           className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col justify-between min-w-[280px] max-w-md mx-auto"
         >
           <h3 className="text-secondary text-lg font-bold mb-4">Order Summary</h3>
@@ -392,6 +390,8 @@ const Page = ({ params }) => {
           </button>
 
         </div>
+        <div
+          ref={summaryRef}></div>
       </div>
     </div>
   );
