@@ -8,134 +8,158 @@ import ContactInfoTooltip from '@/components/ContactInfoTooltip';
 
 const PRODUCTS = {
   semaglutide: {
-    name: 'Semaglutide',
-    image: '/pricing/semaglutide.png',
+    name: "Semaglutide",
+    image: "/pricing/semaglutide.png",
     options: [
       {
-        label: '8 Weeks (0.25mg and 0.5mg/week)',
-        price: '$279',//done
-        link: 'https://buy.stripe.com/dRmeVee5w32gaXW4Uw3ks03',
+        label: "8 Weeks (0.25mg and 0.5mg/week)",
+        price: "$279",
+        link: "https://buy.stripe.com/dRmeVee5w32gaXW4Uw3ks03",
+        paypal: "https://www.paypal.com/ncp/payment/4YFSKRYYADRSN",
       },
       {
-        label: '12 Weeks (0.25mg, 0.5mg, 1mg/week)',
-        price: '$329',//done
-        link: 'https://buy.stripe.com/dRm6oI2mO8mAc203Qs3ks05',
+        label: "12 Weeks (0.25mg, 0.5mg, 1mg/week)",
+        price: "$329",
+        link: "https://buy.stripe.com/dRm6oI2mO8mAc203Qs3ks05",
+        paypal: "https://www.paypal.com/ncp/payment/36YF4BSN7HLKQ",
       },
       {
-        label: '4 Weeks (0.5mg/week)',
-        price: '$190',//done
-        link: 'https://buy.stripe.com/fZu7sM1iK46k5DCbiU3ks0k',
+        label: "4 Weeks (0.5mg/week)",
+        price: "$190",
+        link: "https://buy.stripe.com/fZu7sM1iK46k5DCbiU3ks0k",
+        paypal: "https://www.paypal.com/ncp/payment/EQ5MKPVKRVVFN",
       },
       {
-        label: '8 Weeks (0.5mg/week)',
-        price: '$249',//done
-        link: 'https://buy.stripe.com/8x27sM5z046k6HG86I3ks0l',
+        label: "8 Weeks (0.5mg/week)",
+        price: "$249",
+        link: "https://buy.stripe.com/8x27sM5z046k6HG86I3ks0l",
+        paypal: "https://www.paypal.com/ncp/payment/YTTF4ETKSFVKU",
       },
       {
-        label: '13 Weeks (0.5mg/week)',
-        price: '$329',//done
-        link: 'https://buy.stripe.com/14AaEY3qS8mAc20aeQ3ks0L',
+        label: "13 Weeks (0.5mg/week)",
+        price: "$329",
+        link: "https://buy.stripe.com/14AaEY3qS8mAc20aeQ3ks0L",
+        paypal: "https://www.paypal.com/ncp/payment/EBN4U5BB2JEC2",
       },
       {
-        label: '4 Weeks (1mg/week)',
-        price: '$249',//done
-        link: 'https://buy.stripe.com/aFafZi5z00U8fec1Ik3ks06',
+        label: "4 Weeks (1mg/week)",
+        price: "$249",
+        link: "https://buy.stripe.com/aFafZi5z00U8fec1Ik3ks06",
+        paypal: "https://www.paypal.com/ncp/payment/Z6QL685V59FXE",
       },
       {
-        label: '10 Weeks (1mg/week)',
-        price: '$369',//done
-        link: 'https://buy.stripe.com/aFaeVe1iK5ao3vu72E3ks0S',
+        label: "10 Weeks (1mg/week)",
+        price: "$369",
+        link: "https://buy.stripe.com/aFaeVe1iK5ao3vu72E3ks0S",
+        paypal: "https://www.paypal.com/ncp/payment/65DK4XAADRKPU",
       },
       {
-        label: '4 Weeks (1.7mg/Week)',
-        price: '$329',//done
-        link: 'https://buy.stripe.com/14AeVe8LcauI5DC3Qs3ks0M',
+        label: "4 Weeks (1.7mg/week)",
+        price: "$329",
+        link: "https://buy.stripe.com/14AeVe8LcauI5DC3Qs3ks0M",
+        paypal: "https://www.paypal.com/ncp/payment/FQGQDF7CFF9RS",
       },
       {
-        label: '12 Weeks (1.7mg/week)',
-        price: '$474',//done
-        link: 'https://buy.stripe.com/6oUfZif9A8mA8POdr23ks0N',
+        label: "12 Weeks (1.7mg/week)",
+        price: "$474",
+        link: "https://buy.stripe.com/6oUfZif9A8mA8POdr23ks0N",
+        paypal: "https://www.paypal.com/ncp/payment/W5CF6BHE5A4YY",
       },
       {
-        label: '5 Weeks (2mg/Week)',
-        price: '$329',//done
-        link: 'https://buy.stripe.com/8x214o0eGcCQd64gDe3ks0O',
+        label: "5 Weeks (2mg/week)",
+        price: "$329",
+        link: "https://buy.stripe.com/8x214o0eGcCQd64gDe3ks0O",
+        paypal: "https://www.paypal.com/ncp/payment/W7TSXKYMUX7R6",
       },
       {
-        label: '10 Weeks (2mg/week)',
-        price: '$474',//done
-        link: 'https://buy.stripe.com/9B6aEY9Pg0U83vuaeQ3ks0Q',
+        label: "10 Weeks (2mg/week)",
+        price: "$474",
+        link: "https://buy.stripe.com/9B6aEY9Pg0U83vuaeQ3ks0Q",
+        paypal: "https://www.paypal.com/ncp/payment/G7JV8ZC9NPQMG",
       },
       {
-        label: '4 Weeks (2.5mg/week)',
-        price: '$329',//done
-        link: 'https://buy.stripe.com/cNi00k3qSgT60jibiU3ks0P',
+        label: "4 Weeks (2.5mg/week)",
+        price: "$329",
+        link: "https://buy.stripe.com/cNi00k3qSgT60jibiU3ks0P",
+        paypal: "https://www.paypal.com/ncp/payment/FN4U9PLWJD4DL",
       },
       {
-        label: '8 Weeks (2.5mg/week)',
-        price: '$474',//done
-        link: 'https://buy.stripe.com/14A8wQ8Lc46kd6472E3ks0R',
+        label: "8 Weeks (2.5mg/week)",
+        price: "$474",
+        link: "https://buy.stripe.com/14A8wQ8Lc46kd6472E3ks0R",
+        paypal: "https://www.paypal.com/ncp/payment/QQ4QRPLQNDLU6",
       },
     ],
   },
   tirzepatide: {
-    name: 'Tirzepatide',
-    image: '/pricing/tirzepatide.png',
+    name: "Tirzepatide",
+    image: "/pricing/tirzepatide.png",
     options: [
       {
-        label: '8 Weeks (2.5mg and 5mg/week)',
-        price: '$379',//done
-        link: 'https://buy.stripe.com/eVqfZi5z08mA5DCev63ks0F',
+        label: "8 Weeks (2.5mg and 5mg/week)",
+        price: "$379",
+        link: "https://buy.stripe.com/eVqfZi5z08mA5DCev63ks0F",
+        paypal: "https://www.paypal.com/ncp/payment/J86MHH45U7GWN",
       },
       {
-        label: '12 Weeks (2.5mg, 5mg, 7.5mg/week)',
-        price: '$559',//done
-        link: 'https://buy.stripe.com/00w9AU1iK0U88PO3Qs3ks0g',
+        label: "12 Weeks (2.5mg, 5mg, 7.5mg/week)",
+        price: "$559",
+        link: "https://buy.stripe.com/00w9AU1iK0U88PO3Qs3ks0g",
+        paypal: "https://www.paypal.com/ncp/payment/MLFXB77UD2N98",
       },
       {
-        label: '4 Weeks (5mg/Week)',
-        price: '$299',//done
-        link: 'https://buy.stripe.com/fZu5kE4uW0U8c20dr23ks0h',
+        label: "4 Weeks (5mg/Week)",
+        price: "$299",
+        link: "https://buy.stripe.com/fZu5kE4uW0U8c20dr23ks0h",
+        paypal: "https://www.paypal.com/ncp/payment/TX5V8TB4GGGPY",
       },
       {
-        label: '8 Weeks (5mg/Week)',
-        price: '$399',//done
-        link: 'https://buy.stripe.com/3cI7sM7H846kaXWbiU3ks0i',
+        label: "8 Weeks (5mg/Week)",
+        price: "$399",
+        link: "https://buy.stripe.com/3cI7sM7H846kaXWbiU3ks0i",
+        paypal: "https://www.paypal.com/ncp/payment/5M4A2QMHVFLBL",
       },
       {
-        label: '12 Weeks (5mg/Week)',
-        price: '$559',//done
-        link: 'https://buy.stripe.com/5kQbJ28LccCQgigbiU3ks0G',
+        label: "12 Weeks (5mg/Week)",
+        price: "$559",
+        link: "https://buy.stripe.com/5kQbJ28LccCQgigbiU3ks0G",
+        paypal: "https://www.paypal.com/ncp/payment/R59N9NQCLVFJ2",
       },
       {
-        label: '4 Weeks (7.5mg/Week)',
-        price: '$359',//done
-        link: 'https://buy.stripe.com/eVqdRa6D4byM0jiev63ks0t',
+        label: "4 Weeks (7.5mg/Week)",
+        price: "$359",
+        link: "https://buy.stripe.com/eVqdRa6D4byM0jiev63ks0t",
+        paypal: "https://www.paypal.com/ncp/payment/CJ28K2HK89W7W",
       },
       {
-        label: '8 Weeks (7.5mg/Week)',
-        price: '$559',//done
-        link: 'https://buy.stripe.com/aFafZi3qSeKY8PO86I3ks0H',
+        label: "8 Weeks (7.5mg/Week)",
+        price: "$559",
+        link: "https://buy.stripe.com/aFafZi3qSeKY8PO86I3ks0H",
+        paypal: "https://www.paypal.com/ncp/payment/CC7Z99ELVR36E",
       },
       {
-        label: '4 Weeks (10mg/week)',
-        price: '$399',//done
-        link: 'https://buy.stripe.com/9B63cw3qS5aoea85YA3ks0o',
+        label: "4 Weeks (10mg/week)",
+        price: "$399",
+        link: "https://buy.stripe.com/9B63cw3qS5aoea85YA3ks0o",
+        paypal: "https://www.paypal.com/ncp/payment/5WHNYV3HZHBXQ",
       },
       {
-        label: '6 Weeks (10mg/week)',
-        price: '$559',//done
-        link: 'https://buy.stripe.com/14AaEY8LcdGUd64biU3ks0K',
+        label: "6 Weeks (10mg/week)",
+        price: "$559",
+        link: "https://buy.stripe.com/14AaEY8LcdGUd64biU3ks0K",
+        paypal: "https://www.paypal.com/ncp/payment/VETCFCSGZVKVW",
       },
       {
-        label: '4 Weeks (12.5mg/week)',
-        price: '$469',//done
-        link: 'https://buy.stripe.com/bJe28s7H87iw7LK0Eg3ks0I',
+        label: "4 Weeks (12.5mg/week)",
+        price: "$469",
+        link: "https://buy.stripe.com/bJe28s7H87iw7LK0Eg3ks0I",
+        paypal: "https://www.paypal.com/ncp/payment/GNTYTUZWJT6V4",
       },
       {
-        label: '4 Weeks (15mg/Week)',
-        price: '$559',
-        link: 'https://buy.stripe.com/5kQ00k4uWdGU3vu9aM3ks0J',
+        label: "4 Weeks (15mg/Week)",
+        price: "$559",
+        link: "https://buy.stripe.com/5kQ00k4uWdGU3vu9aM3ks0J",
+        paypal: "https://www.paypal.com/ncp/payment/QP4WRLAPSF3GJ",
       },
     ],
   },
@@ -148,6 +172,7 @@ const INITIAL_SUMMARY = {
   quantity: 1,
   label: '',
   link: '',
+  paypal: '',
 };
 
 const Page = ({ params }) => {
@@ -171,6 +196,7 @@ const Page = ({ params }) => {
       quantity: 1,
       label: selected.label,
       link: selected.link,
+      paypal: selected.paypal,
     }
     : INITIAL_SUMMARY;
 
@@ -188,7 +214,11 @@ const Page = ({ params }) => {
       window.open(summary.link, '_blank');
     }
   };
-
+  const handlePayPalCheckout = () => {
+    if (summary.paypal) {
+      window.open(summary.paypal, '_blank');
+    }
+  };
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
       <Link href="/pricing" >
@@ -329,19 +359,38 @@ const Page = ({ params }) => {
           >
             Checkout {summary.totle ? summary.totle : ''}
           </button>
-          {/* <div className='flex items-center justify-center gap-4 mt-2 text-sm text-gray-600'>
-            <hr className="w-full" /> or <hr className='w-full' />
-          </div> */}
+
           <div className='text-sm text-gray-600 mt-6 p-2'>
             <strong>Note:</strong> Once payment has been made, please proceed with the 5-7 mins Intake Questionnaire.
             Get Approval within 24 hours
           </div>
-          {/* <Link href="/getstarted" >
-            <button
-              className="w-full mt-4 rounded-3xl py-4 font-bold text-base shadow transition bg-green-400 hover:bg-green-300 text-white cursor-pointer">
-              Begin Questionnaire
-            </button>
-          </Link> */}
+          <div className='flex items-center justify-center gap-4 mt-2 text-sm text-gray-600'>
+            <hr className="w-full" /> or <hr className='w-full' />
+          </div>
+          <div className="flex justify-between text-gray-700 font-medium">
+            <span>Total Amount for PayPal</span>
+            <span className="font-bold text-secondary">{summary.totle || '--'}</span>
+          </div>
+          <button
+            className={`w-full mt-6 rounded-3xl py-2 font-bold text-base shadow transition border-[#0031e3] border-2
+    ${summary.paypal
+                ? 'bg-white text-[#0031e3] cursor-pointer'
+                : 'bg-gray-300 text-gray-400 cursor-not-allowed'
+              }`}
+            onClick={handlePayPalCheckout}
+            disabled={!summary.paypal}
+          >
+            <div className="flex items-center justify-center gap-3">
+              <img
+                src="/pricing/8.png"
+                alt="PayPal"
+                className="h-6 md:h-8 object-contain"
+                loading="lazy"
+              />
+              <span>Pay via PayPal</span>
+            </div>
+          </button>
+
         </div>
       </div>
     </div>
