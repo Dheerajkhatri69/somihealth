@@ -12,11 +12,6 @@ const PRODUCTS = {
     image: '/pricing/semaglutide.png',
     options: [
       {
-        label: '4 weeks (0.25mg/week)',
-        price: '$99',//done
-        link: 'https://buy.stripe.com/aFa00kgdE46kd640Eg3ks02',
-      },
-      {
         label: '8 Weeks (0.25mg and 0.5mg/week)',
         price: '$279',//done
         link: 'https://buy.stripe.com/dRmeVee5w32gaXW4Uw3ks03',
@@ -87,11 +82,6 @@ const PRODUCTS = {
     name: 'Tirzepatide',
     image: '/pricing/tirzepatide.png',
     options: [
-      {
-        label: '4 weeks (2.5mg/week)',
-        price: '$145',//done
-        link: 'https://buy.stripe.com/9B67sM0eG5ao5DCfza3ks0e',
-      },
       {
         label: '8 Weeks (2.5mg and 5mg/week)',
         price: '$379',//done
