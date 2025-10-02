@@ -1,167 +1,14 @@
 'use client'
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, Info } from 'lucide-react';
 import Link from 'next/link';
 import ContactInfoTooltip from '@/components/ContactInfoTooltip';
 
-const PRODUCTS = {
-  semaglutide: {
-    name: "Semaglutide",
-    image: "/pricing/semaglutide.png",
-    options: [
-      {
-        label: "8 Weeks (0.25mg and 0.5mg/week)",
-        price: "$279",
-        link: "https://buy.stripe.com/dRmeVee5w32gaXW4Uw3ks03",
-        paypal: "https://www.paypal.com/ncp/payment/4YFSKRYYADRSN",
-      },
-      {
-        label: "12 Weeks (0.25mg, 0.5mg, 1mg/week)",
-        price: "$329",
-        link: "https://buy.stripe.com/dRm6oI2mO8mAc203Qs3ks05",
-        paypal: "https://www.paypal.com/ncp/payment/36YF4BSN7HLKQ",
-      },
-      {
-        label: "4 Weeks (0.5mg/week)",
-        price: "$190",
-        link: "https://buy.stripe.com/fZu7sM1iK46k5DCbiU3ks0k",
-        paypal: "https://www.paypal.com/ncp/payment/EQ5MKPVKRVVFN",
-      },
-      {
-        label: "8 Weeks (0.5mg/week)",
-        price: "$249",
-        link: "https://buy.stripe.com/8x27sM5z046k6HG86I3ks0l",
-        paypal: "https://www.paypal.com/ncp/payment/YTTF4ETKSFVKU",
-      },
-      {
-        label: "13 Weeks (0.5mg/week)",
-        price: "$329",
-        link: "https://buy.stripe.com/14AaEY3qS8mAc20aeQ3ks0L",
-        paypal: "https://www.paypal.com/ncp/payment/EBN4U5BB2JEC2",
-      },
-      {
-        label: "4 Weeks (1mg/week)",
-        price: "$249",
-        link: "https://buy.stripe.com/aFafZi5z00U8fec1Ik3ks06",
-        paypal: "https://www.paypal.com/ncp/payment/Z6QL685V59FXE",
-      },
-      {
-        label: "10 Weeks (1mg/week)",
-        price: "$369",
-        link: "https://buy.stripe.com/aFaeVe1iK5ao3vu72E3ks0S",
-        paypal: "https://www.paypal.com/ncp/payment/65DK4XAADRKPU",
-      },
-      {
-        label: "4 Weeks (1.7mg/week)",
-        price: "$329",
-        link: "https://buy.stripe.com/14AeVe8LcauI5DC3Qs3ks0M",
-        paypal: "https://www.paypal.com/ncp/payment/FQGQDF7CFF9RS",
-      },
-      {
-        label: "12 Weeks (1.7mg/week)",
-        price: "$474",
-        link: "https://buy.stripe.com/6oUfZif9A8mA8POdr23ks0N",
-        paypal: "https://www.paypal.com/ncp/payment/W5CF6BHE5A4YY",
-      },
-      {
-        label: "5 Weeks (2mg/week)",
-        price: "$329",
-        link: "https://buy.stripe.com/8x214o0eGcCQd64gDe3ks0O",
-        paypal: "https://www.paypal.com/ncp/payment/W7TSXKYMUX7R6",
-      },
-      {
-        label: "10 Weeks (2mg/week)",
-        price: "$474",
-        link: "https://buy.stripe.com/9B6aEY9Pg0U83vuaeQ3ks0Q",
-        paypal: "https://www.paypal.com/ncp/payment/G7JV8ZC9NPQMG",
-      },
-      {
-        label: "4 Weeks (2.5mg/week)",
-        price: "$329",
-        link: "https://buy.stripe.com/cNi00k3qSgT60jibiU3ks0P",
-        paypal: "https://www.paypal.com/ncp/payment/FN4U9PLWJD4DL",
-      },
-      {
-        label: "8 Weeks (2.5mg/week)",
-        price: "$474",
-        link: "https://buy.stripe.com/14A8wQ8Lc46kd6472E3ks0R",
-        paypal: "https://www.paypal.com/ncp/payment/QQ4QRPLQNDLU6",
-      },
-    ],
-  },
-  tirzepatide: {
-    name: "Tirzepatide",
-    image: "/pricing/tirzepatide.png",
-    options: [
-      {
-        label: "8 Weeks (2.5mg and 5mg/week)",
-        price: "$379",
-        link: "https://buy.stripe.com/eVqfZi5z08mA5DCev63ks0F",
-        paypal: "https://www.paypal.com/ncp/payment/J86MHH45U7GWN",
-      },
-      {
-        label: "12 Weeks (2.5mg, 5mg, 7.5mg/week)",
-        price: "$559",
-        link: "https://buy.stripe.com/00w9AU1iK0U88PO3Qs3ks0g",
-        paypal: "https://www.paypal.com/ncp/payment/MLFXB77UD2N98",
-      },
-      {
-        label: "4 Weeks (5mg/Week)",
-        price: "$299",
-        link: "https://buy.stripe.com/fZu5kE4uW0U8c20dr23ks0h",
-        paypal: "https://www.paypal.com/ncp/payment/TX5V8TB4GGGPY",
-      },
-      {
-        label: "8 Weeks (5mg/Week)",
-        price: "$399",
-        link: "https://buy.stripe.com/3cI7sM7H846kaXWbiU3ks0i",
-        paypal: "https://www.paypal.com/ncp/payment/5M4A2QMHVFLBL",
-      },
-      {
-        label: "12 Weeks (5mg/Week)",
-        price: "$559",
-        link: "https://buy.stripe.com/5kQbJ28LccCQgigbiU3ks0G",
-        paypal: "https://www.paypal.com/ncp/payment/R59N9NQCLVFJ2",
-      },
-      {
-        label: "4 Weeks (7.5mg/Week)",
-        price: "$359",
-        link: "https://buy.stripe.com/eVqdRa6D4byM0jiev63ks0t",
-        paypal: "https://www.paypal.com/ncp/payment/CJ28K2HK89W7W",
-      },
-      {
-        label: "8 Weeks (7.5mg/Week)",
-        price: "$559",
-        link: "https://buy.stripe.com/aFafZi3qSeKY8PO86I3ks0H",
-        paypal: "https://www.paypal.com/ncp/payment/CC7Z99ELVR36E",
-      },
-      {
-        label: "4 Weeks (10mg/week)",
-        price: "$399",
-        link: "https://buy.stripe.com/9B63cw3qS5aoea85YA3ks0o",
-        paypal: "https://www.paypal.com/ncp/payment/5WHNYV3HZHBXQ",
-      },
-      {
-        label: "6 Weeks (10mg/week)",
-        price: "$559",
-        link: "https://buy.stripe.com/14AaEY8LcdGUd64biU3ks0K",
-        paypal: "https://www.paypal.com/ncp/payment/VETCFCSGZVKVW",
-      },
-      {
-        label: "4 Weeks (12.5mg/week)",
-        price: "$469",
-        link: "https://buy.stripe.com/bJe28s7H87iw7LK0Eg3ks0I",
-        paypal: "https://www.paypal.com/ncp/payment/GNTYTUZWJT6V4",
-      },
-      {
-        label: "4 Weeks (15mg/Week)",
-        price: "$559",
-        link: "https://buy.stripe.com/5kQ00k4uWdGU3vu9aM3ks0J",
-        paypal: "https://www.paypal.com/ncp/payment/QP4WRLAPSF3GJ",
-      },
-    ],
-  },
+// route param -> display name & image
+const PRODUCT_META = {
+  semaglutide: { title: 'Semaglutide', image: '/pricing/semaglutide.png' },
+  tirzepatide: { title: 'Tirzepatide', image: '/pricing/tirzepatide.png' },
 };
 
 const INITIAL_SUMMARY = {
@@ -174,28 +21,81 @@ const INITIAL_SUMMARY = {
   paypal: '',
 };
 
-const Page = ({ params }) => {
-  const name = params.name?.toLowerCase();
-  const product = PRODUCTS[name];
-  const [selected, setSelected] = useState(null);
+export default function Page({ params }) {
+  const key = (params?.name || '').toLowerCase();
+  const meta = PRODUCT_META[key];
   const summaryRef = useRef(null);
 
-  if (!product) {
+  const [loading, setLoading] = useState(true);
+  const [options, setOptions] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [error, setError] = useState(null);
+
+  // fetch from DB
+  useEffect(() => {
+    let alive = true;
+    async function load() {
+      if (!meta) return;
+      setLoading(true);
+      setError(null);
+      try {
+        // try filtered endpoint first
+        const qs = `?name=${encodeURIComponent(meta.title)}`;
+        let res = await fetch(`/api/plan-pay-options${qs}`, { cache: 'no-store' });
+        let j = await res.json();
+
+        // fallback: fetch all and filter client-side
+        if (!j?.success) {
+          res = await fetch('/api/plan-pay-options', { cache: 'no-store' });
+          j = await res.json();
+        }
+        if (!j?.success) throw new Error(j?.message || 'Failed to load options');
+
+        const rows = Array.isArray(j.result) ? j.result : [];
+        const filtered = rows.filter(r => r.name === meta.title);
+
+        // sort: by sort asc, then createdAt
+        filtered.sort(
+          (a, b) =>
+            (a.sort ?? 0) - (b.sort ?? 0) ||
+            (a.createdAt || '').localeCompare(b.createdAt || '')
+        );
+
+        if (alive) {
+          setOptions(filtered);
+          setSelected(null); // reset on product change
+        }
+      } catch (e) {
+        if (alive) setError(e?.message || 'Failed to load');
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    load();
+    return () => { alive = false; };
+  }, [key, meta]);
+
+  if (!meta) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl text-secondary">Product not found</div>
+      <div className="min-h-screen flex items-center justify-center text-2xl text-secondary">
+        Product not found
+      </div>
     );
   }
 
   const summary = selected
     ? {
-      product: product.name,
+      product: meta.title,
       reviewFee: 25,
-      totle: `$${parseFloat(selected.price.replace('$', '')) + 25}`,
-      price: selected.price,
+      totle:
+        selected.price && String(selected.price).startsWith('$')
+          ? `$${(Number(String(selected.price).replace('$', '')) || 0) + 25}`
+          : '',
+      price: selected.price || '',
       quantity: 1,
-      label: selected.label,
-      link: selected.link,
-      paypal: selected.paypal,
+      label: selected.label || '',
+      link: selected.link || '',
+      paypal: selected.paypal || '',
     }
     : INITIAL_SUMMARY;
 
@@ -203,26 +103,24 @@ const Page = ({ params }) => {
     setSelected(opt);
     if (typeof window !== 'undefined' && window.innerWidth < 768 && summaryRef.current) {
       setTimeout(() => {
-        summaryRef.current.scrollIntoView({ behavior: 'smooth' });
-      }, 100); // slight delay to ensure state update
+        summaryRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     }
   };
 
   const handleCheckout = () => {
-    if (summary.link) {
-      window.open(summary.link, '_blank');
-    }
+    if (summary.link) window.open(summary.link, '_blank');
   };
   const handlePayPalCheckout = () => {
-    if (summary.paypal) {
-      window.open(summary.paypal, '_blank');
-    }
+    if (summary.paypal) window.open(summary.paypal, '_blank');
   };
+
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
       <Link href="/pricing" >
         <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">somi</h1>
       </Link>
+
       <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-start justify-center">
         {/* Product Card */}
         <div className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col items-center mb-4 md:mb-0">
@@ -234,25 +132,39 @@ const Page = ({ params }) => {
           </div>
 
           <div className="relative w-36 h-36 md:w-[180px] md:h-[180px] mb-4">
-            <Image src={product.image} alt={product.name} fill className="object-contain rounded-xl" priority />
+            <Image src={meta.image} alt={meta.title} fill className="object-contain rounded-xl" priority />
           </div>
-          <h2 className="text-secondary text-xl font-bold mb-4">Compounded {product.name}</h2>
-          {/* <h3 className="text-gray-700 font-semibold mb-4">Starter Dose/Price</h3> */}
+          <h2 className="text-secondary text-xl font-bold mb-4">Compounded {meta.title}</h2>
+
           <ul className="w-full space-y-2">
-            {product.options.map((opt, idx) => (
-              <li
-                key={idx}
-                className={`flex flex-col md:flex-row md:items-center md:justify-between border rounded-lg px-4 py-2 transition-all duration-200 cursor-pointer
-                  ${selected === opt ? 'bg-blue-100 border-secondary shadow' : 'bg-blue-50 border-blue-200 hover:bg-blue-100'}
-                `}
-                onClick={() => handleOptionClick(opt)}
-              >
-                <span className="text-secondary font-medium text-sm md:text-base">{opt.label}</span>
-                <span className="text-secondary font-bold text-base mt-1 md:mt-0">{opt.price}</span>
-              </li>
-            ))}
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <li key={i} className="border rounded-lg px-4 py-2 bg-blue-50 border-blue-200">
+                  <div className="h-4 w-1/2 bg-blue-100 animate-pulse rounded mb-2" />
+                  <div className="h-4 w-20 bg-blue-100 animate-pulse rounded" />
+                </li>
+              ))
+            ) : error ? (
+              <li className="text-sm text-red-600 px-1">{error}</li>
+            ) : options.length === 0 ? (
+              <li className="text-sm text-gray-600 px-1">No options available right now.</li>
+            ) : (
+              options.map((opt, idx) => (
+                <li
+                  key={opt._id || idx}
+                  className={`flex flex-col md:flex-row md:items-center md:justify-between border rounded-lg px-4 py-2 transition-all duration-200 cursor-pointer
+                    ${selected?._id === opt._id ? 'bg-blue-100 border-secondary shadow' : 'bg-blue-50 border-blue-200 hover:bg-blue-100'}
+                  `}
+                  onClick={() => handleOptionClick(opt)}
+                >
+                  <span className="text-secondary font-medium text-sm md:text-base">{opt.label}</span>
+                  <span className="text-secondary font-bold text-base mt-1 md:mt-0">{opt.price}</span>
+                </li>
+              ))
+            )}
           </ul>
         </div>
+
         {/* Summary Card */}
         <div
           className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col justify-between min-w-[280px] max-w-md mx-auto"
@@ -267,15 +179,10 @@ const Page = ({ params }) => {
               <span>Selected Option</span>
               <span className="font-bold text-right text-secondary">{summary.label || '--'}</span>
             </div>
-            {/* <div className="flex justify-between text-gray-700 font-medium">
-              <span>Product Price</span>
-              <span className="font-bold text-secondary">{summary.price || '--'}</span>
-            </div> */}
             <div className="flex justify-between text-gray-700 font-medium">
               <span>Quantity</span>
               <span className="font-bold text-secondary">{summary.quantity}</span>
             </div>
-            {/* <hr /> */}
             <div className="flex justify-between text-gray-700 font-medium">
               <span>Subtotal</span>
               <span className="font-bold text-secondary">{summary.price || '--'}</span>
@@ -300,7 +207,7 @@ const Page = ({ params }) => {
               <span>Total Amount</span>
               <span className="font-bold text-secondary">{summary.totle || '--'}</span>
             </div>
-            {/* <hr /> */}
+
             <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-lg p-4 max-w-md">
               <div className="flex items-center justify-center">
                 <div className="w-8 h-8 flex items-center justify-center">
@@ -315,10 +222,11 @@ const Page = ({ params }) => {
                 </div>
               </div>
               <div className="text-sm text-gray-700">
-                <strong className="font-semibold">You&apos;re covered:</strong> We will refund 100% of your money if our licensed clinician determines you are not eligible for GLP-1 weight loss therapy. 100% money back guarantee
+                <strong className="font-semibold">You&apos;re covered:</strong> We will refund 100% of your money if our licensed clinician determines you are not eligible for GLP-1 weight loss therapy. 100% money back guarantee
               </div>
             </div>
           </div>
+
           <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
             {[1, 2, 3, 6, 7, 8].map((num) => (
               <img
@@ -362,19 +270,19 @@ const Page = ({ params }) => {
             <strong>Note:</strong> Once payment has been made, please proceed with the 5-7 mins Intake Questionnaire.
             Get Approval within 24 hours
           </div>
+
           <div className='flex items-center justify-center gap-4 mt-2 text-sm text-gray-600'>
             <hr className="w-full" /> or <hr className='w-full' />
           </div>
+
           <div className="flex justify-between text-gray-700 font-medium">
             <span>Total Amount for PayPal</span>
             <span className="font-bold text-secondary">{summary.totle || '--'}</span>
           </div>
+
           <button
             className={`w-full mt-6 rounded-3xl py-2 font-bold text-base shadow transition border-[#0031e3] border-2
-    ${summary.paypal
-                ? 'bg-white text-[#0031e3] cursor-pointer'
-                : 'bg-gray-300 text-gray-400 cursor-not-allowed'
-              }`}
+              ${summary.paypal ? 'bg-white text-[#0031e3] cursor-pointer' : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
             onClick={handlePayPalCheckout}
             disabled={!summary.paypal}
           >
@@ -388,13 +296,10 @@ const Page = ({ params }) => {
               <span>Pay via PayPal</span>
             </div>
           </button>
-
         </div>
-        <div
-          ref={summaryRef}></div>
+
+        <div ref={summaryRef} />
       </div>
     </div>
   );
-};
-
-export default Page;
+}
