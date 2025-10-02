@@ -282,7 +282,7 @@ export default function ClientVideoReviews() {
       setCurrentMobile(i);
       videoRefs.current.forEach((v, idx) => {
         if (!v) return;
-        if (idx === i) v.play().catch(() => {});
+        if (idx === i) v.play().catch(() => { });
         else v.pause();
       });
     };
@@ -302,13 +302,30 @@ export default function ClientVideoReviews() {
     return () => apiDesk.off("select", onSelect);
   }, [apiDesk]);
 
+  const [headerText, setHeaderText] = React.useState("From stuck to thriving.");
+
+  React.useEffect(() => {
+    fetchHeader();
+    fetchVideos();
+  }, []);
+
+  async function fetchHeader() {
+    try {
+      const r = await fetch("/api/review-header?key=client-reviews-header", { cache: "no-store" });
+      const j = await r.json();
+      if (j?.success && j?.result?.text) setHeaderText(j.result.text);
+    } catch (e) {
+      console.error("Error fetching header:", e);
+    }
+  }
+
   if (loading) {
     return (
       <section className="w-full py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <header className="mb-6 flex items-end justify-between gap-4">
             <h2 className="text-2xl font-SofiaSans font-bold sm:text-3xl">
-              From stuck to thriving.
+              {headerText}
             </h2>
           </header>
           <div className="space-y-4">
@@ -326,7 +343,7 @@ export default function ClientVideoReviews() {
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <header className="mb-6 flex items-end justify-between gap-4">
           <h2 className="text-2xl font-SofiaSans font-bold sm:text-3xl">
-            From stuck to thriving.
+            {headerText}
           </h2>
         </header>
 
@@ -348,7 +365,7 @@ export default function ClientVideoReviews() {
                           preload="metadata"
                           poster={v.poster}
                           onLoadedData={() => {
-                            if (i === currentMobile) videoRefs.current[i]?.play().catch(() => {});
+                            if (i === currentMobile) videoRefs.current[i]?.play().catch(() => { });
                           }}
                         >
                           {v.srcMp4 && <source src={v.srcMp4} type="video/mp4" />}
@@ -400,9 +417,8 @@ export default function ClientVideoReviews() {
                   aria-selected={active}
                   aria-controls={`review-slide-${i}`}
                   onClick={() => apiMobile && apiMobile.scrollTo(i)}
-                  className={`h-1.5 w-24 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
-                    active ? "bg-secondary" : "bg-secondary/40 hover:bg-secondary/60"
-                  }`}
+                  className={`h-1.5 w-24 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${active ? "bg-secondary" : "bg-secondary/40 hover:bg-secondary/60"
+                    }`}
                 />
               );
             })}
@@ -439,9 +455,8 @@ export default function ClientVideoReviews() {
                   role="tab"
                   aria-selected={active}
                   onClick={() => apiDesk && apiDesk.scrollTo(i)}
-                  className={`h-2 w-10 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
-                    active ? "bg-secondary" : "bg-secondary/40 hover:bg-secondary/60"
-                  }`}
+                  className={`h-2 w-10 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${active ? "bg-secondary" : "bg-secondary/40 hover:bg-secondary/60"
+                    }`}
                 />
               );
             })}

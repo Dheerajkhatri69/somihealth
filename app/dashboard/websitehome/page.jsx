@@ -8,6 +8,7 @@ import UploadMediaLite from '@/components/UploadMediaLite';
 import Image from 'next/image';
 import * as LucideIcons from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import toast from 'react-hot-toast';
 
 export default function WebsiteHome() {
     const [menus, setMenus] = useState([]);
@@ -581,6 +582,38 @@ export default function WebsiteHome() {
         { value: 'Camera', label: 'Camera' },
         { value: 'Code', label: 'Code' }
     ];
+    const [text, setText] = useState("From stuck to thriving.");
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const r = await fetch("/api/review-header?key=client-reviews-header", { cache: "no-store" });
+                const j = await r.json();
+                if (j?.success && j?.result?.text) setText(j.result.text);
+            } catch (e) {
+                console.error(e);
+            }
+        })();
+    }, []);
+
+    const save = async () => {
+        setSaving(true);
+        try {
+            const r = await fetch("/api/review-header", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key: "client-reviews-header", text }),
+            });
+            const j = await r.json();
+            if (!j?.success) throw new Error(j?.message || "Save failed");
+            toast.success("Saved!");
+        } catch (e) {
+            toast.error(e.message || "Error");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <div className="p-4">
@@ -846,6 +879,27 @@ export default function WebsiteHome() {
 
             {/* Video Management Section */}
             <section className="mt-8">
+                <div className="mx-auto w-full pb-6 space-y-4">
+                    <h1 className="text-xl font-semibold">Review Videos Header</h1>
+                    {videoLoading ? (
+                        <></>
+                    ) : (
+                        <div className='flex gap-4'>
+                            <input
+                                value={text}
+                                onChange={(e) => setText(e.target.value)}
+                                className="w-full rounded border p-2"
+                            />
+                            <button
+                                onClick={save}
+                                disabled={saving}
+                                className="rounded-xl bg-secondary px-4 py-2 text-white disabled:opacity-50"
+                            >
+                                {saving ? "Saving…" : "Save"}
+                            </button>
+                        </div>
+                    )}
+                </div>
                 {/* Header */}
                 <div className="mb-4 flex items-center justify-between">
                     <div>
