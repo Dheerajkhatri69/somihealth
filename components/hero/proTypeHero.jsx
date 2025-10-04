@@ -138,7 +138,7 @@ export default function ProTypeHero({ content = HERO_CONTENT, onCta = () => { } 
                             </p>
                         ) : null}
 
-                        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
+                        <h1 className="text-3xl md:text-5xl tracking-tight">
                             {content.headingLine1}
                         </h1>
 
@@ -147,7 +147,7 @@ export default function ProTypeHero({ content = HERO_CONTENT, onCta = () => { } 
                             lines={content.lines}
                             interval={2200}
                             duration={450}
-                            className="text-3xl sm:text-4xl md:text-5xl text-darkprimary"
+                            className="text-2xl sm:text-3xl md:text-4xl text-darkprimary"
                         />
 
                         <p className="mt-6 max-w-xl text-[15px] sm:text-base leading-7 text-neutral-700">
@@ -181,10 +181,6 @@ export default function ProTypeHero({ content = HERO_CONTENT, onCta = () => { } 
                                     />
                                 </div>
                             </div>
-
-                            <p className="mt-3 text-center text-[11px] text-neutral-500">
-                                Medication charged separately
-                            </p>
                         </div>
                     </div>
                 </div>

@@ -184,23 +184,24 @@ export default function BMICalculator() {
         <section
             className="relative isolate overflow-hidden bg-[#fffaf6] pt-14 text-center p-2"
         >
-            <h2 className="mx-auto max-w-4xl text-3xl font-bold sm:text-4xl font-SofiaSans text-darkprimary">
+            <h2 className="mx-auto max-w-4xl text-3xl sm:text-5xl font-SofiaSans text-darkprimary">
                 {content.title}
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-darkprimary/80 font-SofiaSans">
                 {content.description}
             </p>
-            <div className="flex items-center justify-center">
-                <div className="relative w-full max-w-lg z-10 hidden lg:block sm:hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-3 items-center justify-center gap-8">
+                {/* Image */}
+                <div className="col-span-1 flex justify-center">
                     <Image
                         src={content.image}
                         alt="BMI Calculator"
                         width={400}
                         height={400}
-                        className="mx-auto bottom-0 rounded-2xl"
+                        className="mx-auto rounded-2xl"
                     />
                 </div>
-                <div className="relative z-10 mx-auto mt-10 w-full max-w-4xl rounded-xl bg-lightprimary p-6 shadow-md ring-1 ring-black/10 backdrop-blur-md">
+                <div className="col-span-2 relative z-10 mx-auto mt-10 w-full max-w-3xl rounded-xl bg-lightprimary p-6 shadow-md ring-1 ring-black/10 backdrop-blur-md">
                     <div className="grid gap-6 md:grid-cols-2">
                         {/* current weight */}
                         <div>

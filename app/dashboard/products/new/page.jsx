@@ -29,9 +29,22 @@ function slugify(s = '') {
 }
 
 const EMPTY = () => ({
-  category: '', slug: '', showInPlans: true, label: '', shortLabel: '', heroImage: '',
-  price: 0, unit: '', inStock: true, ratingLabel: '', trustpilot: '',
-  bullets: [], description: '',
+  category: '',
+  slug: '',
+  showInPlans: true,
+  label: '',
+  shortLabel: '',
+  heroImage: '',
+  price: 0,
+  unit: '',
+  inStock: true,
+  ratingLabel: '',
+  trustpilot: '',
+  // NEW:
+  plansNote: 'Price for purchase of 3 month supply',
+
+  bullets: [],
+  description: '',
   ctas: {
     primary: { label: 'Get Started', href: '/getstarted' },
     secondary: { label: 'Learn More', href: '/learn-more' }
@@ -58,6 +71,20 @@ const EMPTY = () => ({
   isActive: true,
   sortOrder: 0,
 });
+function setDeep(obj, path, value) {
+  const keys = path.split('.');
+  const next = { ...obj };
+  let cur = next;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const k = keys[i];
+    const prevVal = cur[k];
+    // ensure each level is an object we can clone into
+    cur[k] = (prevVal && typeof prevVal === 'object') ? { ...prevVal } : {};
+    cur = cur[k];
+  }
+  cur[keys[keys.length - 1]] = value;
+  return next;
+}
 
 // ---------- component ----------
 export default function NewProductPage() {
@@ -79,19 +106,21 @@ export default function NewProductPage() {
   }, []);
 
   function handleInputChange(field, value) {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData(prev => ({ ...prev, [parent]: { ...prev[parent], [child]: value } }));
-    } else {
-      setFormData(prev => {
-        const next = { ...prev, [field]: value };
-        if (field === 'label' && (!prev.slug || prev.slug.trim() === '')) {
-          next.slug = slugify(value);
-        }
-        return next;
-      });
-    }
+    setFormData(prev => {
+      // auto-slug when label changes and slug is empty
+      if (field === 'label' && (!prev.slug || prev.slug.trim() === '')) {
+        const next = setDeep(prev, field, value);
+        return { ...next, slug: slugify(value) };
+      }
+      // deep update for dot paths (e.g., "ctas.primary.label")
+      if (field.includes('.')) {
+        return setDeep(prev, field, value);
+      }
+      // shallow update
+      return { ...prev, [field]: value };
+    });
   }
+
 
   function handleImageUpload(_, url) {
     setFormData(p => ({ ...p, heroImage: url }));
@@ -202,6 +231,22 @@ export default function NewProductPage() {
               <Input value={formData.ratingLabel} onChange={(e) => handleInputChange('ratingLabel', e.target.value)} className="mt-1" />
             </div>
           </div>
+          {/* Plans Note (text that shows above buttons in Plans card) */}
+          <div className="border-t pt-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Plans Note (shown above buttons)</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <Label className="text-sm font-medium">Text</Label>
+                <Input
+                  value={formData.plansNote || ''}
+                  onChange={(e) => handleInputChange('plansNote', e.target.value)}
+                  className="mt-1"
+                  placeholder="Price for purchase of 3 month supply"
+                />
+                <p className="mt-1 text-xs text-gray-500">This appears under the product image and above the buttons on the plans carousel/grid.</p>
+              </div>
+            </div>
+          </div>
 
           {/* Hero image */}
           <div>
@@ -232,12 +277,16 @@ export default function NewProductPage() {
                 <div className="space-y-3">
                   <div>
                     <Label className="text-sm">Button Text</Label>
-                    <Input value={formData.ctas?.primary?.label || ''} onChange={(e) => handleInputChange('ctas.primary.label', e.target.value)} className="mt-1" />
-                  </div>
+                    <Input
+                      value={formData.ctas?.primary?.label || ''}
+                      onChange={(e) => handleInputChange('ctas.primary.label', e.target.value)}
+                    />   </div>
                   <div>
                     <Label className="text-sm">Button Link</Label>
-                    <Input value={formData.ctas?.primary?.href || ''} onChange={(e) => handleInputChange('ctas.primary.href', e.target.value)} className="mt-1" />
-                  </div>
+                    <Input
+                      value={formData.ctas?.primary?.href || ''}
+                      onChange={(e) => handleInputChange('ctas.primary.href', e.target.value)}
+                    /> </div>
                 </div>
               </div>
               <div>
@@ -245,11 +294,17 @@ export default function NewProductPage() {
                 <div className="space-y-3">
                   <div>
                     <Label className="text-sm">Button Text</Label>
-                    <Input value={formData.ctas?.secondary?.label || ''} onChange={(e) => handleInputChange('ctas.secondary.label', e.target.value)} className="mt-1" />
+                    <Input
+                      value={formData.ctas?.secondary?.label || ''}
+                      onChange={(e) => handleInputChange('ctas.secondary.label', e.target.value)}
+                    />
                   </div>
                   <div>
                     <Label className="text-sm">Button Link</Label>
-                    <Input value={formData.ctas?.secondary?.href || ''} onChange={(e) => handleInputChange('ctas.secondary.href', e.target.value)} className="mt-1" />
+                    <Input
+                      value={formData.ctas?.secondary?.href || ''}
+                      onChange={(e) => handleInputChange('ctas.secondary.href', e.target.value)}
+                    />
                   </div>
                 </div>
               </div>

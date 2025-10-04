@@ -22,6 +22,7 @@ import {
   Contact,
   Footprints,
   RectangleEllipsis,
+  TicketSlash,
 } from "lucide-react"
 
 import {
@@ -52,6 +53,7 @@ const sidebarItems = [
 const frontendItems = [
   { title: "Website Home", url: "/dashboard/websitehome", icon: Globe, allowedRoles: ["A"] },
   { title: "Products", url: "/dashboard/products", icon: ShoppingCart, allowedRoles: ["A"] },
+  { title: "Feature Banner", url: "/dashboard/feature-banners", icon: TicketSlash, allowedRoles: ["A"] },
   { title: "Pricing Page", url: "/dashboard/pricing-pay-options", icon: ChartCandlestick, allowedRoles: ["A"] },
   { title: "GH Content", url: "/dashboard/gh-content", icon: ScanHeart, allowedRoles: ["A"] },
   { title: "FAQ Component", url: "/dashboard/faq", icon: HelpCircle, allowedRoles: ["A"] },

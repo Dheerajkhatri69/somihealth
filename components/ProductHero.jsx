@@ -43,7 +43,7 @@ export default function ProductHero({ product }) {
 
                 <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">{label}</h1>
                 <p className="mt-3 text-xl md:text-2xl">
-                    From <span className="font-semibold">${price.toFixed(2)}</span> {unit}
+                    From <span className="font-semibold">${price}</span> {unit}
                 </p>
 
                 <ul className="mt-6 space-y-4">

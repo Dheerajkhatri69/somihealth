@@ -47,7 +47,7 @@ function ReviewCard({ quote, author, rating = 5, verified = true }) {
   const stars = Math.max(0, Math.min(5, Math.round(rating)));
 
   return (
-    <figure className="group relative h-full overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
+    <figure className="group relative h-full overflow-hidden rounded-3xl bg-white shadow-sm border-2 border-darkprimary transition-shadow hover:shadow-md">
       <div className="p-6 sm:p-7">
         {/* header */}
         <div className="mb-4 flex items-center justify-between gap-3">
@@ -129,7 +129,7 @@ export default function StoriesWithReviews() {
 
   if (loading) {
     return (
-      <section className="relative isolate w-full bg-lightprimary-foreground py-10 sm:py-14">
+      <section className="relative isolate w-full py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="rounded-3xl bg-darkprimary px-5 py-8 sm:px-8 sm:py-10">
             <div className="mb-6 flex items-center justify-between gap-4">
@@ -144,9 +144,9 @@ export default function StoriesWithReviews() {
   }
 
   return (
-    <section className="relative isolate w-full bg-lightprimary-foreground py-10 sm:py-14">
+    <section className="relative isolate w-full bg-white py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <div className="rounded-3xl bg-darkprimary px-5 py-8 sm:px-8 sm:py-10">
+        <div className="rounded-3xl bg-white px-5 py-8 sm:px-8 sm:py-10">
           {/* top bar: heading left, button right */}
           {/* TOP BAR — rating left, CTA right (no color changes) */}
           {(() => {
@@ -159,8 +159,8 @@ export default function StoriesWithReviews() {
                 {/* Left: Rating strip + Headline */}
                 <div className="min-w-0">
                   {/* Rating strip (Excellent • ★★★★★ • Trustpilot) */}
-                  <div className="flex items-center gap-3 text-white">
-                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
+                  <div className="flex items-center gap-3 text-darkprimary">
+                    <span className="rounded-full bg-lightprimary-foreground px-3 py-1 text-xs font-semibold">
                       Excellent
                     </span>
 
@@ -176,7 +176,7 @@ export default function StoriesWithReviews() {
                   </div>
 
                   {/* Headline (with optional italic segment) */}
-                  <h2 className="mt-3 font-SofiaSans text-3xl font-bold leading-tight text-white sm:text-4xl">
+                  <h2 className="mt-3 font-SofiaSans text-3xl font-bold leading-tight text-darkprimary sm:text-4xl">
                     {hasEmphasis ? (
                       <>
                         {parts[0]}
@@ -192,7 +192,7 @@ export default function StoriesWithReviews() {
                 {/* Right: CTA */}
                 <Link
                   href={cta.href}
-                  className="fx86 inline-flex h-10 min-w-[250px] items-center justify-between rounded-3xl border border-lightprimary bg-transparent px-6 py-2 text-base font-semibold text-lightprimary hover:text-darkprimary shadow-sm md:px-10"
+                  className="fx86 inline-flex h-10 min-w-[250px] items-center justify-between rounded-3xl border border-lightprimary bg-darkprimary px-6 py-2 text-base font-semibold text-lightprimary hover:text-darkprimary shadow-sm md:px-10"
                   style={{ "--fx86-base": "transparent", "--fx86-glow": "#E9ECF1" }}
                 >
                   {cta.label}

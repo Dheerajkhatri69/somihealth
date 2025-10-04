@@ -1,3 +1,4 @@
+import FeatureBanner from "@/components/FeatureBanner";
 import BMICalculator from "@/components/hero/BMICalculator";
 import CategoriesGrid from "@/components/hero/CategoriesGrid";
 import CompoundedExplainer from "@/components/hero/compounded-glp1";
@@ -9,14 +10,17 @@ import { TabsDemo } from "@/components/hero/Results";
 import ClientVideoReviews from "@/components/hero/ReviewVideoCard";
 import SomiFooter from "@/components/hero/SomiFooter";
 import StoriesWithReviews from "@/components/hero/StoriesWithReviews";
+import WeightLossPlans from "@/components/hero/WeightLossPlans";
 
 export default async function Home() {
 
   return (
     <main >
+      <FeatureBanner queryKey="global" />
       <Navbar />
       <Hero />
       <CategoriesGrid />
+      <WeightLossPlans />
       <ClientVideoReviews />
       <StoriesWithReviews />
       <BMICalculator />

@@ -24,10 +24,10 @@ export function RotatingLine({
 
     // color handling via refs (no state deps)
     const COLOR_CLASSES = useRef([
-        "text-[#333399]",
+        "text-[#9e9eff]",
         "text-[#006db0]",
         "text-[#0093af]",
-        "text-[#00009c]",
+        "text-[#8a8aee]",
     ]).current;
     const curColorIdxRef = useRef(Math.floor(Math.random() * COLOR_CLASSES.length));
     const nextColorIdxRef = useRef((curColorIdxRef.current + 1) % COLOR_CLASSES.length);

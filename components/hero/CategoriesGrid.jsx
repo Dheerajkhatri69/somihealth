@@ -12,7 +12,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import WeightLossPlansV3 from "./WeightLossPlans";
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
 import { LoadingPage, CategoriesGridSkeleton } from "@/components/LoadingSkeleton";
 
@@ -245,8 +244,6 @@ export default function CategoriesGrid() {
             </div>
           )}
         </div>
-
-        <WeightLossPlansV3 />
       </section>
     </LoadingPage>
   );

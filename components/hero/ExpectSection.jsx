@@ -60,14 +60,14 @@ export default function ExpectSection({ content = EXPECT_CONTENT }) {
 
           {/* RIGHT — text */}
           <div className="md:col-span-6">
-            <h2 className="font-semibold tracking-tight text-2xl sm:text-3xl md:text-4xl text-neutral-900">
+            <h2 className="tracking-tight text-2xl sm:text-3xl md:text-4xl text-darkprimary">
               {title}
             </h2>
 
             <div className="mt-8 space-y-8">
               {items?.map((it, i) => (
                 <div key={i} className="max-w-xl">
-                  <p className="text-lg font-semibold text-neutral-900">
+                  <p className="text-lg font-semibold text-darkprimary">
                     {it.heading}
                   </p>
                   <p className="mt-1 text-[15px] sm:text-base leading-7 text-neutral-700">

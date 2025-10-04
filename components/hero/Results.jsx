@@ -102,7 +102,7 @@ export function TabsDemo() {
         ? display.tabs.map((t, idx) => ({
             idx: idx + 1,
             color: t.color || "#364c78",
-            title: `${idx + 1}. ${t.title ?? ""}`,
+            title: t.title,
             desc: t.body ?? "",
             cap1: t.bullets?.[0] ?? "",
             cap2: t.bullets?.[1] ?? "",
@@ -169,33 +169,33 @@ export function TabsDemo() {
             <div className="mx-auto max-w-7xl px-4 md:px-6 py-10 sm:py-14">
                 <div className="grid items-stretch gap-8 md:grid-cols-12 md:gap-12">
                     {/* LEFT — big image (always shows full image, no crop) */}
-                    <div className="md:col-span-6">
-                        <div className="rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden bg-lightprimary">
-                            {/* Control height with aspect-ratio so it never becomes taller than the image */}
-                            <div className="relative w-full aspect-[4/5] sm:aspect-[5/6] md:aspect-[3/4]">
-                                <Image
-                                    src={display.image || "/hero/bmilady.png"}
-                                    alt="How it works"
-                                    fill
-                                    className="object-contain"     // show the whole image
-                                    sizes="(max-width: 1024px) 100vw, 50vw"
-                                    priority
-                                />
-                                {/* Optional: soft backdrop so 'contain' never looks like empty space */}
-                                <Image
-                                    src={display.image || "/hero/bmilady.png"}
-                                    alt=""
-                                    fill
-                                    className="absolute inset-0 -z-10 object-cover blur-lg scale-110 opacity-20"
-                                    aria-hidden
-                                />
-                            </div>
+                    {/* LEFT — big image (match right side height) */}
+                    <div className="md:col-span-6 flex">
+                        <div className="relative h-full w-full overflow-hidden rounded-2xl md:min-h-[520px]">
+                            <Image
+                                src={display.image || "/hero/bmilady.png"}
+                                alt="How it works"
+                                fill
+                                className="object-cover rounded-2xl"
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                                priority
+                            />
+
+                            {/* Optional blurred backdrop, kept consistent */}
+                            <Image
+                                src={display.image || "/hero/bmilady.png"}
+                                alt=""
+                                fill
+                                className="absolute inset-0 -z-10 object-cover blur-lg scale-110 opacity-20 rounded-2xl"
+                                aria-hidden
+                            />
                         </div>
                     </div>
 
+
                     {/* RIGHT — header + vertical timeline */}
                     <div className="md:col-span-6">
-                        <p className="text-xs font-SofiaSans tracking-[.12em] text-darkprimary/70 uppercase">
+                        <p className="text-base font-SofiaSans tracking-[.12em] text-darkprimary/70 uppercase">
                             {display.header?.eyebrow || "Feel stronger, healthier, and more confident"}
                         </p>
                         <h2 className="mt-2 font-SofiaSans text-[28px] leading-tight text-darkprimary sm:text-[36px] md:text-[40px]">
@@ -213,8 +213,8 @@ export function TabsDemo() {
                                     <div key={s.idx} className="relative font-SofiaSans">
                                         {(s.cap1 || s.cap2) && (
                                             <div className="mb-2 pl-3 text-[14px] leading-5">
-                                                {s.cap1 && <p className="font-semibold text-secondary">{s.cap1}</p>}
-                                                {s.cap2 && <p className="text-secondary/70">{s.cap2}</p>}
+                                                {s.cap1 && <p className="font-semibold text-base text-secondary">{s.cap1}</p>}
+                                                {s.cap2 && <p className="text-secondary/70 text-base">{s.cap2}</p>}
                                             </div>
                                         )}
                                         <div className="relative rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-black/5">
@@ -228,8 +228,8 @@ export function TabsDemo() {
                                                 style={{ backgroundColor: s.color }}
                                                 aria-hidden="true"
                                             />
-                                            <h3 className="mt-2 text-center font-semibold text-gray-800">{s.title}</h3>
-                                            <p className="mt-3 text-center text-[14px] leading-6 text-gray-600">{s.desc}</p>
+                                            <h3 className="mt-2 text-center text-lg font-semibold text-gray-800">{s.title}</h3>
+                                            <p className="mt-3 text-center text-base leading-6 text-gray-600">{s.desc}</p>
                                         </div>
                                     </div>
                                 ))}

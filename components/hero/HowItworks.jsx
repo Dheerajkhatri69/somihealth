@@ -97,7 +97,7 @@ export default function HowItWorksGnz() {
                 <p className="text-xs font-semibold tracking-[.18em] text-foreground/60">
                     {displayContent.eyebrow}
                 </p>
-                <h2 className="mt-3 font-SofiaSans text-3xl font-bold leading-tight sm:text-4xl text-darkprimary">
+                <h2 className="mt-3 font-SofiaSans text-3xl leading-tight sm:text-4xl text-darkprimary">
                     {displayContent.mainTitle.replace(displayContent.mainTitleHighlight, '')}
                     <span className="text-darkprimary">{displayContent.mainTitleHighlight}</span>
                 </h2>
@@ -107,8 +107,8 @@ export default function HowItWorksGnz() {
             <div className="mx-auto mt-20 max-w-6xl px-4">
                 <div className="grid gap-8 md:grid-cols-3">
                     {displayContent.steps.map((step, index) => {
-                        const IconComponent = step.icon === 'ClipboardList' ? ClipboardList : 
-                                            step.icon === 'Video' ? Video : Package;
+                        const IconComponent = step.icon === 'ClipboardList' ? ClipboardList :
+                            step.icon === 'Video' ? Video : Package;
                         return (
                             <Step
                                 key={index}
@@ -157,18 +157,24 @@ function Step({ eyebrow, caption, icon, title, text }) {
 
             {/* icon bubble (floats above the card) */}
             <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2">
-                <div className="grid h-12 w-12 place-items-center rounded-full bg-darkprimary text-white shadow-md ring-2 ring-white/80">
+                <div className="grid h-12 w-12 place-items-center rounded-full bg-white text-darkprimary shadow-md ring-2 ring-white/80">
                     {icon}
                 </div>
             </div>
 
             {/* card */}
-            <div className="relative rounded-2xl bg-darkprimary h-[200px] border border-border bg-card/70 px-6 pb-6 pt-10 shadow-sm backdrop-blur transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
+            <div className="relative rounded-2xl bg-white h-[200px] border border-border border-darkprimary bg-card/70 px-6 pb-6 pt-10 shadow-sm backdrop-blur transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
                 {/* small notch */}
-                <span className="absolute -top-3 left-1/2 h-6 w-6 bg-darkprimary border-darkprimary -translate-x-1/2 rotate-45 rounded-[6px] border border-border bg-card/80 shadow-sm" />
+                <span
+                    className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rotate-45 rounded-[6px]"
+                    style={{
+                        background: 'linear-gradient(135deg, #364C78 50%, white 50%)',
+                    }}
+                />
 
-                <h3 className="text-center font-SofiaSans text-xl font-semibold text-white">{title}</h3>
-                <p className="mt-3 text-center text-sm leading-6 text-muted-foreground text-slate-300">{text}</p>
+
+                <h3 className="text-center font-SofiaSans text-xl font-semibold text-darkprimary">{title}</h3>
+                <p className="mt-3 text-center text-sm leading-6 text-darkprimary/80">{text}</p>
             </div>
         </div>
     );

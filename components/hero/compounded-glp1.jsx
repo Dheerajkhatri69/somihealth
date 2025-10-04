@@ -55,7 +55,7 @@ export default function CompoundedExplainer() {
                 <div className="mt-6 grid items-center gap-8 md:mt-8 md:grid-cols-12 md:gap-12">
                     {/* LEFT – copy */}
                     <div className="md:col-span-5 text-[15px] leading-7 text-gray-700 sm:text-base">
-                        <h2 className="font-SofiaSans text-3xl mb-4 font-bold leading-tight text-gray-900 sm:text-4xl md:text-[40px]">
+                        <h2 className="font-SofiaSans text-3xl mb-4 leading-tight text-gray-900 sm:text-4xl md:text-[40px]">
                             {content.title}
                         </h2>
                         {/* Tabs list */}
