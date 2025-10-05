@@ -172,7 +172,7 @@ export default function BMICalculator() {
 
     if (loading) {
         return (
-            <section className="relative isolate overflow-hidden bg-[#fffaf6] pt-14 text-center p-2">
+            <section className="relative isolate overflow-hidden bg-white pt-14 text-center p-2">
                 <div className="h-12 w-3/4 mx-auto bg-gray-200 animate-pulse rounded mb-4" />
                 <div className="h-6 w-2/3 mx-auto bg-gray-200 animate-pulse rounded mb-8" />
                 <div className="h-96 w-full max-w-4xl mx-auto bg-gray-200 animate-pulse rounded-xl" />
@@ -182,7 +182,7 @@ export default function BMICalculator() {
 
     return (
         <section
-            className="relative isolate overflow-hidden bg-[#fffaf6] pt-14 text-center p-2"
+            className="relative isolate overflow-hidden bg-white pt-14 text-center p-2"
         >
             <h2 className="mx-auto max-w-4xl text-3xl sm:text-5xl font-SofiaSans text-darkprimary">
                 {content.title}
@@ -190,110 +190,132 @@ export default function BMICalculator() {
             <p className="mx-auto mt-4 max-w-3xl text-darkprimary/80 font-SofiaSans">
                 {content.description}
             </p>
-            <div className="grid grid-cols-1 lg:grid-cols-3 items-center justify-center gap-8">
-                {/* Image */}
-                <div className="col-span-1 flex justify-center">
-                    <Image
-                        src={content.image}
-                        alt="BMI Calculator"
-                        width={400}
-                        height={400}
-                        className="mx-auto rounded-2xl"
-                    />
-                </div>
-                <div className="col-span-2 relative z-10 mx-auto mt-10 w-full max-w-3xl rounded-xl bg-lightprimary p-6 shadow-md ring-1 ring-black/10 backdrop-blur-md">
-                    <div className="grid gap-6 md:grid-cols-2">
-                        {/* current weight */}
-                        <div>
-                            <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Your weight</label>
-                            <div className="flex items-center gap-3">
-                                <input
-                                    type="number"
-                                    min={0}
-                                    step="1"
-                                    inputMode="numeric"
-                                    value={weight}
-                                    onChange={(e) => {
-                                        const v = e.target.value;
-                                        if (v === "") { setWeight(""); return; }           // allow clearing
-                                        const n = Number(v);
-                                        if (Number.isNaN(n)) return;                       // ignore bad chars
-                                        setWeight(String(Math.max(0, n)));                 // clamp to 0+, no auto-1
-                                    }}
-                                    onBlur={() => { if (weight === "") setWeight("0"); }}// normalize empty on blur
-                                    className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
+            <div className="w-full flex justify-center mt-4">
+                <div className="grid grid-cols-1 max-w-7xl lg:grid-cols-3 items-center justify-center gap-8">
+                    {/* Image */}
+                    <div className="col-span-1 flex justify-center">
+                        <Image
+                            src={content.image}
+                            alt="BMI Calculator"
+                            width={400}
+                            height={400}
+                            className="mx-auto rounded-2xl"
+                        />
+                    </div>
+                    <div className="col-span-2 relative z-10 mx-auto mt-10 w-full max-w-3xl rounded-xl bg-lightprimary p-6 shadow-md ring-1 ring-black/10 backdrop-blur-md">
+                        <div className="grid gap-6 md:grid-cols-2">
+                            {/* current weight */}
+                            <div>
+                                <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Your weight</label>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        step="1"
+                                        inputMode="numeric"
+                                        value={weight}
+                                        onChange={(e) => {
+                                            const v = e.target.value;
+                                            if (v === "") { setWeight(""); return; }           // allow clearing
+                                            const n = Number(v);
+                                            if (Number.isNaN(n)) return;                       // ignore bad chars
+                                            setWeight(String(Math.max(0, n)));                 // clamp to 0+, no auto-1
+                                        }}
+                                        onBlur={() => { if (weight === "") setWeight("0"); }}// normalize empty on blur
+                                        className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
+                                    />
+                                    <button
+                                        onClick={toggleUnit}
+                                        className="rounded-lg border bg-secondary px-3 py-2 text-sm font-medium text-white"
+                                    >
+                                        {unit.toUpperCase()}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* goal weight (same unit) */}
+                            <div>
+                                <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Goal weight</label>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        step="1"
+                                        inputMode="numeric"
+                                        value={goalWeight}
+                                        onChange={(e) => {
+                                            const v = e.target.value;
+                                            if (v === "") { setGoalWeight(""); return; }
+                                            const n = Number(v);
+                                            if (Number.isNaN(n)) return;
+                                            setGoalWeight(String(Math.max(0, n)));
+                                        }}
+                                        onBlur={() => { if (goalWeight === "") setGoalWeight("0"); }}
+                                        className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
+                                    />
+                                    <span className="text-sm font-semibold text-gray-600">{unit.toUpperCase()}</span>
+                                </div>
+                            </div>
+
+                            {/* height */}
+                            <div className="md:col-span-2 text-left">
+                                <label className="mb-1 block text-sm font-semibold text-gray-700">Your height</label>
+                                <HeightPicker
+                                    feet={heightFt}
+                                    inches={heightIn}
+                                    onFeet={setHeightFt}
+                                    onInches={setHeightIn}
                                 />
-                                <button
-                                    onClick={toggleUnit}
-                                    className="rounded-lg border bg-secondary px-3 py-2 text-sm font-medium text-white"
-                                >
-                                    {unit.toUpperCase()}
-                                </button>
                             </div>
                         </div>
 
-                        {/* goal weight (same unit) */}
-                        <div>
-                            <label className="mb-1 block text-sm text-left font-semibold text-gray-700">Goal weight</label>
-                            <div className="flex items-center gap-3">
-                                <input
-                                    type="number"
-                                    min={0}
-                                    step="1"
-                                    inputMode="numeric"
-                                    value={goalWeight}
-                                    onChange={(e) => {
-                                        const v = e.target.value;
-                                        if (v === "") { setGoalWeight(""); return; }
-                                        const n = Number(v);
-                                        if (Number.isNaN(n)) return;
-                                        setGoalWeight(String(Math.max(0, n)));
-                                    }}
-                                    onBlur={() => { if (goalWeight === "") setGoalWeight("0"); }}
-                                    className="w-28 rounded-lg border px-3 py-2 text-center text-lg font-semibold sm:w-32"
-                                />
-                                <span className="text-sm font-semibold text-gray-600">{unit.toUpperCase()}</span>
-                            </div>
-                        </div>
-
-                        {/* height */}
-                        <div className="md:col-span-2 text-left">
-                            <label className="mb-1 block text-sm font-semibold text-gray-700">Your height</label>
-                            <HeightPicker
-                                feet={heightFt}
-                                inches={heightIn}
-                                onFeet={setHeightFt}
-                                onInches={setHeightIn}
+                        {/* results */}
+                        <div className="mt-8 grid gap-6 md:grid-cols-3">
+                            <ResultCard
+                                title="Your BMI"
+                                value={bmi.toFixed(1)}
+                                help="Body-mass index"
+                                color="bg-white border-t-8 border-secondary"
+                            />
+                            <ResultCard
+                                title="Goal BMI"
+                                value={goalBmi.toFixed(1)}
+                                help="From your goal weight"
+                                color="bg-white border-t-8 border-emerald-700"
+                            />
+                            <ResultCard
+                                title="You could lose up to"
+                                value={Math.max(0, +canLose.toFixed(0))}
+                                unit={unit}
+                                help="Current − Goal"
+                                color="bg-white border-t-8 border-secondary/80"
                             />
                         </div>
-                    </div>
 
-                    {/* results */}
-                    <div className="mt-8 grid gap-6 md:grid-cols-3">
-                        <ResultCard
-                            title="Your BMI"
-                            value={bmi.toFixed(1)}
-                            help="Body-mass index"
-                            color="bg-white border-t-8 border-secondary"
-                        />
-                        <ResultCard
-                            title="Goal BMI"
-                            value={goalBmi.toFixed(1)}
-                            help="From your goal weight"
-                            color="bg-white border-t-8 border-emerald-700"
-                        />
-                        <ResultCard
-                            title="You could lose up to"
-                            value={Math.max(0, +canLose.toFixed(0))}
-                            unit={unit}
-                            help="Current − Goal"
-                            color="bg-white border-t-8 border-secondary/80"
-                        />
                     </div>
 
                 </div>
-
             </div>
+
+            <div className="w-full flex justify-center">
+                <div className="max-w-7xl w-full">
+                    <p className="mt-10 text-darkprimary/80 font-SofiaSans leading-relaxed text-base sm:text-[17px] text-justify">
+                        BMI does not measure body composition directly, and it may not accurately reflect the
+                        health or wellness of individuals of a specific race/ethnic group, those with high
+                        muscle mass, pregnant women, children, the elderly, or those with specific health
+                        conditions. BMI should not be used as a sole diagnostic tool.
+                    </p>
+
+                    <p className="mt-6 text-darkprimary/80 font-SofiaSans leading-relaxed text-base sm:text-[17px] text-justify">
+                        The BMI calculator does not determine eligibility for any weight loss medications or
+                        treatments provided via the Hims/Hers platform. Consultation with a healthcare provider
+                        is required to assess suitability for any medical treatment based on individual health
+                        and medical history.
+                    </p>
+                </div>
+            </div>
+
+
         </section>
     );
 }

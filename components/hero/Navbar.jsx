@@ -38,24 +38,11 @@ function MegaPanel({ menuKey, onNavigate }) {
 
     return (
         <div
-            className="watermark w-full border-t  rounded-b-3xl bg-lightprimary"
+            className="w-full border-t  rounded-b-3xl bg-lightprimary"
         >
             <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-12 md:px-6">
                 <div
-                    className="watermark md:col-span-1"
-                    data-text="somi"
-                    style={{
-                        '--wm-size': '160px',     // text size
-                        '--wm-stroke-c': '#364c781d',                   // outline color
-                        '--wm-stroke-w': '2px',                       // outline width
-                        '--wm-fill': 'transparent',                   // set e.g. 'rgba(0,0,0,.06)' for filled text
-                        '--wm-font': '"Sofia Sans", ui-sans-serif',      // font family
-                        '--wm-weight': 700,                           // font weight
-                        '--wm-tracking': '0em',                    // letter spacing
-                        '--wm-opacity': 1,                         // overall opacity
-                        '--wm-left': '-7rem',                         // horizontal offset
-                        '--wm-rotate': '90deg',                       // rotate; use '0deg' for horizontal
-                    }}
+                    className="md:col-span-1"
                 >
                 </div>
                 {data.type === "categorized" ? (
@@ -656,8 +643,8 @@ export default function Navbar({ brand = "somi" }) {
     return (
         <header className="sticky top-0 z-50 bg-white">
             {/* White top bar */}
-            <div ref={wrapperRef} className="relative border-b">
-                <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+            <div ref={wrapperRef} className="relative">
+                <nav className="mx-auto flex w-full items-center justify-between px-4 py-3 md:px-6">
                     {/* Left: Hamburger (mobile) */}
                     <button
                         className="inline-flex items-center gap-2 rounded-md p-2 md:hidden"

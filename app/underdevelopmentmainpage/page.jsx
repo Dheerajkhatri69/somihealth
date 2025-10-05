@@ -23,7 +23,6 @@ export default async function Home() {
       <WeightLossPlans />
       <ClientVideoReviews />
       <StoriesWithReviews />
-      <BMICalculator />
       <CompoundedExplainer />
       <HowItWorksGnz />
       <TabsDemo />

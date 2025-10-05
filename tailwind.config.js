@@ -80,6 +80,7 @@ module.exports = {
 			fontFamily: {
 				tagesschrift: ["Cormorant Garamond", "serif"],
 				SofiaSans: ["Sofia Sans", "sans-serif"],
+				Poppins: ["Poppins", "sans-serif"]
 			},
 		}
 	},

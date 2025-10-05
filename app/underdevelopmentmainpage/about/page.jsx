@@ -199,25 +199,7 @@ export default function AboutPage() {
                             </p>
 
                             {/* Ticker stats */}
-                            <div className="watermark mt-8 rounded-3xl border-lightprimary border-2 grid gap-6 sm:grid-cols-3"
-                                data-text="somi"
-                                style={{
-                                    '--wm-size': '160px',     // text size
-                                    '--wm-stroke-c': '#364c781d',                   // outline color
-                                    '--wm-stroke-w': '2px',                       // outline width
-                                    '--wm-fill': 'transparent',                   // set e.g. 'rgba(0,0,0,.06)' for filled text
-                                    '--wm-font': '"Sofia Sans", ui-sans-serif',      // font family
-                                    '--wm-weight': 700,                           // font weight
-                                    '--wm-tracking': '0em',                    // letter spacing
-                                    '--wm-opacity': 1,                         // overall opacity
-                                    '--wm-left': '-7rem',                         // horizontal offset
-                                    '--wm-top': '0rem',                         // horizontal offset
-                                    '--wm-rotate': '90deg',                       // rotate; use '0deg' for horizontal
-
-                                    backgroundImage:
-                                        "linear-gradient(#E9ECF1 50%,#FFFFFF 50%)",
-                                }}
-                            >
+                            <div className="mt-8 rounded-3xl border-lightprimary border-2 grid gap-6 sm:grid-cols-3">
                                 {content?.stats?.stats?.map((stat, index) => (
                                     <Stat
                                         key={index}

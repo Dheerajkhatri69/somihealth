@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import * as Icons from "lucide-react";
+import { Fragment } from "react";
 
 function Icon({ name, className }) {
     const Cmp = Icons[name] || Icons.Circle;
@@ -11,15 +12,20 @@ function Icon({ name, className }) {
 }
 
 export default function ProductHero({ product }) {
-    const { label, heroImage, price, unit, inStock, ratingLabel, bullets, description, ctas } =
-        product;
+    const { label, heroImage, price, unit, inStock, bullets, description, ctas } = product;
+
+    // ⬇️ Add your logo paths here (update paths if different)
+    const payLogos = [
+        { src: "/pay/klarna-badge.png", alt: "Klarna" },
+        { src: "/pay/paypal-badge.png", alt: "PayPal" }, // 3rd image is PayPal
+
+        { src: "/pay/affirm-badge.webp", alt: "Affirm" },
+    ];
 
     return (
         <section className="grid items-start gap-10 md:grid-cols-2">
             {/* Image / soft panel */}
-            <div
-                className="rounded-3xl p-6 md:p-10 bg-darkprimary-foreground/20"
-            >
+            <div className="rounded-3xl p-6 md:p-10 bg-darkprimary-foreground/20">
                 <div className="relative mx-auto aspect-[4/3] max-w-md">
                     <Image
                         src={heroImage}
@@ -41,7 +47,7 @@ export default function ProductHero({ product }) {
                     </span>
                 </div>
 
-                <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">{label}</h1>
+                <h1 className="text-2xl sm:text-4xl text-darkprimary tracking-tight">{label}</h1>
                 <p className="mt-3 text-xl md:text-2xl">
                     From <span className="font-semibold">${price}</span> {unit}
                 </p>
@@ -60,18 +66,51 @@ export default function ProductHero({ product }) {
                 <p className="mt-6 text-gray-700">{description}</p>
 
                 <div className="mt-8 space-y-3">
+                    {/* Primary CTA keeps */}
                     <Link
                         href={ctas?.primary?.href || "#"}
                         className="btn-hero block w-full rounded-full bg-darkprimary px-6 py-4 text-center text-sm font-semibold text-white hover:opacity-90"
                     >
                         {ctas?.primary?.label || "Get started"}
                     </Link>
-                    <Link
-                        href={ctas?.secondary?.href || "#"}
-                        className="btn-hero block w-full rounded-full bg-transparent px-6 py-4 text-center text-sm font-semibold text-secondary border-2 border-darkprimary overflow-hidden"
-                    >
-                        {ctas?.secondary?.label || "Book a consultation"}
-                    </Link>
+
+                    {/* ⬇️ Payment strip replaces the secondary CTA button */}
+                    <div className="w-full rounded-2xl bg-darkprimary-foreground/20 px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between gap-3">
+                        {/* Left: icon + text */}
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-darkprimary/10">
+                                <Icons.PiggyBank className="h-4 w-4 text-darkprimary/80" />
+                            </span>
+                            <span className="text-[15px] font-semibold text-darkprimary/90">
+                                Pay Over Time With
+                            </span>
+                        </div>
+
+                        {/* Right: logos with "or" separators */}
+                        <div className="flex items-center gap-2 sm:gap-3 ml-4">
+                            {payLogos.map((logo, idx) => (
+                                <Fragment key={logo.alt}>
+                                    <div className="relative h-7 w-auto sm:h-8">
+                                        <Image
+                                            src={logo.src}
+                                            alt={logo.alt}
+                                            width={96}
+                                            height={32}
+                                            className="h-full w-auto rounded-md"
+                                            sizes="(max-width:768px) 80px, 96px"
+                                        />
+                                    </div>
+                                    {/* "or" between logos, not after the last */}
+                                    {idx < payLogos.length - 1 && (
+                                        <span className="text-sm text-gray-600 select-none" aria-hidden="true">
+                                            or
+                                        </span>
+                                    )}
+                                </Fragment>
+                            ))}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>

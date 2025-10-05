@@ -342,10 +342,15 @@ export default function ClientVideoReviews() {
     <section className="w-full py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <header className="mb-6 flex items-end justify-between gap-4">
-          <h2 className="text-2xl font-SofiaSans font-bold sm:text-3xl">
-            {headerText}
+          <h2 className="text-3xl sm:text-4xl font-SofiaSans text-darkprimary uppercase">
+            {/* Split your headerText */}
+            {headerText.split(" ").slice(0, -1).join(" ")}{" "}
+            <span className="bg-gradient-to-r from-[#AEBFA3] via-[#9BB0B9] to-[#6F91C8] bg-clip-text text-transparent">
+              {headerText.split(" ").slice(-1)}
+            </span>
           </h2>
         </header>
+
 
         {/* --- Mobile: 1 per slide --- */}
         <div className="lg:hidden">

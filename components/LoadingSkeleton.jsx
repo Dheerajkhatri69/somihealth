@@ -128,7 +128,7 @@ export function PageLoadingSkeleton() {
 // Categories grid skeleton
 export function CategoriesGridSkeleton() {
   return (
-    <section className="w-full watermark bg-[#F4F4F8] py-10 sm:py-14">
+    <section className="w-full bg-[#F4F4F8] py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         {/* Mobile skeleton */}
         <div className="lg:hidden">

@@ -751,26 +751,27 @@ export default function WebsiteHome() {
                 {/* Right Section - Hero Text Management */}
                 <section className="w-full lg:w-1/2">
                     {/* Header */}
+                    {/* Header */}
                     <div className="mb-4 flex items-center justify-between">
                         <div>
                             <h1 className="text-xl font-semibold text-gray-900">Hero Text</h1>
-                            <p className="text-sm text-gray-500">Manage the main hero text and rotating lines.</p>
+                            <p className="text-sm text-gray-500">Manage the main hero text, rotating lines, and features.</p>
                         </div>
-                        {!isEditingHero && (
-                            <button
-                                onClick={startEditingHero}
-                                className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-white hover:bg-secondary/80"
-                            >
-                                <Edit size={18} />
-                                Edit
-                            </button>
-                        )}
+
+                        <Link
+                            href="/dashboard/websitehome/hero-text"   // NEW dedicated editor page
+                            className="inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-white hover:bg-secondary/80"
+                        >
+                            <Edit size={18} />
+                            Edit
+                        </Link>
                     </div>
 
                     {/* Hero Text Card */}
                     <div className="rounded-2xl border-l-4 border border-gray-200 border-l-secondary bg-white shadow-md">
                         {heroLoading ? (
                             <div className="p-6">
+                                {/* skeleton as you had */}
                                 <div className="space-y-4">
                                     <div className="h-6 w-3/4 rounded bg-gray-200 animate-pulse" />
                                     <div className="space-y-2">
@@ -779,97 +780,39 @@ export default function WebsiteHome() {
                                     </div>
                                 </div>
                             </div>
-                        ) : isEditingHero ? (
-                            <div className="p-6 space-y-4">
-                                {/* Main Title Input */}
+                        ) : (
+                            <div className="p-6 space-y-6">
+                                {/* Main Title */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Main Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={editingHero.mainTitle}
-                                        onChange={(e) => setEditingHero(prev => ({ ...prev, mainTitle: e.target.value }))}
-                                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter main title..."
-                                    />
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Main Title</h3>
+                                    <p className="text-gray-700 bg-gray-50 p-3 rounded-md">{heroText.mainTitle}</p>
                                 </div>
 
                                 {/* Rotating Lines */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Rotating Lines
-                                    </label>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Rotating Lines ({heroText.rotatingLines?.length || 0})</h3>
                                     <div className="space-y-2">
-                                        {editingHero.rotatingLines.map((line, index) => (
-                                            <div key={index} className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={line}
-                                                    onChange={(e) => updateRotatingLine(index, e.target.value)}
-                                                    className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    placeholder={`Rotating line ${index + 1}...`}
-                                                />
-                                                {editingHero.rotatingLines.length > 1 && (
-                                                    <button
-                                                        onClick={() => removeRotatingLine(index)}
-                                                        className="rounded-md bg-red-100 p-2 text-red-600 hover:bg-red-200"
-                                                    >
-                                                        <X size={16} />
-                                                    </button>
-                                                )}
+                                        {heroText.rotatingLines?.map((line, i) => (
+                                            <div key={i} className="bg-gray-50 p-3 rounded-md">
+                                                <span className="text-sm text-gray-600">#{i + 1}</span>
+                                                <p className="text-gray-700 mt-1">{line}</p>
                                             </div>
                                         ))}
-                                        <button
-                                            onClick={addRotatingLine}
-                                            className="text-sm text-blue-600 hover:text-blue-700"
-                                        >
-                                            + Add another line
-                                        </button>
                                     </div>
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="flex gap-2 pt-4">
-                                    <button
-                                        onClick={saveHeroText}
-                                        className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-                                    >
-                                        <Save size={16} />
-                                        Save
-                                    </button>
-                                    <button
-                                        onClick={cancelEditingHero}
-                                        className="inline-flex items-center gap-2 rounded-lg bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
-                                    >
-                                        <X size={16} />
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="p-6">
-                                <div className="space-y-4">
-                                    {/* Main Title Display */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Main Title</h3>
-                                        <p className="text-gray-700 bg-gray-50 p-3 rounded-md">
-                                            {heroText.mainTitle}
-                                        </p>
-                                    </div>
-
-                                    {/* Rotating Lines Display */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Rotating Lines</h3>
-                                        <div className="space-y-2">
-                                            {heroText.rotatingLines.map((line, index) => (
-                                                <div key={index} className="bg-gray-50 p-3 rounded-md">
-                                                    <span className="text-sm text-gray-600">#{index + 1}</span>
-                                                    <p className="text-gray-700 mt-1">{line}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                {/* Features Overview */}
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Features ({heroText.features?.length || 0})</h3>
+                                    <ul className="space-y-2">
+                                        {(heroText.features || []).sort((a, b) => (a?.sortOrder ?? 0) - (b?.sortOrder ?? 0)).map((f, i) => (
+                                            <li key={i} className="flex items-center gap-2 bg-gray-50 p-3 rounded-md">
+                                                <span className="text-xs text-gray-500">#{i + 1}</span>
+                                                <span className="text-xs text-gray-500">[{f.icon}]</span>
+                                                <span className="text-gray-700">{f.text}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </div>
                         )}

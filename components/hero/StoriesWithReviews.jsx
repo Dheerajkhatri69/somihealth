@@ -30,9 +30,26 @@ const Arrow = ({ dir = "right", className = "h-5 w-5" }) => (
   </svg>
 );
 
-const Star = ({ className = "h-4 w-4" }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="#F8C33C" aria-hidden="true">
+// Full star
+const Star = ({ className = "h-4 w-4", fill = "#22c55e" }) => (
+  <svg viewBox="0 0 24 24" className={className} fill={fill} aria-hidden="true">
     <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.401 8.168L12 18.896 4.665 23.165l1.401-8.168L.132 9.21l8.2-1.192L12 .587z" />
+  </svg>
+);
+
+// Half star (left half filled)
+const HalfStar = ({ className = "h-4 w-4", fill = "#22c55e" }) => (
+  <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+    <defs>
+      <linearGradient id="halfFill" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="50%" stopColor={fill} />
+        <stop offset="50%" stopColor="lightgray" />
+      </linearGradient>
+    </defs>
+    <path
+      d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.401 8.168L12 18.896 4.665 23.165l1.401-8.168L.132 9.21l8.2-1.192L12 .587z"
+      fill="url(#halfFill)"
+    />
   </svg>
 );
 
@@ -51,10 +68,11 @@ function ReviewCard({ quote, author, rating = 5, verified = true }) {
       <div className="p-6 sm:p-7">
         {/* header */}
         <div className="mb-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1" aria-label={`${stars} out of 5 stars`}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className={`h-4 w-4 ${i < stars ? "" : "opacity-25"}`} />
+          <div className="flex items-center gap-1" aria-label="4.5 out of 5 stars">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Star key={i} className="h-4 w-4" fill="#22c55e" /> // full green stars
             ))}
+            <HalfStar className="h-4 w-4" fill="#22c55e" />
           </div>
           {verified && (
             <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">
@@ -164,12 +182,12 @@ export default function StoriesWithReviews() {
                       Excellent
                     </span>
 
-                    <div className="flex items-center gap-1" aria-label="5 out of 5 stars">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className="h-4 w-4" />
+                    <div className="flex items-center gap-1" aria-label="4.5 out of 5 stars">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4" fill="#22c55e" />
                       ))}
+                      <HalfStar className="h-4 w-4" fill="#22c55e" />
                     </div>
-
                     <span className="text-xs font-semibold opacity-90">
                       Trustpilot
                     </span>

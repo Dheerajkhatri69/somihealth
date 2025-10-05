@@ -77,20 +77,7 @@ export default function ProductTypePage({ params }) {
             <FeatureBanner queryKey="global" />
             <Navbar />
             <main
-                className="px-4 md:px-6 watermark"
-                data-text="somi"
-                style={{
-                    '--wm-size': '250px',
-                    '--wm-stroke-c': '#364c781d',
-                    '--wm-stroke-w': '2px',
-                    '--wm-fill': 'transparent',
-                    '--wm-font': '"Sofia Sans", ui-sans-serif',
-                    '--wm-weight': 700,
-                    '--wm-tracking': '0em',
-                    '--wm-opacity': 1,
-                    '--wm-left': '-10rem',
-                    '--wm-rotate': '90deg',
-                }}
+                className="px-4 md:px-6"
             >
                 <div className="mx-auto max-w-6xl font-SofiaSans ">
                     <ProTypeHero
@@ -163,8 +150,10 @@ export default function ProductTypePage({ params }) {
                     />
                 </div>
             </main>
-
-            <ClientVideoReviews />
+            
+            {!["Erectile Dysfunction", "Skin+Hair"].includes((title || "").trim()) && (
+                <ClientVideoReviews />
+            )}
             <CompoundedExplainer />
             <HowItWorksGnz />
             {title === "Weight Loss" ? <></> : <TabsDemo />}

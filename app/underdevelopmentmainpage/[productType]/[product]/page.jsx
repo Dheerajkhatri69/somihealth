@@ -38,7 +38,9 @@ export default function ProductPage({ params }) {
           )}
         </div>
       </main>
-      <ClientVideoReviews />
+      {!["erectile-dysfunction", "skin-hair"].includes((productType || "").trim()) && (
+        <ClientVideoReviews />
+      )}
       <CompoundedExplainer />
       <HowItWorksGnz />
       <FaqPro />

@@ -47,36 +47,32 @@ export default function CompoundedExplainer() {
     }
 
     return (
-        <section
-            className="relative isolate w-full overflow-hidden"
-        >
+        <section className="relative isolate w-full overflow-hidden">
             <div className="mx-auto max-w-7xl p-4 md:p-6 pt-10 md:pt-14">
                 {/* layout: text left (5/12), image right (7/12) */}
-                <div className="mt-6 grid items-center gap-8 md:mt-8 md:grid-cols-12 md:gap-12">
+                {/* CHANGED: items-center -> items-stretch */}
+                <div className="mt-6 grid items-stretch gap-8 md:mt-8 md:grid-cols-12 md:gap-12">
                     {/* LEFT – copy */}
-                    <div className="md:col-span-5 text-[15px] leading-7 text-gray-700 sm:text-base">
+                    {/* OPTIONAL: h-full helps define the row height from left content */}
+                    <div className="md:col-span-5 text-[15px] leading-7 text-gray-700 sm:text-base h-full">
                         <h2 className="font-SofiaSans text-3xl mb-4 leading-tight text-gray-900 sm:text-4xl md:text-[40px]">
                             {content.title}
                         </h2>
-                        {/* Tabs list */}
-                        {/* Tabs list – clean media rows */}
+
                         <div className="mt-6 space-y-8">
                             {Array.isArray(content.tabs) &&
                                 content.tabs.map((t, i) => {
-                                    const Icon = LucideIcons[t.icon] || LucideIcons.Sparkles; // fallback
+                                    const Icon = LucideIcons[t.icon] || LucideIcons.Sparkles;
                                     return (
                                         <div key={i} className="flex items-start gap-4">
-                                            {/* Icon inline with subtitle */}
                                             <span className="mt-0.5 flex h-6 w-6 items-center justify-center text-secondary">
                                                 <Icon className="h-5 w-5" />
                                             </span>
-
-                                            {/* Text block */}
                                             <div className="min-w-0">
                                                 <p className="font-semibold text-[16px] sm:text-[17px] text-gray-900 flex items-center gap-2">
                                                     {t.subtitle}
                                                 </p>
-                                                <p className="mt-1 text-[15px] sm:text-[16px] leading-7 text-gray-700">
+                                                <p className="mt-1 text-[15px] sm:text[16px] leading-7 text-gray-700">
                                                     {t.description}
                                                 </p>
                                             </div>
@@ -87,21 +83,20 @@ export default function CompoundedExplainer() {
                     </div>
 
                     {/* RIGHT – big image */}
-                    <div className="md:col-span-7">
-                        <div className="relative ml-auto w-full max-w-[780px] lg:max-w-[880px]">
-                            {/* subtle backdrop glow */}
+                    {/* CHANGED: ensure this column stretches and the wrappers are h-full */}
+                    <div className="md:col-span-7 h-full">
+                        <div className="relative ml-auto w-full max-w-[780px] lg:max-w-[880px] h-full">
                             <div
                                 className="pointer-events-none absolute -inset-6 rounded-[36px] bg-white/40 blur-2xl"
                                 aria-hidden="true"
                             />
-                            {/* ratio wrapper so the fill image is responsive */}
-                            <div className="relative rounded-[28px] ring-1 ring-black/5 shadow-lg overflow-hidden"
-                                style={{ aspectRatio: "4 / 5" }}>
+                            {/* CHANGED: remove fixed aspect ratio, make container h-full; add a sensible min-height for small screens */}
+                            <div className="relative rounded-[28px] ring-1 ring-black/5 shadow-lg overflow-hidden h-full min-h-[320px] sm:min-h-[420px]">
                                 <Image
                                     src={content.image}
                                     alt={content.title || "Compounded GLP-1"}
                                     fill
-                                    priority={true}
+                                    priority
                                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 60vw, 780px"
                                     className="object-cover"
                                 />
@@ -111,5 +106,6 @@ export default function CompoundedExplainer() {
                 </div>
             </div>
         </section>
+
     );
 }
