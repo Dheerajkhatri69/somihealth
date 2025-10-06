@@ -55,7 +55,7 @@ export default function CompoundedExplainer() {
                     {/* LEFT – copy */}
                     {/* OPTIONAL: h-full helps define the row height from left content */}
                     <div className="md:col-span-5 text-[15px] leading-7 text-gray-700 sm:text-base h-full">
-                        <h2 className="font-SofiaSans text-3xl mb-4 leading-tight text-gray-900 sm:text-4xl md:text-[40px]">
+                        <h2 className="font-SofiaSans text-3xl mb-4 leading-tight text-darkprimary sm:text-4xl md:text-[40px]">
                             {content.title}
                         </h2>
 
@@ -64,12 +64,12 @@ export default function CompoundedExplainer() {
                                 content.tabs.map((t, i) => {
                                     const Icon = LucideIcons[t.icon] || LucideIcons.Sparkles;
                                     return (
-                                        <div key={i} className="flex items-start gap-4">
-                                            <span className="mt-0.5 flex h-6 w-6 items-center justify-center text-secondary">
+                                        <div key={i} className="flex items-start gap-4 font-SofiaSans">
+                                            <span className="mt-0.5 flex h-6 w-6 items-center justify-center text-darkprimary">
                                                 <Icon className="h-5 w-5" />
                                             </span>
                                             <div className="min-w-0">
-                                                <p className="font-semibold text-[16px] sm:text-[17px] text-gray-900 flex items-center gap-2">
+                                                <p className="font-semibold text-[16px] sm:text-[17px] text-darkprimary flex items-center gap-2">
                                                     {t.subtitle}
                                                 </p>
                                                 <p className="mt-1 text-[15px] sm:text[16px] leading-7 text-gray-700">
@@ -90,19 +90,23 @@ export default function CompoundedExplainer() {
                                 className="pointer-events-none absolute -inset-6 rounded-[36px] bg-white/40 blur-2xl"
                                 aria-hidden="true"
                             />
-                            {/* CHANGED: remove fixed aspect ratio, make container h-full; add a sensible min-height for small screens */}
+
+                            {/* Responsive aspect ratio container */}
                             <div className="relative rounded-[28px] ring-1 ring-black/5 shadow-lg overflow-hidden h-full min-h-[320px] sm:min-h-[420px]">
-                                <Image
-                                    src={content.image}
-                                    alt={content.title || "Compounded GLP-1"}
-                                    fill
-                                    priority
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 60vw, 780px"
-                                    className="object-cover"
-                                />
+                                <div className="relative w-full h-full md:aspect-[16/9] aspect-[3/4]">
+                                    <Image
+                                        src={content.image}
+                                        alt={content.title || "Compounded GLP-1"}
+                                        fill
+                                        priority
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 60vw, 780px"
+                                        className="object-cover"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { RotatingLine } from "./Hero";
 
 /* ------------------ Content Config ------------------ */
 export const HERO_CONTENT = {
@@ -138,12 +139,12 @@ export default function ProTypeHero({ content = HERO_CONTENT, onCta = () => { } 
                             </p>
                         ) : null}
 
-                        <h1 className="text-3xl md:text-5xl tracking-tight">
+                        <h1 className="text-3xl md:text-5xl tracking-tight text-darkprimary">
                             {content.headingLine1}
                         </h1>
 
                         {/* Rotating line (left aligned) */}
-                        <NewRotatingLine
+                        <RotatingLine
                             lines={content.lines}
                             interval={2200}
                             duration={450}

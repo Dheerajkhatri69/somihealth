@@ -40,20 +40,21 @@ function MegaPanel({ menuKey, onNavigate }) {
         <div
             className="w-full border-t  rounded-b-3xl bg-lightprimary"
         >
-            <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-12 md:px-6">
+            <div className={`mx-auto grid ${data.type === "categorized" ? "max-w-8xl" : "max-w-7xl"} grid-cols-1 gap-8 px-4 py-10 md:grid-cols-12 md:px-6`}>
                 <div
                     className="md:col-span-1"
                 >
                 </div>
                 {data.type === "categorized" ? (
                     <>
-                        {/* Direct Primary Care */}
-
-                        <div className="md:col-span-3">
+                        <div className="md:col-span-2">
+                            <h3 className="text-lg font-semibold text-darkprimary mb-3 font-SofiaSans">
+                                Discover
+                            </h3>
                             <Link
                                 href={`/underdevelopmentmainpage/${data.slug}`}
                                 onClick={onNavigate}
-                                className="fx86 inline-flex font-SofiaSans w-full items-center mb-4 justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
                                 style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                             >
                                 {data.name}
@@ -61,115 +62,95 @@ function MegaPanel({ menuKey, onNavigate }) {
                                     <ArrowRight />
                                 </span>
                             </Link>
-                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Direct Primary Care</div>
-                            <ul className="mt-4 space-y-2">
-                                {data.categories[0]?.items.map((item) => (
-                                    <li key={item.label}>
-                                        <Link
-                                            href={item.href}
-                                            onClick={onNavigate}
-                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
-                                        >
-                                            {/* Label */}
-                                            <span className="text-lg font-SofiaSans">
-                                                {item.label}
-                                            </span>
-
-                                            {/* Animated underline (grows from left on hover) */}
-                                            <span
-                                                aria-hidden="true"
-                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
-                                            />
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
+                            <Link
+                                href={"/underdevelopmentmainpage/general-health/hot-flashes"}
+                                onClick={onNavigate}
+                                className="fx86 inline-flex mt-4 min-w-[160px] font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                            >
+                                Testing
+                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                    <ArrowRight />
+                                </span>
+                            </Link>
                         </div>
+                        {data.categories?.map((cat, idx) => {
+                            const isRefill =
+                                /refill/i.test(cat?.title ?? "") || idx === data.categories.length - 1;
+                            const spanClass = isRefill ? "md:col-span-3" : "md:col-span-2";
 
-                        {/* Same-day Care */}
-                        <div className="md:col-span-3">
-                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Same-day Care</div>
-                            <ul className="mt-4 space-y-2">
-                                {data.categories[1]?.items.map((item) => (
-                                    <li key={item.label}>
-                                        <Link
-                                            href={item.href}
-                                            onClick={onNavigate}
-                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
-                                        >
-                                            {/* Label */}
-                                            <span className="text-lg font-SofiaSans">
-                                                {item.label}
-                                            </span>
+                            return (
+                                <div key={cat?._id || cat?.title || idx} className={spanClass}>
 
-                                            {/* Animated underline (grows from left on hover) */}
-                                            <span
-                                                aria-hidden="true"
-                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
-                                            />
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Medication Refill */}
-                        <div className="md:col-span-4">
-                            <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Medication Refill</div>
-                            <ul className="mt-4 space-y-2">
-                                {data.categories[2]?.items.map((item) => (
-                                    <li key={item.label}>
-                                        <Link
-                                            href={item.href}
-                                            onClick={onNavigate}
-                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
-                                        >
-                                            {/* Label */}
-                                            <span className="text-lg font-SofiaSans">
-                                                {item.label}
-                                            </span>
-
-                                            {/* Animated underline (grows from left on hover) */}
-                                            <span
-                                                aria-hidden="true"
-                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
-                                            />
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                            <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                                <img src={data.cta.img} alt="" className="h-full w-full object-cover" />
-
-                                {/* subtle gradient to improve readability */}
-                                <div
-                                    className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
-                                    aria-hidden="true"
-                                />
-                                <div className="absolute left-4 top-4 right-4">
-                                    <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
-                                        {String(data?.cta?.title ?? '').replace(/\\n/g, '\n')}
+                                    {/* Category title from DB */}
+                                    <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">
+                                        {cat?.title}
                                     </div>
+
+                                    {/* Items from DB */}
+                                    <ul className="mt-4 space-y-2">
+                                        {cat?.items?.map((item) => (
+                                            <li key={item?._id || item?.label}>
+                                                <Link
+                                                    href={item?.href || "#"}
+                                                    onClick={onNavigate}
+                                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                                >
+                                                    <span className="text-lg font-SofiaSans">{item?.label}</span>
+
+                                                    {/* Animated underline */}
+                                                    <span
+                                                        aria-hidden="true"
+                                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100 motion-reduce:hidden"
+                                                    />
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {/* CTA card only on the Refill section (uses your existing data.cta) */}
+                                    {isRefill && data?.cta && (
+                                        <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
+                                            <img
+                                                src={data.cta.img}
+                                                alt=""
+                                                className="h-full w-full object-cover"
+                                            />
+
+                                            {/* subtle gradient to improve readability */}
+                                            <div
+                                                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
+                                                aria-hidden="true"
+                                            />
+
+                                            {/* Title */}
+                                            <div className="absolute left-4 top-4 right-4">
+                                                <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
+                                                    {String(data?.cta?.title ?? "").replace(/\\n/g, "\n")}
+                                                </div>
+                                            </div>
+
+                                            {/* Button */}
+                                            {data?.cta?.button && (
+                                                <div className="absolute bottom-4 left-4">
+                                                    <Link
+                                                        href={data.cta.button.href}
+                                                        onClick={onNavigate}
+                                                        className="fx86 inline-flex items-center gap-3 font-SofiaSans rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                                                        style={{ "--fx86-base": "transparent" }}
+                                                    >
+                                                        {data.cta.button.label}
+                                                        <span className="inline-flex h-7 w-7 items-center justify-center">
+                                                            <ArrowRight />
+                                                        </span>
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-
-
-
-                                {/* button – bottom-left */}
-                                <div className="absolute bottom-4 left-4">
-                                    <Link
-                                        href={data.cta.button.href}
-                                        onClick={onNavigate}
-                                        className="fx86 inline-flex items-center gap-3 font-SofiaSans  rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                                        style={{ "--fx86-base": "transparent" }}
-                                    >
-                                        {data.cta.button.label}
-                                        <span className="inline-flex h-7 w-7 items-center justify-center">
-                                            <ArrowRight />
-                                        </span>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
+                            );
+                        })}
                     </>
                 ) : (
                     <>
@@ -349,11 +330,14 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                 </div>
             ) : menuData?.type === "categorized" ? (
                 <>
-                    {/* Direct Primary Care */}
+                    <h3 className="text-lg font-semibold text-darkprimary mb-3 font-SofiaSans">
+                        Discover
+                    </h3>
+                    {/* Direct Primary Care (top pill stays the same, from menuData) */}
                     <Link
                         href={`/underdevelopmentmainpage/${menuData.slug}`}
                         onClick={onNavigate}
-                        className="fx86 inline-flex font-SofiaSans w-full items-center mb-4 justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                        className="fx86 inline-flex font-SofiaSans w-full items-center  justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
                         style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                     >
                         {menuData.name}
@@ -361,78 +345,48 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                             <ArrowRight />
                         </span>
                     </Link>
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Direct Primary Care</div>
-                    <ul className="space-y-3 mb-8">
-                        {menuData.categories[0]?.items.map((item) => (
-                            <li key={item.label}>
-                                <Link
-                                    href={item.href}
-                                    onClick={onNavigate}
-                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
-                                >
-                                    {/* Label */}
-                                    <span className="text-lg font-SofiaSans">
-                                        {item.label}
-                                    </span>
+                    <Link
+                        href={"/underdevelopmentmainpage/general-health/hot-flashes"}
+                        onClick={onNavigate}
+                        className="fx86 inline-flex mt-4 min-w-[160px] font-SofiaSans w-full mb-4 items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                    >
+                        Testing
+                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                            <ArrowRight />
+                        </span>
+                    </Link>
+                    {/* Render all categories from DB in order */}
+                    {menuData.categories?.map((cat, idx) => (
+                        <div key={cat?._id || `${cat?.title}-${idx}`}>
+                            <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">
+                                {cat?.title}
+                            </div>
 
-                                    {/* Animated underline (grows from left on hover) */}
-                                    <span
-                                        aria-hidden="true"
-                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
-                                    />
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+                            <ul className={`space-y-3 ${idx < (menuData.categories?.length ?? 0) - 1 ? "mb-8" : ""}`}>
+                                {cat?.items?.map((item) => (
+                                    <li key={item?._id || item?.label}>
+                                        <Link
+                                            href={item?.href}
+                                            onClick={onNavigate}
+                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                        >
+                                            {/* Label */}
+                                            <span className="text-lg font-SofiaSans">{item?.label}</span>
 
-                    {/* Same-day Care */}
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Same-day Care</div>
-                    <ul className="space-y-3 mb-8">
-                        {menuData.categories[1]?.items.map((item) => (
-                            <li key={item.label}>
-                                <Link
-                                    href={item.href}
-                                    onClick={onNavigate}
-                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
-                                >
-                                    {/* Label */}
-                                    <span className="text-lg font-SofiaSans">
-                                        {item.label}
-                                    </span>
+                                            {/* Animated underline (grows from left on hover) */}
+                                            <span
+                                                aria-hidden="true"
+                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
+                                            />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
 
-                                    {/* Animated underline (grows from left on hover) */}
-                                    <span
-                                        aria-hidden="true"
-                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
-                                    />
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-
-                    {/* Medication Refill */}
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-4 text-darkprimary">Medication Refill</div>
-                    <ul className="space-y-3">
-                        {menuData.categories[2]?.items.map((item) => (
-                            <li key={item.label}>
-                                <Link
-                                    href={item.href}
-                                    onClick={onNavigate}
-                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
-                                >
-                                    {/* Label */}
-                                    <span className="text-lg font-SofiaSans">
-                                        {item.label}
-                                    </span>
-                                    {/* Animated underline (grows from left on hover) */}
-                                    <span
-                                        aria-hidden="true"
-                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
-                                    />
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+                    {/* CTA block (unchanged) */}
                     <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
                         <img src={menuData.cta?.img} alt="" className="h-full w-full object-cover" />
 
@@ -445,7 +399,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                         {/* title – top-left */}
                         <div className="absolute left-4 top-4 right-4">
                             <div className="whitespace-pre-line text-xl font-SofiaSans font-bold tracking-tight text-white drop-shadow">
-                                {String(menuData?.cta?.title ?? '').replace(/\\n/g, '\n')}
+                                {String(menuData?.cta?.title ?? "").replace(/\\n/g, "\n")}
                             </div>
                         </div>
 

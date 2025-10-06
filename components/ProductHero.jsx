@@ -10,6 +10,21 @@ function Icon({ name, className }) {
     const Cmp = Icons[name] || Icons.Circle;
     return <Cmp className={className} aria-hidden />;
 }
+const CheckSeal = ({ className = "h-4 w-4" }) => (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+        {/* green circle (soft olive like the screenshot) */}
+        <circle cx="12" cy="12" r="10" fill="#008000" />
+        {/* white check */}
+        <path
+            d="M8 12.5l2.5 2.5 5-5"
+            stroke="#ffffff"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+        />
+    </svg>
+);
 
 export default function ProductHero({ product }) {
     const { label, heroImage, price, unit, inStock, bullets, description, ctas } = product;
@@ -25,7 +40,14 @@ export default function ProductHero({ product }) {
     return (
         <section className="grid items-start gap-10 md:grid-cols-2">
             {/* Image / soft panel */}
-            <div className="rounded-3xl p-6 md:p-10 bg-darkprimary-foreground/20">
+            <div className="relative rounded-3xl p-6 md:p-10 bg-darkprimary-foreground/20">
+                {/* Badge */}
+                <div className="absolute top-4 font-SofiaSans left-4 bg-white text-[#1a1a1a] text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                    <CheckSeal />
+                    HSA & FSA accepted
+                </div>
+
+                {/* Image */}
                 <div className="relative mx-auto aspect-[4/3] max-w-md">
                     <Image
                         src={heroImage}

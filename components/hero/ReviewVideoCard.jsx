@@ -324,9 +324,7 @@ export default function ClientVideoReviews() {
       <section className="w-full py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <header className="mb-6 flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-SofiaSans font-bold sm:text-3xl">
-              {headerText}
-            </h2>
+            <div className="h-10 w-[200px] bg-gray-200 animate-pulse rounded-2xl" />
           </header>
           <div className="space-y-4">
             {Array.from({ length: 2 }).map((_, i) => (

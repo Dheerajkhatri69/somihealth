@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 
 const FAQManagementPage = () => {
   const [faqData, setFaqData] = useState({
+    _id: '',
     heading: '',
     subheading: '',
     faqs: [],
@@ -17,7 +18,7 @@ const FAQManagementPage = () => {
     footerTitle: '',
     footerDescription: '',
     footerButtonText: '',
-    footerButtonLink: ''
+    footerButtonLink: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,10 +27,10 @@ const FAQManagementPage = () => {
   useEffect(() => {
     const fetchFAQData = async () => {
       try {
-        const response = await fetch('/api/faq');
+        const response = await fetch('/api/faq', { cache: 'no-store' });
         if (response.ok) {
           const data = await response.json();
-          setFaqData(data);
+          setFaqData((prev) => ({ ...prev, ...data })); // keep shape, include _id
         }
       } catch (error) {
         console.error('Error fetching FAQ data:', error);
@@ -41,20 +42,22 @@ const FAQManagementPage = () => {
     fetchFAQData();
   }, []);
 
-  // Save FAQ data
+  // Save FAQ data (POST first time, PUT afterwards)
   const handleSave = async () => {
     setSaving(true);
     try {
+      const hasId = Boolean(faqData?._id);
+      const method = hasId ? 'PUT' : 'POST';
       const response = await fetch('/api/faq', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        method,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(faqData),
       });
 
       if (response.ok) {
-        toast.success('FAQ data saved successfully!');
+        const saved = await response.json();
+        setFaqData((prev) => ({ ...prev, ...saved })); // sync with server
+        toast.success(hasId ? 'FAQ updated!' : 'FAQ created!');
       } else {
         toast.error('Failed to save FAQ data');
       }
@@ -68,53 +71,49 @@ const FAQManagementPage = () => {
 
   // Add new FAQ item
   const addFAQ = () => {
-    setFaqData(prev => ({
+    setFaqData((prev) => ({
       ...prev,
-      faqs: [...prev.faqs, { question: '', answer: '', sortOrder: prev.faqs.length }]
+      faqs: [...(prev.faqs || []), { question: '', answer: '', sortOrder: prev.faqs?.length || 0 }],
     }));
   };
 
   // Remove FAQ item
   const removeFAQ = (index) => {
-    setFaqData(prev => ({
+    setFaqData((prev) => ({
       ...prev,
-      faqs: prev.faqs.filter((_, i) => i !== index)
+      faqs: prev.faqs.filter((_, i) => i !== index),
     }));
   };
 
   // Update FAQ item
   const updateFAQ = (index, field, value) => {
-    setFaqData(prev => ({
+    setFaqData((prev) => ({
       ...prev,
-      faqs: prev.faqs.map((item, i) => 
-        i === index ? { ...item, [field]: value } : item
-      )
+      faqs: prev.faqs.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
     }));
   };
 
   // Add new benefit
   const addBenefit = () => {
-    setFaqData(prev => ({
+    setFaqData((prev) => ({
       ...prev,
-      benefits: [...prev.benefits, { text: '', sortOrder: prev.benefits.length }]
+      benefits: [...(prev.benefits || []), { text: '', sortOrder: prev.benefits?.length || 0 }],
     }));
   };
 
   // Remove benefit
   const removeBenefit = (index) => {
-    setFaqData(prev => ({
+    setFaqData((prev) => ({
       ...prev,
-      benefits: prev.benefits.filter((_, i) => i !== index)
+      benefits: prev.benefits.filter((_, i) => i !== index),
     }));
   };
 
   // Update benefit
   const updateBenefit = (index, value) => {
-    setFaqData(prev => ({
+    setFaqData((prev) => ({
       ...prev,
-      benefits: prev.benefits.map((item, i) => 
-        i === index ? { ...item, text: value } : item
-      )
+      benefits: prev.benefits.map((item, i) => (i === index ? { ...item, text: value } : item)),
     }));
   };
 
@@ -130,7 +129,7 @@ const FAQManagementPage = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">FAQ Management</h1>
-        <Button onClick={handleSave} disabled={saving} className='bg-secondary text-white hover:bg-secondary/90'>
+        <Button onClick={handleSave} disabled={saving || loading} className="bg-secondary text-white hover:bg-secondary/90">
           {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
           Save Changes
         </Button>
@@ -149,7 +148,7 @@ const FAQManagementPage = () => {
                 <label className="block text-sm font-medium mb-2">Heading</label>
                 <Input
                   value={faqData.heading}
-                  onChange={(e) => setFaqData(prev => ({ ...prev, heading: e.target.value }))}
+                  onChange={(e) => setFaqData((prev) => ({ ...prev, heading: e.target.value }))}
                   placeholder="Enter main heading"
                 />
               </div>
@@ -157,7 +156,7 @@ const FAQManagementPage = () => {
                 <label className="block text-sm font-medium mb-2">Subheading</label>
                 <Input
                   value={faqData.subheading}
-                  onChange={(e) => setFaqData(prev => ({ ...prev, subheading: e.target.value }))}
+                  onChange={(e) => setFaqData((prev) => ({ ...prev, subheading: e.target.value }))}
                   placeholder="Enter subheading"
                 />
               </div>
@@ -169,7 +168,7 @@ const FAQManagementPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>FAQ Items</CardTitle>
-                <Button onClick={addFAQ} size="sm" className='bg-secondary text-white hover:bg-secondary/90'>
+                <Button onClick={addFAQ} size="sm" className="bg-secondary text-white hover:bg-secondary/90">
                   <Plus className="h-4 w-4 mr-2" />
                   Add FAQ
                 </Button>
@@ -180,11 +179,7 @@ const FAQManagementPage = () => {
                 <div key={index} className="border rounded-lg p-4 space-y-3">
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium">FAQ Item {index + 1}</h4>
-                    <Button
-                      onClick={() => removeFAQ(index)}
-                      variant="destructive"
-                      size="sm"
-                    >
+                    <Button onClick={() => removeFAQ(index)} variant="destructive" size="sm">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -216,7 +211,7 @@ const FAQManagementPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Benefits List</CardTitle>
-                <Button onClick={addBenefit} size="sm" className='bg-secondary text-white hover:bg-secondary/90'>
+                <Button onClick={addBenefit} size="sm" className="bg-secondary text-white hover:bg-secondary/90">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Benefit
                 </Button>
@@ -225,16 +220,8 @@ const FAQManagementPage = () => {
             <CardContent className="space-y-4">
               {faqData.benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    value={benefit.text}
-                    onChange={(e) => updateBenefit(index, e.target.value)}
-                    placeholder="Enter benefit text"
-                  />
-                  <Button
-                    onClick={() => removeBenefit(index)}
-                    variant="destructive"
-                    size="sm"
-                  >
+                  <Input value={benefit.text} onChange={(e) => updateBenefit(index, e.target.value)} placeholder="Enter benefit text" />
+                  <Button onClick={() => removeBenefit(index)} variant="destructive" size="sm">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -245,7 +232,7 @@ const FAQManagementPage = () => {
 
         {/* Right Column - Footer Content */}
         <div className="space-y-6">
-          <Card className="border-l-4 border-gray-200 border-l-secondary"> 
+          <Card className="border-l-4 border-gray-200 border-l-secondary">
             <CardHeader>
               <CardTitle>Footer Callout</CardTitle>
             </CardHeader>
@@ -254,7 +241,7 @@ const FAQManagementPage = () => {
                 <label className="block text-sm font-medium mb-2">Footer Title</label>
                 <Input
                   value={faqData.footerTitle}
-                  onChange={(e) => setFaqData(prev => ({ ...prev, footerTitle: e.target.value }))}
+                  onChange={(e) => setFaqData((prev) => ({ ...prev, footerTitle: e.target.value }))}
                   placeholder="Enter footer title"
                 />
               </div>
@@ -262,7 +249,7 @@ const FAQManagementPage = () => {
                 <label className="block text-sm font-medium mb-2">Footer Description</label>
                 <Textarea
                   value={faqData.footerDescription}
-                  onChange={(e) => setFaqData(prev => ({ ...prev, footerDescription: e.target.value }))}
+                  onChange={(e) => setFaqData((prev) => ({ ...prev, footerDescription: e.target.value }))}
                   placeholder="Enter footer description"
                   rows={3}
                 />
@@ -271,7 +258,7 @@ const FAQManagementPage = () => {
                 <label className="block text-sm font-medium mb-2">Button Text</label>
                 <Input
                   value={faqData.footerButtonText}
-                  onChange={(e) => setFaqData(prev => ({ ...prev, footerButtonText: e.target.value }))}
+                  onChange={(e) => setFaqData((prev) => ({ ...prev, footerButtonText: e.target.value }))}
                   placeholder="Enter button text"
                 />
               </div>
@@ -279,7 +266,7 @@ const FAQManagementPage = () => {
                 <label className="block text-sm font-medium mb-2">Button Link</label>
                 <Input
                   value={faqData.footerButtonLink}
-                  onChange={(e) => setFaqData(prev => ({ ...prev, footerButtonLink: e.target.value }))}
+                  onChange={(e) => setFaqData((prev) => ({ ...prev, footerButtonLink: e.target.value }))}
                   placeholder="Enter button link"
                 />
               </div>

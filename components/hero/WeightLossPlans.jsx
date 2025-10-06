@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
@@ -30,6 +30,109 @@ function ArrowRight() {
     </svg>
   );
 }
+
+export function AnimatedTitle({ title, interval = 2200, duration = 450, className = "" }) {
+  const COLOR_CLASSES = [
+    "text-[#9e9eff]",
+    "text-[#006db0]",
+    "text-[#0093af]",
+    "text-[#8a8aee]",
+  ];
+
+  // split into prefix + last word
+  const words = String(title || "").trim().split(" ");
+  const lastWord = words.pop();
+  const prefix = words.join(" ");
+
+  // animation state
+  const [animating, setAnimating] = useState(false);
+  const curColorIdxRef = useRef(Math.floor(Math.random() * COLOR_CLASSES.length));
+  const nextColorIdxRef = useRef((curColorIdxRef.current + 1) % COLOR_CLASSES.length);
+  const aliveRef = useRef(true);
+  const tRef = useRef(null);
+
+  const pickDifferentColor = (prev) => {
+    if (COLOR_CLASSES.length < 2) return prev;
+    let idx = Math.floor(Math.random() * COLOR_CLASSES.length);
+    if (idx === prev) idx = (idx + 1) % COLOR_CLASSES.length;
+    return idx;
+  };
+
+  useEffect(() => {
+    aliveRef.current = true;
+
+    const cycle = () => {
+      if (!aliveRef.current) return;
+      // trigger slide: current slides out, next slides in (same word, different color)
+      nextColorIdxRef.current = pickDifferentColor(curColorIdxRef.current);
+      setAnimating(true);
+
+      // after the slide duration, commit the next color as current and wait for the next interval
+      tRef.current = setTimeout(() => {
+        if (!aliveRef.current) return;
+        curColorIdxRef.current = nextColorIdxRef.current;
+        setAnimating(false);
+
+        tRef.current = setTimeout(cycle, interval);
+      }, duration);
+    };
+
+    // initial delay = interval, then animate
+    tRef.current = setTimeout(cycle, interval);
+
+    return () => {
+      aliveRef.current = false;
+      clearTimeout(tRef.current);
+    };
+  }, [interval, duration]);
+
+  const curColorClass = COLOR_CLASSES[curColorIdxRef.current];
+  const nextColorClass = COLOR_CLASSES[nextColorIdxRef.current];
+
+  return (
+    <h2
+      className={`text-start font-SofiaSans text-darkprimary text-3xl sm:text-5xl ${className}`}
+      style={{ "--rot-dur": `${duration}ms` }}
+    >
+      {/* prefix text stays static */}
+      {prefix && <span>{prefix} </span>}
+
+      {/* animated last-word container */}
+      {/* animated last-word container (baseline-safe) */}
+      <span
+        className="inline-grid align-baseline leading-[1em] h-[1em] whitespace-nowrap overflow-hidden"
+        style={{ "--rot-dur": `${duration}ms` }}
+      >
+        {/* sizing ghost (defines width/height & baseline) */}
+        <span className="opacity-0 pointer-events-none col-start-1 row-start-1">
+          {lastWord}
+        </span>
+
+        {/* current word (slides out up) */}
+        <span
+          key={`cur-${curColorIdxRef.current}-${animating ? "anim" : "idle"}`}
+          className={`col-start-1 row-start-1 ${curColorClass} ${animating ? "animate-slide-out-up" : "opacity-100"
+            } will-change-transform`}
+          aria-hidden={animating}
+        >
+          {lastWord}
+        </span>
+
+        {/* next word (slides in from below) */}
+        <span
+          key={`next-${nextColorIdxRef.current}-${animating ? "anim" : "idle"}`}
+          className={`col-start-1 row-start-1 ${nextColorClass} ${animating ? "animate-slide-in-up" : "opacity-0"
+            } will-change-transform`}
+          aria-hidden={!animating}
+        >
+          {lastWord}
+        </span>
+      </span>
+
+    </h2>
+  );
+}
+
 
 export default function WeightLossPlans() {
   const { data, isLoading, error } = useWebsiteData();
@@ -150,9 +253,7 @@ export default function WeightLossPlans() {
               <div className="mx-auto h-6 w-3/4 max-w-xl rounded bg-slate-200" />
             </div>
           ) : (
-            <h2 className="text-start font-SofiaSans text-3xl sm:text-5xl">
-              {ph.title || "Wellness Plan designed by clinicians to optimize your health."}
-            </h2>
+            <AnimatedTitle title={ph.title} />
           )}
 
           {plans.length >= 3 ? (

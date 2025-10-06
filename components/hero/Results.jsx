@@ -229,7 +229,7 @@ export function TabsDemo() {
                                                 aria-hidden="true"
                                             />
                                             <h3 className="mt-2 text-center text-lg font-semibold text-gray-800">{s.title}</h3>
-                                            <p className="mt-3 text-center text-base leading-6 text-gray-600">{s.desc}</p>
+                                            <p className="mt-3 text-[15px] sm:text[16px] leading-7 text-gray-700 text-center">{s.desc}</p>
                                         </div>
                                     </div>
                                 ))}

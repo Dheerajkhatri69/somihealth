@@ -69,10 +69,9 @@ function ReviewCard({ quote, author, rating = 5, verified = true }) {
         {/* header */}
         <div className="mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-1" aria-label="4.5 out of 5 stars">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} className="h-4 w-4" fill="#22c55e" /> // full green stars
             ))}
-            <HalfStar className="h-4 w-4" fill="#22c55e" />
           </div>
           {verified && (
             <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">
@@ -85,7 +84,7 @@ function ReviewCard({ quote, author, rating = 5, verified = true }) {
         {/* body */}
         <blockquote className="relative">
           <span className="absolute left-0 top-1 h-6 w-1 rounded-full bg-darkprimary/20" aria-hidden="true" />
-          <p className="clamped break-words hyphens-auto pl-3 text-[15px] leading-6 text-gray-800 sm:text-base">
+          <p className="clamped break-words font-SofiaSans text-[15px] sm:text[16px] leading-7 text-gray-700 hyphens-auto pl-3 ">
             {quote}
           </p>
         </blockquote>
@@ -194,7 +193,7 @@ export default function StoriesWithReviews() {
                   </div>
 
                   {/* Headline (with optional italic segment) */}
-                  <h2 className="mt-3 font-SofiaSans text-3xl font-bold leading-tight text-darkprimary sm:text-4xl">
+                  <h2 className="mt-3 font-SofiaSans text-3xl leading-tight text-darkprimary sm:text-4xl">
                     {hasEmphasis ? (
                       <>
                         {parts[0]}
