@@ -12,7 +12,7 @@ export default function ProductsIndexPage() {
     const [q, setQ] = useState('');
 
     // PlanHeader state
-    const [ph, setPh] = useState({ title: '', subtitle: '' });
+    const [ph, setPh] = useState({ title: "", items: [] });
     const [phLoading, setPhLoading] = useState(true);
     const [phSaving, setPhSaving] = useState(false);
 
@@ -54,7 +54,7 @@ export default function ProductsIndexPage() {
             if (!j?.success) throw new Error(j?.message || 'Failed to load plan header');
             setPh({
                 title: j.result?.title || '',
-                subtitle: j.result?.subtitle || '',
+                items: Array.isArray(j.result?.items) ? j.result.items : [],
             });
         } catch (e) {
             console.error(e);
@@ -65,21 +65,25 @@ export default function ProductsIndexPage() {
     }
 
     async function savePlanHeader() {
-        if (!ph.title.trim() || !ph.subtitle.trim()) {
-            toast.error('Please fill in both Title and Subtitle');
+        const cleanItems = (ph.items || [])
+            .map((s) => (typeof s === 'string' ? s.trim() : ''))
+            .filter(Boolean);
+
+        if (!ph.title.trim() || cleanItems.length === 0) {
+            toast.error('Please enter a Title and at least one Item');
             return;
         }
+
         setPhSaving(true);
         try {
             const r = await fetch('/api/planheader', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(ph),
+                body: JSON.stringify({ title: ph.title, items: cleanItems }),
             });
             const j = await r.json();
             if (!j?.success) throw new Error(j?.message || 'Update failed');
             toast.success('Plan header updated');
-            // refresh local copy just in case server modified defaults
             await fetchPlanHeader();
         } catch (e) {
             console.error(e);
@@ -158,7 +162,7 @@ export default function ProductsIndexPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <label className="block">
+                            <label className="block md:col-span-2">
                                 <span className="text-sm font-medium text-gray-700">Title</span>
                                 <input
                                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -167,15 +171,24 @@ export default function ProductsIndexPage() {
                                     onChange={(e) => setPh((p) => ({ ...p, title: e.target.value }))}
                                 />
                             </label>
+
                             <label className="block md:col-span-2">
-                                <span className="text-sm font-medium text-gray-700">Subtitle</span>
+                                <span className="text-sm font-medium text-gray-700">Items (one per line)</span>
                                 <textarea
-                                    rows={3}
+                                    rows={5}
                                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary"
-                                    placeholder="Your journey deserves more than one-size-fits-all…"
-                                    value={ph.subtitle}
-                                    onChange={(e) => setPh((p) => ({ ...p, subtitle: e.target.value }))}
+                                    placeholder={`Speed\nStability\nStyle\nSomi ❤️`}
+                                    value={(ph.items || []).join('\n')}
+                                    onChange={(e) =>
+                                        setPh((p) => ({
+                                            ...p,
+                                            items: e.target.value.split('\n').map((s) => s.trim()),
+                                        }))
+                                    }
                                 />
+                                <p className="mt-1 text-xs text-gray-500">
+                                    These rotate in the hero line. You can reorder, add, or remove lines.
+                                </p>
                             </label>
                         </div>
                     )}

@@ -31,7 +31,14 @@ function ArrowRight() {
   );
 }
 
-export function AnimatedTitle({ title, interval = 2200, duration = 450, className = "" }) {
+export function AnimatedTitle({
+  items = [],
+  prefix = "",
+  suffix = "",
+  interval = 2200,
+  duration = 450,
+  className = "",
+}) {
   const COLOR_CLASSES = [
     "text-[#9e9eff]",
     "text-[#006db0]",
@@ -39,15 +46,23 @@ export function AnimatedTitle({ title, interval = 2200, duration = 450, classNam
     "text-[#8a8aee]",
   ];
 
-  // split into prefix + last word
-  const words = String(title || "").trim().split(" ");
-  const lastWord = words.pop();
-  const prefix = words.join(" ");
+  // guard: if no items, render nothing (or just prefix/suffix)
+  const safeItems = Array.isArray(items) && items.length > 0 ? items : [""];
+  const longestItem = useMemo(
+    () => safeItems.reduce((a, b) => (String(b).length > String(a).length ? b : a), ""),
+    [safeItems]
+  );
 
   // animation state
   const [animating, setAnimating] = useState(false);
+
+  // refs so we don't re-run effects unnecessarily
+  const curItemIdxRef = useRef(0);
+  const nextItemIdxRef = useRef(safeItems.length > 1 ? 1 : 0);
+
   const curColorIdxRef = useRef(Math.floor(Math.random() * COLOR_CLASSES.length));
   const nextColorIdxRef = useRef((curColorIdxRef.current + 1) % COLOR_CLASSES.length);
+
   const aliveRef = useRef(true);
   const tRef = useRef(null);
 
@@ -63,28 +78,39 @@ export function AnimatedTitle({ title, interval = 2200, duration = 450, classNam
 
     const cycle = () => {
       if (!aliveRef.current) return;
-      // trigger slide: current slides out, next slides in (same word, different color)
+
+      // compute next item + next color
+      nextItemIdxRef.current = (curItemIdxRef.current + 1) % safeItems.length;
       nextColorIdxRef.current = pickDifferentColor(curColorIdxRef.current);
+
+      // start animation (current slides out, next slides in)
       setAnimating(true);
 
-      // after the slide duration, commit the next color as current and wait for the next interval
+      // after slide completes, commit next -> current
       tRef.current = setTimeout(() => {
         if (!aliveRef.current) return;
+
+        curItemIdxRef.current = nextItemIdxRef.current;
         curColorIdxRef.current = nextColorIdxRef.current;
+
         setAnimating(false);
 
+        // wait idle interval, then loop
         tRef.current = setTimeout(cycle, interval);
       }, duration);
     };
 
-    // initial delay = interval, then animate
+    // initial idle wait, then animate
     tRef.current = setTimeout(cycle, interval);
 
     return () => {
       aliveRef.current = false;
-      clearTimeout(tRef.current);
+      if (tRef.current) clearTimeout(tRef.current);
     };
-  }, [interval, duration]);
+  }, [interval, duration, safeItems.length]);
+
+  const currentText = safeItems[curItemIdxRef.current] ?? "";
+  const nextText = safeItems[nextItemIdxRef.current] ?? "";
 
   const curColorClass = COLOR_CLASSES[curColorIdxRef.current];
   const nextColorClass = COLOR_CLASSES[nextColorIdxRef.current];
@@ -94,41 +120,42 @@ export function AnimatedTitle({ title, interval = 2200, duration = 450, classNam
       className={`text-start font-SofiaSans text-darkprimary text-3xl sm:text-5xl ${className}`}
       style={{ "--rot-dur": `${duration}ms` }}
     >
-      {/* prefix text stays static */}
+      {/* optional static prefix */}
       {prefix && <span>{prefix} </span>}
 
-      {/* animated last-word container */}
-      {/* animated last-word container (baseline-safe) */}
+      {/* rotating word/phrase (baseline-safe, no layout shift thanks to sizer) */}
       <span
         className="inline-grid align-baseline leading-[1em] h-[1em] whitespace-nowrap overflow-hidden"
         style={{ "--rot-dur": `${duration}ms` }}
       >
-        {/* sizing ghost (defines width/height & baseline) */}
+        {/* sizing ghost keeps width/height stable */}
         <span className="opacity-0 pointer-events-none col-start-1 row-start-1">
-          {lastWord}
+          {longestItem || currentText}
         </span>
 
-        {/* current word (slides out up) */}
+        {/* current item (slides out up) */}
         <span
-          key={`cur-${curColorIdxRef.current}-${animating ? "anim" : "idle"}`}
+          key={`cur-${curItemIdxRef.current}-${curColorIdxRef.current}-${animating ? "anim" : "idle"}`}
           className={`col-start-1 row-start-1 ${curColorClass} ${animating ? "animate-slide-out-up" : "opacity-100"
             } will-change-transform`}
           aria-hidden={animating}
         >
-          {lastWord}
+          {currentText}
         </span>
 
-        {/* next word (slides in from below) */}
+        {/* next item (slides in from below) */}
         <span
-          key={`next-${nextColorIdxRef.current}-${animating ? "anim" : "idle"}`}
+          key={`next-${nextItemIdxRef.current}-${nextColorIdxRef.current}-${animating ? "anim" : "idle"}`}
           className={`col-start-1 row-start-1 ${nextColorClass} ${animating ? "animate-slide-in-up" : "opacity-0"
             } will-change-transform`}
           aria-hidden={!animating}
         >
-          {lastWord}
+          {nextText}
         </span>
       </span>
 
+      {/* optional static suffix */}
+      {suffix && <span> {suffix}</span>}
     </h2>
   );
 }
@@ -183,8 +210,8 @@ export default function WeightLossPlans() {
       }),
     []
   );
-
-  const [ph, setPh] = useState({ title: "", subtitle: "" });
+  // state + fetch
+  const [ph, setPh] = useState({ title: "", items: [] });
   const [phLoading, setPhLoading] = useState(true);
 
   useEffect(() => {
@@ -193,18 +220,22 @@ export default function WeightLossPlans() {
       try {
         const r = await fetch("/api/planheader", { cache: "no-store" });
         const j = await r.json();
-        if (mounted && j?.success)
-          setPh({ title: j.result?.title, subtitle: j.result?.subtitle });
+        if (mounted && j?.success) {
+          const res = j.result || {};
+          setPh({
+            title: res.title ?? "",
+            items: Array.isArray(res.items) ? res.items : [],
+          });
+        }
       } catch (e) {
         console.error(e);
       } finally {
         if (mounted) setPhLoading(false);
       }
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
+
 
   if (error) {
     return (
@@ -253,8 +284,14 @@ export default function WeightLossPlans() {
               <div className="mx-auto h-6 w-3/4 max-w-xl rounded bg-slate-200" />
             </div>
           ) : (
-            <AnimatedTitle title={ph.title} />
+            <AnimatedTitle
+              prefix={ph.title}
+              items={ph.items?.length ? ph.items : ['Speed', 'Stability', 'Style', 'Somi ❤️']}
+              interval={2200}
+              duration={450}
+            />
           )}
+
 
           {plans.length >= 3 ? (
             <div>
