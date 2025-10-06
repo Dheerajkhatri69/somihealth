@@ -78,7 +78,7 @@ export default function FaqPro() {
         className="overflow-hidden transition-[max-height,opacity,transform] duration-500 ease-in-out will-change-[max-height,opacity,transform]"
         style={{ maxHeight: `${maxH}px`, opacity: isOpen ? 1 : 0, transform: isOpen ? 'translateY(0)' : 'translateY(-6px)' }}
       >
-        <div ref={innerRef} className="px-5 pb-5 pl-7 pr-6 text-sm leading-6 text-gray-700 sm:px-6 sm:pl-8 sm:text-base">
+        <div ref={innerRef} className="px-5 pb-5 pl-7 pr-6 text-sm leading-6 text-gray-700 sm:px-6 sm:pl-8 sm:text-lg">
           {children}
         </div>
       </div>
@@ -87,14 +87,14 @@ export default function FaqPro() {
 
   return (
     <section className="relative isolate w-full overflow-hidden py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
         <div className="grid items-start gap-10 md:grid-cols-3">
           {/* Left */}
           <div className="md:sticky font-SofiaSans">
             <span className="border-darkprimary border-2 inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-1 text-lg font-semibold text-secondary">
               <ShieldIcon className="h-5 w-5" /> FAQ
             </span>
-            <h2 className="mt-3 text-2xl font-bold sm:text-3xl">{faqData.heading}</h2>
+            <h2 className="mt-3 text-2xl text-darkprimary sm:text-3xl">{faqData.heading}</h2>
             <p className="mt-2 text-sm font-semibold text-secondary sm:text-lg">{faqData.subheading}</p>
 
             <ul className="mt-5 space-y-2 text-base text-gray-600">
@@ -130,7 +130,7 @@ export default function FaqPro() {
                           }`}
                       >
                         <span className="mt-2 block h-2 w-2 flex-shrink-0 rounded-full bg-secondary/70" />
-                        <span className="flex-1 pr-6 text-base font-semibold sm:text-lg font-SofiaSans">
+                        <span className="flex-1 pr-6 text-base font-semibold sm:text-xl font-SofiaSans">
                           {item.question}
                         </span>
                         <PlusMinusIcon open={isOpen} />

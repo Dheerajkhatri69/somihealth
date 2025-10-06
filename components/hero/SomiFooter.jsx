@@ -95,12 +95,12 @@ export default function SomiFooter() {
             style={{ backgroundImage: "linear-gradient(#FFFFFF 0 230px, #364C78 230px 100%)" }}
         >
             {/* === TOP CTA CARD === */}
-            <section className="mx-auto -mt-24 max-w-6xl px-4 md:px-6">
+            <section className="mx-auto -mt-24 max-w-7xl px-4 md:px-6">
                 <div className="rounded-2xl bg-lightprimary p-6 shadow-2xl ring-1 ring-white/10 sm:pt-8 sm:px-8 md:pt-10 md:px-10">
                     <div className="grid items-center gap-6 md:grid-cols-2">
                         {/* Left copy */}
                         <div className="text-secondary">
-                            <h3 className="text-3xl font-extrabold font-SofiaSans leading-snug sm:text-4xl">
+                            <h3 className="text-3xl font-SofiaSans leading-snug sm:text-4xl">
                                 {footerData.ctaTitle}
                             </h3>
                             {footerData.ctaDescription ? (
@@ -148,7 +148,7 @@ export default function SomiFooter() {
             </section>
 
             {/* === MAIN FOOTER === */}
-            <div className="mx-auto max-w-6xl px-4 pb-10 pt-24 md:px-6">
+            <div className="mx-auto max-w-7xl px-4 pb-10 pt-24 md:px-6">
                 <div className="flex flex-col justify-between md:flex-row gap-10 md:gap-10 lg:gap-16">
                     {/* Brand + blurb + socials + badges */}
                     <div>
@@ -190,17 +190,30 @@ export default function SomiFooter() {
                         <ul className="space-y-3 text-sm text-white/85">
                             <li className="flex items-start gap-3">
                                 <Phone className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>{footerData?.contactInfo?.phone}</span>
+                                <a
+                                    href={`tel:${footerData?.contactInfo?.phone}`}
+                                    className="hover:underline hover:text-white transition"
+                                >
+                                    {footerData?.contactInfo?.phone}
+                                </a>
                             </li>
+
                             <li className="flex items-start gap-3">
                                 <MapPin className="mt-0.5 h-4 w-4 flex-none text-white/70" />
                                 <span>{footerData?.contactInfo?.address}</span>
                             </li>
+
                             <li className="flex items-start gap-3">
                                 <Mail className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>{footerData?.contactInfo?.email}</span>
+                                <a
+                                    href={`mailto:${footerData?.contactInfo?.email}`}
+                                    className="hover:underline hover:text-white transition"
+                                >
+                                    {footerData?.contactInfo?.email}
+                                </a>
                             </li>
                         </ul>
+
                     </div>
 
                     {/* Badges */}
