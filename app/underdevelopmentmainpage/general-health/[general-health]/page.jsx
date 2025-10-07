@@ -70,10 +70,6 @@ export default function GeneralHealthPage({ params }) {
                     </>
                 )}
             </main>
-            <ClientVideoReviews />
-            <CompoundedExplainer />
-            <HowItWorksGnz />
-            <TabsDemo />
             <FaqPro />
             <SomiFooter />
         </>

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Save, X, Trash2, Settings, Globe, GripVertical, Image as ImageIcon } from 'lucide-react';
 import UploadMediaLite from '@/components/UploadMediaLite';
+import toast from 'react-hot-toast';
 
 function TextInput({ label, value, onChange, placeholder = '' }) {
     return (
@@ -68,9 +69,11 @@ export default function GHContentDashboard() {
             if (data?.success) {
                 setContent(data.result);
                 setEditing(data.result);
+                toast.success("successfully updated");
             }
         } catch (e) {
             console.error(e);
+            toast.error("Error");
         } finally {
             setSaving(false);
         }
@@ -287,6 +290,209 @@ export default function GHContentDashboard() {
                                     </button>
                                 </div>
                             </section>
+                            {/* GLOW COMPARE */}
+                            <section className="space-y-4">
+                                <h3 className="text-lg font-medium text-gray-900">Glow Compare</h3>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <TextInput
+                                        label="Title"
+                                        value={editing?.glowCompare?.title}
+                                        onChange={(v) => setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, title: v } }))}
+                                    />
+                                    <TextInput
+                                        label="First Column Title"
+                                        value={editing?.glowCompare?.firstTitle}
+                                        onChange={(v) => setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, firstTitle: v } }))}
+                                    />
+                                    <TextInput
+                                        label="Left Column Title"
+                                        value={editing?.glowCompare?.leftTitle}
+                                        onChange={(v) => setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, leftTitle: v } }))}
+                                    />
+                                    <TextInput
+                                        label="Right Column Title"
+                                        value={editing?.glowCompare?.rightTitle}
+                                        onChange={(v) => setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, rightTitle: v } }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-4">
+                                    {(editing?.glowCompare?.rows || []).map((row, idx) => (
+                                        <div key={idx} className="border rounded-lg p-4 border-gray-200 space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-500 flex items-center gap-2">
+                                                    <GripVertical className="w-4 h-4" /> Row #{idx + 1}
+                                                </span>
+                                                <button
+                                                    className="text-red-600 hover:bg-red-50 rounded px-2 py-1 inline-flex items-center gap-1"
+                                                    onClick={() => {
+                                                        const copy = [...(editing?.glowCompare?.rows || [])];
+                                                        copy.splice(idx, 1);
+                                                        setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, rows: copy } }));
+                                                    }}
+                                                >
+                                                    <Trash2 className="w-4 h-4" /> Remove
+                                                </button>
+                                            </div>
+
+                                            <TextInput
+                                                label="Feature Label"
+                                                value={row.label}
+                                                onChange={(v) => {
+                                                    const copy = [...(editing?.glowCompare?.rows || [])];
+                                                    copy[idx] = { ...copy[idx], label: v };
+                                                    setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, rows: copy } }));
+                                                }}
+                                            />
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <TextArea
+                                                    label="Left Value"
+                                                    rows={2}
+                                                    value={row.left}
+                                                    onChange={(v) => {
+                                                        const copy = [...(editing?.glowCompare?.rows || [])];
+                                                        copy[idx] = { ...copy[idx], left: v };
+                                                        setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, rows: copy } }));
+                                                    }}
+                                                />
+                                                <TextArea
+                                                    label="Right Value"
+                                                    rows={2}
+                                                    value={row.right}
+                                                    onChange={(v) => {
+                                                        const copy = [...(editing?.glowCompare?.rows || [])];
+                                                        copy[idx] = { ...copy[idx], right: v };
+                                                        setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, rows: copy } }));
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <button
+                                        className="inline-flex items-center gap-2 px-3 py-2 rounded bg-slate-900 text-white hover:opacity-90"
+                                        onClick={() => {
+                                            const copy = [...(editing?.glowCompare?.rows || []), { label: "New feature", left: "Left text…", right: "Right text…" }];
+                                            setEditing(p => ({ ...p, glowCompare: { ...p.glowCompare, rows: copy } }));
+                                        }}
+                                    >
+                                        <Plus className="w-4 h-4" /> Add Row
+                                    </button>
+                                </div>
+                            </section>
+                            {/* HEALTH PLANS */}
+                            <section className="space-y-4">
+                                <h3 className="text-lg font-medium text-gray-900">Health Plans</h3>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <TextInput
+                                        label="Title"
+                                        value={editing?.healthPlans?.title}
+                                        onChange={(v) => setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, title: v } }))}
+                                    />
+                                    <TextInput
+                                        label="Subtitle"
+                                        value={editing?.healthPlans?.subtitle}
+                                        onChange={(v) => setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, subtitle: v } }))}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Hero Image</label>
+                                        <UploadMediaLite
+                                            file={editing?.healthPlans?.image?.src}
+                                            onUploadComplete={(url) =>
+                                                setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, image: { ...p.healthPlans.image, src: url } } }))
+                                            }
+                                            onDelete={() =>
+                                                setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, image: { ...p.healthPlans.image, src: '' } } }))
+                                            }
+                                        />
+                                    </div>
+                                    <TextInput
+                                        label="Image Alt"
+                                        value={editing?.healthPlans?.image?.alt}
+                                        onChange={(v) => setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, image: { ...p.healthPlans.image, alt: v } } }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-4">
+                                    {(editing?.healthPlans?.plans || []).map((plan, idx) => (
+                                        <div key={idx} className="border rounded-lg p-4 border-gray-200 space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-500 flex items-center gap-2"><GripVertical className="w-4 h-4" /> Plan #{idx + 1}</span>
+                                                <button
+                                                    className="text-red-600 hover:bg-red-50 rounded px-2 py-1 inline-flex items-center gap-1"
+                                                    onClick={() => {
+                                                        const copy = [...(editing?.healthPlans?.plans || [])];
+                                                        copy.splice(idx, 1);
+                                                        setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, plans: copy } }));
+                                                    }}
+                                                >
+                                                    <Trash2 className="w-4 h-4" /> Remove
+                                                </button>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <TextInput
+                                                    label="Name"
+                                                    value={plan.name}
+                                                    onChange={(v) => {
+                                                        const copy = [...(editing?.healthPlans?.plans || [])];
+                                                        copy[idx] = { ...copy[idx], name: v };
+                                                        setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, plans: copy } }));
+                                                    }}
+                                                />
+                                                <TextInput
+                                                    label="Price Label"
+                                                    value={plan.priceLabel}
+                                                    onChange={(v) => {
+                                                        const copy = [...(editing?.healthPlans?.plans || [])];
+                                                        copy[idx] = { ...copy[idx], priceLabel: v };
+                                                        setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, plans: copy } }));
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <TextArea
+                                                label="Blurb"
+                                                rows={2}
+                                                value={plan.blurb}
+                                                onChange={(v) => {
+                                                    const copy = [...(editing?.healthPlans?.plans || [])];
+                                                    copy[idx] = { ...copy[idx], blurb: v };
+                                                    setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, plans: copy } }));
+                                                }}
+                                            />
+
+                                            <TagsInput
+                                                label="Features"
+                                                tags={plan.features || []}
+                                                onChange={(arr) => {
+                                                    const copy = [...(editing?.healthPlans?.plans || [])];
+                                                    copy[idx] = { ...copy[idx], features: arr };
+                                                    setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, plans: copy } }));
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+
+                                    <button
+                                        className="inline-flex items-center gap-2 px-3 py-2 rounded bg-slate-900 text-white hover:opacity-90"
+                                        onClick={() => {
+                                            const copy = [
+                                                ...(editing?.healthPlans?.plans || []),
+                                                { name: "New Plan", blurb: "Describe this plan…", priceLabel: "$0/mo", features: ["Feature A", "Feature B"] }
+                                            ];
+                                            setEditing(p => ({ ...p, healthPlans: { ...p.healthPlans, plans: copy } }));
+                                        }}
+                                    >
+                                        <Plus className="w-4 h-4" /> Add Plan
+                                    </button>
+                                </div>
+                            </section>
 
                             {/* ACTIONS */}
                             <div className="flex gap-2 pt-4">
@@ -310,6 +516,72 @@ export default function GHContentDashboard() {
                     )}
                 </div>
             </div>
+        </div>
+    );
+}
+function TagsInput({ label = "Features", tags = [], onChange }) {
+    const [value, setValue] = useState("");
+
+    const commit = (t) => {
+        const clean = t.trim();
+        if (!clean) return;
+        const next = [...tags, clean];
+        onChange(next);
+        setValue("");
+    };
+
+    const onKeyDown = (e) => {
+        if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            commit(value);
+        } else if (e.key === "Backspace" && value === "" && tags.length) {
+            // delete last tag on backspace when input empty
+            onChange(tags.slice(0, -1));
+        }
+    };
+
+    const onPaste = (e) => {
+        const text = e.clipboardData.getData("text");
+        if (text.includes(",")) {
+            e.preventDefault();
+            const parts = text
+                .split(",")
+                .map(s => s.trim())
+                .filter(Boolean);
+            if (parts.length) onChange([...tags, ...parts]);
+        }
+    };
+
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+            <div className="w-full min-h-[42px] px-2 py-2 border border-gray-300 rounded-lg flex flex-wrap gap-2">
+                {tags.map((t, i) => (
+                    <span
+                        key={`${t}-${i}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-sm"
+                    >
+                        {t}
+                        <button
+                            type="button"
+                            className="ml-1 text-gray-500 hover:text-red-600"
+                            onClick={() => onChange(tags.filter((_, idx) => idx !== i))}
+                            aria-label={`Remove ${t}`}
+                        >
+                            ×
+                        </button>
+                    </span>
+                ))}
+                <input
+                    className="flex-1 min-w-[120px] outline-none"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    onKeyDown={onKeyDown}
+                    onPaste={onPaste}
+                    placeholder="Type a feature and press , or Enter"
+                />
+            </div>
+            <p className="mt-1 text-xs text-gray-500">Tip: use comma or Enter to add; Backspace to remove last.</p>
         </div>
     );
 }

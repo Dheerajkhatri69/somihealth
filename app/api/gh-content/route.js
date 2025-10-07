@@ -82,6 +82,79 @@ function defaults() {
                 { title: "Men’s health", items: ["Acne, Hair Loss, Sexual Dysfunction"] }
             ]
         },
+        glowCompare: {
+            title: "Exceptional primary care that gets easier each year",
+            firstTitle: "Feature",
+            leftTitle: "Traditional",
+            rightTitle: "Lemonaid",
+            rows: [
+                {
+                    label: "# of patients per doctor",
+                    left: "About 2500 or more. To provide the recommended care to patients, this would require 17+ hours per day!",
+                    right: "With Lemonaid, less than 600. This means more time to focus on you and your needs",
+                },
+                {
+                    label: "Time with doctor per visit",
+                    left: "Typically have time for 15 minutes of care",
+                    right: "Up to 1 hour, or however much time you need",
+                },
+                {
+                    label: "Call, text, and video chat",
+                    left: "Very uncommon to recieve virtual care directly from your doctor",
+                    right: "Yes, we offer unlimited virtual care for our patients",
+                },
+                {
+                    label: "Time and convenience",
+                    left: "The average doctor visit takes 121 minutes devoted to the appointment, including travel, waiting room, payment, and paperwork",
+                    right: "After sign up, the average Lemonaid doctor visit typically takes less than 20 minutes",
+                },
+                {
+                    label: "Payments and costs",
+                    left: "Your insurance co-pay per visit, and frequent surprise bills",
+                    right: "A $99 monthly membership. Nothing more",
+                },
+                {
+                    label: "Availability",
+                    left: "The average wait time to see a doctor in the US is 24 days, and rises each year",
+                    right: "The average wait time to see a Lemonaid doctor, from any location, is less than 2 days",
+                },
+            ],
+        },
+
+        healthPlans: {
+            title: "Health coverage for you and your loved ones",
+            subtitle: "Choose the plan that’s right for you, no insurance required",
+            image: {
+                src: "/hero-family.jpg",
+                alt: "Smiling parent with kids",
+            },
+            plans: [
+                {
+                    name: "Individual Plan",
+                    blurb:
+                        "Partnering you with a doctor who really gets to know you, listens to you, and has the time for you. Aligned with your life.",
+                    priceLabel: "$99/month",
+                    features: [
+                        "No additional fees or co-pays",
+                        "Cancel anytime in the first 30 days",
+                        "Comprehensive one-hour first appointment tailored to your needs",
+                        "Message your medical team whenever you want",
+                        "All your medical records in one place",
+                    ],
+                },
+                {
+                    name: "Family Plan",
+                    blurb:
+                        "Comprehensive, personalized care for you and your spouse or partner. Add on your kids and other family members.",
+                    priceLabel: "Starting at $178/month",
+                    features: [
+                        "All of the benefits of the Individual Plan",
+                        "Share all of your benefits with a spouse or partner",
+                        "Add on your kids and other family members later and cover the entire family",
+                    ],
+                },
+            ],
+        },
         config: { isActive: true }
     };
 }
@@ -91,13 +164,10 @@ export async function GET() {
     try {
         await connectDB();
         let content = await GeneralHealthContent.findOne({ 'config.isActive': true }).lean();
-
         if (!content) {
-            // Seed with defaults
             const seeded = new GeneralHealthContent(defaults());
             content = await seeded.save();
         }
-
         return NextResponse.json({ success: true, result: content });
     } catch (err) {
         console.error('GET /api/gh-content error', err);
@@ -105,35 +175,40 @@ export async function GET() {
     }
 }
 
-// PUT
+// PUT – extend merge logic for new sections
 export async function PUT(req) {
     try {
         await connectDB();
         const body = await req.json();
 
-        // Merge logic: shallow merge for top-level, shallow inside hero/partner/features
         let doc = await GeneralHealthContent.findOne({ 'config.isActive': true });
-
         if (!doc) {
             doc = new GeneralHealthContent({ ...defaults(), ...body, config: { isActive: true } });
             await doc.save();
         } else {
-            // Only update supplied subtrees
             if (body.hero) doc.hero = { ...doc.hero.toObject(), ...body.hero };
             if (body.partner) doc.partner = { ...doc.partner.toObject(), ...body.partner };
             if (body.features) doc.features = { ...doc.features.toObject(), ...body.features };
+            if (body.glowCompare) doc.glowCompare = { ...doc.glowCompare.toObject(), ...body.glowCompare };
+            if (body.healthPlans) doc.healthPlans = { ...doc.healthPlans.toObject(), ...body.healthPlans };
             if (body.config) doc.config = { ...doc.config.toObject(), ...body.config, isActive: true };
 
-            // Allow full array replacement if arrays provided
+            // Array replacements
             if (Array.isArray(body.partner?.items)) doc.partner.items = body.partner.items;
             if (Array.isArray(body.features?.groups)) doc.features.groups = body.features.groups;
+            if (Array.isArray(body.glowCompare?.rows)) doc.glowCompare.rows = body.glowCompare.rows;
+            if (Array.isArray(body.healthPlans?.plans)) doc.healthPlans.plans = body.healthPlans.plans;
+
+            // Image object (healthPlans.image) if fully supplied
+            if (body.healthPlans?.image) {
+                doc.healthPlans.image = { ...doc.healthPlans.image?.toObject?.(), ...body.healthPlans.image };
+            }
 
             await doc.save();
         }
 
         return NextResponse.json({ success: true, result: doc, message: 'GH content updated' });
     } catch (err) {
-        // Handle unique index violation gracefully
         if (err?.code === 11000) {
             return NextResponse.json({ success: false, message: 'Only one active GH content is allowed' }, { status: 409 });
         }

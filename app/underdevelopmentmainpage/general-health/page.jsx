@@ -1,17 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-import ClientVideoReviews from "@/components/hero/ReviewVideoCard";
-import CompoundedExplainer from "@/components/hero/compounded-glp1";
-import HowItWorksGnz from "@/components/hero/HowItworks";
-import { TabsDemo } from "@/components/hero/Results";
 import FaqPro from "@/components/hero/Faq";
 import SomiFooter from "@/components/hero/SomiFooter";
 import Navbar from "@/components/hero/Navbar";
 import PrimaryCareHero from "@/components/GeneralHealth/HeroGH";
 import PartnerWithDoctor from "@/components/GeneralHealth/partnerWithDoctor";
 import PrimaryCareFeatures from "@/components/GeneralHealth/primaryCareFeatures";
+import GlowCompare from '@/components/GeneralHealth/ComparisonGrid';
+import HealthPlans from '@/components/GeneralHealth/HealthPlans';
 
 function SkeletonSection() {
   return (
@@ -30,7 +27,7 @@ export default function GeneralHealthPage() {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { 
+  useEffect(() => {
     (async () => {
       try {
         const res = await fetch('/api/gh-content', { cache: 'no-store' });
@@ -41,27 +38,14 @@ export default function GeneralHealthPage() {
       } finally {
         setLoading(false);
       }
-    })(); 
+    })();
   }, []);
 
   return (
     <>
       <Navbar />
       <main
-        className="px-4 md:px-6 watermark"
-        data-text="somi"
-        style={{
-          '--wm-size': '250px',
-          '--wm-stroke-c': '#364c781d',
-          '--wm-stroke-w': '2px',
-          '--wm-fill': 'transparent',
-          '--wm-font': '"Sofia Sans", ui-sans-serif',
-          '--wm-weight': 700,
-          '--wm-tracking': '0em',
-          '--wm-opacity': 1,
-          '--wm-left': '-10rem',
-          '--wm-rotate': '90deg',
-        }}
+        className="px-4 md:px-6"
       >
         {loading ? (
           <>
@@ -74,14 +58,12 @@ export default function GeneralHealthPage() {
             <PrimaryCareHero content={content?.hero} />
             <PartnerWithDoctor content={content?.partner} />
             <PrimaryCareFeatures content={content?.features} />
+            <GlowCompare {...content?.glowCompare} />
+            <HealthPlans {...content?.healthPlans} />
           </>
         )}
       </main>
 
-      <ClientVideoReviews />
-      <CompoundedExplainer />
-      <HowItWorksGnz />
-      <TabsDemo />
       <FaqPro />
       <SomiFooter />
     </>
