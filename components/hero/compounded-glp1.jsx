@@ -69,10 +69,10 @@ export default function CompoundedExplainer() {
                                                 <Icon className="h-5 w-5" />
                                             </span>
                                             <div className="min-w-0">
-                                                <p className="font-semibold text-[16px] sm:text-[17px] text-darkprimary flex items-center gap-2">
+                                                <p className="font-semibold text-[18px] sm:text-[16px] text-darkprimary flex items-center gap-2">
                                                     {t.subtitle}
                                                 </p>
-                                                <p className="mt-1 text-[15px] sm:text[16px] leading-7 text-gray-700">
+                                                <p className="mt-1 text-[18px] sm:text[16px] leading-7 text-gray-700">
                                                     {t.description}
                                                 </p>
                                             </div>

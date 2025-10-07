@@ -174,7 +174,7 @@ function Step({ eyebrow, caption, icon, title, text }) {
 
 
                 <h3 className="text-center font-SofiaSans text-xl font-semibold text-darkprimary">{title}</h3>
-                <p className="mt-3 text-center text-[15px] sm:text[16px] leading-7 text-gray-700">{text}</p>
+                <p className="mt-3 text-center font-SofiaSans text-[18px] sm:text[16px] leading-7 text-gray-700">{text}</p>
             </div>
         </div>
     );

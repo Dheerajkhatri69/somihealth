@@ -78,7 +78,7 @@ export default function FaqPro() {
         className="overflow-hidden transition-[max-height,opacity,transform] duration-500 ease-in-out will-change-[max-height,opacity,transform]"
         style={{ maxHeight: `${maxH}px`, opacity: isOpen ? 1 : 0, transform: isOpen ? 'translateY(0)' : 'translateY(-6px)' }}
       >
-        <div ref={innerRef} className="px-5 pb-5 pl-7 pr-6 text-sm leading-6 text-gray-700 sm:px-6 sm:pl-8 sm:text-lg">
+        <div ref={innerRef} className="px-5 pb-5 pl-7 pr-6 text-lg font-SofiaSans leading-6 text-gray-700 sm:px-6 sm:pl-8 sm:text-xl">
           {children}
         </div>
       </div>

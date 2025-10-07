@@ -213,8 +213,8 @@ export function TabsDemo() {
                                     <div key={s.idx} className="relative font-SofiaSans">
                                         {(s.cap1 || s.cap2) && (
                                             <div className="mb-2 pl-3 text-[14px] leading-5">
-                                                {s.cap1 && <p className="font-semibold text-base text-secondary">{s.cap1}</p>}
-                                                {s.cap2 && <p className="text-secondary/70 text-base">{s.cap2}</p>}
+                                                {s.cap1 && <p className="font-semibold text-lg text-secondary">{s.cap1}</p>}
+                                                {s.cap2 && <p className="text-secondary/70 text-lg">{s.cap2}</p>}
                                             </div>
                                         )}
                                         <div className="relative rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-black/5">
@@ -229,7 +229,7 @@ export function TabsDemo() {
                                                 aria-hidden="true"
                                             />
                                             <h3 className="mt-2 text-center text-lg font-semibold text-gray-800">{s.title}</h3>
-                                            <p className="mt-3 text-[15px] sm:text[16px] leading-7 text-gray-700 text-center">{s.desc}</p>
+                                            <p className="mt-3 text-[16px] sm:text[17px] leading-7 text-gray-700 text-center">{s.desc}</p>
                                         </div>
                                     </div>
                                 ))}

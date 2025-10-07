@@ -345,7 +345,7 @@ export default function WeightLossPlans() {
                               </CardItem>
 
                               <CardItem translateZ={60}>
-                                <h3 className="mt-1 text-lg font-bold tracking-tight sm:text-2xl font-SofiaSans">
+                                <h3 className="mt-1 text-lg tracking-tight sm:text-2xl font-SofiaSans">
                                   {p.name}
                                 </h3>
                               </CardItem>

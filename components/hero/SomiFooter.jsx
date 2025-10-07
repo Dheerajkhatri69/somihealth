@@ -104,14 +104,14 @@ export default function SomiFooter() {
                                 {footerData.ctaTitle}
                             </h3>
                             {footerData.ctaDescription ? (
-                                <p className="mt-3 text-secondary/90 text-sm sm:text-base">{footerData.ctaDescription}</p>
+                                <p className="mt-3 text-secondary/90 font-SofiaSans text-base sm:text-lg">{footerData.ctaDescription}</p>
                             ) : null}
 
                             <ul className="mt-6 space-y-3 text-sm sm:text-base">
                                 {footerData?.ctaBenefits?.map((benefit, index) => (
                                     <li key={index} className="flex items-start gap-3">
                                         <CheckCircle className="mt-0.5 h-5 w-5 flex-none text-emerald-400" />
-                                        <span className="text-secondary/90">{benefit.text}</span>
+                                        <span className="text-secondary/90 font-SofiaSans text-[18px]">{benefit.text}</span>
                                     </li>
                                 ))}
                             </ul>

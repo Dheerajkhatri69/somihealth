@@ -84,7 +84,7 @@ function ReviewCard({ quote, author, rating = 5, verified = true }) {
         {/* body */}
         <blockquote className="relative">
           <span className="absolute left-0 top-1 h-6 w-1 rounded-full bg-darkprimary/20" aria-hidden="true" />
-          <p className="clamped break-words font-SofiaSans text-[15px] sm:text[16px] leading-7 text-gray-700 hyphens-auto pl-3 ">
+          <p className="clamped break-words font-SofiaSans text-[18px] sm:text[16px] leading-7 text-gray-700 hyphens-auto pl-3 ">
             {quote}
           </p>
         </blockquote>

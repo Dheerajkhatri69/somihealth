@@ -69,7 +69,7 @@ export default function ProductHero({ product }) {
                     </span>
                 </div>
 
-                <h1 className="text-2xl sm:text-4xl text-darkprimary tracking-tight">{label}</h1>
+                <h1 className="text-3xl sm:text-5xl text-darkprimary tracking-tight">{label}</h1>
                 <p className="mt-3 text-xl md:text-2xl">
                     From <span className="font-semibold">${price}</span> {unit}
                 </p>
@@ -80,7 +80,7 @@ export default function ProductHero({ product }) {
                             <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-lightprimary-foreground">
                                 <Icon name={b.icon} className="h-4 w-4 text-darkprimary" />
                             </span>
-                            <span className="text-gray-800">{b.text}</span>
+                            <span className="text-gray-800 text-lg">{b.text}</span>
                         </li>
                     ))}
                 </ul>

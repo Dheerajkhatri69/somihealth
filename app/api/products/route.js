@@ -171,12 +171,12 @@ export async function PUT(request) {
 
     // Handle menu treatment sync with category change detection
     await handleMenuTreatmentSync(oldProduct, result);
-    
+
     // If product slug changed, update treatment hrefs in all menus
     if (oldProduct && oldProduct.slug !== result.slug) {
       await updateTreatmentHrefsForProductSlugChange(oldProduct, result);
     }
-    
+
     return NextResponse.json({ result, success: true });
   } catch (error) {
     console.error('PUT Product Error:', error);
@@ -208,7 +208,7 @@ export async function DELETE(request) {
 
     // Body selector support
     let selectorBody = null;
-    try { selectorBody = await request.json(); } catch {}
+    try { selectorBody = await request.json(); } catch { }
     const selector = selectorBody?.selector || null;
     if (!selector) {
       return NextResponse.json({ success: false, message: 'Product id or selector is required' }, { status: 400 });
@@ -224,10 +224,10 @@ export async function DELETE(request) {
 
     const result = await Product.findOneAndUpdate(query, { isActive: false }, { new: true });
     if (!result) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
-    
+
     // Remove from menu treatments when product is deleted
     await removeProductFromMenuTreatments(result);
-    
+
     return NextResponse.json({ result, success: true });
   } catch (error) {
     console.error('DELETE Product Error:', error);
@@ -239,7 +239,6 @@ export async function DELETE(request) {
 async function handleMenuTreatmentSync(oldProduct, newProduct) {
   try {
     const Menu = (await import('@/lib/model/menu')).default;
-    
     // If category or slug changed, remove the old entry first to avoid duplicates
     if (
       oldProduct &&
@@ -247,7 +246,6 @@ async function handleMenuTreatmentSync(oldProduct, newProduct) {
     ) {
       await removeProductFromMenuTreatments(oldProduct);
     }
-    
     // Add/update in new menu
     await syncProductToMenuTreatments(newProduct);
   } catch (error) {
@@ -259,42 +257,43 @@ async function handleMenuTreatmentSync(oldProduct, newProduct) {
 async function removeProductFromMenuTreatments(product) {
   try {
     const Menu = (await import('@/lib/model/menu')).default;
-    
-    // Find menu by old category name (case-insensitive)
-    const categoryName = product.category;
-    const menu = await Menu.findOne({
-      $or: [
-        { name: { $regex: new RegExp(`^${categoryName}$`, 'i') } },
-        { slug: { $regex: new RegExp(`^${categoryName}$`, 'i') } }
-      ],
-      isActive: true
-    });
-    
-    if (!menu) return; // No matching menu found
-    
-    // Create treatment href to find and remove
+
+    // Remove by productId first (most reliable), then by href as a fallback (legacy)
+    const productId = product._id?.toString?.() || product.id || null;
     const treatmentHref = `/underdevelopmentmainpage/${product.category}/${product.slug}`;
-    
-    // Remove treatment from menu treatments array
-    const initialLength = menu.treatments.length;
-    menu.treatments = menu.treatments.filter(t => t.href !== treatmentHref);
-    
-    // Only save if something was actually removed
-    if (menu.treatments.length < initialLength) {
-      await menu.save();
-      console.log(`Removed treatment "${product.label}" from menu "${menu.name}"`);
+
+    // Find any menus that may contain this treatment
+    const menus = await Menu.find({
+      isActive: true,
+      $or: [
+        { 'treatments.productId': productId || undefined },
+        { 'treatments.href': treatmentHref }
+      ]
+    });
+
+    for (const menu of menus) {
+      const before = menu.treatments.length;
+
+      // Remove any treatment matching productId OR the legacy href
+      menu.treatments = menu.treatments.filter(t =>
+        (productId ? String(t.productId) !== String(productId) : true) &&
+        t.href !== treatmentHref
+      );
+
+      if (menu.treatments.length < before) {
+        await menu.save();
+        console.log(`Removed treatment "${product.label}" from menu "${menu.name}"`);
+      }
     }
   } catch (error) {
     console.error('Error removing product from menu treatments:', error);
   }
 }
 
-// Auto-sync product to menu treatments
 async function syncProductToMenuTreatments(product) {
   try {
     const Menu = (await import('@/lib/model/menu')).default;
-    
-    // Find menu by category name (case-insensitive)
+
     const categoryName = product.category;
     const menu = await Menu.findOne({
       $or: [
@@ -303,29 +302,42 @@ async function syncProductToMenuTreatments(product) {
       ],
       isActive: true
     });
-    
+
     if (!menu) return; // No matching menu found
-    
-    // Create treatment object
+
+    const productId = product._id?.toString?.() || product.id || null;
+
     const treatment = {
+      productId, // <-- new field
       label: product.label,
       href: `/underdevelopmentmainpage/${product.category}/${product.slug}`,
       img: product.heroImage,
       badge: product.trustpilot || ''
     };
-    
-    // Update menu treatments array
-    const existingIndex = menu.treatments.findIndex(t => t.href === treatment.href);
-    if (existingIndex >= 0) {
-      // Update existing treatment
-      menu.treatments[existingIndex] = treatment;
+
+    // 1) Try to find by productId first
+    let idx = -1;
+    if (productId) {
+      idx = menu.treatments.findIndex(t => String(t.productId) === String(productId));
+    }
+
+    // 2) Fallback for legacy items (no productId saved yet): match by href
+    if (idx < 0) {
+      idx = menu.treatments.findIndex(t => t.href === treatment.href);
+    }
+
+    if (idx >= 0) {
+      // Update in place (keeps array position)
+      // Preserve existing `isLink` if present
+      const prev = menu.treatments[idx] || {};
+      menu.treatments[idx] = { ...prev, ...treatment };
       console.log(`Updated treatment "${product.label}" in menu "${menu.name}"`);
     } else {
-      // Add new treatment
+      // Add new treatment (now keyed by productId)
       menu.treatments.push(treatment);
       console.log(`Added treatment "${product.label}" to menu "${menu.name}"`);
     }
-    
+
     await menu.save();
   } catch (error) {
     console.error('Error syncing product to menu treatments:', error);
@@ -334,33 +346,47 @@ async function syncProductToMenuTreatments(product) {
 
 // Update treatment hrefs when product slug changes
 async function updateTreatmentHrefsForProductSlugChange(oldProduct, newProduct) {
-  try {
-    const Menu = (await import('@/lib/model/menu')).default;
-    
-    // Find all menus that might have treatments for this product
-    const menus = await Menu.find({ isActive: true });
-    
-    for (const menu of menus) {
-      let needsUpdate = false;
-      
-      // Update treatment hrefs that contain the old product slug
-      menu.treatments = menu.treatments.map(treatment => {
-        if (treatment.href && treatment.href.includes(`/${oldProduct.slug}`)) {
-          needsUpdate = true;
-          return {
-            ...treatment,
-            href: treatment.href.replace(`/${oldProduct.slug}`, `/${newProduct.slug}`)
-          };
+    try {
+      const Menu = (await import('@/lib/model/menu')).default;
+      const productId = newProduct._id?.toString?.() || newProduct.id || null;
+
+      const menus = await Menu.find({ isActive: true });
+
+      for (const menu of menus) {
+        let needsUpdate = false;
+
+        menu.treatments = menu.treatments.map(treatment => {
+          // Prefer identity by productId
+          if (productId && String(treatment.productId) === String(productId)) {
+            needsUpdate = true;
+            return {
+              ...treatment,
+              href: `/underdevelopmentmainpage/${newProduct.category}/${newProduct.slug}`,
+              label: newProduct.label,
+              img: newProduct.heroImage,
+              badge: newProduct.trustpilot || ''
+            };
+          }
+
+          // Legacy fallback: href contains old slug
+          if (treatment.href && treatment.href.includes(`/${oldProduct.slug}`)) {
+            needsUpdate = true;
+            return {
+              ...treatment,
+              href: treatment.href.replace(`/${oldProduct.slug}`, `/${newProduct.slug}`)
+            };
+          }
+          return treatment;
+        });
+
+        if (needsUpdate) {
+          await menu.save();
+          console.log(
+            `Updated treatment hrefs in menu "${menu.name}" for product slug change ${oldProduct.slug} → ${newProduct.slug}`
+          );
         }
-        return treatment;
-      });
-      
-      if (needsUpdate) {
-        await menu.save();
-        console.log(`Updated treatment hrefs in menu "${menu.name}" for product slug change from ${oldProduct.slug} to ${newProduct.slug}`);
       }
+    } catch (error) {
+      console.error('Error updating treatment hrefs for product slug change:', error);
     }
-  } catch (error) {
-    console.error('Error updating treatment hrefs for product slug change:', error);
   }
-}

@@ -92,21 +92,21 @@ export default function ProductDetails({ content = PRODUCT_DETAILS_CONTENT }) {
               {title}
             </h2>
 
-            <h3 className="mt-6 font-semibold tracking-wide text-[#2c3a57]">
+            <h3 className="mt-6 font-semibold text-[18px] tracking-wide text-[#2c3a57]">
               {introTitle}
             </h3>
-            <p className="mt-3 text-[15px] sm:text-base leading-7 text-gray-700">
+            <p className="mt-3 text-[15px] sm:text-lg leading-7 text-gray-700">
               {intro}
             </p>
 
-            <p className="mt-6 font-medium text-gray-800">{breakdownHeading}</p>
+            <p className="mt-6 font-medium text-[18px] text-gray-800">{breakdownHeading}</p>
             <ul className="mt-2 space-y-3">
               {ingredients?.map((ing, i) => (
                 <li
                   key={i}
-                  className="text-[15px] sm:text-base leading-7 text-gray-700"
+                  className="text-[15px] sm:text-[18px] leading-7 text-gray-700"
                 >
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-[17px] text-gray-900">
                     {ing.name}:
                   </span>{" "}
                   {ing.desc}
@@ -128,7 +128,7 @@ export default function ProductDetails({ content = PRODUCT_DETAILS_CONTENT }) {
             <h4 className="font-semibold tracking-wide text-[#2c3a57]">
               {expectationsHeading}
             </h4>
-            <p className="mt-2 text-[15px] sm:text-base leading-7 text-gray-700">
+            <p className="mt-2 text-[15px] sm:text-[18px] leading-7 text-gray-700">
               {expectations}
             </p>
 

@@ -223,7 +223,7 @@ export default function Hero() {
                     {/* LEFT (2/3) */}
                     <div className="md:col-span-2 text-start flex flex-col justify-center">
                         {/* Rating */}
-                        <div className="flex items-center mt-2 gap-4 rounded-full bg-white shadow-sm border border-white/60 px-3 py-1 text-darkprimary w-fit">
+                        <div className="flex items-center mt-2 mb-2 gap-4 rounded-full bg-white shadow-sm border border-white/60 px-3 py-1 text-darkprimary w-fit">
                             <span className="text-sm font-semibold">Excellent</span>
                             <span>|</span>
                             <div className="flex items-center gap-1" aria-label="4.5 out of 5 stars">

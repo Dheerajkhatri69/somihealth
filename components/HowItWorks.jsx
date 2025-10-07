@@ -77,7 +77,7 @@ export default function HowItWorks({ content = HOW_IT_WORKS_CONTENT }) {
                       <h3 className="text-base sm:text-lg font-semibold text-[#2c3a57]">
                         {step.title}
                       </h3>
-                      <p className="mt-1 sm:mt-2 text-[15px] leading-7 text-gray-700">
+                      <p className="mt-1 sm:mt-2 text-[17px] leading-7 text-gray-700">
                         {step.description}
                       </p>
                     </div>
