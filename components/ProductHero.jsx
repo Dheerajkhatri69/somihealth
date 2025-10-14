@@ -104,12 +104,12 @@ export default function ProductHero({ product }) {
                                 <Icons.PiggyBank className="h-4 w-4 text-darkprimary/80" />
                             </span>
                             <span className="text-[15px] font-semibold text-darkprimary/90">
-                                Pay Over Time With
+                                Buy now, pay later with
                             </span>
                         </div>
 
                         {/* Right: logos with "or" separators */}
-                        <div className="flex items-center gap-2 sm:gap-3 ml-4">
+                        <div className="flex items-center gap-2 py-3 sm:gap-3 ml-4">
                             {payLogos.map((logo, idx) => (
                                 <Fragment key={logo.alt}>
                                     <div className="relative h-7 w-auto sm:h-8">
