@@ -55,6 +55,7 @@ import { FollowupClinicianDropdown } from "@/components/followupClinicianDropdow
 import FollowupShowAssig from "@/components/followupshowassign";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FollowupClinicianAction, FollowupClinicianStatusBadge } from "@/components/clinicianStatusBadge";
+import PillSelect from "@/components/follow_refills";
 
 export default function FollowUp() {
     const [patients, setPatients] = useState([]);
@@ -72,6 +73,12 @@ export default function FollowUp() {
 
     const [openDialog, setOpenDialog] = useState(false)
     const [selectedPatientId, setSelectedPatientId] = useState(null)
+
+    // Add state for follow-up and refill reminder modal
+    const [reminderModalOpen, setReminderModalOpen] = useState(false)
+    const [selectedPatientForReminder, setSelectedPatientForReminder] = useState(null)
+    const [followUpInterval, setFollowUpInterval] = useState('')
+    const [refillReminderInterval, setRefillReminderInterval] = useState('')
 
     // Load user data from localStorage on component mount
     useEffect(() => {
@@ -111,61 +118,48 @@ export default function FollowUp() {
     useEffect(() => {
         const fetchPatients = async () => {
             try {
-                // Fetch all followup patients first
+                // 1) Get all followup records
                 const patientsRes = await fetch("/api/followup");
                 const patientsData = await patientsRes.json();
-
                 if (!patientsData.success) {
-                    console.error("Error fetching patients:", patientsData.result.message);
+                    console.error("Error fetching followups:", patientsData.result?.message);
                     return;
                 }
 
-                // Filter active patients (closetickets === false)
-                let activePatients = patientsData.result.filter(patient => patient.closetickets === false);
+                // 2) Keep only active (closetickets === false)
+                let activePatients = (patientsData.result || []).filter(p => p.closetickets === false);
 
-                // If user is a clinician, filter based on view mode
-                if (userType === 'C') {
-                    if (viewMode === 'assigned') {
+                // 3) Clinician: optionally narrow by assignments
+                if (userType === "C") {
+                    if (viewMode === "assigned") {
                         const assigningRes = await fetch("/api/followupassig");
                         const assigningData = await assigningRes.json();
-
                         if (assigningData.success) {
-                            const clinicianAssignments = assigningData.result.filter(
-                                assignment => assignment.cid === userId
-                            );
-                            const assignedPids = clinicianAssignments.map(item => item.pid);
-                            activePatients = activePatients.filter(patient =>
-                                assignedPids.includes(patient.authid)
-                            );
+                            const clinicianAssignments = assigningData.result.filter(a => a.cid === userId);
+                            const assignedPids = new Set(clinicianAssignments.map(a => String(a.pid)));
+                            activePatients = activePatients.filter(p => assignedPids.has(String(p.authid)));
                         } else {
-                            console.error("Error fetching assignments:", assigningData.result.message);
+                            console.error("Error fetching assignments:", assigningData.result?.message);
                         }
                     }
                     setCLoading(false);
                 }
-                // If user is a technician, filter only patients they created
-                else if (userType === 'T') {
+                // 4) Technician: show only records they created
+                else if (userType === "T") {
                     const creatorRes = await fetch("/api/followupcreatorofp");
                     const creatorData = await creatorRes.json();
-
                     if (creatorData.success) {
-                        // Filter creator records for this technician
-                        const technicianCreations = creatorData.result.filter(
-                            record => record.tid === userId
+                        const createdPids = new Set(
+                            creatorData.result.filter(r => r.tid === userId).map(r => String(r.pid))
                         );
-                        // Get list of patient IDs created by this technician
-                        const createdPids = technicianCreations.map(item => item.pid);
-                        // Filter patients to only those created by this technician
-                        activePatients = activePatients.filter(patient =>
-                            createdPids.includes(patient.authid)
-                        );
+                        activePatients = activePatients.filter(p => createdPids.has(String(p.authid)));
                     } else {
-                        console.error("Error fetching creator records:", creatorData.result.message);
+                        console.error("Error fetching creator records:", creatorData.result?.message);
                     }
-
                     setTLoading(false);
                 }
 
+                // 5) Done
                 setPatients(activePatients);
             } catch (err) {
                 console.error("Fetch failed:", err);
@@ -174,11 +168,8 @@ export default function FollowUp() {
             }
         };
 
-        // Only fetch if we have userType
-        if (userType) {
-            fetchPatients();
-        }
-    }, [userType, userId, viewMode]); // Updated dependency array
+        if (userType) fetchPatients();
+    }, [userType, userId, viewMode]);
 
     useEffect(() => {
         // console.log("dashboard localStorage user:", userType);
@@ -226,6 +217,50 @@ export default function FollowUp() {
     const [selectedStatus, setSelectedStatus] = useState('all');
 
     const [clinicianFilter, setClinicianFilter] = useState("all");
+
+    // Add state for new filters
+    const [followUpFilter, setFollowUpFilter] = useState('all');
+    const [refillReminderFilter, setRefillReminderFilter] = useState('all');
+
+    // Helper to extract interval
+    function extractInterval(val) {
+        if (!val) return '';
+        const parts = val.split('_');
+        return parts.length > 1 ? parts[1] : '';
+    }
+
+    function extractDate(val) {
+        if (!val) return null;
+        const parts = val.split('_');
+        return parts.length > 1 ? new Date(parts[0]) : null;
+    }
+    function isFollowUpExpired(val) {
+        const date = extractDate(val);
+        if (!date) return false;
+        return date < new Date();
+    }
+    function isRefillReminderDue(val) {
+        const date = extractDate(val);
+        if (!date) return false;
+        const now = new Date();
+        return now >= date; // Due on or after the set date
+    }
+
+    // Count patients for each interval
+    const followUpCounts = patients.reduce((acc, patient) => {
+        if (isFollowUpExpired(patient.followUp)) {
+            const interval = extractInterval(patient.followUp);
+            if (interval) acc[interval] = (acc[interval] || 0) + 1;
+        }
+        return acc;
+    }, {});
+    const refillReminderCounts = patients.reduce((acc, patient) => {
+        if (isRefillReminderDue(patient.refillReminder)) {
+            const interval = extractInterval(patient.refillReminder);
+            if (interval) acc[interval] = (acc[interval] || 0) + 1;
+        }
+        return acc;
+    }, {});
 
     // Map clinician id → Set(patient ids)
     const cidToPidSet = useMemo(() => {
@@ -315,9 +350,17 @@ export default function FollowUp() {
         const createDateRangeMatch = isWithinRange(patient.createTimeDate, fromUtc, toUtc);
 
         const createDateMatch = createDateFilter ? patient.createTimeDate.split('T')[0] === createDateFilter : true;
+        const followUpExpired = isFollowUpExpired(patient.followUp);
+        const followUpMatch =
+            followUpFilter === 'all' ||
+            (followUpExpired && extractInterval(patient.followUp) === followUpFilter);
+        const refillDue = isRefillReminderDue(patient.refillReminder);
+        const refillReminderMatch =
+            refillReminderFilter === 'all' ||
+            (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
 
         return emailMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
-            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch;
+            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch && followUpMatch && refillReminderMatch;
     });
 
     const statusCounts = getStatusCounts(filteredPatients);
@@ -348,6 +391,115 @@ export default function FollowUp() {
         }
         setSelectAll(checked);
     };
+
+    // Add loading state for resolve actions
+    const [resolveLoading, setResolveLoading] = useState({});
+
+    // Handler for resolving follow up
+    async function handleResolveFollowUp(patient) {
+        setResolveLoading(prev => ({ ...prev, [patient.authid + "_followup"]: true }));
+        try {
+            const response = await fetch(`/api/followup/${patient.authid}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ followUp: "" }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                toast.success(`Follow up cleared for ${patient.firstName} ${patient.lastName}`);
+                setPatients(prev =>
+                    prev.map(p => (p.authid === patient.authid ? { ...p, followUp: "" } : p))
+                );
+            } else {
+                toast.error(data.result?.message || "Failed to clear follow up");
+            }
+        } catch (error) {
+            toast.error("Error clearing follow up: " + error.message);
+        } finally {
+            setResolveLoading(prev => ({ ...prev, [patient.authid + "_followup"]: false }));
+        }
+    }
+
+    // Handler for resolving refill reminder
+    async function handleResolveRefillReminder(patient) {
+        setResolveLoading(prev => ({ ...prev, [patient.authid + "_refill"]: true }));
+        try {
+            const response = await fetch(`/api/followup/${patient.authid}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refillReminder: "" }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                toast.success(`Refill reminder cleared for ${patient.firstName} ${patient.lastName}`);
+                setPatients(prev =>
+                    prev.map(p => (p.authid === patient.authid ? { ...p, refillReminder: "" } : p))
+                );
+            } else {
+                toast.error(data.result?.message || "Failed to clear refill reminder");
+            }
+        } catch (error) {
+            toast.error("Error clearing refill reminder: " + error.message);
+        } finally {
+            setResolveLoading(prev => ({ ...prev, [patient.authid + "_refill"]: false }));
+        }
+    }
+
+    function tagNow(interval) {
+        if (!interval || interval === "None") return "";
+        const now = new Date();
+        return `${now.toISOString()}_${interval}`;
+    }
+
+    // Handler for setting follow-up and refill reminders
+    async function handleSetReminders(patient) {
+        try {
+            const followUp = tagNow(followUpInterval);
+            const refillReminder = tagNow(refillReminderInterval);
+
+            const response = await fetch(`/api/followup/${patient.authid}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ followUp, refillReminder }),
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success(`Reminders set for ${patient.firstName} ${patient.lastName}`);
+                setPatients(prev =>
+                    prev.map(p =>
+                        p.authid === patient.authid ? { ...p, followUp, refillReminder } : p
+                    )
+                );
+                setReminderModalOpen(false);
+                setSelectedPatientForReminder(null);
+                setFollowUpInterval("");
+                setRefillReminderInterval("");
+            } else {
+                toast.error(data.result?.message || "Failed to set reminders");
+            }
+        } catch (error) {
+            toast.error("Error setting reminders: " + error.message);
+        }
+    }
+
+
+    // Function to open reminder modal
+    function openReminderModal(patient) {
+        setSelectedPatientForReminder(patient);
+        // Extract current intervals if they exist
+        let currentFollowUpInterval = '';
+        if (patient.followUp && patient.followUp.includes('_')) {
+            currentFollowUpInterval = patient.followUp.split('_')[1];
+        }
+        let currentRefillInterval = '';
+        if (patient.refillReminder && patient.refillReminder.includes('_')) {
+            currentRefillInterval = patient.refillReminder.split('_')[1];
+        }
+        setFollowUpInterval(currentFollowUpInterval);
+        setRefillReminderInterval(currentRefillInterval);
+        setReminderModalOpen(true);
+    }
 
     const handleDelete = async (authid) => {
         try {
@@ -779,7 +931,43 @@ export default function FollowUp() {
                 </div>
 
             </div>
+            {
+                (userType === 'A' || userType === 'C') && (
+                    <div className="flex flex-wrap gap-4 mb-1 px-2 ">
+                        <PillSelect
+                            value={followUpFilter}
+                            onChange={setFollowUpFilter}
+                            options={["7d", "14d", "30d", "None", "all"]}
+                            counts={followUpCounts}
+                            labelPrefix="Follow Up"
+                            formatUnit="d"
+                            tone={{
+                                bg: "bg-cyan-200 text-cyan-900",
+                                text: "text-cyan-900",
+                                badge: "bg-cyan-600 text-white",
+                            }}
+                            placeholder="Follow Up"
+                            showTotal   // ✅ this makes it show total count instead of per-option
+                        />
 
+                        <PillSelect
+                            value={refillReminderFilter}
+                            onChange={setRefillReminderFilter}
+                            options={["4w", "5w", "6w", "8w", "10w", "12w", "13w", "None", "all"]}
+                            counts={refillReminderCounts}
+                            labelPrefix="Refill"
+                            formatUnit="w"
+                            tone={{
+                                bg: "bg-slate-200 text-slate-900",
+                                text: "text-slate-900",
+                                badge: "bg-slate-700 text-white",
+                            }}
+                            placeholder="Refill Reminder"
+                            showTotal   // ✅ this makes it show total count instead of per-option
+                        />
+                    </div>
+                )
+            }
             {(userType === 'A' || userType === 'C') && (
                 <div className="flex flex-wrap gap-4 mb-4 p-2 ">
                     <div
@@ -1124,6 +1312,27 @@ export default function FollowUp() {
                                                         <Link href={`/dashboard/followup/${patient.authid}`}>Open</Link>
                                                     </DropdownMenuItem>
                                                 )}
+
+                                                {followUpFilter !== 'all' && (
+                                                    <Button
+                                                        className="bg-green-200 text-black mt-2 text-sm flex justify-start w-full pl-2 hover:bg-green-300"
+                                                        disabled={resolveLoading[patient.authid + '_followup']}
+                                                        onClick={() => handleResolveFollowUp(patient)}
+                                                    >
+                                                        {resolveLoading[patient.authid + '_followup'] ? 'Resolving...' : 'Follow Up Resolve'}
+                                                    </Button>
+                                                )}
+
+                                                {refillReminderFilter !== 'all' && (
+                                                    <Button
+                                                        className="bg-green-200 text-black mt-2 text-sm flex justify-start w-full pl-2 hover:bg-green-300"
+                                                        disabled={resolveLoading[patient.authid + '_refill']}
+                                                        onClick={() => handleResolveRefillReminder(patient)}
+                                                    >
+                                                        {resolveLoading[patient.authid + '_refill'] ? 'Resolving...' : 'Refill Reminder Resolve'}
+                                                    </Button>
+                                                )}
+
                                                 {userType === 'A' && (
                                                     <DropdownMenuItem
                                                         onClick={() => {
@@ -1263,6 +1472,64 @@ export default function FollowUp() {
                     </div>
                     <AlertDialogFooter>
                         <AlertDialogAction>Close</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Reminder Modal */}
+            <AlertDialog open={reminderModalOpen} onOpenChange={setReminderModalOpen}>
+                <AlertDialogContent className="max-w-md">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Set Follow-up & Refill Reminders</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Set follow-up and refill reminder intervals for {selectedPatientForReminder?.firstName} {selectedPatientForReminder?.lastName}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Follow Up Interval</label>
+                            <Select value={followUpInterval} onValueChange={setFollowUpInterval}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select follow-up interval" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="None">None</SelectItem>
+                                    <SelectItem value="7d">7 Days</SelectItem>
+                                    <SelectItem value="14d">14 Days</SelectItem>
+                                    <SelectItem value="30d">30 Days</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Refill Reminder Interval</label>
+                            <Select value={refillReminderInterval} onValueChange={setRefillReminderInterval}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select refill reminder interval" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="None">None</SelectItem>
+                                    <SelectItem value="4w">4 Weeks</SelectItem>
+                                    <SelectItem value="5w">5 Weeks</SelectItem>
+                                    <SelectItem value="6w">6 Weeks</SelectItem>
+                                    <SelectItem value="8w">8 Weeks</SelectItem>
+                                    <SelectItem value="10w">10 Weeks</SelectItem>
+                                    <SelectItem value="12w">12 Weeks</SelectItem>
+                                    <SelectItem value="13w">13 Weeks</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => selectedPatientForReminder && handleSetReminders(selectedPatientForReminder)}
+                            className="bg-primary hover:bg-primary/90"
+                        >
+                            Set Reminders
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

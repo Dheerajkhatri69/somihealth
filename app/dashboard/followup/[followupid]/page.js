@@ -79,6 +79,10 @@ export default function UpdateFollowUp({ params }) {
 
             closetickets: false,
             Reasonclosetickets: '',
+            followUp: '', // new field
+            refillReminder: '', // new field
+            followUpInterval: '', // for select
+            refillReminderInterval: '', // for select
         };
     });
     // const [images, setImages] = useState(Array(3).fill(null));
@@ -100,22 +104,33 @@ export default function UpdateFollowUp({ params }) {
 
                 if (!response.ok || !data.success) {
                     setNotFound(true);
-                    throw new Error(data.result || 'Failed to fetch data');
+                    throw new Error(data.result || "Failed to fetch data");
                 }
 
-                // Convert empty strings to null for consistency
-                const apiImages = (data.result.images || []).map(img => img || null);
-                // Fill remaining slots with null
-                const mergedImages = [...apiImages, ...Array(3).fill(null)].slice(0, 3);
-                setFileUrls({
-                    file1: data.result.file1 || '',
-                    file2: data.result.file2 || ''
-                });
-                setFormData(data.result);
-                setImages(mergedImages);
+                // intervals directly from follow-up record
+                const followUpInterval = extractInterval(data.result?.followUp);
+                const refillReminderInterval = extractInterval(data.result?.refillReminder);
 
+                // normalize images to 3 slots
+                const apiImages = (data.result.images || []).map((img) => img || null);
+                const mergedImages = [...apiImages, ...Array(3).fill(null)].slice(0, 3);
+
+                setFileUrls({
+                    file1: data.result.file1 || "",
+                    file2: data.result.file2 || "",
+                });
+
+                setFormData({
+                    ...data.result,
+                    followUp: data.result?.followUp || "",
+                    refillReminder: data.result?.refillReminder || "",
+                    followUpInterval,
+                    refillReminderInterval,
+                });
+
+                setImages(mergedImages);
             } catch (error) {
-                console.error('Fetch error:', error);
+                console.error("Fetch error:", error);
                 setMessageHead("Error ❌");
                 setMessage("Failed to load follow-up data");
                 setIsDialogOpen(true);
@@ -150,6 +165,18 @@ export default function UpdateFollowUp({ params }) {
     const [message, setMessage] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
 
+    function extractInterval(tag) {
+        if (!tag) return "";
+        const parts = String(tag).split("_");
+        return parts[1] || "";
+    }
+
+    function getNowWithIntervalTag(interval) {
+        if (!interval || interval === "None") return "";
+        const now = new Date();
+        return `${now.toISOString()}_${interval}`;
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -157,23 +184,26 @@ export default function UpdateFollowUp({ params }) {
             setSearchLoading(true);
             setIsDialogOpen(false);
 
+            // tag with now + interval (e.g., 2025-10-19T18:22:00.000Z_4w)
+            const followUp = getNowWithIntervalTag(formData.followUpInterval);
+            const refillReminder = getNowWithIntervalTag(formData.refillReminderInterval);
+
             const response = await fetch(`/api/followup/${params.followupid}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
-                    images: images.filter(url => url !== ''),
+                    followUp,
+                    refillReminder,
+                    images: (images || []).filter(Boolean), // keep only real URLs
                     file1: fileUrls.file1,
-                    file2: fileUrls.file2
+                    file2: fileUrls.file2,
                 }),
             });
 
             const data = await response.json();
-
             if (!response.ok || !data.success) {
-                throw new Error(data.result || 'Update failed');
+                throw new Error(data.result || "Update failed");
             }
 
             setMessageHead("Success 🎉");
@@ -182,13 +212,14 @@ export default function UpdateFollowUp({ params }) {
             setIsDialogOpen(true);
         } catch (error) {
             setMessageHead("Error ❌");
-            setMessage(error.message || 'Update failed');
+            setMessage(error?.message || "Update failed");
             setIsSuccess(false);
             setIsDialogOpen(true);
         } finally {
             setSearchLoading(false);
         }
     };
+
     const [selectedImage, setSelectedImage] = useState(null); // Should be first
     const [images, setImages] = useState([null]);
     // ... other state declarations ...
@@ -865,6 +896,55 @@ export default function UpdateFollowUp({ params }) {
                         </div>
                     </div>
                 </div>
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <div className="space-y-2 ">
+                            <Label>Follow Up</Label>
+                            <div className="flex gap-2">
+                                <Select
+                                    value={formData.followUpInterval}
+                                    onValueChange={(value) => handleSelectChange('followUpInterval', value)}
+                                >
+                                    <SelectTrigger className="w-1/2">
+                                        <SelectValue placeholder="Select interval" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="7d">7 Days</SelectItem>
+                                        <SelectItem value="14d">14 Days</SelectItem>
+                                        <SelectItem value="30d">30 Days</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Refill Reminder</Label>
+                            <div className="flex gap-2">
+                                <Select
+                                    value={formData.refillReminderInterval}
+                                    onValueChange={(value) => handleSelectChange('refillReminderInterval', value)}
+                                >
+                                    <SelectTrigger className="w-1/2">
+                                        <SelectValue placeholder="Select interval" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="4w">4 weeks</SelectItem>
+                                        <SelectItem value="5w">5 weeks</SelectItem>
+                                        <SelectItem value="6w">6 weeks</SelectItem>
+                                        <SelectItem value="8w">8 weeks</SelectItem>
+                                        <SelectItem value="10w">10 weeks</SelectItem>
+                                        <SelectItem value="12w">12 weeks</SelectItem>
+                                        <SelectItem value="13w">13 weeks</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 {(session?.user?.accounttype === 'C') && (
                     <div className="w-full max-w-5xl mx-auto flex justify-center">
                         <Button
