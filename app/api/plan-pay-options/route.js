@@ -1,7 +1,15 @@
+// /app/api/plan-pay-options/route.js
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import PlanPayOption from '@/lib/model/PlanPayOption';
-import mongoose from "mongoose";
-import { connectionSrt } from "@/lib/db";
+import PricingLanding from '@/lib/model/pricingLanding';
+import PricingWeightLoss from '@/lib/model/pricingWeightLoss'; // Add this import
+import { connectionSrt } from '@/lib/db';
+
+export const runtime = 'nodejs'; // ensure Node runtime (Mongoose)
+
+// ---------- helpers ----------
+function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
 async function connectDB() {
     if (mongoose.connection.readyState === 0) {
@@ -9,17 +17,74 @@ async function connectDB() {
     }
 }
 
-// GET /api/plan-pay-options?name=Semaglutide (optional filter)
+// Merge GLP-1 categories with PricingLanding.options AND PricingWeightLoss.options
+async function getPlanCategories() {
+    // Get Pricing Landing options
+    const landingDoc = await PricingLanding
+        .findOne({ 'config.isActive': true })
+        .lean()
+        .select({ options: 1 });
+
+    const landing = (landingDoc?.options || []).map(o => ({
+        idname: String(o.idname || '').toLowerCase().trim(),
+        title: o.title || o.idname || '',
+        image: o.image || '',
+    }));
+
+    // Get Weight Loss options
+    const weightLossDoc = await PricingWeightLoss
+        .findOne({ 'config.isActive': true })
+        .lean()
+        .select({ options: 1 });
+
+    const weightLoss = (weightLossDoc?.options || []).map(o => ({
+        idname: String(o.idname || '').toLowerCase().trim(),
+        title: o.title || o.idname || '',
+        image: o.image || '',
+    }));
+
+    // de-dupe by idname
+    const seen = new Set();
+    const merged = [];
+    for (const c of [...landing, ...weightLoss]) {
+        const key = c.idname;
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        merged.push(c);
+    }
+    return merged;
+}
+
+// ---------- GET /api/plan-pay-options?name=<idname or legacy label> ----------
 export async function GET(req) {
     try {
         await connectDB();
         const { searchParams } = new URL(req.url);
-        const name = searchParams.get('name');
+        const rawName = (searchParams.get('name') || '').trim();
 
-        const filter = {};
-        if (name) filter.name = name;
+        let filter = {};
+        if (rawName) {
+            const nameId = rawName.toLowerCase();
+            const legacyCap =
+                nameId === 'semaglutide' ? 'Semaglutide' :
+                    nameId === 'tirzepatide' ? 'Tirzepatide' :
+                        null;
 
-        const result = await PlanPayOption.find(filter).sort({ name: 1, sort: 1, createdAt: 1 }).lean();
+            filter = {
+                $or: [
+                    { name: nameId },
+                    ...(legacyCap ? [{ name: legacyCap }] : []),
+                    { name: { $regex: new RegExp(`^${escapeRegExp(rawName)}$`, 'i') } },
+                    { name: { $regex: new RegExp(`^\\s*${escapeRegExp(nameId)}\\s*$`, 'i') } },
+                ],
+            };
+        }
+
+        const result = await PlanPayOption
+            .find(filter)
+            .sort({ name: 1, sort: 1, createdAt: 1 })
+            .lean();
+
         return NextResponse.json({ success: true, result });
     } catch (e) {
         console.error(e);
@@ -27,23 +92,37 @@ export async function GET(req) {
     }
 }
 
-// POST /api/plan-pay-options
-// body: { name, sort, label, price, link, paypal, isActive }
+// ---------- POST /api/plan-pay-options ----------
 export async function POST(req) {
     try {
         await connectDB();
         const body = await req.json();
 
-        // minimal validation
-        if (!body?.name || !['Semaglutide', 'Tirzepatide'].includes(body.name)) {
-            return NextResponse.json({ success: false, message: 'Invalid or missing name' }, { status: 400 });
+        const categories = await getPlanCategories();
+        const allowed = new Set(categories.map(c => c.idname));
+
+        const raw = String(body?.name || '').trim();
+        const nameId = raw.toLowerCase();
+
+        if (!raw || !allowed.has(nameId)) {
+            const availableCategories = Array.from(allowed).join(', ');
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: `Invalid or missing name (idname). Use one from /api/plan-categories. Available: ${availableCategories}`
+                },
+                { status: 400 }
+            );
         }
         if (!body?.label || !body?.price) {
-            return NextResponse.json({ success: false, message: 'label and price are required' }, { status: 400 });
+            return NextResponse.json(
+                { success: false, message: 'label and price are required' },
+                { status: 400 }
+            );
         }
 
         const created = await PlanPayOption.create({
-            name: body.name,
+            name: nameId,
             sort: Number(body.sort ?? 0),
             label: String(body.label),
             price: String(body.price),
@@ -59,7 +138,7 @@ export async function POST(req) {
     }
 }
 
-// Optional: PATCH bulk reorder [{_id, sort}]
+// ---------- PATCH /api/plan-pay-options  (bulk reorder) ----------
 export async function PATCH(req) {
     try {
         await connectDB();

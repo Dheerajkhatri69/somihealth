@@ -1,11 +1,67 @@
 "use client";
+
 import ContactInfoTooltip from '@/components/ContactInfoTooltip';
-import { ChevronLeft, Info } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-// import { getstartedpic } from '../../public/getstarted.png';
+import { Fragment, useEffect, useState } from 'react';
+
+// ----- Local fallback (used until API loads) -----
+const PAGE = {
+  brand: "somi",
+  backLabel: "Back",
+  backUrl: "https://joinsomi.com/",
+  title: "What is your primary health goal?",
+  subtitle: "View Our Pricing",
+
+  payLaterPrefix: "Buy now, pay later with",
+  refundCopy:
+    "We will refund 100% of your money if our licensed clinician determines you are not eligible for GLP-1 weight loss therapy.",
+  guaranteeLines: ["100% Money Back", "Guarantee", "FSA and HSA Accepted"],
+
+  badges: [
+    { src: "/pricing/certified.png", alt: "Certified", w: 96, h: 96 },
+    { src: "/pricing/guaranteed.png", alt: "Guaranteed", w: 112, h: 112 },
+  ],
+
+  payLogos: [
+    { src: "/pay/klarna-badge.png", alt: "Klarna" },
+    { src: "/pay/paypal-badge.png", alt: "PayPal" },
+    { src: "/pay/affirm-badge.webp", alt: "Affirm" },
+  ],
+
+  options: [
+    {
+      title: "Weight Loss",
+      idname: "weightloss",
+      price: { note: "AS LOW AS", amount: 196, unit: "/mo" },
+      href: "/pricing/weightLoss",
+      image: ""
+    },
+    {
+      title: "Longevity",
+      idname: "longevity", // fixed key
+      price: { note: "AS LOW AS", amount: 188, unit: "/mo" },
+      href: "/pricing/longevity",
+      image: ""
+    },
+    {
+      title: "Erectile Dysfunction",
+      idname: "erectiledysfunction",
+      price: { note: "AS LOW AS", amount: 182, unit: "/mo" },
+      href: "/pricing/erectileDysfunction",
+      image: ""
+    },
+    {
+      title: "Skin+Hair",
+      idname: "skinhair",
+      price: { note: "AS LOW AS", amount: 182, unit: "/mo" },
+      href: "/pricing/skinhair",
+      image: ""
+    },
+  ],
+};
 
 // ProgressBar Component
 const ProgressBar = ({ progress }) => {
@@ -14,34 +70,23 @@ const ProgressBar = ({ progress }) => {
       <div
         className="bg-secondary h-2.5 rounded-full transition-all duration-300"
         style={{ width: `${progress}%` }}
-      ></div>
+      />
     </div>
   );
 };
-
-const PRICING_OPTIONS = [
-  {
-    name: 'Compounded Semaglutide',
-    img: '/pricing/semaglutide.png',
-    href: '/pricing/semaglutide',
-    alt: 'Semaglutide',
-  },
-  {
-    name: 'Compounded Tirzepatide',
-    img: '/pricing/tirzepatide.png',
-    href: '/pricing/tirzepatide',
-    alt: 'Tirzepatide',
-  },
-];
 
 const LandingPagePricing = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
+  // NEW: DB data
+  const [data, setData] = useState(null);
+  const [apiError, setApiError] = useState(null);
+
+  // fake loader bar
   useEffect(() => {
-    let interval;
     let current = 0;
-    interval = setInterval(() => {
+    const interval = setInterval(() => {
       current += 10;
       setProgress(current);
       if (current >= 100) {
@@ -49,17 +94,16 @@ const LandingPagePricing = () => {
         setTimeout(() => setLoading(false), 200);
       }
     }, 80);
+    return () => clearInterval(interval);
   }, []);
 
+  // Facebook Pixel (unchanged)
   useEffect(() => {
-    // Avoid multiple pixel loads
     if (!window.fbq) {
       !(function (f, b, e, v, n, t, s) {
         if (f.fbq) return;
         n = f.fbq = function () {
-          n.callMethod
-            ? n.callMethod.apply(n, arguments)
-            : n.queue.push(arguments);
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
         };
         if (!f._fbq) f._fbq = n;
         n.push = n;
@@ -71,18 +115,35 @@ const LandingPagePricing = () => {
         t.src = v;
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
-      })(
-        window,
-        document,
-        "script",
-        "https://connect.facebook.net/en_US/fbevents.js"
-      );
+      })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
 
-      fbq("init", "1848512062399758"); // Your Pixel ID
+      fbq("init", "1848512062399758");
     }
-
     fbq("track", "PageView");
   }, []);
+
+  // NEW: fetch DB content
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/pricing-landing-content', { cache: 'no-store' });
+        const json = await res.json();
+        if (!alive) return;
+        if (json?.success) {
+          setData(json.result);
+        } else {
+          setApiError(json?.message || 'Failed to load content');
+        }
+      } catch (e) {
+        setApiError('Failed to load content');
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  // Use DB data if available, otherwise fallback PAGE
+  const D = data || PAGE;
 
   if (loading) {
     return (
@@ -110,83 +171,132 @@ const LandingPagePricing = () => {
       </Head>
 
       <main>
-
         <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
-          <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-gray-100 px-6 flex flex-col items-center">
-            <div className='w-full flex items-start justify-between'>
+          <div className="w-full max-w-7xl flex flex-col items-center">
+            <div className="relative w-full flex items-start justify-between mb-12">
+              {/* Left: Back button */}
+              <button
+                className="flex text-xs items-center hover:underline text-secondary cursor-pointer mt-2"
+                onClick={() => { window.location.href = D.backUrl; }}
+              >
+                <ChevronLeft size={18} />
+                {D.backLabel}
+              </button>
 
-              <div className='flex text-xs items-center hover:underline text-secondary cursor-pointer mt-2'
-                onClick={() => {
-                  window.location.href = "https://joinsomi.com/";
-                }}
-              ><ChevronLeft size={18} />Back</div>
-              <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">somi</h1>
-              <div className='mt-2'>
+              {/* Center: brand logo — absolutely centered */}
+              <h1 className="absolute left-1/2 -translate-x-1/2 font-tagesschrift text-5xl md:text-7xl text-secondary font-bold text-center">
+                {D.brand}
+              </h1>
+
+              {/* Right: tooltip container */}
+              <div className="mt-2">
                 <ContactInfoTooltip />
               </div>
             </div>
-            <h2 className="text-secondary font-bold text-xl md:text-2xl mt-2 mb-1 text-center">Ready To Start Your Weight Loss Journey?</h2>
-            <h3 className="text-secondary text-lg font-semibold mt-2 mb-4 text-center">View Our Pricing</h3>
 
-            <div className="flex items-center justify-center gap-4 max-w-md w-full mb-6">
-              {PRICING_OPTIONS.map(option => (
+            {/* Optional error message (non-blocking; still shows fallback) */}
+            {apiError && (
+              <p className="text-sm text-red-600 mb-2">{apiError}</p>
+            )}
+
+            <h2 className="text-secondary font-bold text-xl md:text-2xl mt-2 mb-1 text-center">
+              {D.title}
+            </h2>
+            <h3 className="text-secondary text-lg font-semibold mt-2 mb-4 text-center">
+              {D.subtitle}
+            </h3>
+
+            {/* ---------- Options ---------- */}
+            <div className="w-full max-w-3xl mx-auto mt-2 mb-2 space-y-3">
+              {(D.options || []).map((opt) => (
                 <Link
-                  key={option.name}
-                  href={option.href}
-                  className={`group flex-1 ${option.name === "Compounded Semaglutide" ? "border-l-4" : " border-r-4"} bg-blue-50 hover:bg-blue-100 border border-secondary rounded-xl p-4 flex flex-col items-center transition-all duration-200 shadow-sm hover:shadow-lg cursor-pointer`}
+                  key={opt.idname || opt.title}
+                  href={opt.href || '#'}
+                  className={[
+                    "block rounded-2xl border bg-white transition-all duration-150 ease-in-out",
+                    "hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary",
+                    "px-5 py-5",
+                    "border-darkprimary border-l-2 hover:border-l-8 hover:bg-blue-100"
+                  ].join(" ")}
                 >
-                  <div className="relative w-20 h-20 md:w-40 md:h-40 mb-2">
-                    <Image
-                      src={option.img}
-                      alt={option.alt}
-                      fill
-                      className="rounded-xl object-contain"
-                      priority
-                    />
-                  </div>
-                  <span className="text-secondary font-bold text-sm whitespace-normal md:whitespace-nowrap text-center group-hover:underline">{option.name}</span>
-                  <div className="relative w-5 h-5 mt-2">
-                    <Image
-                      src="/pricing/check.png"
-                      alt="Guaranteed"
-                      fill
-                      className="rounded-xl object-contain"
-                      priority
-                    />
+                  <div className="flex items-center justify-between">
+                    <div className="text-base md:text-lg font-medium text-gray-800">
+                      {opt.title}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] md:text-[11px] tracking-wide uppercase text-gray-500">
+                        {opt?.price?.note}
+                      </div>
+                      <div className="text-2xl md:text-3xl text-gray-900">
+                        ${opt?.price?.amount ?? 0}
+                        <span className="text-lg md:text-xl font-bold text-gray-700">
+                          {opt?.price?.unit}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </Link>
               ))}
             </div>
+            {/* ---------- End options ---------- */}
 
-            <div className="flex flex-col items-center mb-4">
-
+            <div className="flex flex-col items-center mt-4">
               <p className="text-gray-700 text-base font-bold text-center">
-                100% Money Back <br /> Guarantee <br/>FSA and HSA Accepted
+                {(D.guaranteeLines || []).map((line, idx) => (
+                  <Fragment key={idx}>
+                    {line}
+                    {idx < (D.guaranteeLines || []).length - 1 && <><br /></>}
+                  </Fragment>
+                ))}
               </p>
             </div>
 
+            <div className="w-full px-4 py-3 sm:px-5 sm:py-3.5 flex flex-col md:flex-row items-center justify-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[15px] text-gray-700">
+                  {D.payLaterPrefix}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 py-3 sm:gap-3 ml-4">
+                {(D.payLogos || []).map((logo, idx) => (
+                  <Fragment key={`${logo.alt}-${idx}`}>
+                    <div className="relative h-7 w-auto sm:h-8">
+                      <Image
+                        src={logo.src}
+                        alt={logo.alt}
+                        width={96}
+                        height={32}
+                        className="h-full w-auto rounded-md"
+                        sizes="(max-width:768px) 80px, 96px"
+                      />
+                    </div>
+                    {idx < (D.payLogos || []).length - 1 && (
+                      <span className="text-sm text-gray-600 select-none" aria-hidden="true">
+                        or
+                      </span>
+                    )}
+                  </Fragment>
+                ))}
+              </div>
+            </div>
+
             <p className="text-gray-700 mb-2 font-medium text-center">
-              We will refund 100% of your money if our licensed clinician determines you are not eligible for GLP-1 weight loss therapy.
+              {D.refundCopy}
             </p>
-            <div className='flex items-center justify-center gap-4'>
-              <div className="relative w-24 h-24 mb-2">
-                <Image
-                  src="/pricing/certified.png"
-                  alt="Guaranteed"
-                  fill
-                  className="rounded-xl object-contain"
-                  priority
-                />
-              </div>
-              <div className="relative w-28 h-28 mb-2">
-                <Image
-                  src="/pricing/guaranteed.png"
-                  alt="Guaranteed"
-                  fill
-                  className="rounded-xl object-contain"
-                  priority
-                />
-              </div>
+
+            <div className="flex items-center justify-center gap-4">
+              {(D.badges || []).map((b, i) => (
+                <div key={`${b.alt}-${i}`} className="relative mb-2" style={{ width: b.w || 96, height: b.h || 96 }}>
+                  <Image
+                    src={b.src}
+                    alt={b.alt}
+                    fill
+                    className="rounded-xl object-contain"
+                    priority
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>

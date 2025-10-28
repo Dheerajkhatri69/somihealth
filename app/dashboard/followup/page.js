@@ -316,7 +316,13 @@ export default function FollowUp() {
         };
     };
     const filteredPatients = patients.filter(patient => {
+        // const emailMatch = patient.email?.toLowerCase().includes(emailFilter.toLowerCase());
         const emailMatch = patient.email?.toLowerCase().includes(emailFilter.toLowerCase());
+        const nameMatch = emailFilter === '' ||
+            patient.firstName?.toLowerCase().includes(emailFilter.toLowerCase()) ||
+            patient.lastName?.toLowerCase().includes(emailFilter.toLowerCase()) ||
+            `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(emailFilter.toLowerCase());
+        const emailOrNameMatch = emailMatch || nameMatch;
         // const pIdMatch = patient.patientId.toLowerCase().includes(pIdFilter.toLowerCase());
         const pIdMatch = patient.authid?.toLowerCase().includes(pIdFilter.toLowerCase());
         const genderMatch = genderFilter === 'all' || patient.sex === genderFilter;
@@ -359,7 +365,7 @@ export default function FollowUp() {
             refillReminderFilter === 'all' ||
             (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
 
-        return emailMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
+        return emailOrNameMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
             medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch && followUpMatch && refillReminderMatch;
     });
 
@@ -627,7 +633,7 @@ export default function FollowUp() {
                     onChange={(e) => setPIdFilter(e.target.value)}
                 />
                 <Input
-                    placeholder="Filter emails..."
+                    placeholder="Filter by email or name..."
                     className="max-w-sm"
                     value={emailFilter}
                     onChange={(e) => setEmailFilter(e.target.value)}
