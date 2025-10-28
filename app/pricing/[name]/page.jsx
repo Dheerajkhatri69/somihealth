@@ -8,7 +8,7 @@ import ContactInfoTooltip from '@/components/ContactInfoTooltip';
 
 const INITIAL_SUMMARY = {
   product: '',
-  reviewFee: 25,
+  reviewFee: 0,
   price: '',
   quantity: 1,
   label: '',
@@ -100,10 +100,10 @@ export default function Page({ params }) {
   const summary = selected
     ? {
       product: meta?.title || '',
-      reviewFee: 25,
+      reviewFee: 0,
       totle:
         selected.price && String(selected.price).trim().startsWith('$')
-          ? `$${(Number(String(selected.price).replace(/[^0-9.]/g, '')) || 0) + 25}`
+          ? `$${(Number(String(selected.price).replace(/[^0-9.]/g, '')) || 0)}`
           : '',
       price: selected.price || '',
       quantity: 1,
@@ -231,7 +231,7 @@ export default function Page({ params }) {
               <span>Subtotal</span>
               <span className="font-bold text-secondary">{summary.price || '--'}</span>
             </div>
-            <div className="flex justify-between text-gray-700 font-medium">
+            {/* <div className="flex justify-between text-gray-700 font-medium">
               <span className="flex gap-2 items-center">
                 Clinician Review Fee
                 <div className="relative inline-flex group">
@@ -247,7 +247,7 @@ export default function Page({ params }) {
                 </div>
               </span>
               <span className="font-bold text-secondary">${summary.reviewFee}</span>
-            </div>
+            </div> */}
 
             <div className="flex justify-between text-gray-700 font-medium">
               <span>Total Amount</span>

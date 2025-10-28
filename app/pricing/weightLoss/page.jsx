@@ -1,5 +1,6 @@
 "use client";
 import ContactInfoTooltip from '@/components/ContactInfoTooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, Info } from 'lucide-react';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -43,20 +44,58 @@ const WeightLossPagePricing = () => {
         return (
             <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
                 <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-gray-100 px-6 py-8 flex flex-col items-center">
-                    <div className="animate-pulse">
-                        <div className="h-8 w-64 bg-gray-200 rounded mb-4"></div>
-                        <div className="h-6 w-80 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-6 w-96 bg-gray-200 rounded mb-6"></div>
-                        <div className="flex justify-center gap-4 mb-6">
-                            <div className="h-40 w-40 bg-gray-200 rounded"></div>
-                        </div>
-                        <div className="h-16 w-80 bg-gray-200 rounded mb-4"></div>
-                        <div className="h-12 w-96 bg-gray-200 rounded"></div>
+
+                    {/* Top Section */}
+                    <div className="w-full flex items-start justify-between">
+                        <Skeleton className="h-4 w-20 mt-2 rounded" />
+                        <Skeleton className="h-10 w-64 md:w-80 rounded-xl" />
+                        <Skeleton className="h-7 w-7 rounded-xl mt-2" />
                     </div>
+
+                    {/* Headings */}
+                    <div className="mt-8 space-y-3 w-full max-w-lg">
+                        <Skeleton className="h-6 w-full rounded" />
+                        <Skeleton className="h-5 w-3/4 rounded" />
+                    </div>
+
+                    {/* Pricing Options Grid */}
+                    <div className="grid grid-cols-2 gap-4 sm:flex sm:items-center sm:justify-center max-w-md w-full mb-6 mt-10">
+                        {Array.from({ length: 2 }).map((_, idx) => (
+                            <div
+                                key={idx}
+                                className="border border-gray-200 rounded-xl p-4 flex flex-col items-center w-full shadow-sm"
+                            >
+                                <Skeleton className="w-20 h-20 md:w-40 md:h-40 rounded-xl mb-3" />
+                                <Skeleton className="h-4 w-20 rounded mb-2" />
+                                <Skeleton className="w-5 h-5 rounded-full" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Guarantee Lines */}
+                    <div className="mt-6 space-y-2 text-center w-full max-w-xs">
+                        <Skeleton className="h-4 w-32 mx-auto rounded" />
+                        <Skeleton className="h-4 w-28 mx-auto rounded" />
+                        <Skeleton className="h-4 w-36 mx-auto rounded" />
+                    </div>
+
+                    {/* Refund Line */}
+                    <div className="mt-6 space-y-2 w-full max-w-xl text-center mx-auto">
+                        <Skeleton className="h-4 w-full rounded" />
+                        <Skeleton className="h-4 w-4/5 mx-auto rounded" />
+                    </div>
+
+                    {/* Badges */}
+                    <div className="flex items-center justify-center gap-4 mt-8">
+                        <Skeleton className="w-24 h-24 rounded-xl" />
+                        <Skeleton className="w-24 h-24 rounded-xl" />
+                    </div>
+
                 </div>
             </div>
         );
     }
+
 
     if (error || !data) {
         return (
@@ -121,12 +160,12 @@ const WeightLossPagePricing = () => {
                         </h3>
 
                         {/* Pricing Options */}
-                        <div className="flex items-center justify-center gap-4 max-w-md w-full mb-6">
+                        <div className="grid grid-cols-2 gap-4 sm:flex sm:items-center sm:justify-center max-w-md w-full mb-6">
                             {(data.options || []).map((option, index) => (
                                 <Link
                                     key={option.title || index}
                                     href={option.href || "#"}
-                                    className="group flex-1 bg-blue-50 hover:bg-blue-100 border border-secondary rounded-xl p-4 flex flex-col items-center transition-all duration-200 shadow-sm hover:shadow-lg cursor-pointer"
+                                    className="group bg-white border border-secondary rounded-xl p-4 flex flex-col items-center transition-all duration-200 shadow-sm hover:shadow-lg cursor-pointer"
                                 >
                                     <div className="relative w-20 h-20 md:w-40 md:h-40 mb-2">
                                         <Image
