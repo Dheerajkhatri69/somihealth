@@ -268,9 +268,7 @@ export default function Page({ params }) {
                 </div>
               </div>
               <div className="text-sm text-gray-700">
-                <strong className="font-semibold">You&apos;re covered:</strong> We will refund 100% of your money if our
-                licensed clinician determines you are not eligible for GLP-1 weight loss therapy. 100% money back
-                guarantee
+                <strong className="font-semibold">You&apos;re covered:</strong> If a licensed clinician determines you&apos;re not eligible for treatment, we&apos;ll refund 100% of your money.
               </div>
             </div>
           </div>
