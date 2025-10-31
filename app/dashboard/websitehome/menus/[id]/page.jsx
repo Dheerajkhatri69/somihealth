@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import UploadMediaLite from '@/components/UploadMediaLite';
 import Image from 'next/image';
+import { slugifyId as slugify } from '@/lib/slugify';
 
 /* ================= schema-aligned defaults (with legacy fallback in mergeDefaults) ================= */
 // <<< NEW: fully align to mongoose schema
@@ -768,15 +769,15 @@ export default function MenuDetailPage() {
 
 /* ================= utilities ================= */
 
-function slugify(s = '') {
-  return s
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
-    .replace(/-+/g, '-');
-}
+// function slugify(s = '') {
+//   return s
+//     .toString()
+//     .trim()
+//     .toLowerCase()
+//     .replace(/\s+/g, '-')
+//     .replace(/[^a-z0-9-]/g, '')
+//     .replace(/-+/g, '-');
+// }
 
 /** Safely merge defaults into possibly sparse/legacy API object */
 // <<< NEW: map legacy fields -> schema fields for backward compatibility

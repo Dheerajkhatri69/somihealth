@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import UploadMediaLite from '@/components/UploadMediaLite';
 import * as LucideIcons from "lucide-react";
+import { slugifyId as slugify } from '@/lib/slugify';
 
 export default function EditProductPage() {
   const params = useParams();
@@ -686,21 +687,46 @@ const ICON_OPTIONS = [
   { value: 'Camera', label: 'Camera' },
   { value: 'Code', label: 'Code' }
 ];
+// function hydrate(p) {
+//   return {
+//     ...EMPTY(),
+//     ...p,
+//     bullets: Array.isArray(p.bullets) ? p.bullets : [],
+//     productDetails: p?.productDetails || EMPTY().productDetails,
+//     howItWorksSection: p?.howItWorksSection || EMPTY().howItWorksSection,
+//     ctas: p?.ctas || EMPTY().ctas,
+//     howItWorks: p?.howItWorks || { heading: '', intro: '' },
+//   };
+// }
 function hydrate(p) {
+  const base = EMPTY();
   return {
-    ...EMPTY(),
+    ...base,
     ...p,
-    bullets: Array.isArray(p.bullets) ? p.bullets : [],
-    productDetails: p?.productDetails || EMPTY().productDetails,
-    howItWorksSection: p?.howItWorksSection || EMPTY().howItWorksSection,
-    ctas: p?.ctas || EMPTY().ctas,
+    category: slugify(p?.category || ''), // normalize old categories like "skin-hair" -> "skinhair"
+    bullets: Array.isArray(p?.bullets) ? p.bullets : [],
+    productDetails: p?.productDetails || base.productDetails,
+    howItWorksSection: p?.howItWorksSection || base.howItWorksSection,
+    ctas: p?.ctas || base.ctas,
     howItWorks: p?.howItWorks || { heading: '', intro: '' },
   };
 }
+
+// function toMenuOptions(result) {
+//   if (!result) return [];
+//   if (Array.isArray(result)) return result.map(m => ({ value: (m.name || '').toLowerCase().replace(/\s+/g, '-'), label: m.name }));
+//   return Object.keys(result).map(k => ({ value: k.toLowerCase().replace(/\s+/g, '-'), label: k }));
+// }
 function toMenuOptions(result) {
   if (!result) return [];
-  if (Array.isArray(result)) return result.map(m => ({ value: (m.name || '').toLowerCase().replace(/\s+/g, '-'), label: m.name }));
-  return Object.keys(result).map(k => ({ value: k.toLowerCase().replace(/\s+/g, '-'), label: k }));
+  // result can be array or object; normalize to array
+  const arr = Array.isArray(result)
+    ? result
+    : Object.values(result || {});
+  return arr.map(m => ({
+    value: (m.slug && String(m.slug)) || slugify(String(m.name || '')),
+    label: m.name || m.slug || ''
+  }));
 }
 
 /* ------- same resolver utils as details page ------- */
@@ -764,12 +790,12 @@ function pickFromResult(result, wantedId) {
   return null;
 }
 
-function slugify(s = '') {
-  return s
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-+/g, '-');
-}
+// function slugify(s = '') {
+//   return s
+//     .toString()
+//     .toLowerCase()
+//     .trim()
+//     .replace(/[^a-z0-9]+/g, '-')
+//     .replace(/^-+|-+$/g, '')
+//     .replace(/-+/g, '-');
+// }

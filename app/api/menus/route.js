@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import Menu from '@/lib/model/menu';
 import { connectionSrt } from '@/lib/db';
-
+import { slugifyId as slugify } from '@/lib/slugify';
 // Connect to MongoDB
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
@@ -10,14 +10,14 @@ async function connectDB() {
   }
 }
 
-function slugify(text = '') {
-  return String(text)
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-+/g, '-');
-}
+// function slugify(text = '') {
+//   return String(text)
+//     .toLowerCase()
+//     .trim()
+//     .replace(/[^a-z0-9]+/g, '-')
+//     .replace(/^-+|-+$/g, '')
+//     .replace(/-+/g, '-');
+// }
 
 // GET: Fetch all menus
 export async function GET(request) {

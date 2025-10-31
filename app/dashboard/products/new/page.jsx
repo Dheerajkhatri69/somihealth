@@ -10,23 +10,31 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import UploadMediaLite from '@/components/UploadMediaLite';
 import toast, { Toaster } from 'react-hot-toast';
+import { slugifyId as slugify } from '@/lib/slugify';
 
 // ---------- helpers (single definitions) ----------
+// function toMenuOptions(result) {
+//   if (!result) return [];
+//   if (Array.isArray(result)) return result.map(m => ({ value: (m.name || '').toLowerCase().replace(/\s+/g, '-'), label: m.name }));
+//   return Object.keys(result).map(k => ({ value: k.toLowerCase().replace(/\s+/g, '-'), label: k }));
+// }
 function toMenuOptions(result) {
   if (!result) return [];
-  if (Array.isArray(result)) return result.map(m => ({ value: (m.name || '').toLowerCase().replace(/\s+/g, '-'), label: m.name }));
-  return Object.keys(result).map(k => ({ value: k.toLowerCase().replace(/\s+/g, '-'), label: k }));
+  const arr = Array.isArray(result) ? result : Object.values(result || {});
+  return arr.map(m => ({
+    value: (m.slug && String(m.slug)) || slugify(String(m.name || '')),
+    label: m.name || m.slug || ''
+  }));
 }
-
-function slugify(s = '') {
-  return s
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-+/g, '-');
-}
+// function slugify(s = '') {
+//   return s
+//     .toString()
+//     .toLowerCase()
+//     .trim()
+//     .replace(/[^a-z0-9]+/g, '-')
+//     .replace(/^-+|-+$/g, '')
+//     .replace(/-+/g, '-');
+// }
 
 const EMPTY = () => ({
   category: '',

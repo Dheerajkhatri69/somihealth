@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import Product from '@/lib/model/product';
 import { connectionSrt } from '@/lib/db';
-
+import { slugifyId as slugify } from '@/lib/slugify';
 // Connect to MongoDB
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
@@ -11,14 +11,14 @@ async function connectDB() {
 }
 
 // Normalize text into a URL-safe slug
-function slugify(text = '') {
-  return String(text)
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-') // replace any non-alnum run with '-'
-    .replace(/^-+|-+$/g, '')     // trim leading/trailing '-'
-    .replace(/-+/g, '-');        // collapse multiple '-'
-}
+// function slugify(text = '') {
+//   return String(text)
+//     .toLowerCase()
+//     .trim()
+//     .replace(/[^a-z0-9]+/g, '-') // replace any non-alnum run with '-'
+//     .replace(/^-+|-+$/g, '')     // trim leading/trailing '-'
+//     .replace(/-+/g, '-');        // collapse multiple '-'
+// }
 
 function isValidObjectId(v) {
   return /^[a-f0-9]{24}$/i.test(String(v || ''));
@@ -87,9 +87,12 @@ export async function POST(request) {
       'productDetails', 'howItWorksSection'
     ];
     // Auto slug from label if slug is empty
-    if (!body.slug && body.label) {
-      body.slug = slugify(body.label);
-    }
+    // if (!body.slug && body.label) {
+    //   body.slug = slugify(body.label);
+    // }
+    // Normalize category & slug
+    if (body.category) body.category = slugify(body.category);
+    if (!body.slug && body.label) body.slug = slugify(body.label);
     const missing = required.filter((k) => body[k] === undefined || body[k] === null || body[k] === '');
     if (missing.length) {
       return NextResponse.json({ success: false, message: `Missing fields: ${missing.join(', ')}` }, { status: 400 });
@@ -132,10 +135,16 @@ export async function PUT(request) {
 
       // Get old product before update to check for category change
       oldProduct = await Product.findOne(selector).lean();
+
+      // Normalize: category + slug
+      if (body.update.category) {
+        body.update.category = slugify(body.update.category);
+      }
       // Auto slug from label if slug missing in update
       if ((!body.update.slug || body.update.slug === '') && body.update.label) {
         body.update.slug = slugify(body.update.label);
       }
+
       result = await Product.findOneAndUpdate(selector, body.update, { new: true, runValidators: true });
       if (!result) return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
     } else {
@@ -160,6 +169,7 @@ export async function PUT(request) {
         result = await Product.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
       } else {
         oldProduct = await Product.findOne({ slug: id }).lean();
+        if (updateData.category) updateData.category = slugify(updateData.category);
         if ((!updateData.slug || updateData.slug === '') && updateData.label) {
           updateData.slug = slugify(updateData.label);
         }
@@ -346,47 +356,47 @@ async function syncProductToMenuTreatments(product) {
 
 // Update treatment hrefs when product slug changes
 async function updateTreatmentHrefsForProductSlugChange(oldProduct, newProduct) {
-    try {
-      const Menu = (await import('@/lib/model/menu')).default;
-      const productId = newProduct._id?.toString?.() || newProduct.id || null;
+  try {
+    const Menu = (await import('@/lib/model/menu')).default;
+    const productId = newProduct._id?.toString?.() || newProduct.id || null;
 
-      const menus = await Menu.find({ isActive: true });
+    const menus = await Menu.find({ isActive: true });
 
-      for (const menu of menus) {
-        let needsUpdate = false;
+    for (const menu of menus) {
+      let needsUpdate = false;
 
-        menu.treatments = menu.treatments.map(treatment => {
-          // Prefer identity by productId
-          if (productId && String(treatment.productId) === String(productId)) {
-            needsUpdate = true;
-            return {
-              ...treatment,
-              href: `/underdevelopmentmainpage/${newProduct.category}/${newProduct.slug}`,
-              label: newProduct.label,
-              img: newProduct.heroImage,
-              badge: newProduct.trustpilot || ''
-            };
-          }
-
-          // Legacy fallback: href contains old slug
-          if (treatment.href && treatment.href.includes(`/${oldProduct.slug}`)) {
-            needsUpdate = true;
-            return {
-              ...treatment,
-              href: treatment.href.replace(`/${oldProduct.slug}`, `/${newProduct.slug}`)
-            };
-          }
-          return treatment;
-        });
-
-        if (needsUpdate) {
-          await menu.save();
-          console.log(
-            `Updated treatment hrefs in menu "${menu.name}" for product slug change ${oldProduct.slug} → ${newProduct.slug}`
-          );
+      menu.treatments = menu.treatments.map(treatment => {
+        // Prefer identity by productId
+        if (productId && String(treatment.productId) === String(productId)) {
+          needsUpdate = true;
+          return {
+            ...treatment,
+            href: `/underdevelopmentmainpage/${newProduct.category}/${newProduct.slug}`,
+            label: newProduct.label,
+            img: newProduct.heroImage,
+            badge: newProduct.trustpilot || ''
+          };
         }
+
+        // Legacy fallback: href contains old slug
+        if (treatment.href && treatment.href.includes(`/${oldProduct.slug}`)) {
+          needsUpdate = true;
+          return {
+            ...treatment,
+            href: treatment.href.replace(`/${oldProduct.slug}`, `/${newProduct.slug}`)
+          };
+        }
+        return treatment;
+      });
+
+      if (needsUpdate) {
+        await menu.save();
+        console.log(
+          `Updated treatment hrefs in menu "${menu.name}" for product slug change ${oldProduct.slug} → ${newProduct.slug}`
+        );
       }
-    } catch (error) {
-      console.error('Error updating treatment hrefs for product slug change:', error);
     }
+  } catch (error) {
+    console.error('Error updating treatment hrefs for product slug change:', error);
   }
+}
