@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect } from "react";
 
 /**
  * PrimaryCareFeatures.jsx (image bottom text overlay with local blur only)
@@ -53,6 +54,7 @@ const DEFAULT_CONTENT = {
 export default function PrimaryCareFeatures({ content = DEFAULT_CONTENT }) {
   const c = { ...DEFAULT_CONTENT, ...content };
 
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
@@ -68,8 +70,8 @@ export default function PrimaryCareFeatures({ content = DEFAULT_CONTENT }) {
           />
 
           {/* Text panel only at bottom with local blur */}
-          <figcaption className="absolute bottom-0 left-0 right-0 mx-4 mb-4 rounded-xl bg-lightprimary/50 p-5 text-black backdrop-blur-md md:mx-6 md:mb-6 md:max-w-[85%]">
-            <h2 className="font-SofiaSans text-3xl font-semibold leading-snug md:text-4xl">
+          <figcaption className="absolute bottom-0 left-0 font-SofiaSans right-0 mx-4 mb-4 rounded-xl bg-lightprimary/50 p-5 text-black backdrop-blur-md md:mx-6 md:mb-6 md:max-w-[85%]">
+            <h2 className="font-SofiaSans text-xl font-semibold leading-snug md:text-3xl">
               {c.heading}
             </h2>
             <p className="mt-2 text-lg leading-6 text-black/90 md:text-xl">
@@ -93,9 +95,12 @@ function FeatureGroup({ group }) {
   return (
     <div className="rounded-xl bg-white backdrop-blur-md border-l-4 border-secondary p-5 shadow-sm">
       <h3 className="text-lg font-semibold text-slate-900">{group.title}</h3>
-      <div className="mt-2 list-disc space-y-1 text-base leading-6 text-slate-700">
+      <div className="mt-2 font-SofiaSans list-disc space-y-1 text-base leading-6 text-slate-700">
         {group.items.map((item, idx) => (
-          <div key={idx}>{item}</div>
+          <span key={idx}>
+            {item}
+            {idx < group.items.length - 1 && ', '}
+          </span>
         ))}
       </div>
     </div>

@@ -71,7 +71,7 @@ function PlanCard({ name, blurb, priceLabel, features = [] }) {
             <h3 className="text-xl font-semibold text-darkprimary
                  transition-transform duration-200 ease-out
                  group-hover:scale-[1.02] origin-left">{name}</h3>
-            <p className="mt-2 text-sm text-darkprimary/80 leading-relaxed">{blurb}</p>
+            <p className="mt-2 text-lg text-darkprimary/80 leading-relaxed">{blurb}</p>
             <Link href={"/pricing"}>
                 <div className="hover:scale-105 duration-150 ease-in-out mt-4 inline-flex items-center rounded-md bg-emerald-100 px-2.5 py-1 text-xl font-semibold text-emerald-800">
                     {priceLabel}
@@ -81,7 +81,7 @@ function PlanCard({ name, blurb, priceLabel, features = [] }) {
 
             <ul className="mt-5 space-y-3">
                 {features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-darkprimary/90 border-l-2 pl-2 rounded-sm border-darkprimary">
+                    <li key={i} className="flex items-start gap-3 text-lg text-darkprimary/90 border-l-2 pl-2 rounded-sm border-darkprimary">
                         <span>{f}</span>
                     </li>
                 ))}

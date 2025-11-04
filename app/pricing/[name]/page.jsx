@@ -187,12 +187,12 @@ export default function Page({ params }) {
                     className={[
                       'relative border rounded-lg transition-colors duration-300 overflow-hidden',
                       isSelected ? 'bg-blue-100' : 'bg-blue-50 border-blue-200 hover:bg-blue-100',
-                      isFirst ? 'pt-5' : ''
+                      isFirst ? 'rounded-t-lg' : ''
                     ].join(' ')}
                   >
                     {/* Banner behind the card */}
                     {isFirst && (
-                      <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-r px-4 from-blue-200 via-blue-100 to-blue-200 flex items-center justify-start">
+                      <div className="h-8 bg-pink-200 px-4 py-4 border-b-8 border-white flex items-center justify-start">
                         <span className="text-secondary font-semibold text-sm">
                           Recommended for New GLP-1 Patients
                         </span>
