@@ -58,7 +58,7 @@ export default function GeneralHealthPage() {
             <PrimaryCareHero content={content?.hero} />
             <PartnerWithDoctor content={content?.partner} />
             <PrimaryCareFeatures content={content?.features} />
-            <GlowCompare {...content?.glowCompare} />
+            {/* <GlowCompare {...content?.glowCompare} /> */}
             <HealthPlans {...content?.healthPlans} />
           </>
         )}

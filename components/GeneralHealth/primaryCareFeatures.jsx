@@ -69,10 +69,10 @@ export default function PrimaryCareFeatures({ content = DEFAULT_CONTENT }) {
 
           {/* Text panel only at bottom with local blur */}
           <figcaption className="absolute bottom-0 left-0 right-0 mx-4 mb-4 rounded-xl bg-lightprimary/50 p-5 text-black backdrop-blur-md md:mx-6 md:mb-6 md:max-w-[85%]">
-            <h2 className="font-SofiaSans text-xl font-semibold leading-snug md:text-2xl">
+            <h2 className="font-SofiaSans text-3xl font-semibold leading-snug md:text-4xl">
               {c.heading}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-black/90 md:text-[15px]">
+            <p className="mt-2 text-lg leading-6 text-black/90 md:text-xl">
               {c.intro}
             </p>
           </figcaption>
@@ -91,13 +91,13 @@ export default function PrimaryCareFeatures({ content = DEFAULT_CONTENT }) {
 
 function FeatureGroup({ group }) {
   return (
-    <div className="rounded-xl bg-lightprimary/50 backdrop-blur-md border-l-4 border-secondary p-5 shadow-sm">
+    <div className="rounded-xl bg-white backdrop-blur-md border-l-4 border-secondary p-5 shadow-sm">
       <h3 className="text-lg font-semibold text-slate-900">{group.title}</h3>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-700">
+      <div className="mt-2 list-disc space-y-1 text-base leading-6 text-slate-700">
         {group.items.map((item, idx) => (
-          <li key={idx}>{item}</li>
+          <div key={idx}>{item}</div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

@@ -5,11 +5,29 @@ import { Plus, Pencil, Trash2, GripVertical, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter
+} from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 const emptyDraft = (name) => ({
     _id: null,
@@ -20,6 +38,8 @@ const emptyDraft = (name) => ({
     link: '',
     paypal: '',
     isActive: true,
+    // remaining field
+    weekdes: '',
 });
 
 export default function PricingPayOptionsDashboard() {
@@ -102,6 +122,7 @@ export default function PricingPayOptionsDashboard() {
             link: row.link || '',
             paypal: row.paypal || '',
             isActive: row.isActive !== false,
+            weekdes: row.weekdes || '',
         });
         setOpen(true);
     }
@@ -126,8 +147,8 @@ export default function PricingPayOptionsDashboard() {
                 link: draft.link,
                 paypal: draft.paypal,
                 isActive: draft.isActive !== false,
+                weekdes: String(draft.weekdes || ''),
             };
-
 
             if (!draft._id) {
                 const res = await fetch('/api/plan-pay-options', {
@@ -151,12 +172,13 @@ export default function PricingPayOptionsDashboard() {
             await fetchAll();
             setOpen(false);
         } catch (e) {
-            console.error('Save error:', e); // Debug log
+            console.error('Save error:', e);
             toast.error(e.message || 'Save failed');
         } finally {
             setSaving(false);
         }
     }
+
     async function removeRow(id) {
         try {
             const r = await fetch(`/api/plan-pay-options/${encodeURIComponent(id)}`, { method: 'DELETE' });
@@ -215,7 +237,7 @@ export default function PricingPayOptionsDashboard() {
             const res = await fetch('/api/plan-pay-options', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, updates }),
+                body: JSON.stringify({ updates }),
             });
             const j = await res.json().catch(() => ({}));
             if (!res.ok || j?.success === false) throw new Error(j?.message || 'Failed to save order');
@@ -262,9 +284,17 @@ export default function PricingPayOptionsDashboard() {
 
                         <ul className="space-y-2">
                             {list.map((r, idx) => (
-                                <li key={r._id} onDragOver={onDragOver} onDrop={(e) => onDrop(name, idx, e)} className="rounded border bg-white">
+                                <li
+                                    key={r._id}
+                                    onDragOver={onDragOver}
+                                    onDrop={(e) => onDrop(name, idx, e)}
+                                    className="rounded border bg-white"
+                                >
                                     <div
-                                        className={cn('px-3 py-3 grid gap-2', 'grid-cols-1 md:[grid-template-columns:28px_minmax(0,1fr)_110px_minmax(0,1fr)_220px] md:items-center')}
+                                        className={cn(
+                                            'px-3 py-3 grid gap-2',
+                                            'grid-cols-1 md:[grid-template-columns:28px_minmax(0,1fr)_110px_minmax(0,1fr)_220px] md:items-center'
+                                        )}
                                         onDragOver={onDragOver}
                                         onDrop={(e) => onDrop(name, idx, e)}
                                     >
@@ -275,7 +305,11 @@ export default function PricingPayOptionsDashboard() {
                                                 aria-label="Drag handle"
                                                 draggable
                                                 onDragStart={(e) => onDragStart(name, r._id, e)}
-                                                className={cn('h-7 w-7 rounded-md text-gray-400 hover:text-gray-600', 'flex items-center justify-center hover:bg-gray-50 active:bg-gray-100', 'cursor-grab active:cursor-grabbing')}
+                                                className={cn(
+                                                    'h-7 w-7 rounded-md text-gray-400 hover:text-gray-600',
+                                                    'flex items-center justify-center hover:bg-gray-50 active:bg-gray-100',
+                                                    'cursor-grab active:cursor-grabbing'
+                                                )}
                                             >
                                                 <GripVertical size={16} />
                                             </button>
@@ -283,62 +317,130 @@ export default function PricingPayOptionsDashboard() {
 
                                         <div className="min-w-0">
                                             <div className="md:hidden text-[11px] text-gray-500 mb-1">Label</div>
-                                            <div className="truncate text-sm">{r.label}</div>
+                                            <div className="truncate text-sm font-medium text-gray-800">{r.label}</div>
 
+                                            {/* Week description directly below label */}
+                                            {r.weekdes ? (
+                                                <div className="text-xs text-gray-600 mt-0.5 break-words">{r.weekdes}</div>
+                                            ) : null}
+
+                                            {/* metadata preview on mobile */}
                                             <div className="md:hidden mt-2 space-y-1">
                                                 <div className="text-xs text-gray-700">
                                                     <span className="font-medium">{r.price}</span>
                                                 </div>
+
                                                 <div className="text-[11px] text-gray-600 leading-4">
                                                     <div className="truncate">
                                                         <span className="text-gray-500">Stripe link:</span>{' '}
-                                                        {r.link ? <a href={r.link} target="_blank" rel="noreferrer" className="underline break-all">{r.link}</a> : <span className="text-gray-400">—</span>}
+                                                        {r.link ? (
+                                                            <a
+                                                                href={r.link}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="underline break-all"
+                                                            >
+                                                                {r.link}
+                                                            </a>
+                                                        ) : (
+                                                            <span className="text-gray-400">—</span>
+                                                        )}
                                                     </div>
                                                     <div className="truncate">
                                                         <span className="text-gray-500">PayPal link:</span>{' '}
-                                                        {r.paypal ? <a href={r.paypal} target="_blank" rel="noreferrer" className="underline break-all">{r.paypal}</a> : <span className="text-gray-400">—</span>}
+                                                        {r.paypal ? (
+                                                            <a
+                                                                href={r.paypal}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="underline break-all"
+                                                            >
+                                                                {r.paypal}
+                                                            </a>
+                                                        ) : (
+                                                            <span className="text-gray-400">—</span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
+                                        {/* Price column */}
                                         <div className="hidden md:block text-sm">
                                             <div className="font-medium">{r.price}</div>
                                         </div>
 
+                                        {/* Links column */}
                                         <div className="hidden md:block min-w-0">
                                             <div className="text-xs text-gray-700 space-y-0.5">
                                                 <div className="truncate">
                                                     <span className="text-gray-500">Stripe link:</span>{' '}
-                                                    {r.link ? <a href={r.link} target="_blank" rel="noreferrer" className="underline truncate inline-block max-w-full align-top">{r.link}</a> : <span className="text-gray-400">—</span>}
+                                                    {r.link ? (
+                                                        <a
+                                                            href={r.link}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="underline truncate inline-block max-w-full align-top"
+                                                        >
+                                                            {r.link}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-gray-400">—</span>
+                                                    )}
                                                 </div>
                                                 <div className="truncate">
                                                     <span className="text-gray-500">PayPal link:</span>{' '}
-                                                    {r.paypal ? <a href={r.paypal} target="_blank" rel="noreferrer" className="underline truncate inline-block max-w-full align-top">{r.paypal}</a> : <span className="text-gray-400">—</span>}
+                                                    {r.paypal ? (
+                                                        <a
+                                                            href={r.paypal}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="underline truncate inline-block max-w-full align-top"
+                                                        >
+                                                            {r.paypal}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-gray-400">—</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
 
+                                        {/* Action buttons */}
                                         <div className="md:ml-auto">
                                             <div className="flex gap-2 flex-wrap md:flex-nowrap md:justify-end w-full whitespace-nowrap">
-                                                <Button variant="secondary" size="sm" className="text-white gap-1 px-2.5" onClick={() => openEditModal(r)}>
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className="text-white gap-1 px-2.5"
+                                                    onClick={() => openEditModal(r)}
+                                                >
                                                     <Pencil size={16} /> Edit
                                                 </Button>
 
                                                 <AlertDialog>
                                                     <AlertDialogTrigger asChild>
-                                                        <Button variant="outline" size="sm" className="gap-1 px-2.5 text-red-600 border-red-200 hover:bg-red-50">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="gap-1 px-2.5 text-red-600 border-red-200 hover:bg-red-50"
+                                                        >
                                                             <Trash2 size={16} /> Delete
                                                         </Button>
                                                     </AlertDialogTrigger>
                                                     <AlertDialogContent>
                                                         <AlertDialogHeader>
                                                             <AlertDialogTitle>Delete this option?</AlertDialogTitle>
-                                                            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone.
+                                                            </AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
                                                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={() => removeRow(r._id)}>
+                                                            <AlertDialogAction
+                                                                className="bg-red-600 hover:bg-red-700"
+                                                                onClick={() => removeRow(r._id)}
+                                                            >
                                                                 Delete
                                                             </AlertDialogAction>
                                                         </AlertDialogFooter>
@@ -349,8 +451,14 @@ export default function PricingPayOptionsDashboard() {
                                     </div>
                                 </li>
                             ))}
-                            <li onDragOver={onDragOver} onDrop={(e) => onDrop(name, (grouped.get(name) || []).length, e)} className="h-4" aria-hidden />
+                            <li
+                                onDragOver={onDragOver}
+                                onDrop={(e) => onDrop(name, (grouped.get(name) || []).length, e)}
+                                className="h-4"
+                                aria-hidden
+                            />
                         </ul>
+
                     </div>
                 )}
             </div>
@@ -361,7 +469,9 @@ export default function PricingPayOptionsDashboard() {
         <div className="w-full mx-auto px-4 pb-4 space-y-6">
             <div>
                 <h1 className="text-2xl font-bold">Pricing – Pay Options</h1>
-                <p className="text-gray-500 text-sm">Add, edit, delete, and drag to sort options across all categories.</p>
+                <p className="text-gray-500 text-sm">
+                    Add, edit, delete, and drag to sort options across all categories. Supports week descriptions.
+                </p>
             </div>
 
             {/* Render a Section per category */}
@@ -377,7 +487,7 @@ export default function PricingPayOptionsDashboard() {
 
             {/* Add/Edit Modal */}
             <Dialog open={open} onOpenChange={(v) => !saving && setOpen(v)}>
-                <DialogContent className="sm:max-w-lg">
+                <DialogContent className="sm:max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>{draft._id ? 'Edit Option' : 'Add Option'}</DialogTitle>
                         <DialogDescription>Choose category and fill details.</DialogDescription>
@@ -385,24 +495,21 @@ export default function PricingPayOptionsDashboard() {
 
                     <div className="grid gap-4 py-2">
                         {/* Category select */}
-                        {/* Category select (shadcn Select) */}
                         <div>
                             <Label className="text-xs">Category*</Label>
-
                             <Select
-                                value={draft.name || ""}
+                                value={draft.name || ''}
                                 onValueChange={(value) => setDraft((d) => ({ ...d, name: value }))}
                             >
                                 <SelectTrigger className="w-full mt-1">
                                     <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
-
                                 <SelectContent>
                                     {cats
                                         .filter(
                                             (c) =>
-                                                c.title.toLowerCase() !== "weight loss" &&
-                                                c.idname.toLowerCase() !== "weight-loss"
+                                                c.title.toLowerCase() !== 'weight loss' &&
+                                                c.idname.toLowerCase() !== 'weight-loss'
                                         )
                                         .map((c) => (
                                             <SelectItem key={c.idname} value={c.idname}>
@@ -419,12 +526,10 @@ export default function PricingPayOptionsDashboard() {
                                 <Input
                                     type="text"
                                     placeholder="$0"
-                                    value={draft.price || ""}
+                                    value={draft.price || ''}
                                     onChange={(e) => {
-                                        let val = e.target.value.replace(/[^\d]/g, ""); // remove all non-digit chars
-                                        if (val) {
-                                            val = `$${val}`; // prepend $
-                                        }
+                                        let val = e.target.value.replace(/[^\d]/g, ''); // digits only
+                                        if (val) val = `$${val}`;
                                         setDraft((d) => ({ ...d, price: val }));
                                     }}
                                 />
@@ -433,18 +538,44 @@ export default function PricingPayOptionsDashboard() {
 
                         <div>
                             <Label className="text-xs">Label*</Label>
-                            <Input placeholder="e.g., 8 Weeks (0.25mg and 0.5mg/week)" value={draft.label} onChange={(e) => setDraft((d) => ({ ...d, label: e.target.value }))} className="mt-1" />
+                            <Input
+                                placeholder="e.g., 8 Weeks (0.25mg and 0.5mg/week)"
+                                value={draft.label}
+                                onChange={(e) => setDraft((d) => ({ ...d, label: e.target.value }))}
+                                className="mt-1"
+                            />
                         </div>
-
+                        {/* Week description */}
+                        <div>
+                            <Label className="text-xs">Week description</Label>
+                            <Input
+                                placeholder='e.g., "For 12 weeks"'
+                                className="mt-1"
+                                value={draft.weekdes}
+                                onChange={(e) => setDraft((d) => ({ ...d, weekdes: e.target.value }))}
+                            />
+                        </div>
                         <div>
                             <Label className="text-xs">Stripe link</Label>
-                            <Input placeholder="https://buy.stripe.com/..." value={draft.link} onChange={(e) => setDraft((d) => ({ ...d, link: e.target.value }))} className="mt-1" />
+                            <Input
+                                placeholder="https://buy.stripe.com/..."
+                                value={draft.link}
+                                onChange={(e) => setDraft((d) => ({ ...d, link: e.target.value }))}
+                                className="mt-1"
+                            />
                         </div>
 
                         <div>
                             <Label className="text-xs">PayPal link</Label>
-                            <Input placeholder="https://www.paypal.com/ncp/payment/..." value={draft.paypal} onChange={(e) => setDraft((d) => ({ ...d, paypal: e.target.value }))} className="mt-1" />
+                            <Input
+                                placeholder="https://www.paypal.com/ncp/payment/..."
+                                value={draft.paypal}
+                                onChange={(e) => setDraft((d) => ({ ...d, paypal: e.target.value }))}
+                                className="mt-1"
+                            />
                         </div>
+
+
                     </div>
 
                     <DialogFooter className="gap-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 export default function HealthPlans({
@@ -13,21 +14,22 @@ export default function HealthPlans({
         <section className="relative">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
                 {/* Layout: image left, header + cards right */}
-                <div className="grid gap-6 lg:[grid-template-columns:40%_60%] items-start">
-
+                <div className="flex flex-col items-start gap-10">
                     {/* Left image */}
-                    <figure className="overflow-hidden rounded-2xl shadow-sm">
-                        <div className="relative aspect-[9/16] w-full">
+                    <figure className="w-full rounded-2xl shadow-sm overflow-hidden">
+                        <div className="relative w-full h-56 sm:h-72 md:h-80 lg:h-96">
                             <Image
                                 src={image.src}
                                 alt={image.alt}
                                 fill
-                                priority={false}
-                                className="object-cover"
+                                // If you have a global `img { height:auto; }` reset, force both dims:
+                                className="!w-full !h-full object-cover"
                                 sizes="(max-width: 1024px) 100vw, 640px"
+                                priority={false}
                             />
                         </div>
                     </figure>
+
 
 
                     {/* Right: centered header + cards */}
@@ -41,7 +43,7 @@ export default function HealthPlans({
                             </p>
                         </header>
 
-                        <div className="grid w-full gap-6 sm:grid-cols-2">
+                        <div className="grid w-full gap-6 sm:grid-cols-3">
                             {plans.map((plan, idx) => (
                                 <PlanCard key={idx} {...plan} highlight={true} />
                             ))}
@@ -55,7 +57,7 @@ export default function HealthPlans({
 
 /* ----------------- subcomponents ----------------- */
 
-function PlanCard({ name, blurb, priceLabel, features = []}) {
+function PlanCard({ name, blurb, priceLabel, features = [] }) {
     return (
         <article
             className={[
@@ -70,10 +72,11 @@ function PlanCard({ name, blurb, priceLabel, features = []}) {
                  transition-transform duration-200 ease-out
                  group-hover:scale-[1.02] origin-left">{name}</h3>
             <p className="mt-2 text-sm text-darkprimary/80 leading-relaxed">{blurb}</p>
-
-            <div className="mt-4 inline-flex items-center rounded-md bg-emerald-100 px-2.5 py-1 text-[12px] font-semibold text-emerald-800">
-                {priceLabel}
-            </div>
+            <Link href={"/pricing"}>
+                <div className="hover:scale-105 duration-150 ease-in-out mt-4 inline-flex items-center rounded-md bg-emerald-100 px-2.5 py-1 text-xl font-semibold text-emerald-800">
+                    {priceLabel}
+                </div>
+            </Link>
 
 
             <ul className="mt-5 space-y-3">

@@ -1,19 +1,23 @@
+// /app/api/plan-pay-options/[id]/route.js
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import PlanPayOption from '@/lib/model/PlanPayOption';
 import PricingLanding from '@/lib/model/pricingLanding';
-import PricingWeightLoss from '@/lib/model/pricingWeightLoss'; // Add this import
+import PricingWeightLoss from '@/lib/model/pricingWeightLoss';
 import { connectionSrt } from '@/lib/db';
 
+export const runtime = 'nodejs'; // ensure Node runtime (Mongoose)
+
+// ---------- db ----------
 async function connectDB() {
     if (mongoose.connection.readyState === 0) {
         await mongoose.connect(connectionSrt);
     }
 }
 
-// Updated getPlanCategories function for this route
+// ---------- helpers ----------
 async function getPlanCategories() {
-    // Get Pricing Landing options
+    // Pricing Landing
     const landingDoc = await PricingLanding
         .findOne({ 'config.isActive': true })
         .lean()
@@ -25,7 +29,7 @@ async function getPlanCategories() {
         image: o.image || '',
     }));
 
-    // Get Weight Loss options
+    // Pricing Weight Loss
     const weightLossDoc = await PricingWeightLoss
         .findOne({ 'config.isActive': true })
         .lean()
@@ -49,11 +53,14 @@ async function getPlanCategories() {
     return merged;
 }
 
+// ---------- GET /api/plan-pay-options/[id] ----------
 export async function GET(_req, { params }) {
     try {
         await connectDB();
         const row = await PlanPayOption.findById(params.id).lean();
-        if (!row) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+        if (!row) {
+            return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+        }
         return NextResponse.json({ success: true, result: row });
     } catch (e) {
         console.error(e);
@@ -61,40 +68,55 @@ export async function GET(_req, { params }) {
     }
 }
 
+// ---------- PUT /api/plan-pay-options/[id] ----------
 export async function PUT(req, { params }) {
     try {
         await connectDB();
         const body = await req.json();
 
+        // guard: field removed from model
+        if (body.dragoption !== undefined) {
+            return NextResponse.json(
+                { success: false, message: '`dragoption` has been removed from PlanPayOption.' },
+                { status: 400 }
+            );
+        }
+
         const update = {
-            ...(body.name && { name: String(body.name).trim().toLowerCase() }), // allow renaming to another idname
+            ...(body.name && { name: String(body.name).trim().toLowerCase() }),
             ...(body.sort !== undefined && { sort: Number(body.sort) }),
             ...(body.label !== undefined && { label: String(body.label) }),
             ...(body.price !== undefined && { price: String(body.price) }),
             ...(body.link !== undefined && { link: String(body.link || '') }),
             ...(body.paypal !== undefined && { paypal: String(body.paypal || '') }),
             ...(body.isActive !== undefined && { isActive: !!body.isActive }),
+
+            // remaining new field
+            ...(body.weekdes !== undefined && { weekdes: String(body.weekdes || '') }),
         };
 
-        // if updating name, validate against categories
+        // Validate name against categories if changing
         if (update.name) {
             const cats = await getPlanCategories();
-            const set = new Set(cats.map(c => c.idname));
-            if (!set.has(update.name)) {
-                const availableCategories = Array.from(set).join(', ');
+            const allowed = new Set(cats.map(c => c.idname));
+            if (!allowed.has(update.name)) {
+                const availableCategories = Array.from(allowed).join(', ');
                 return NextResponse.json(
-                    {
-                        success: false,
-                        message: `Invalid name (idname). Available: ${availableCategories}`
-                    },
+                    { success: false, message: `Invalid name (idname). Available: ${availableCategories}` },
                     { status: 400 }
                 );
             }
         }
 
-        const updated = await PlanPayOption.findByIdAndUpdate(params.id, { $set: update }, { new: true });
-        if (!updated) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+        const updated = await PlanPayOption.findByIdAndUpdate(
+            params.id,
+            { $set: update },
+            { new: true }
+        );
 
+        if (!updated) {
+            return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+        }
         return NextResponse.json({ success: true, result: updated });
     } catch (e) {
         console.error(e);
@@ -102,11 +124,14 @@ export async function PUT(req, { params }) {
     }
 }
 
+// ---------- DELETE /api/plan-pay-options/[id] ----------
 export async function DELETE(_req, { params }) {
     try {
         await connectDB();
         const r = await PlanPayOption.findByIdAndDelete(params.id);
-        if (!r) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+        if (!r) {
+            return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+        }
         return NextResponse.json({ success: true, result: r._id });
     } catch (e) {
         console.error(e);

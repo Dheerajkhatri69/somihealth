@@ -28,7 +28,7 @@ export default function PrimaryCareHero({ content = DEFAULT_CONTENT }) {
 
     return (
         <section className="relative isolate overflow-hidden">
-            <div className="mx-auto font-SofiaSans grid max-w-5xl grid-cols-1 gap-8 px-4 py-12 md:grid-cols-2 md:py-16 lg:gap-10 lg:px-6">
+            <div className="mx-auto font-SofiaSans grid max-w-7xl grid-cols-1 gap-8 px-4 py-12 md:grid-cols-2 md:py-12 lg:gap-10 lg:px-6">
                 {/* Left: Copy */}
                 <div className="flex flex-col items-start justify-center">
                     {c.eyebrow ? (
@@ -37,16 +37,16 @@ export default function PrimaryCareHero({ content = DEFAULT_CONTENT }) {
                         </span>
                     ) : null}
 
-                    <h1 className="text-2xl font-semibold leading-snug text-slate-900 md:text-3xl">
+                    <h1 className="text-3xl font-semibold leading-snug text-slate-900 md:text-5xl">
                         {c.heading}
                     </h1>
 
-                    <p className="mt-4 max-w-md text-base leading-6 text-slate-700">
+                    <p className="mt-4 max-w-md text-lg md:text-xl leading-6 text-slate-700">
                         {c.subheading}
                     </p>
 
                     {c.priceNote ? (
-                        <div className="mt-6 inline-flex rounded bg-lightprimary px-3 py-1.5 text-xs text-slate-800 ring-1 ring-lightprimary-foreground">
+                        <div className="mt-6 inline-flex rounded bg-darkprimary-foreground/20 border-l-2 border-secondary border-r-2 px-3 py-1.5 md:text-lg text-base text-slate-800 ring-1 ring-lightprimary-foreground">
                             {c.priceNote}
                         </div>
                     ) : null}
@@ -54,7 +54,7 @@ export default function PrimaryCareHero({ content = DEFAULT_CONTENT }) {
                     {c.ctaLabel ? (
                         <a
                             href={c.ctaHref || "#"}
-                            className="fx-primary rounded-full mt-6 font-SofiaSans bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-100"
+                            className="fx-primary rounded-full mt-6 font-SofiaSans bg-darkprimary px-5 py-2 md:text-lg text-base font-semibold text-white hover:opacity-100"
                         >
                             {c.ctaLabel}
                         </a>
@@ -63,8 +63,6 @@ export default function PrimaryCareHero({ content = DEFAULT_CONTENT }) {
 
                 {/* Right: Image with background div as shadow */}
                 <div className="relative flex items-center justify-center">
-                    {/* Secondary background div */}
-                    <div className="absolute right-4 top-4 -z-10 hidden h-[95%] w-[95%] rounded-2xl bg-lightprimary md:block" />
 
                     <div className="relative overflow-hidden rounded-2xl max-w-md">
                         <Image

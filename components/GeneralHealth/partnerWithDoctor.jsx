@@ -55,7 +55,7 @@ export default function PartnerWithDoctor({ content = DEFAULT_CONTENT }) {
     <section className="relative isolate">
       {/* Soft backdrop */}
       <div className="mx-auto font-SofiaSans max-w-7xl rounded-3xl bg-darkprimary-foreground/20 px-4 py-14 shadow-inner ring-1 ring-sky-100 md:px-8">
-        <h2 className="mx-auto max-w-3xl text-center text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+        <h2 className="mx-auto max-w-3xl text-center text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl">
           {c.heading}
         </h2>
 
@@ -91,10 +91,10 @@ function Card({ item }) {
           </div>
         ) : null}
 
-        <h3 className="text-base font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-slate-900">
           {item.title}
         </h3>
-        <p className="mt-3 text-sm leading-6 text-slate-600">
+        <p className="mt-3 text-base leading-6 text-slate-600">
           {item.desc}
         </p>
       </div>

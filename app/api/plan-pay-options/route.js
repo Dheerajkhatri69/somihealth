@@ -3,23 +3,26 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import PlanPayOption from '@/lib/model/PlanPayOption';
 import PricingLanding from '@/lib/model/pricingLanding';
-import PricingWeightLoss from '@/lib/model/pricingWeightLoss'; // Add this import
+import PricingWeightLoss from '@/lib/model/pricingWeightLoss';
 import { connectionSrt } from '@/lib/db';
 
 export const runtime = 'nodejs'; // ensure Node runtime (Mongoose)
 
-// ---------- helpers ----------
-function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-
+// ---------- db ----------
 async function connectDB() {
     if (mongoose.connection.readyState === 0) {
         await mongoose.connect(connectionSrt);
     }
 }
 
+// ---------- helpers ----------
+function escapeRegExp(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // Merge GLP-1 categories with PricingLanding.options AND PricingWeightLoss.options
 async function getPlanCategories() {
-    // Get Pricing Landing options
+    // Pricing Landing
     const landingDoc = await PricingLanding
         .findOne({ 'config.isActive': true })
         .lean()
@@ -31,7 +34,7 @@ async function getPlanCategories() {
         image: o.image || '',
     }));
 
-    // Get Weight Loss options
+    // Pricing Weight Loss
     const weightLossDoc = await PricingWeightLoss
         .findOne({ 'config.isActive': true })
         .lean()
@@ -67,8 +70,8 @@ export async function GET(req) {
             const nameId = rawName.toLowerCase();
             const legacyCap =
                 nameId === 'semaglutide' ? 'Semaglutide' :
-                    nameId === 'tirzepatide' ? 'Tirzepatide' :
-                        null;
+                nameId === 'tirzepatide' ? 'Tirzepatide' :
+                null;
 
             filter = {
                 $or: [
@@ -98,6 +101,14 @@ export async function POST(req) {
         await connectDB();
         const body = await req.json();
 
+        // guard: field removed from model
+        if (body.dragoption !== undefined) {
+            return NextResponse.json(
+                { success: false, message: '`dragoption` has been removed from PlanPayOption.' },
+                { status: 400 }
+            );
+        }
+
         const categories = await getPlanCategories();
         const allowed = new Set(categories.map(c => c.idname));
 
@@ -114,6 +125,7 @@ export async function POST(req) {
                 { status: 400 }
             );
         }
+
         if (!body?.label || !body?.price) {
             return NextResponse.json(
                 { success: false, message: 'label and price are required' },
@@ -129,6 +141,9 @@ export async function POST(req) {
             link: String(body.link || ''),
             paypal: String(body.paypal || ''),
             isActive: body.isActive !== false,
+
+            // remaining field
+            weekdes: String(body.weekdes || ''),
         });
 
         return NextResponse.json({ success: true, result: created });
@@ -144,13 +159,17 @@ export async function PATCH(req) {
         await connectDB();
         const body = await req.json();
         const updates = Array.isArray(body?.updates) ? body.updates : [];
+
         const ops = updates.map(u => ({
             updateOne: {
                 filter: { _id: u._id },
                 update: { $set: { sort: Number(u.sort || 0) } },
             },
         }));
-        if (!ops.length) return NextResponse.json({ success: true, result: [] });
+
+        if (!ops.length) {
+            return NextResponse.json({ success: true, result: [] });
+        }
 
         const r = await PlanPayOption.bulkWrite(ops);
         return NextResponse.json({ success: true, result: r });
