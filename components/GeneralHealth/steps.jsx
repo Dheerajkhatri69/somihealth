@@ -43,7 +43,7 @@ export default function Steps({ content = DEFAULT_CONTENT }) {
   const c = { ...DEFAULT_CONTENT, ...content };
 
   return (
-    <section className="relative isolate">
+    <section className="relative isolate font-SofiaSans">
       <div className="mx-auto max-w-6xl px-4 py-16 md:px-8">
         <h2 className="text-center text-2xl font-semibold tracking-tight text-slate-900 md:text-4xl">
           {c.heading}

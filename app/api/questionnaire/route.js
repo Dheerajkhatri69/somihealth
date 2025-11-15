@@ -94,6 +94,10 @@ export async function POST(request) {
             labs: body.labs,
             glp1Statement: body.glp1Statement,
             glp1DoseInfo: body.glp1DoseInfo,
+            // 👇 NEW
+            heardAbout: body.heardAbout,
+            heardAboutOther: body.heardAboutOther,
+
             agreeTerms: body.agreeTerms || false,
             prescriptionPhoto: body.prescriptionPhoto,
             idPhoto: body.idPhoto,

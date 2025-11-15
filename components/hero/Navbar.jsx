@@ -40,14 +40,14 @@ function MegaPanel({ menuKey, onNavigate }) {
         <div
             className="w-full border-t  rounded-b-3xl bg-lightprimary"
         >
-            <div className={`mx-auto grid ${data.type === "categorized" ? "max-w-8xl" : "max-w-7xl"} grid-cols-1 gap-8 px-4 py-10 md:grid-cols-12 md:px-6`}>
+            <div className={`mx-auto grid ${data.type === "categorized" ? "max-w-7xl" : "max-w-7xl"} grid-cols-1 gap-8 px-4 py-10 md:grid-cols-12 md:px-6`}>
                 <div
                     className="md:col-span-1"
                 >
                 </div>
                 {data.type === "categorized" ? (
                     <>
-                        <div className="md:col-span-2">
+                        <div className="md:col-span-3">
                             <h3 className="text-lg font-semibold text-darkprimary mb-3 font-SofiaSans">
                                 Discover
                             </h3>
@@ -77,7 +77,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                         {data.categories?.map((cat, idx) => {
                             const isRefill =
                                 /refill/i.test(cat?.title ?? "") || idx === data.categories.length - 1;
-                            const spanClass = isRefill ? "md:col-span-3" : "md:col-span-2";
+                            const spanClass = isRefill ? "md:col-span-4" : "md:col-span-4";
 
                             return (
                                 <div key={cat?._id || cat?.title || idx} className={spanClass}>
@@ -98,11 +98,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                                                 >
                                                     <span className="text-lg font-SofiaSans">{item?.label}</span>
 
-                                                    {/* Animated underline */}
-                                                    <span
-                                                        aria-hidden="true"
-                                                        className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100 motion-reduce:hidden"
-                                                    />
+                                                   
                                                 </Link>
                                             </li>
                                         ))}

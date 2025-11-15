@@ -116,13 +116,10 @@ const LandingPage = () => {
                                 Start Your Weight Loss Journey Today!
                             </h2>
 
-                            <p className="text-gray-700 mb-2">
+                            <p className="text-gray-700 mb-6">
                                 No hidden fees, No monthly subscription, Free Expedited shipping
                             </p>
 
-                            <p className="text-green-600 font-medium mb-6">
-                                $25 Clinician Review Fee
-                            </p>
 
                             <Link href="/getstarted/questions">
                                 <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">

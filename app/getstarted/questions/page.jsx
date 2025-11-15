@@ -68,6 +68,13 @@ const formSchema = z.object({
   labs: z.string().min(1, "This field is required"),
   glp1Statement: z.string().min(1, "This field is required"),
   glp1DoseInfo: z.string().optional(),
+
+  // 👇 NEW: How did you hear about us
+  heardAbout: z.enum(['Instagram', 'Facebook', 'TikTok', 'Other'], {
+    required_error: "Please tell us how you heard about us",
+  }),
+  heardAboutOther: z.string().optional(),
+
   agreeTerms: z.string().min(1, "This field is required"),
   prescriptionPhoto: z.string().optional(),
   idPhoto: z.string().min(1, "This field is required"),
@@ -665,7 +672,7 @@ export default function PatientRegistrationForm() {
       case 'terms': return ['agreeTerms'];
       case 'prescription': return ['prescriptionPhoto'];
       case 'id': return ['idPhoto'];
-      case 'comments': return ['comments'];
+      case 'comments': return ['heardAbout', 'heardAboutOther', 'comments'];
       case 'consent': return ['consent', 'terms', 'treatment', 'agreetopay'];
       default: return [];
     }
@@ -2260,13 +2267,65 @@ export default function PatientRegistrationForm() {
             </div>
           )}
 
-          {/* Comments segment */}
+          {/* How did you hear about us + Comments segment */}
           {currentSegment === 35 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Do you have any questions or comments for the provider?</h2>
+            <div className="space-y-6">
+              {/* How did you hear about us */}
+              <div className="space-y-3">
+                <h2 className="text-xl font-semibold">How did you hear about us?</h2>
+                <Label>
+                  Please select one option <span className="text-red-500">*</span>
+                </Label>
+
+                <div className="flex flex-col gap-3">
+                  {['Instagram', 'Facebook', 'TikTok', 'Other'].map((option, index) => (
+                    <label
+                      key={index}
+                      htmlFor={`heardAbout-${index}`}
+                      className={`flex items-center justify-center ${option == "Other"? "w-[320px]" : "w-[160px]"} text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option
+                        ? 'bg-secondary text-white'
+                        : 'bg-white text-secondary'
+                        }`}
+                    >
+                      <input
+                        type="radio"
+                        id={`heardAbout-${index}`}
+                        value={option}
+                        className="hidden"
+                        {...register('heardAbout')}
+                      />
+                      <span>{option == "Other" ? "Others(family, friend or any specific name)" : option}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Show text field when "Other" is selected */}
+                {watch('heardAbout') === 'Other' && (
+                  <div className="mt-3 space-y-2">
+                    <Label htmlFor="heardAboutOther">
+                      Please tell us where you heard about us
+                    </Label>
+                    <Input
+                      id="heardAboutOther"
+                      type="text"
+                      {...register('heardAboutOther')}
+                      placeholder="e.g. family, friend or any specific name etc."
+                    />
+                  </div>
+                )}
+
+                {errors.heardAbout && (
+                  <p className="text-sm text-red-500">{errors.heardAbout.message}</p>
+                )}
+              </div>
+
+              {/* Questions / comments for provider */}
               <div className="space-y-2">
+                <h2 className="text-xl font-semibold">
+                  Do you have any questions or comments for the provider?
+                </h2>
                 <Label htmlFor="comments">
-                  Discription (Optional)
+                  Description (Optional)
                 </Label>
                 <Textarea
                   id="comments"
