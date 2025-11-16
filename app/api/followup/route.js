@@ -62,7 +62,7 @@ export async function POST(request) {
             semaglutideUnit: body.semaglutideUnit,
             tirzepatideDose: body.tirzepatideDose,
             tirzepatideUnit: body.tirzepatideUnit,
-            createTimeDate: new Date().toISOString(),
+            createTimeDate: body.createTimeDate || new Date().toISOString(),
             closetickets: body.closetickets || false,
             Reasonclosetickets: body.Reasonclosetickets,
             images: body.images || [],
@@ -121,7 +121,6 @@ export async function PUT(request) {
             {
                 $set: {
                     ...body,
-                    createTimeDate: body.createTimeDate || new Date().toISOString(),
                 }
             },
             { new: true }

@@ -1353,33 +1353,6 @@ export default function FollowUp() {
                                             </DropdownMenuContent>
                                         </DropdownMenu>
 
-                                        {/* Delete Confirmation Dialog */}
-                                        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This action cannot be undone. This will permanently delete the selected patient from our servers.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction
-                                                        onClick={() => {
-                                                            if (selectedPatientId) {
-                                                                handleDelete(selectedPatientId)
-                                                                setOpenDialog(false)
-                                                                setSelectedPatientId(null)
-                                                            }
-                                                        }}
-                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                    >
-                                                        Delete Permanently
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
                                     </TableCell>
 
                                 </TableRow>
@@ -1539,8 +1512,33 @@ export default function FollowUp() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            {/* Email Dialog */}
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the selected patient from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
 
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (selectedPatientId) {
+                                    handleDelete(selectedPatientId)
+                                    setOpenDialog(false)
+                                    setSelectedPatientId(null)
+                                }
+                            }}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Delete Permanently
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

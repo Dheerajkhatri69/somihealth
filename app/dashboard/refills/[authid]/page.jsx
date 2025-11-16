@@ -163,7 +163,6 @@ export default function FollowUpForm({ params }) {
                 if (data.success) {
                     setRefillId(data.result._id);
                     // Only update fields that exist in the refill data
-                    // console.log("data", data.result)
                     setFormData(prev => ({
                         ...prev,
                         authid: data.result.authid,
@@ -200,6 +199,7 @@ export default function FollowUpForm({ params }) {
                                 : "",
 
                         providerComments: data.result.dosageNote,
+                        createTimeDate: data.result.createdAt || data.result.createTimeDate || new Date().toISOString(),
 
                     }));
                 } else {
@@ -245,7 +245,7 @@ export default function FollowUpForm({ params }) {
 
         const submissionData = {
             ...formData,
-            createTimeDate: new Date().toISOString(),
+            createTimeDate: formData.createTimeDate,
             images: images.filter(url => url !== ''),
             file1: fileUrls.file1,
             file2: fileUrls.file2
