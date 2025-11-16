@@ -92,7 +92,7 @@ export async function POST(request) {
             tirzepatideDose: body.tirzepatideDose,
             tirzepatideUnit: body.tirzepatideUnit,
             providerNote: body.providerNote,
-            createTimeDate: new Date().toISOString(),
+            createTimeDate: body.createTimeDate || new Date().toISOString(),
             closetickets: body.closetickets || false,
             Reasonclosetickets: body.Reasonclosetickets,
             images: body.images || [],

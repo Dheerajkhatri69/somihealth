@@ -99,7 +99,7 @@ export default function PatientUpdateForm({ params }) {
             try {
                 const response = await fetch(`/api/questionnaire/${params.patientId}`);
                 const data = await response.json();
-
+                console.log(data.result);
                 if (data.success) {
                     setFormData(data.result);
                     // Set file URLs from the fetched data
@@ -168,7 +168,7 @@ export default function PatientUpdateForm({ params }) {
                 semaglutideUnit: '',
                 tirzepatideDose: '',
                 tirzepatideUnit: '',
-                createTimeDate: new Date().toISOString(),
+                createTimeDate: formData.createTimeDate,
                 images: [],
                 file1: formData.prescriptionPhoto,
                 file2: formData.idPhoto,

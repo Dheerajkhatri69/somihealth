@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableHeader,
     TableHead,
     TableRow,
@@ -41,10 +40,8 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -69,6 +66,12 @@ export default function Dashboard() {
 
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 100;
+    const [now, setNow] = useState(() => new Date());
+
+    useEffect(() => {
+        const id = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(id);
+    }, []);
 
     // Load user data from localStorage on component mount
     useEffect(() => {
@@ -81,24 +84,46 @@ export default function Dashboard() {
     }, []);
     const [clinicians, setClinicians] = useState([]);
     const [assignedPatients, setAssignedPatients] = useState([]);
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const userRes = await fetch("/api/users");
-                const userData = await userRes.json();
-                const clinicianList = userData.result?.filter(user => user.accounttype === "C") || [];
-                setClinicians(clinicianList);
-                const assignRes = await fetch("/api/assigning");
-                const assignData = await assignRes.json();
-                setAssignedPatients(assignData.result);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                toast.error("Failed to load data");
-            }
-        }
+    // replace your current assigning fetch useEffect with this pattern:
 
-        fetchData();
+    useEffect(() => {
+        fetchAssigningAndClinicians();
     }, []);
+
+    async function fetchAssigningAndClinicians() {
+        try {
+            const userRes = await fetch("/api/users");
+            const userData = await userRes.json();
+            const clinicianList =
+                userData.result?.filter((user) => user.accounttype === "C") || [];
+            setClinicians(clinicianList);
+
+            const assignRes = await fetch("/api/assigning");
+            const assignData = await assignRes.json();
+            setAssignedPatients(assignData.result);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Failed to load data");
+        }
+    }
+    const handleAssignmentsChanged = () => {
+        fetchAssigningAndClinicians(); // or fetchData()
+    };
+
+    const assignmentByPid = useMemo(() => {
+        const map = new Map();
+        assignedPatients.forEach((assign) => {
+            const clinician = clinicians.find((c) => c.id === assign.cid);
+            if (clinician) {
+                map.set(assign.pid, {
+                    id: clinician.id,
+                    fullname: clinician.fullname,
+                    createTimeDate: assign.createTimeDate,
+                });
+            }
+        });
+        return map;
+    }, [assignedPatients, clinicians]);
 
 
     const [openDialog, setOpenDialog] = useState(false);
@@ -327,58 +352,77 @@ export default function Dashboard() {
             disqualified: patients.filter(p => p.approvalStatus === 'disqualified').length,
         };
     };
-    const filteredPatients = patients.filter(patient => {
-        const emailMatch = patient.email.toLowerCase().includes(emailFilter.toLowerCase());
-        const nameMatch = emailFilter === '' || 
-            patient.firstName.toLowerCase().includes(emailFilter.toLowerCase()) ||
-            patient.lastName.toLowerCase().includes(emailFilter.toLowerCase()) ||
-            `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(emailFilter.toLowerCase());
-        const emailOrNameMatch = emailMatch || nameMatch;
-        // const pIdMatch = patient.patientId.toLowerCase().includes(pIdFilter.toLowerCase());
-        const pIdMatch = patient.authid.toLowerCase().includes(pIdFilter.toLowerCase());
-        const genderMatch = genderFilter === 'all' || patient.sex === genderFilter;
-        const dobMatch = dobFilter ? patient.dob === dobFilter : true;
-        const cityMatch = cityFilter ? patient.city.toLowerCase().includes(cityFilter.toLowerCase()) : true;
-        const medicineMatch = medicineFilter === 'all' || patient.glp1 === medicineFilter;
+    const filteredPatients = useMemo(() => {
+        return patients.filter(patient => {
+            const emailMatch = patient.email.toLowerCase().includes(emailFilter.toLowerCase());
+            const nameMatch = emailFilter === '' ||
+                patient.firstName.toLowerCase().includes(emailFilter.toLowerCase()) ||
+                patient.lastName.toLowerCase().includes(emailFilter.toLowerCase()) ||
+                `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(emailFilter.toLowerCase());
+            const emailOrNameMatch = emailMatch || nameMatch;
 
-        // const approvalMatch = approvalFilter === 'all' || patient.approvalStatus === approvalFilter;
-        const approvalMatch =
-            approvalFilter === 'all' ||
-            (approvalFilter === '' && (patient.approvalStatus === '' || patient.approvalStatus === 'None')) ||
-            patient.approvalStatus === approvalFilter;
+            const pIdMatch = patient.authid.toLowerCase().includes(pIdFilter.toLowerCase());
+            const genderMatch = genderFilter === 'all' || patient.sex === genderFilter;
+            const dobMatch = dobFilter ? patient.dob === dobFilter : true;
+            const cityMatch = cityFilter ? patient.city.toLowerCase().includes(cityFilter.toLowerCase()) : true;
+            const medicineMatch = medicineFilter === 'all' || patient.glp1 === medicineFilter;
 
-        const semaglutideMatch = (
-            (semaglutideDoseOnly === 'all' || patient.semaglutideDose == semaglutideDoseOnly) &&
-            (semaglutideUnitFilter === 'all' || patient.semaglutideUnit === semaglutideUnitFilter)
-        );
+            const approvalMatch =
+                approvalFilter === 'all' ||
+                (approvalFilter === '' &&
+                    (patient.approvalStatus === '' || patient.approvalStatus === 'None')) ||
+                patient.approvalStatus === approvalFilter;
 
-        const tirzepatideMatch = (
-            (tirzepatideDoseOnly === 'all' || patient.tirzepatideDose == tirzepatideDoseOnly) &&
-            (tirzepatideUnitFilter === 'all' || patient.tirzepatideUnit === tirzepatideUnitFilter)
-        );
-        const clinicianMatch =
-            clinicianFilter === "all"
-                ? true
-                : clinicianFilter === "unassigned"
-                    ? !allAssignedPids.has(getPatientPid(patient))
-                    : cidToPidSet.get(clinicianFilter)?.has(getPatientPid(patient)) ?? false;
+            const semaglutideMatch =
+                (semaglutideDoseOnly === 'all' || patient.semaglutideDose == semaglutideDoseOnly) &&
+                (semaglutideUnitFilter === 'all' || patient.semaglutideUnit === semaglutideUnitFilter);
 
-        const createDateRangeMatch = isWithinRange(patient.createTimeDate, fromUtc, toUtc);
+            const tirzepatideMatch =
+                (tirzepatideDoseOnly === 'all' || patient.tirzepatideDose == tirzepatideDoseOnly) &&
+                (tirzepatideUnitFilter === 'all' || patient.tirzepatideUnit === tirzepatideUnitFilter);
 
-        const createDateMatch = createDateFilter ? patient.createTimeDate.split('T')[0] === createDateFilter : true;
-        const followUpExpired = isFollowUpExpired(patient.followUp);
-        const followUpMatch =
-            followUpFilter === 'all' ||
-            (followUpExpired && extractInterval(patient.followUp) === followUpFilter);
-        const refillDue = isRefillReminderDue(patient.refillReminder);
-        const refillReminderMatch =
-            refillReminderFilter === 'all' ||
-            (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
-        return emailOrNameMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
-            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch && followUpMatch && refillReminderMatch;
-    });
+            const clinicianMatch =
+                clinicianFilter === "all"
+                    ? true
+                    : clinicianFilter === "unassigned"
+                        ? !allAssignedPids.has(getPatientPid(patient))
+                        : cidToPidSet.get(clinicianFilter)?.has(getPatientPid(patient)) ?? false;
 
-    const statusCounts = getStatusCounts(filteredPatients);
+            const createDateRangeMatch = isWithinRange(patient.createTimeDate, fromUtc, toUtc);
+            const createDateMatch = createDateFilter
+                ? patient.createTimeDate.split('T')[0] === createDateFilter
+                : true;
+
+            const followUpExpired = isFollowUpExpired(patient.followUp);
+            const followUpMatch =
+                followUpFilter === 'all' ||
+                (followUpExpired && extractInterval(patient.followUp) === followUpFilter);
+
+            const refillDue = isRefillReminderDue(patient.refillReminder);
+            const refillReminderMatch =
+                refillReminderFilter === 'all' ||
+                (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
+
+            return (
+                emailOrNameMatch &&
+                pIdMatch &&
+                genderMatch &&
+                dobMatch &&
+                cityMatch &&
+                medicineMatch &&
+                semaglutideMatch &&
+                tirzepatideMatch &&
+                approvalMatch &&
+                createDateMatch &&
+                clinicianMatch &&
+                createDateRangeMatch &&
+                followUpMatch &&
+                refillReminderMatch
+            );
+        });
+    }, [patients, emailFilter, pIdFilter, genderFilter, dobFilter, cityFilter, medicineFilter, approvalFilter, semaglutideDoseOnly, semaglutideUnitFilter, tirzepatideDoseOnly, tirzepatideUnitFilter, clinicianFilter, allAssignedPids, cidToPidSet, fromUtc, toUtc, createDateFilter, isFollowUpExpired, followUpFilter, isRefillReminderDue, refillReminderFilter]);
+
+    const statusCounts = useMemo(() => getStatusCounts(filteredPatients), [filteredPatients]);
 
     const handleCheckboxChange = (patientId) => {
         setSelectedPatients(prev =>
@@ -387,12 +431,6 @@ export default function Dashboard() {
                 : [...prev, patientId]
         );
     };
-    // Helper to generate date string using current date (no future offset)
-    function getFutureDateString(interval) {
-        if (!interval || interval === 'None') return '';
-        const now = new Date();
-        return `${now.toISOString()}_${interval}`;
-    }
 
     // Add loading state for resolve actions
     const [resolveLoading, setResolveLoading] = useState({});
@@ -410,8 +448,8 @@ export default function Dashboard() {
             if (data.success) {
                 toast.success(`Follow up cleared for ${patient.firstName} ${patient.lastName}`);
                 // Update the patient in the local state
-                setPatients(prev => prev.map(p => 
-                    p.authid === patient.authid 
+                setPatients(prev => prev.map(p =>
+                    p.authid === patient.authid
                         ? { ...p, followUp: "" }
                         : p
                 ));
@@ -437,8 +475,8 @@ export default function Dashboard() {
             if (data.success) {
                 toast.success(`Refill reminder cleared for ${patient.firstName} ${patient.lastName}`);
                 // Update the patient in the local state
-                setPatients(prev => prev.map(p => 
-                    p.authid === patient.authid 
+                setPatients(prev => prev.map(p =>
+                    p.authid === patient.authid
                         ? { ...p, refillReminder: "" }
                         : p
                 ));
@@ -1163,8 +1201,20 @@ export default function Dashboard() {
 
                                     <TableCell className="sticky left-[32px] z-10 w-[94px] text-secondary bg-white font-bold whitespace-nowrap">{patient.createTimeDate.split('T')[0]}</TableCell>
 
-                                    <TimeSensitiveCell patient={patient} />
-
+                                    <TimeSensitiveCell
+                                        patient={patient}
+                                        now={now}
+                                        session={session}
+                                        clinicians={clinicians}
+                                        assignedInfo={assignmentByPid.get(patient.authid)}
+                                        onAssignmentsChanged={handleAssignmentsChanged}
+                                        onAutoClose={(p) =>
+                                            handleDelete(
+                                                p.authid,
+                                                "Automatically closed after 120 hours without approval"
+                                            )
+                                        }
+                                    />
 
                                     <TableCell className="sticky left-[206px] z-10 w-[100px] text-secondary bg-white font-bold">
                                         {patient.firstName}
@@ -1346,6 +1396,7 @@ export default function Dashboard() {
                                                         className="text-destructive"
                                                         onClick={() => {
                                                             setSelectedPatientId(patient.authid);
+                                                            setDeleteReason("");      // reset reason each time
                                                             setOpenDialog(true);
                                                         }}
                                                     >
@@ -1354,44 +1405,6 @@ export default function Dashboard() {
                                                 )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
-
-                                        {/* AlertDialog for Delete Confirmation */}
-                                        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This patient record will be moved to the <strong>Closed Tickets</strong> section.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-
-                                                <div className="mt-4">
-                                                    <label className="block text-sm font-medium mb-1">Reason for Closing</label>
-                                                    <Textarea
-                                                        placeholder="Enter reason..."
-                                                        value={deleteReason}
-                                                        onChange={(e) => setDeleteReason(e.target.value)}
-                                                    />
-                                                </div>
-
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction
-                                                        onClick={() => {
-                                                            if (selectedPatientId) {
-                                                                handleDelete(selectedPatientId, deleteReason);
-                                                                setSelectedPatientId(null);
-                                                                setDeleteReason("");
-                                                                setOpenDialog(false);
-                                                            }
-                                                        }}
-                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                    >
-                                                        Move to Closed Tickets
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
                                     </TableCell>
 
 
@@ -1494,7 +1507,42 @@ export default function Dashboard() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            {/* Email Dialog */}
+            <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This patient record will be moved to the <strong>Closed Tickets</strong> section.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="mt-4">
+                        <label className="block text-sm font-medium mb-1">Reason for Closing</label>
+                        <Textarea
+                            placeholder="Enter reason..."
+                            value={deleteReason}
+                            onChange={(e) => setDeleteReason(e.target.value)}
+                        />
+                    </div>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (selectedPatientId) {
+                                    handleDelete(selectedPatientId, deleteReason);
+                                }
+                                setSelectedPatientId(null);
+                                setDeleteReason("");
+                                setOpenDialog(false);
+                            }}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Move to Closed Tickets
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
         </div >
     );
