@@ -353,3 +353,8 @@ input {
   .animate-slide-in-up,
   .animate-slide-out-up { animation: none !important; }
 }
+.shape-wrap {
+  float: right;
+  shape-outside: inset(0);
+  width: 50%;    /* <--- updated from px to % */
+}

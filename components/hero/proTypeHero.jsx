@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RotatingLine } from "./Hero";
+import { usePathname } from "next/navigation";
 
 /* ------------------ Content Config ------------------ */
 export const HERO_CONTENT = {
@@ -83,7 +84,7 @@ export function NewRotatingLine({ lines, interval = 2200, duration = 450, classN
             clearTimeout(tRef.current);
         };
     }, [interval, duration, lines.length]);
-
+    
     return (
         <div
             ref={containerRef}
@@ -127,6 +128,17 @@ export function NewRotatingLine({ lines, interval = 2200, duration = 450, classN
 
 /* ---------------------- Hero Component ---------------------- */
 export default function ProTypeHero({ content = HERO_CONTENT, onCta = () => { } }) {
+    const pathname = usePathname();
+
+    const pricingMap = {
+        "/underdevelopmentmainpage/weight-loss": "/pricing/weightLoss",
+        "/underdevelopmentmainpage/longevity": "/pricing/longevity",
+        "/underdevelopmentmainpage/erectile-dysfunction": "/pricing/erectileDysfunction",
+        "/underdevelopmentmainpage/skinhair": "/pricing/skinhair",
+    };
+
+    // fallback route
+    const finalHref = pricingMap[pathname] || "/pricing";
     return (
         <section className="relative w-full">
             <div className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-14">
@@ -157,12 +169,13 @@ export default function ProTypeHero({ content = HERO_CONTENT, onCta = () => { } 
 
                         <div className="mt-6">
                             <Link
-                                href="/getstarted"
+                                href={finalHref}
                                 className="fx-primary rounded-full font-SofiaSans bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-100"
                             >
                                 {content.ctaText}
                             </Link>
                         </div>
+
 
                         <p className="mt-5 max-w-2xl text-xs leading-5 text-neutral-600">{content.disclaimer}</p>
                     </div>

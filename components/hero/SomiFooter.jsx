@@ -117,13 +117,13 @@ export default function SomiFooter() {
                             </ul>
 
                             <div className="mt-6 flex flex-wrap gap-3">
-                                <Link
+                                {/* <Link
                                     href={footerData.ctaLearnMoreLink || "#"}
                                     className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary hover:text-lightprimary px-10 py-2 text-base font-semibold shadow-sm md:w-auto"
                                     style={{ "--fx86-base": "transparent", "--fx86-glow": "#364C78" }}
                                 >
                                     {footerData.ctaLearnMoreText || "Learn More"}
-                                </Link>
+                                </Link> */}
                                 <Link
                                     href={footerData.ctaStartJourneyLink || "#"}
                                     className="fx-primary inline-flex items-center justify-center gap-2 rounded-full bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-90"

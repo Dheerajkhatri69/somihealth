@@ -23,9 +23,12 @@ export async function GET() {
         fields: {
           interestedIn: {
             options: [
-              { value: 'Medical Weight Loss', label: 'Medical Weight Loss' },
-              { value: 'Hormone Therapy', label: 'Hormone Therapy' },
-              { value: 'General Question', label: 'General Question' }
+              { value: 'Weight Loss', label: 'Weight Loss' },
+              { value: 'Longevity', label: 'Longevity' },
+              { value: 'Erectile Dysfunction', label: 'Erectile Dysfunction' },
+              { value: 'Skin+Hair', label: 'Skin+Hair' },
+              { value: 'General Health', label: 'General Health' },
+              { value: 'Other', label: 'Other' },
             ]
           }
         }

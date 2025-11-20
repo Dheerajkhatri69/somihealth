@@ -68,7 +68,7 @@ export default function Banner({ content = BANNER_CONTENT, onCta }) {
                       </button>
                     ) : (
                       <a
-                        href={cta?.href || "#"}
+                        href={cta?.href || "/getstarted"}
                         className="fx86 inline-flex items-center font-SofiaSans gap-3 rounded-full hover:bg-transparent bg-secondary px-6 py-3 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         style={{ "--fx86-base": "transparent" }}
                       >

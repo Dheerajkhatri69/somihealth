@@ -117,7 +117,7 @@ function ReviewCard({ quote, author, rating = 5, verified = true }) {
 /* ===== Main Section – heading top-left, button top-right, 3 cards visible ===== */
 export default function StoriesWithReviews() {
   const headline = "Real stories from real patients on their journey to better health.";
-  const cta = { label: "Start Your Journey", href: "/getstarted" };
+  const cta = { label: "Start Your Journey", href: "/pricing" };
 
   const [reviews, setReviews] = React.useState([]);
   const [loading, setLoading] = React.useState(true);

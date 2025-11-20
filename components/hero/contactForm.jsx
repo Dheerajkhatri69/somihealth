@@ -89,22 +89,22 @@ export default function ContactFormShadcn({ settings = null }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      
+
       const data = await res.json();
-      
+
       if (data.success) {
-        setStatus({ 
-          ok: true, 
-          msg: formSettings?.messages?.success || "Thanks! We'll get back to you shortly." 
+        setStatus({
+          ok: true,
+          msg: formSettings?.messages?.success || "Thanks! We'll get back to you shortly."
         });
         form.reset();
       } else {
         throw new Error(data.message || "Failed");
       }
     } catch (error) {
-      setStatus({ 
-        ok: false, 
-        msg: formSettings?.messages?.error || "Something went wrong. Please try again." 
+      setStatus({
+        ok: false,
+        msg: formSettings?.messages?.error || "Something went wrong. Please try again."
       });
     } finally {
       setSubmitting(false);
@@ -128,7 +128,7 @@ export default function ContactFormShadcn({ settings = null }) {
   }
 
   return (
-    <div 
+    <div
       className="rounded-2xl border bg-white p-6 shadow-sm md:p-8"
       style={{
         backgroundColor: formSettings.styling?.backgroundColor || '#ffffff',
@@ -136,7 +136,7 @@ export default function ContactFormShadcn({ settings = null }) {
         color: formSettings.styling?.textColor || '#0f172a'
       }}
     >
-      <h2 
+      <h2
         className="text-2xl font-semibold"
         style={{ color: formSettings.styling?.textColor || '#0f172a' }}
       >
@@ -156,9 +156,9 @@ export default function ContactFormShadcn({ settings = null }) {
                     {formSettings.fields?.firstName?.label || 'Name'} <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder={formSettings.fields?.firstName?.placeholder || 'First'} 
-                      {...field} 
+                    <Input
+                      placeholder={formSettings.fields?.firstName?.placeholder || 'First'}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -172,13 +172,13 @@ export default function ContactFormShadcn({ settings = null }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className={formSettings.config?.requireLastName ? "" : "invisible"}>
-                    {formSettings.fields?.lastName?.label || 'Last'} 
+                    {formSettings.fields?.lastName?.label || 'Last'}
                     {formSettings.config?.requireLastName && <span className="text-red-500">*</span>}
                   </FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder={formSettings.fields?.lastName?.placeholder || 'Last'} 
-                      {...field} 
+                    <Input
+                      placeholder={formSettings.fields?.lastName?.placeholder || 'Last'}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -198,10 +198,10 @@ export default function ContactFormShadcn({ settings = null }) {
                     {formSettings.fields?.email?.label || 'Email'} <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input 
-                      type="email" 
-                      placeholder={formSettings.fields?.email?.placeholder || 'you@example.com'} 
-                      {...field} 
+                    <Input
+                      type="email"
+                      placeholder={formSettings.fields?.email?.placeholder || 'you@example.com'}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -218,10 +218,10 @@ export default function ContactFormShadcn({ settings = null }) {
                     {formSettings.fields?.phone?.label || 'Phone'} <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input 
-                      type="tel" 
-                      placeholder={formSettings.fields?.phone?.placeholder || '(704) 386-6871'} 
-                      {...field} 
+                    <Input
+                      type="tel"
+                      placeholder={formSettings.fields?.phone?.placeholder || '(000) 000-0000'}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -251,12 +251,15 @@ export default function ContactFormShadcn({ settings = null }) {
                         {option.label}
                       </SelectItem>
                     )) || (
-                      <>
-                        <SelectItem value="Medical Weight Loss">Medical Weight Loss</SelectItem>
-                        <SelectItem value="Hormone Therapy">Hormone Therapy</SelectItem>
-                        <SelectItem value="General Question">General Question</SelectItem>
-                      </>
-                    )}
+                        <>
+                          <SelectItem value="Weight Loss">Weight Loss</SelectItem>
+                          <SelectItem value="Longevity">Longevity</SelectItem>
+                          <SelectItem value="Erectile Dysfunction">Erectile Dysfunction</SelectItem>
+                          <SelectItem value="Skin+Hair">Skin+Hair</SelectItem>
+                          <SelectItem value="General Health">General Health</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </>
+                      )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -294,15 +297,15 @@ export default function ContactFormShadcn({ settings = null }) {
           />
 
           {/* Submit */}
-          <Button 
-            type="submit" 
-            disabled={submitting} 
+          <Button
+            type="submit"
+            disabled={submitting}
             className="mt-2 inline-flex items-center gap-2"
             style={{ backgroundColor: formSettings.styling?.primaryColor || '#3b82f6' }}
           >
             <Send className="h-4 w-4" />
-            {submitting 
-              ? (formSettings.submitButton?.loadingText || "Sending…") 
+            {submitting
+              ? (formSettings.submitButton?.loadingText || "Sending…")
               : (formSettings.submitButton?.text || "Send message")
             }
           </Button>

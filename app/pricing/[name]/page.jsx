@@ -6,6 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import ContactInfoTooltip from '@/components/ContactInfoTooltip';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const INITIAL_SUMMARY = {
   product: '',
@@ -20,7 +21,7 @@ const INITIAL_SUMMARY = {
 export default function Page({ params }) {
   const routeId = (params?.name || '').toLowerCase(); // idname from URL
   const summaryRef = useRef(null);
-
+  const router = useRouter();
   const [options, setOptions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState(null);
@@ -139,12 +140,14 @@ export default function Page({ params }) {
         {/* LEFT: Product Card */}
         <div className="w-full md:w-1/2 bg-white rounded-3xl border border-gray-200 shadow-xl p-6 flex flex-col items-center mb-4 md:mb-0">
           <div className="w-full flex items-start justify-between">
-            <Link href="/pricing">
-              <div className="flex text-xs items-center hover:underline text-secondary cursor-pointer">
-                <ChevronLeft size={18} />
-                Back
-              </div>
-            </Link>
+            <div
+              onClick={() => router.back()}
+              className="flex text-xs items-center hover:underline text-secondary cursor-pointer"
+            >
+              <ChevronLeft size={18} />
+              Back
+            </div>
+
             <ContactInfoTooltip />
           </div>
 

@@ -69,13 +69,35 @@ const CategoryCard = React.memo(function CategoryCard({
             Coming Soon <ArrowRight />
           </span>
         ) : (
-          <Link
-            href={href}
-            className="fx86 inline-flex items-center gap-3 font-SofiaSans hover:bg-transparent rounded-full bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-            style={{ "--fx86-base": "transparent" }}
-          >
-            {label} <ArrowRight />
-          </Link>
+          <div className="relative inline-block">
+
+            {/* If href is /general-health → DISABLED button */}
+            {href === "/general-health" ? (
+              <div
+                className="fx86 inline-flex items-center gap-3 font-SofiaSans rounded-full bg-darkprimary px-5 py-2 font-semibold text-white opacity-60 cursor-not-allowed select-none"
+                style={{ "--fx86-base": "transparent" }}
+              >
+                {label} <ArrowRight />
+              </div>
+            ) : (
+              /* Normal clickable button */
+              <Link
+                href={href}
+                className="fx86 inline-flex items-center gap-3 font-SofiaSans hover:bg-transparent rounded-full bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                style={{ "--fx86-base": "transparent" }}
+              >
+                {label} <ArrowRight />
+              </Link>
+            )}
+
+            {/* Coming Soon Badge (ITALIC) */}
+            {href === "/general-health" && (
+              <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold italic px-2 py-1 rounded-full shadow">
+                Coming Soon
+              </span>
+            )}
+          </div>
+
         )}
       </div>
     </div>

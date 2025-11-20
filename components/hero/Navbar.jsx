@@ -51,60 +51,78 @@ function MegaPanel({ menuKey, onNavigate }) {
                             <h3 className="text-lg font-semibold text-darkprimary mb-3 font-SofiaSans">
                                 Discover
                             </h3>
-                            <Link
-                                href={`/underdevelopmentmainpage/${data.slug}`}
-                                onClick={onNavigate}
-                                className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                            >
-                                {data.name}
-                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                                    <ArrowRight />
+
+                            {/* Discover Button 1 - DISABLED */}
+                            <div className="relative inline-block w-full md:w-auto">
+                                <div
+                                    className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-gray-100 text-darkprimary px-5 py-2 text-base font-semibold shadow-sm opacity-60 cursor-not-allowed select-none"
+                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                                >
+                                    {data.name}
+                                    <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                        <ArrowRight />
+                                    </span>
+                                </div>
+
+                                {/* Coming Soon Badge */}
+                                <span className="absolute -top-2 -right-2 italic bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded-full shadow">
+                                    Coming Soon
                                 </span>
-                            </Link>
-                            <Link
-                                href={"/underdevelopmentmainpage/general-health/hot-flashes"}
-                                onClick={onNavigate}
-                                className="fx86 inline-flex mt-4 min-w-[160px] font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                                style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                            >
-                                Testing
-                                <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                                    <ArrowRight />
+                            </div>
+
+                            {/* Discover Button 2 - DISABLED */}
+                            <div className="relative inline-block w-full md:w-auto mt-4">
+                                <div
+                                    className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-gray-100 text-darkprimary px-5 py-2 text-base font-semibold shadow-sm opacity-60 cursor-not-allowed select-none"
+                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                                >
+                                    Testing
+                                    <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                        <ArrowRight />
+                                    </span>
+                                </div>
+
+                                {/* Coming Soon Badge */}
+                                <span className="absolute -top-2 -right-2 italic bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded-full shadow">
+                                    Coming Soon
                                 </span>
-                            </Link>
+                            </div>
                         </div>
+
                         {data.categories?.map((cat, idx) => {
                             const isRefill =
                                 /refill/i.test(cat?.title ?? "") || idx === data.categories.length - 1;
-                            const spanClass = isRefill ? "md:col-span-4" : "md:col-span-4";
+                            const spanClass = "md:col-span-4";
 
                             return (
                                 <div key={cat?._id || cat?.title || idx} className={spanClass}>
 
-                                    {/* Category title from DB */}
+                                    {/* Category title */}
                                     <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">
                                         {cat?.title}
                                     </div>
 
-                                    {/* Items from DB */}
+                                    {/* Category Items */}
                                     <ul className="mt-4 space-y-2">
                                         {cat?.items?.map((item) => (
                                             <li key={item?._id || item?.label}>
-                                                <Link
-                                                    href={item?.href || "#"}
-                                                    onClick={onNavigate}
-                                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                                {/* Disabled Link + Coming Soon Badge */}
+                                                <div
+                                                    className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 border-secondary px-3 py-2 text-sm font-medium text-secondary opacity-60 cursor-not-allowed select-none"
                                                 >
-                                                    <span className="text-lg font-SofiaSans">{item?.label}</span>
+                                                    <span className="text-lg font-SofiaSans">
+                                                        {item?.label}
+                                                    </span>
 
-                                                   
-                                                </Link>
+                                                    <span className="text-xs italic font-semibold bg-yellow-400 text-black px-2 py-1 rounded-full">
+                                                        Coming Soon
+                                                    </span>
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>
 
-                                    {/* CTA card only on the Refill section (uses your existing data.cta) */}
+                                    {/* Refill CTA Card */}
                                     {isRefill && data?.cta && (
                                         <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
                                             <img
@@ -113,7 +131,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                                                 className="h-full w-full object-cover"
                                             />
 
-                                            {/* subtle gradient to improve readability */}
+                                            {/* gradient */}
                                             <div
                                                 className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
                                                 aria-hidden="true"
@@ -126,27 +144,28 @@ function MegaPanel({ menuKey, onNavigate }) {
                                                 </div>
                                             </div>
 
-                                            {/* Button */}
-                                            {data?.cta?.button && (
-                                                <div className="absolute bottom-4 left-4">
-                                                    <Link
-                                                        href={data.cta.button.href}
-                                                        onClick={onNavigate}
-                                                        className="fx86 inline-flex items-center gap-3 font-SofiaSans rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                                                        style={{ "--fx86-base": "transparent" }}
-                                                    >
-                                                        {data.cta.button.label}
-                                                        <span className="inline-flex h-7 w-7 items-center justify-center">
-                                                            <ArrowRight />
-                                                        </span>
-                                                    </Link>
+                                            {/* Disabled CTA Button + Coming Soon Badge */}
+                                            <div className="absolute bottom-4 left-4">
+                                                <div
+                                                    className="relative inline-flex items-center gap-3 font-SofiaSans rounded-full bg-darkprimary px-5 py-2 font-semibold text-white opacity-60 cursor-not-allowed select-none"
+                                                >
+                                                    {data.cta.button.label}
+                                                    <span className="inline-flex h-7 w-7 items-center justify-center">
+                                                        <ArrowRight />
+                                                    </span>
+
+                                                    {/* Badge */}
+                                                    <span className="absolute -top-2 italic -right-2 bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded-full shadow">
+                                                        Coming Soon
+                                                    </span>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
                             );
                         })}
+
                     </>
                 ) : (
                     <>
@@ -167,17 +186,6 @@ function MegaPanel({ menuKey, onNavigate }) {
                             {
                                 data.discover.label === "Weight Loss" && (
                                     <>
-                                        <Link
-                                            href={"/underdevelopmentmainpage/healthcoach"}
-                                            onClick={onNavigate}
-                                            className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                                            style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                                        >
-                                            Health Coach
-                                            <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                                                <ArrowRight />
-                                            </span>
-                                        </Link>
                                         <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
                                     </>
                                 )
@@ -329,29 +337,43 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     <h3 className="text-lg font-semibold text-darkprimary mb-3 font-SofiaSans">
                         Discover
                     </h3>
-                    {/* Direct Primary Care (top pill stays the same, from menuData) */}
-                    <Link
-                        href={`/underdevelopmentmainpage/${menuData.slug}`}
-                        onClick={onNavigate}
-                        className="fx86 inline-flex font-SofiaSans w-full items-center  justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                    >
-                        {menuData.name}
-                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                            <ArrowRight />
+
+                    {/* Discover primary pill - DISABLED + Coming Soon */}
+                    <div className="relative inline-block w-full md:w-auto">
+                        <div
+                            className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto opacity-60 cursor-not-allowed select-none"
+                            style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                        >
+                            {menuData.name}
+                            <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                <ArrowRight />
+                            </span>
+                        </div>
+
+                        {/* Coming Soon badge */}
+                        <span className="absolute -top-2 -right-2 italic bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded-full shadow">
+                            Coming Soon
                         </span>
-                    </Link>
-                    <Link
-                        href={"/underdevelopmentmainpage/general-health/hot-flashes"}
-                        onClick={onNavigate}
-                        className="fx86 inline-flex mt-4 min-w-[160px] font-SofiaSans w-full mb-4 items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                    >
-                        Testing
-                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                            <ArrowRight />
+                    </div>
+
+                    {/* Discover Testing pill - DISABLED + Coming Soon */}
+                    <div className="relative inline-block w-full md:w-auto mt-4 mb-4">
+                        <div
+                            className="fx86 inline-flex min-w-[160px] font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto opacity-60 cursor-not-allowed select-none"
+                            style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                        >
+                            Testing
+                            <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                                <ArrowRight />
+                            </span>
+                        </div>
+
+                        {/* Coming Soon badge */}
+                        <span className="absolute -top-2 -right-2 italic bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded-full shadow">
+                            Coming Soon
                         </span>
-                    </Link>
+                    </div>
+
                     {/* Render all categories from DB in order */}
                     {menuData.categories?.map((cat, idx) => (
                         <div key={cat?._id || `${cat?.title}-${idx}`}>
@@ -359,32 +381,39 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                 {cat?.title}
                             </div>
 
-                            <ul className={`space-y-3 ${idx < (menuData.categories?.length ?? 0) - 1 ? "mb-8" : ""}`}>
+                            <ul
+                                className={`space-y-3 ${idx < (menuData.categories?.length ?? 0) - 1 ? "mb-8" : ""
+                                    }`}
+                            >
                                 {cat?.items?.map((item) => (
                                     <li key={item?._id || item?.label}>
-                                        <Link
-                                            href={item?.href}
-                                            onClick={onNavigate}
-                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300"
+                                        {/* Disabled item row + Coming Soon badge */}
+                                        <div
+                                            className="group relative flex w-full items-center justify-between gap-2 rounded-xl border-l-2 border-secondary px-3 py-2 text-sm font-medium text-secondary opacity-60 cursor-not-allowed select-none"
                                         >
                                             {/* Label */}
-                                            <span className="text-lg font-SofiaSans">{item?.label}</span>
+                                            <span className="text-lg font-SofiaSans">
+                                                {item?.label}
+                                            </span>
 
-                                            {/* Animated underline (grows from left on hover) */}
-                                            <span
-                                                aria-hidden="true"
-                                                className="pointer-events-none absolute inset-x-3 bottom-1.5 h-px origin-left scale-x-0 bg-gray-300 transition-transform duration-300 group-hover:scale-x-100motion-reduce:hidden"
-                                            />
-                                        </Link>
+                                            {/* Coming Soon badge */}
+                                            <span className="text-xs font-semibold italic bg-yellow-400 text-black px-2 py-1 rounded-full">
+                                                Coming Soon
+                                            </span>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
                         </div>
                     ))}
 
-                    {/* CTA block (unchanged) */}
+                    {/* CTA block */}
                     <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                        <img src={menuData.cta?.img} alt="" className="h-full w-full object-cover" />
+                        <img
+                            src={menuData.cta?.img}
+                            alt=""
+                            className="h-full w-full object-cover"
+                        />
 
                         {/* subtle gradient to improve readability */}
                         <div
@@ -399,22 +428,23 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                             </div>
                         </div>
 
-                        {/* button – bottom-left */}
+                        {/* button – bottom-left (DISABLED + Coming Soon) */}
                         <div className="absolute bottom-4 left-4">
-                            <Link
-                                href={menuData.cta?.button?.href}
-                                onClick={onNavigate}
-                                className="fx86 inline-flex items-center font-SofiaSans gap-3 rounded-full hover:bg-transparent bg-secondary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                                style={{ "--fx86-base": "transparent" }}
-                            >
+                            <div className="relative inline-flex items-center font-SofiaSans gap-3 rounded-full bg-secondary px-5 py-2 font-semibold text-white opacity-60 cursor-not-allowed select-none">
                                 {menuData.cta?.button?.label}
                                 <span className="inline-flex h-7 w-7 items-center justify-center">
                                     <ArrowRight />
                                 </span>
-                            </Link>
+
+                                {/* Coming Soon badge on button */}
+                                <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold italic px-2 py-1 rounded-full shadow">
+                                    Coming Soon
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </>
+
             ) : (
                 <>
                     {/* Discover Pill */}
@@ -430,36 +460,27 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                             <ArrowRight />
                         </span>
                     </Link>
-                    <Link
-                        href={"/underdevelopmentmainpage/healthcoach"}
-                        onClick={onNavigate}
-                        className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                    >
-                        Health Coach
-                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                            <ArrowRight />
-                        </span>
-                    </Link>
 
                     {
                         menuData.discover?.label === "Weight Loss" && (
                             <>
                                 <div className="text-sm font-semibold uppercase tracking-wide mt-4 text-darkprimary">Existing Patients</div>
-                                <Link
-                                    href={"/refills"}
-                                    onClick={onNavigate}
-                                    className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
-                                    style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
-                                >
-                                    Refills
-                                    <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
-                                        <ArrowRight />
-                                    </span>
-                                </Link>
                             </>
                         )
                     }
+
+                    <Link
+                        href={"/refills"}
+                        onClick={onNavigate}
+                        className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
+                        style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
+                    >
+                        Refills
+                        <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
+                            <ArrowRight />
+                        </span>
+                    </Link>
+
                     {/* Treatments */}
                     <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Treatments</div>
                     <ul className="mt-4 space-y-6">
