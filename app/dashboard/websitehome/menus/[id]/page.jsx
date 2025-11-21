@@ -743,9 +743,28 @@ export default function MenuDetailPage() {
                 </div>
               </div>
             </div>
-            <div className="mt-3 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
-              <strong>Default Button:</strong> “{formData.cta.button?.label || 'Get Started'}” → {formData.cta.button?.href || '/getstarted'}
+            <div className="mt-3">
+              <div className="grid md:grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs">Button Label</Label>
+                  <Input
+                    value={formData.cta.button?.label || ''}
+                    onChange={(e) => handleInputChange('cta.button.label', e.target.value)}
+                    className="mt-1 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-xs">Button Href</Label>
+                  <Input
+                    value={formData.cta.button?.href || ''}
+                    onChange={(e) => handleInputChange('cta.button.href', e.target.value)}
+                    className="mt-1 text-sm"
+                  />
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
 

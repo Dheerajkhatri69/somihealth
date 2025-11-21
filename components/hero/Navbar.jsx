@@ -529,7 +529,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                 <span className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight">{brand}</span>
                 {/* right icons (placeholders to match screenshot) */}
                 <div className="flex items-center gap-4">
-                    <Link href="/getstarted">
+                    <Link href="/pricing">
                         <Sparkles />
                     </Link>
                     <Link href="/underdevelopmentmainpage/login">
@@ -641,7 +641,7 @@ export default function Navbar({ brand = "somi" }) {
                     {/* Right actions (desktop) */}
                     <div className="hidden items-center gap-3 md:flex">
                         <Link
-                            href="/getstarted"
+                            href="/pricing"
                             className="fx-primary rounded-full font-SofiaSans bg-darkprimary px-5 py-2 text-sm font-semibold text-white hover:opacity-100"
                         >
                             Get Started
@@ -659,7 +659,7 @@ export default function Navbar({ brand = "somi" }) {
 
                     {/* Right icons (mobile, for visual parity) */}
                     <div className="flex items-center gap-4 md:hidden">
-                        <Link href="/getstarted">
+                        <Link href="/pricing">
                             <Sparkles />
                         </Link>
                         <Link href="/underdevelopmentmainpage/login">
