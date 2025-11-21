@@ -113,10 +113,6 @@ function MegaPanel({ menuKey, onNavigate }) {
                                                     <span className="text-lg font-SofiaSans">
                                                         {item?.label}
                                                     </span>
-
-                                                    <span className="text-xs italic font-semibold bg-yellow-400 text-black px-2 py-1 rounded-full">
-                                                        Coming Soon
-                                                    </span>
                                                 </div>
                                             </li>
                                         ))}
@@ -152,11 +148,6 @@ function MegaPanel({ menuKey, onNavigate }) {
                                                     {data.cta.button.label}
                                                     <span className="inline-flex h-7 w-7 items-center justify-center">
                                                         <ArrowRight />
-                                                    </span>
-
-                                                    {/* Badge */}
-                                                    <span className="absolute -top-2 italic -right-2 bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded-full shadow">
-                                                        Coming Soon
                                                     </span>
                                                 </div>
                                             </div>
@@ -395,11 +386,6 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                             <span className="text-lg font-SofiaSans">
                                                 {item?.label}
                                             </span>
-
-                                            {/* Coming Soon badge */}
-                                            <span className="text-xs font-semibold italic bg-yellow-400 text-black px-2 py-1 rounded-full">
-                                                Coming Soon
-                                            </span>
                                         </div>
                                     </li>
                                 ))}
@@ -434,11 +420,6 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                 {menuData.cta?.button?.label}
                                 <span className="inline-flex h-7 w-7 items-center justify-center">
                                     <ArrowRight />
-                                </span>
-
-                                {/* Coming Soon badge on button */}
-                                <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold italic px-2 py-1 rounded-full shadow">
-                                    Coming Soon
                                 </span>
                             </div>
                         </div>

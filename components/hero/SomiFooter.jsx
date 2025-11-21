@@ -218,6 +218,9 @@ export default function SomiFooter() {
 
                     {/* Badges */}
                     <div>
+                        <a href="https://www.legitscript.com/websites/?checker_keywords=joinsomi.com" target="_blank" title="Verify LegitScript Approval for www.joinsomi.com">
+                            <img src="https://static.legitscript.com/seals/44684757.png" alt="Verify Approval for www.joinsomi.com" width="73" height="79" />
+                        </a>
                         {footerData?.badges?.map((badge, index) => (
                             <img
                                 key={index}
