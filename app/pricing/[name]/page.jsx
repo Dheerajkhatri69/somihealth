@@ -293,7 +293,7 @@ export default function Page({ params }) {
             <strong>Note:</strong> Once payment has been made, please proceed with the 5-7 mins Intake Questionnaire. Get Approval within 24 hours
           </div>
 
-          <div className="flex items-center justify-center gap-4 mt-2 text-sm text-gray-600">
+          {/* <div className="flex items-center justify-center gap-4 mt-2 text-sm text-gray-600">
             <hr className="w-full" /> or <hr className="w-full" />
           </div>
 
@@ -312,7 +312,7 @@ export default function Page({ params }) {
               <img src="/pricing/8.png" alt="PayPal" className="h-6 md:h-8 object-contain" loading="lazy" />
               <span>Pay via PayPal</span>
             </div>
-          </button>
+          </button> */}
         </div>
 
         <div ref={summaryRef} />

@@ -1,15 +1,11 @@
-// app/underdevelopmentmainpage/footer/[name]/page.jsx
+"use client";
+
+import { useEffect, useState } from "react";
 import Navbar from "@/components/hero/Navbar";
 import SomiFooter from "@/components/hero/SomiFooter";
-import { footerPages } from "@/lib/footerContent";
-import { notFound } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton"; // ⬅ shadcn skeleton import
 
-// 1️ Tell Next which pages to pre-generate
-export async function generateStaticParams() {
-    return footerPages.map((p) => ({ name: p.name }));
-}
-
-// 2 Very small renderer for our block format
+// Renderer stays same
 function Block({ block }) {
   switch (block.type) {
     case "heading":
@@ -27,12 +23,10 @@ function Block({ block }) {
       );
 
     case "paragraph": {
-      // Replace **something** with <strong>something</strong>
       const html = block.text.replace(
         /\*\*(.+?)\*\*/g,
         (_, boldText) => `<strong>${boldText}</strong>`
       );
-
       return (
         <p
           className="mt-4 leading-relaxed text-gray-500 font-SofiaSans"
@@ -44,7 +38,7 @@ function Block({ block }) {
     case "list":
       return (
         <ul className="mt-4 list-disc space-y-1 pl-6 text-gray-500 font-SofiaSans">
-          {block.items.map((item, i) => (
+          {block.items?.map((item, i) => (
             <li key={i} dangerouslySetInnerHTML={{ __html: item }} />
           ))}
         </ul>
@@ -54,19 +48,84 @@ function Block({ block }) {
       return null;
   }
 }
-export default function FooterPage({ params }) {
-    const page = footerPages.find((p) => p.name === params.name);
-    if (!page) return notFound();
 
-    return (
-        <>
-            <Navbar />
-            <main className="mx-auto max-w-7xl px-4 py-12">
-                {page.blocks.map((b, i) => (
-                    <Block key={i} block={b} />
-                ))}
-            </main>
-            <SomiFooter />
-        </>
-    );
+// 🟦 Skeleton Loader Component
+function FooterSkeleton() {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-12 space-y-6">
+      {/* Skeleton Heading */}
+      <Skeleton className="h-8 w-1/3" />
+
+      {/* Skeleton Paragraph */}
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-4 w-4/6" />
+      </div>
+
+      {/* Skeleton Subheading */}
+      <Skeleton className="h-6 w-1/4 mt-10" />
+
+      {/* Skeleton Paragraph #2 */}
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-4 w-4/6" />
+        <Skeleton className="h-4 w-3/6" />
+      </div>
+
+      {/* Skeleton List */}
+      <div className="mt-6 space-y-2 pl-6">
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-1/3" />
+      </div>
+    </div>
+  );
+}
+
+export default function FooterPage({ params }) {
+  const [page, setPage] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchContent = async () => {
+    try {
+      const res = await fetch(`/api/footer/${params.name}`);
+      const data = await res.json();
+
+      if (data.success) setPage(data.result);
+    } catch (error) {
+      console.error("Error fetching footer page content:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchContent();
+  }, [params.name]);
+
+  return (
+    <>
+      <Navbar />
+
+      {/* 🟦 Use Skeleton instead of normal loading */}
+      {loading && <FooterSkeleton />}
+
+      {/* When data loaded */}
+      {!loading && page && (
+        <main className="mx-auto max-w-7xl px-4 py-12">
+          {page.blocks?.map((block, i) => (
+            <Block key={i} block={block} />
+          ))}
+        </main>
+      )}
+
+      {!loading && !page && (
+        <p className="p-8 text-center text-gray-500">Page not found.</p>
+      )}
+
+      <SomiFooter />
+    </>
+  );
 }

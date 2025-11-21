@@ -58,6 +58,7 @@ const frontendItems = [
   { title: "GH Content", url: "/dashboard/gh-content", icon: ScanHeart, allowedRoles: ["A"] },
   { title: "FAQ Component", url: "/dashboard/faq", icon: HelpCircle, allowedRoles: ["A"] },
   { title: "Footer", url: "/dashboard/footerUI", icon: Footprints, allowedRoles: ["A"] },
+  { title: "Footer Pages", url: "/dashboard/footer", icon: Footprints, allowedRoles: ["A"] },
   { title: "Contact Forms/UI", url: "/dashboard/contactForms", icon: Contact, allowedRoles: ["A"] },
   { title: "About UI", url: "/dashboard/aboutUI", icon: RectangleEllipsis, allowedRoles: ["A"] },
 ]

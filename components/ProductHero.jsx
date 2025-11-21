@@ -32,7 +32,7 @@ export default function ProductHero({ product }) {
     // ⬇️ Add your logo paths here (update paths if different)
     const payLogos = [
         { src: "/pay/klarna-badge.png", alt: "Klarna" },
-        { src: "/pay/paypal-badge.png", alt: "PayPal" }, // 3rd image is PayPal
+        { src: "/pay/afterpay.png", alt: "Afterpay" }, // 3rd image is PayPal
 
         { src: "/pay/affirm-badge.webp", alt: "Affirm" },
     ];
