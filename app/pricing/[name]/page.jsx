@@ -293,26 +293,26 @@ export default function Page({ params }) {
             <strong>Note:</strong> Once payment has been made, please proceed with the 5-7 mins Intake Questionnaire. Get Approval within 24 hours
           </div>
 
-          {/* <div className="flex items-center justify-center gap-4 mt-2 text-sm text-gray-600">
+          <div className="flex items-center justify-center gap-4 mt-2 text-sm text-gray-600">
             <hr className="w-full" /> or <hr className="w-full" />
           </div>
 
           <div className="flex justify-between text-gray-700 font-medium">
-            <span>Total Amount for PayPal</span>
+            <span>Total Amount for Afterpay</span>
             <span className="font-bold text-secondary">{summary.totle || '--'}</span>
           </div>
 
           <button
-            className={`w-full mt-6 rounded-3xl py-2 font-bold text-base shadow transition border-[#0031e3] border-2 ${summary.paypal ? 'bg-white text-[#0031e3] cursor-pointer' : 'bg-gray-300 text-gray-400 cursor-not-allowed'
+            className={`w-full mt-6 rounded-3xl py-2 font-bold text-base shadow transition border-[#b2fae4] border-2 ${summary.paypal ? 'bg-white text-black cursor-pointer' : 'bg-gray-300 text-gray-400 cursor-not-allowed'
               }`}
             onClick={handlePayPalCheckout}
             disabled={!summary.paypal}
           >
             <div className="flex items-center justify-center gap-3">
-              <img src="/pricing/8.png" alt="PayPal" className="h-6 md:h-8 object-contain" loading="lazy" />
-              <span>Pay via PayPal</span>
+              <img src="/pricing/9.png" alt="PayPal" className="h-6 md:h-8 object-contain" loading="lazy" />
+              <span>Pay via Afterpay</span>
             </div>
-          </button> */}
+          </button>
         </div>
 
         <div ref={summaryRef} />
