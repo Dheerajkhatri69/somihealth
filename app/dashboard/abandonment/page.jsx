@@ -16,7 +16,7 @@ import {
     SelectItem,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-    import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const DashboardStats = () => {
@@ -26,28 +26,65 @@ const DashboardStats = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [newlySeenIds, setNewlySeenIds] = useState([]); // rows to highlight
+    const [newCount, setNewCount] = useState(0); // all new (0 + 1)
+    const [newStateCounts, setNewStateCounts] = useState({ 0: 0, 1: 0 }); // per state
     const recordsPerPage = 100;
 
     useEffect(() => {
         async function fetchData() {
             setLoading(true);
-            const res = await fetch("/api/abandoned");
-            const { result } = await res.json();
+            try {
+                const res = await fetch("/api/abandoned");
+                const { result } = await res.json();
 
-            const transformed = result.map((item) => ({
-                date: item.updatedAt,
-                state: item.state,
-                segment: item.lastSegmentReached,
-                email: item.firstSegment?.email || "",
-                name: `${item.firstSegment?.firstName || ""} ${item.firstSegment?.lastName || ""}`,
-                phone: item.firstSegment?.phone || "",
-            }));
+                const transformed = result.map((item) => ({
+                    id: item._id,
+                    seen: item.seen,
+                    date: item.createdAt,
+                    state: item.state,
+                    segment: item.lastSegmentReached,
+                    email: item.firstSegment?.email || "",
+                    name: `${item.firstSegment?.firstName || ""} ${item.firstSegment?.lastName || ""}`,
+                    phone: item.firstSegment?.phone || "",
+                }));
 
-            setChartData(transformed);
-            setLoading(false);
+                setChartData(transformed);
+
+                // "New" = seen === true and state 0 or 1
+                const newLeave = result.filter(
+                    (item) => item.seen === true && item.state === 0
+                );
+                const newKicked = result.filter(
+                    (item) => item.seen === true && item.state === 1
+                );
+
+                const newIds = [...newLeave, ...newKicked].map((i) => i._id);
+                setNewlySeenIds(newIds);
+                setNewCount(newIds.length);
+                setNewStateCounts({
+                    0: newLeave.length,
+                    1: newKicked.length,
+                });
+            } catch (e) {
+                console.error("Failed to fetch abandoned data", e);
+            } finally {
+                setLoading(false);
+            }
         }
 
         fetchData();
+    }, []);
+
+    // mark all as seen=false in DB when page loads (for sidebar badge logic)
+    useEffect(() => {
+        (async () => {
+            try {
+                await fetch("/api/abandoned/mark-seen?seen=false", { method: "POST" });
+            } finally {
+                window.dispatchEvent(new Event("refreshSidebarCounts"));
+            }
+        })();
     }, []);
 
     useEffect(() => {
@@ -88,14 +125,29 @@ const DashboardStats = () => {
         filled: dateFilteredData.filter((d) => d.state === 2).length,
     };
 
+    // Text for top-right pill
+    const currentStateNewCount =
+        selectedState === 0 || selectedState === 1
+            ? newStateCounts[selectedState] || 0
+            : 0;
+    const currentStateLabel =
+        selectedState === 0
+            ? "LEAVE BETWEEN"
+            : selectedState === 1
+                ? "KICKED OUT"
+                : "";
+
     return (
         <Card className="m-4 p-4">
-            {/* Filter Dropdown */}
-            <div className="flex justify-between mb-4">
+            {/* Filter + Top-right green alert */}
+            <div className="flex justify-between items-center mb-4">
                 {loading ? (
                     <>
                         <Skeleton className="w-[160px] h-10 rounded-md" />
-                        <Skeleton className="w-[260px] h-10 rounded-md" />
+                        <div className="flex items-center gap-3">
+                            <Skeleton className="w-[160px] h-10 rounded-md" />
+                            <Skeleton className="w-[140px] h-8 rounded-md" />
+                        </div>
                     </>
                 ) : (
                     <>
@@ -105,20 +157,31 @@ const DashboardStats = () => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <Select value={timeRange} onValueChange={setTimeRange}>
-                            <SelectTrigger className="w-[160px]">
-                                <SelectValue placeholder="Filter Days" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="7d">Last 7 days</SelectItem>
-                                <SelectItem value="30d">Last 30 days</SelectItem>
-                                <SelectItem value="90d">Last 90 days</SelectItem>
-                                <SelectItem value="all">All Time</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-3">
+
+
+                            <Select value={timeRange} onValueChange={setTimeRange}>
+                                <SelectTrigger className="w-[160px]">
+                                    <SelectValue placeholder="Filter Days" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="7d">Last 7 days</SelectItem>
+                                    <SelectItem value="30d">Last 30 days</SelectItem>
+                                    <SelectItem value="90d">Last 90 days</SelectItem>
+                                    <SelectItem value="all">All Time</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </>
                 )}
             </div>
+
+            {/* Big banner for total new (optional, can remove if you only want pill) */}
+            {!loading && newCount > 0 && (
+                <div className="mb-4 text-center text-green-700 bg-green-100 p-2 rounded-md">
+                    You have {newCount} new abandonment records.
+                </div>
+            )}
 
             {/* Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -126,31 +189,56 @@ const DashboardStats = () => {
                     ? Array.from({ length: 3 }).map((_, i) => (
                         <Skeleton key={i} className="h-[100px] w-full rounded-xl" />
                     ))
-                    : [0, 1, 2].map((state) => (
-                        <Card
-                            key={state}
-                            onClick={() => setSelectedState(state)}
-                            className={`cursor-pointer shadow hover:shadow-md ${state === 0 ? "bg-yellow-200" : ""} ${state === 1 ? "bg-red-200" : ""} ${state === 2 ? "bg-green-200" : ""} ${selectedState === state ? "border-l-8 border-secondary" : ""
-                                }`}
-                        >
-                            <CardHeader className="text-center">
-                                <CardTitle>
-                                    {state === 0
-                                        ? "LEAVE BETWEEN"
-                                        : state === 1
-                                            ? "KICKED OUT"
-                                            : "FILLED"}
-                                </CardTitle>
-                                <CardDescription className="text-3xl font-bold text-secondary">
-                                    {state === 0
-                                        ? counts.leaveBetween
-                                        : state === 1
-                                            ? counts.kickedOut
-                                            : counts.filled}
-                                </CardDescription>
-                            </CardHeader>
-                        </Card>
-                    ))}
+                    : [0, 1, 2].map((state) => {
+                        const isSelected = selectedState === state;
+                        const newCountForState =
+                            state === 0 || state === 1 ? newStateCounts[state] || 0 : 0;
+
+                        return (
+                            <Card
+                                key={state}
+                                onClick={() => setSelectedState(state)}
+                                className={`relative cursor-pointer shadow hover:shadow-md
+              ${state === 0 ? "bg-yellow-200" : ""}
+              ${state === 1 ? "bg-red-200" : ""}
+              ${state === 2 ? "bg-green-200" : ""}
+              ${isSelected ? "border-l-8 border-secondary" : ""}`}
+                            >
+                                {/* top-right green circle (only for LEAVE / KICKED and if there are new ones) */}
+                                {(state === 0 || state === 1) && newCountForState > 0 && (
+                                    <span
+                                        className="
+                  absolute -top-1 -right-1
+                  h-6 w-6 rounded-full
+                  bg-green-500 text-white text-xs font-bold
+                  border-2 border-white
+                  flex items-center justify-center
+                  shadow-md
+                "
+                                    >
+                                        {newCountForState}
+                                    </span>
+                                )}
+
+                                <CardHeader className="text-center">
+                                    <CardTitle>
+                                        {state === 0
+                                            ? "LEAVE BETWEEN"
+                                            : state === 1
+                                                ? "KICKED OUT"
+                                                : "FILLED"}
+                                    </CardTitle>
+                                    <CardDescription className="text-3xl font-bold text-secondary">
+                                        {state === 0
+                                            ? counts.leaveBetween
+                                            : state === 1
+                                                ? counts.kickedOut
+                                                : counts.filled}
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                        );
+                    })}
             </div>
 
             {/* Table */}
@@ -176,7 +264,14 @@ const DashboardStats = () => {
                                     </tr>
                                 ))
                                 : paginatedData.map((user, idx) => (
-                                    <tr key={idx} className="border-b">
+                                    <tr
+                                        key={user.id || idx}
+                                        className={
+                                            newlySeenIds.includes(user.id)
+                                                ? "bg-green-100 hover:bg-green-200"
+                                                : "hover:bg-muted/50"
+                                        }
+                                    >
                                         <td className="px-4 py-2">{user.name}</td>
                                         <td className="px-4 py-2">{user.email}</td>
                                         <td className="px-4 py-2">{user.phone}</td>
@@ -212,7 +307,9 @@ const DashboardStats = () => {
                     ) : (
                         <>
                             <Button
-                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                onClick={() =>
+                                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                                }
                                 disabled={currentPage === 1}
                                 className="px-4 py-2 border rounded-md bg-secondary text-white disabled:opacity-50"
                             >
@@ -222,7 +319,9 @@ const DashboardStats = () => {
                                 Page {currentPage} of {pageCount}
                             </span>
                             <Button
-                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
+                                onClick={() =>
+                                    setCurrentPage((prev) => Math.min(prev + 1, pageCount))
+                                }
                                 disabled={currentPage === pageCount}
                                 className="px-4 py-2 border rounded-md bg-secondary text-white disabled:opacity-50"
                             >

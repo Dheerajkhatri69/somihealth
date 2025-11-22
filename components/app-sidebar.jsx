@@ -113,11 +113,12 @@ export function AppSidebar() {
 
   const refetchAllCounts = () => {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
-      fetchUnseenCount()
-      fetchUnseenQuestionnaireCount()
-      fetchUnseenReferralsCount()
+      fetchUnseenCount();
+      fetchUnseenQuestionnaireCount();
+      fetchUnseenReferralsCount();
+      fetchAbandonmentCount(); // NEW
     }
-  }
+  };
 
   useEffect(() => {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
@@ -160,6 +161,29 @@ export function AppSidebar() {
   const filteredFrontendItems = useMemo(() => {
     return frontendItems.filter((item) => item.allowedRoles.includes(effectiveUserType || ""))
   }, [effectiveUserType])
+
+  // components/sidebar/AppSidebar.jsx (snippets only: add state, fetcher, effects, badge)
+  const [abandonmentCount, setAbandonmentCount] = useState(0);
+
+  const fetchAbandonmentCount = async () => {
+    try {
+      const res = await fetch("/api/abandoned/seen-count"); // default 0,1
+      const data = await res.json();
+      setAbandonmentCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch abandonment count", e);
+    }
+  };
+
+
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchAbandonmentCount();
+      const id = setInterval(fetchAbandonmentCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+
 
   if (effectiveUserType === null) {
     return (
@@ -228,6 +252,12 @@ export function AppSidebar() {
                             {unseenReferralsCount}
                           </span>
                         )}
+                        {item.title === "Abandonment" && abandonmentCount > 0 && (
+                          <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {abandonmentCount}
+                          </span>
+                        )}
+
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

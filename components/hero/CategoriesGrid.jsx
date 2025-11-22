@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
-import { LoadingPage, CategoriesGridSkeleton } from "@/components/LoadingSkeleton";
+import {
+  LoadingPage,
+  CategoriesGridSkeleton,
+} from "@/components/LoadingSkeleton";
 
 /* ---------- Icon ---------- */
 function ArrowRight() {
@@ -30,7 +33,7 @@ function ArrowRight() {
   );
 }
 
-/* ---------- Card (memoized) ---------- */
+/* ---------- Category Card ---------- */
 const CategoryCard = React.memo(function CategoryCard({
   title,
   img,
@@ -103,39 +106,55 @@ const CategoryCard = React.memo(function CategoryCard({
     </div>
   );
 });
-
-/* ---------- Grid + Mobile/Desktop carousels ---------- */
+/* ---------- Main Component ---------- */
 export default function CategoriesGrid() {
-  // 1) All hooks at top-level, no early returns before them
   const { getGridItems, isLoading, error } = useWebsiteData();
   const items = getGridItems();
 
-  // Derived values (no hooks)
   const showStaticDesktop = items.length <= 4;
-
   const firstFour = useMemo(() => items.slice(0, 4), [items]);
 
-  // Mobile dots state
-  const [mobileApi, setMobileApi] = useState(null);
-  const [mobileCurrent, setMobileCurrent] = useState(0);
+  // Mobile state
+// ... (inside CategoriesGrid component)
+  // Mobile state
+  const [mobileApi, setMobileApi] = useState(null);
+  const [mobileCurrent, setMobileCurrent] = useState(0);
 
-  useEffect(() => {
-    if (!mobileApi) return;
-    const onSelect = () => {
-      const idx = mobileApi.selectedScrollSnap();
-      setMobileCurrent((prev) => (prev === idx ? prev : idx));
+  useEffect(() => {
+    if (!mobileApi) return;
+    
+    // --- START: ADDED/MODIFIED LOGIC ---
+    // 1. Get the Autoplay plugin instance
+    const autoplay = mobileApi.plugins().autoplay;
+    
+    // 2. Explicitly play/re-initialize autoplay if it exists
+    if (autoplay) {
+      autoplay.stop(); // Stop any existing instance
+      autoplay.play(); // Explicitly start Autoplay
+    }
+    // --- END: ADDED/MODIFIED LOGIC ---
+
+    const onSelect = () =>
+      setMobileCurrent(mobileApi.selectedScrollSnap());
+    mobileApi.on("select", onSelect);
+    onSelect();
+
+    return () => {
+        mobileApi.off("select", onSelect);
+        // 3. Clean up Autoplay on unmount
+        if (autoplay) {
+            autoplay.stop();
+        }
     };
-    onSelect();
-    mobileApi.on("select", onSelect);
-    return () => mobileApi.off("select", onSelect);
-  }, [mobileApi]);
+  }, [mobileApi]); // mobileApi is the only dependency needed
 
-  // Respect reduced motion (computed, not a hook)
+// ... (and make sure to include setApi={setMobileApi} on the mobile Carousel)
+  // Reduced motion
   const prefersReducedMotion =
     typeof window !== "undefined" &&
-    window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Autoplay Plugin
   const autoplayPlugin = useMemo(
     () =>
       Autoplay({
@@ -146,19 +165,22 @@ export default function CategoriesGrid() {
     []
   );
 
-  // 2) It's safe to early-return *after* all hooks have been called
   if (error) {
     return (
       <section className="w-full watermark bg-[#F4F4F8] py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to load categories</h2>
-            <p className="text-gray-600 mb-4">Please try refreshing the page.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Unable to load categories
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Please try refreshing the page.
+            </p>
             <button
               onClick={() => window.location.reload()}
-              className="rounded-md bg-darkprimary px-4 py-2 text-white hover:bg-darkprimary/90"
+              className="rounded-md bg-darkprimary px-4 py-2 text-white"
             >
-              Refresh Page
+              Refresh
             </button>
           </div>
         </div>
@@ -166,26 +188,23 @@ export default function CategoriesGrid() {
     );
   }
 
-  // 3) Normal render
   return (
     <LoadingPage isLoading={isLoading} fallback={<CategoriesGridSkeleton />}>
       <section className="w-full watermark bg-[#F4F4F8] py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          {/* Mobile: 1 per view, loop + autoplay (headline style) */}
+          {/* ---------- MOBILE CAROUSEL (FIXED) ---------- */}
           <div className="lg:hidden">
             <Carousel
-              setApi={setMobileApi}
-              opts={{ align: "start", loop: true }}
-              plugins={prefersReducedMotion ? [] : [autoplayPlugin]}
-              className="w-full overscroll-x-contain relative"
-            >
-              <CarouselContent className="touch-pan-y -ml-2 [transform:translateZ(0)]" style={{ willChange: "transform" }}>
+                opts={{ align: "start", loop: true }}
+                plugins={prefersReducedMotion ? [] : [autoplayPlugin]}
+                className="w-full relative"
+                setApi={setMobileApi}
+              >
+              <CarouselContent >
                 {items.map((it, i) => (
                   <CarouselItem
-                    id={`slide-${i}`}
                     key={it.title}
-                    className="basis-full [content-visibility:auto] [contain-intrinsic-size:1800px_1013px]"
-                    style={{ willChange: "transform" }}
+                    className="basis-full [content-visibility:auto]" // FIX: removed huge intrinsic size
                   >
                     <Card className="border-0 bg-transparent shadow-none">
                       <CardContent className="p-0">
@@ -198,55 +217,47 @@ export default function CategoriesGrid() {
 
               {items.length > 1 && (
                 <>
-                  <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
-                  <CarouselNext className="right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
+                  <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow" />
+                  <CarouselNext className="right-2 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow" />
                 </>
               )}
             </Carousel>
 
             {/* Dots */}
-            <div className="mt-5 flex justify-center gap-3" role="tablist" aria-label="Category slides">
-              {items.map((_, i) => {
-                const isActive = i === mobileCurrent;
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    aria-controls={`slide-${i}`}
-                    onClick={() => mobileApi && mobileApi.scrollTo(i)}
-                    className={`h-1.5 w-24 cursor-pointer rounded-full transition-colors
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2
-                    ${isActive ? "bg-secondary" : "bg-secondary/40 hover:bg-secondary/60"}`}
-                  />
-                );
-              })}
+            <div className="mt-5 flex justify-center gap-3">
+              {items.map((_, i) => (
+                <button
+                  key={i}
+                  aria-selected={i === mobileCurrent}
+                  onClick={() => mobileApi?.scrollTo(i)}
+                  className={`h-1.5 w-24 rounded-full transition-colors ${i === mobileCurrent
+                      ? "bg-secondary"
+                      : "bg-secondary/40 hover:bg-secondary/60"
+                    }`}
+                />
+              ))}
             </div>
           </div>
 
-          {/* Desktop */}
+          {/* ---------- DESKTOP (UNCHANGED) ---------- */}
           {showStaticDesktop ? (
-            // Static 4 (or fewer) cards
             <div className="hidden lg:grid grid-cols-4 gap-6 md:gap-8">
               {firstFour.map((it, i) => (
                 <CategoryCard key={it.title} {...it} priority={i === 0} />
               ))}
             </div>
           ) : (
-            // When more than 4: looping, auto-moving carousel with 4 per view
             <div className="hidden lg:block">
               <Carousel
                 opts={{ align: "start", loop: true }}
                 plugins={prefersReducedMotion ? [] : [autoplayPlugin]}
                 className="w-full relative"
               >
-                <CarouselContent className="touch-pan-y -ml-2 [transform:translateZ(0)]" style={{ willChange: "transform" }}>
+                <CarouselContent className="-ml-2">
                   {items.map((it, i) => (
                     <CarouselItem
                       key={it.title}
-                      className="basis-1/4 [content-visibility:auto] [contain-intrinsic-size:1800px_1013px]"
-                      style={{ willChange: "transform" }}
+                      className="basis-1/4 [content-visibility:auto]"
                     >
                       <Card className="border-0 bg-transparent shadow-none">
                         <CardContent className="p-0">
@@ -256,12 +267,9 @@ export default function CategoriesGrid() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                {items.length > 4 && (
-                  <>
-                    <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
-                    <CarouselNext className="right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary" />
-                  </>
-                )}
+
+                <CarouselPrevious className="left-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 rounded-full shadow" />
+                <CarouselNext className="right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 rounded-full shadow" />
               </Carousel>
             </div>
           )}

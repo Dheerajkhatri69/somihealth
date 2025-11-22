@@ -482,7 +482,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
 
                     {/* CTA */}
                     <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
-                    <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
+                    <div className="relative aspect-[16/11] mt-4 mb-20 rounded-2xl overflow-hidden bg-gray-100">
                         <img src={menuData.cta?.img} alt="" className="h-full w-full object-cover" />
 
                         {/* subtle gradient to improve readability */}
@@ -526,7 +526,9 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                 <button onClick={onClose} aria-label="Close menu" className="p-2">
                     <CloseIcon />
                 </button>
-                <span className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight">{brand}</span>
+                <Link onClick={onClose} href="/underdevelopmentmainpage" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
+                    {brand}
+                </Link>
                 {/* right icons (placeholders to match screenshot) */}
                 <div className="flex items-center gap-4">
                     <Link href="/pricing">

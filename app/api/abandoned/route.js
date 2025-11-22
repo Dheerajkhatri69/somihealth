@@ -1,3 +1,4 @@
+// app/api/abandoned/route.js
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { Abandoned } from '@/lib/model/abandoned';
@@ -13,98 +14,83 @@ export async function POST(request) {
     await connectDB();
     try {
         const body = await request.json();
-        const {
-            userSessionId,
-            firstSegment,
-            lastSegmentReached,
-            state,
-            timestamp,
-        } = body;
+        const { userSessionId, firstSegment, lastSegmentReached, state, timestamp } = body;
 
         if (!userSessionId) {
             return NextResponse.json(
-                {
-                    success: false,
-                    message: 'Missing userSessionId',
-                },
+                { success: false, message: 'Missing userSessionId' },
                 { status: 400 }
             );
         }
 
-        // Build the update object dynamically
         const updateFields = {
             firstSegment,
             lastSegmentReached,
             timestamp: timestamp ? new Date(timestamp) : new Date(),
+            seen: true, // ✅ anytime data is created/updated, mark seen = true
         };
 
-        if (typeof state === 'number') {
-            updateFields.state = state;
-        }
+        if (typeof state === 'number') updateFields.state = state;
 
         const result = await Abandoned.findOneAndUpdate(
             { userSessionId },
             { $set: updateFields },
-            { new: true, upsert: true }
+            { new: true, upsert: true, setDefaultsOnInsert: true }
         );
 
         return NextResponse.json({ success: true, result });
     } catch (error) {
         return NextResponse.json(
-            {
-                success: false,
-                message: error.message,
-            },
+            { success: false, message: error.message },
             { status: 500 }
         );
     }
 }
 
-// GET: Fetch all abandoned sessions (optional)
 export async function GET() {
     await connectDB();
     try {
         const all = await Abandoned.find().sort({ updatedAt: -1 });
         return NextResponse.json({ success: true, result: all });
     } catch (error) {
-        return NextResponse.json({
-            success: false,
-            message: error.message,
-        }, { status: 500 });
+        return NextResponse.json(
+            { success: false, message: error.message },
+            { status: 500 }
+        );
     }
 }
-// DELETE: Remove a session by userSessionId
+
 export async function DELETE(request) {
     await connectDB();
     try {
         const { searchParams } = new URL(request.url);
-        const userSessionId = searchParams.get("userSessionId");
+        const userSessionId = searchParams.get('userSessionId');
 
         if (!userSessionId) {
-            return NextResponse.json({
-                success: false,
-                message: "Missing userSessionId",
-            }, { status: 400 });
+            return NextResponse.json(
+                { success: false, message: 'Missing userSessionId' },
+                { status: 400 }
+            );
         }
 
         const deleted = await Abandoned.findOneAndDelete({ userSessionId });
 
         if (!deleted) {
-            return NextResponse.json({
-                success: false,
-                message: "No record found for given userSessionId",
-            }, { status: 404 });
+            return NextResponse.json(
+                { success: false, message: 'No record found for given userSessionId' },
+                { status: 404 }
+            );
         }
 
         return NextResponse.json({
             success: true,
-            message: "Deleted successfully",
+            message: 'Deleted successfully',
             result: deleted,
         });
     } catch (error) {
-        return NextResponse.json({
-            success: false,
-            message: error.message,
-        }, { status: 500 });
+        return NextResponse.json(
+            { success: false, message: error.message },
+            { status: 500 }
+        );
     }
 }
