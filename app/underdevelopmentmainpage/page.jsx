@@ -6,7 +6,7 @@ import Hero from "@/components/hero/Hero";
 import HowItWorksGnz from "@/components/hero/HowItworks";
 import Navbar from "@/components/hero/Navbar";
 import { TabsDemo } from "@/components/hero/Results";
-import ClientVideoReviews from "@/components/hero/ReviewVideoCardforlanding";
+import ClientVideoReviews from "@/components/hero/ReviewVideoCard";
 import SomiFooter from "@/components/hero/SomiFooter";
 import StoriesWithReviews from "@/components/hero/StoriesWithReviews";
 import WeightLossPlans from "@/components/hero/WeightLossPlans";

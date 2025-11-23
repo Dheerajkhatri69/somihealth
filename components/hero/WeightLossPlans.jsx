@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
 import { LoadingPage, WeightLossPlansSkeleton } from "@/components/LoadingSkeleton";
 
@@ -46,22 +45,27 @@ export function AnimatedTitle({
     "text-[#8a8aee]",
   ];
 
-  // guard: if no items, render nothing (or just prefix/suffix)
   const safeItems = Array.isArray(items) && items.length > 0 ? items : [""];
   const longestItem = useMemo(
-    () => safeItems.reduce((a, b) => (String(b).length > String(a).length ? b : a), ""),
+    () =>
+      safeItems.reduce(
+        (a, b) => (String(b).length > String(a).length ? b : a),
+        ""
+      ),
     [safeItems]
   );
 
-  // animation state
   const [animating, setAnimating] = useState(false);
 
-  // refs so we don't re-run effects unnecessarily
   const curItemIdxRef = useRef(0);
   const nextItemIdxRef = useRef(safeItems.length > 1 ? 1 : 0);
 
-  const curColorIdxRef = useRef(Math.floor(Math.random() * COLOR_CLASSES.length));
-  const nextColorIdxRef = useRef((curColorIdxRef.current + 1) % COLOR_CLASSES.length);
+  const curColorIdxRef = useRef(
+    Math.floor(Math.random() * COLOR_CLASSES.length)
+  );
+  const nextColorIdxRef = useRef(
+    (curColorIdxRef.current + 1) % COLOR_CLASSES.length
+  );
 
   const aliveRef = useRef(true);
   const tRef = useRef(null);
@@ -79,14 +83,11 @@ export function AnimatedTitle({
     const cycle = () => {
       if (!aliveRef.current) return;
 
-      // compute next item + next color
       nextItemIdxRef.current = (curItemIdxRef.current + 1) % safeItems.length;
       nextColorIdxRef.current = pickDifferentColor(curColorIdxRef.current);
 
-      // start animation (current slides out, next slides in)
       setAnimating(true);
 
-      // after slide completes, commit next -> current
       tRef.current = setTimeout(() => {
         if (!aliveRef.current) return;
 
@@ -95,12 +96,10 @@ export function AnimatedTitle({
 
         setAnimating(false);
 
-        // wait idle interval, then loop
         tRef.current = setTimeout(cycle, interval);
       }, duration);
     };
 
-    // initial idle wait, then animate
     tRef.current = setTimeout(cycle, interval);
 
     return () => {
@@ -117,25 +116,22 @@ export function AnimatedTitle({
 
   return (
     <h2
-      className={`text-start font-SofiaSans text-darkprimary text-3xl sm:text-5xl ${className}`}
+      className={`text-start font-SofiaSans text-darkprimary mb-10 text-3xl sm:text-5xl ${className}`}
       style={{ "--rot-dur": `${duration}ms` }}
     >
-      {/* optional static prefix */}
       {prefix && <span>{prefix} </span>}
 
-      {/* rotating word/phrase (baseline-safe, no layout shift thanks to sizer) */}
       <span
         className="inline-grid align-baseline leading-[1em] h-[1em] whitespace-nowrap overflow-hidden"
         style={{ "--rot-dur": `${duration}ms` }}
       >
-        {/* sizing ghost keeps width/height stable */}
         <span className="opacity-0 pointer-events-none col-start-1 row-start-1">
           {longestItem || currentText}
         </span>
 
-        {/* current item (slides out up) */}
         <span
-          key={`cur-${curItemIdxRef.current}-${curColorIdxRef.current}-${animating ? "anim" : "idle"}`}
+          key={`cur-${curItemIdxRef.current}-${curColorIdxRef.current}-${animating ? "anim" : "idle"
+            }`}
           className={`col-start-1 row-start-1 ${curColorClass} ${animating ? "animate-slide-out-up" : "opacity-100"
             } will-change-transform`}
           aria-hidden={animating}
@@ -143,9 +139,9 @@ export function AnimatedTitle({
           {currentText}
         </span>
 
-        {/* next item (slides in from below) */}
         <span
-          key={`next-${nextItemIdxRef.current}-${nextColorIdxRef.current}-${animating ? "anim" : "idle"}`}
+          key={`next-${nextItemIdxRef.current}-${nextColorIdxRef.current}-${animating ? "anim" : "idle"
+            }`}
           className={`col-start-1 row-start-1 ${nextColorClass} ${animating ? "animate-slide-in-up" : "opacity-0"
             } will-change-transform`}
           aria-hidden={!animating}
@@ -154,12 +150,10 @@ export function AnimatedTitle({
         </span>
       </span>
 
-      {/* optional static suffix */}
       {suffix && <span> {suffix}</span>}
     </h2>
   );
 }
-
 
 export default function WeightLossPlans() {
   const { data, isLoading, error } = useWebsiteData();
@@ -210,7 +204,7 @@ export default function WeightLossPlans() {
       }),
     []
   );
-  // state + fetch
+
   const [ph, setPh] = useState({ title: "", items: [] });
   const [phLoading, setPhLoading] = useState(true);
 
@@ -233,17 +227,22 @@ export default function WeightLossPlans() {
         if (mounted) setPhLoading(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
-
 
   if (error) {
     return (
       <section className="w-full py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to load plans</h2>
-            <p className="text-gray-600 mb-4">Please try refreshing the page.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Unable to load plans
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Please try refreshing the page.
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="rounded-md bg-darkprimary px-4 py-2 text-white hover:bg-darkprimary/90"
@@ -261,8 +260,12 @@ export default function WeightLossPlans() {
       <section className="w-full py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">No plans available</h2>
-            <p className="text-gray-600 mb-4">Check back later for our latest offerings.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              No plans available
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Check back later for our latest offerings.
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
@@ -277,7 +280,7 @@ export default function WeightLossPlans() {
 
   return (
     <LoadingPage isLoading={isLoading} fallback={<WeightLossPlansSkeleton />}>
-      <section className="w-full mt-20">
+      <section className="w-full mt-10 md:mt-20">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           {phLoading ? (
             <div className="animate-pulse text-start">
@@ -286,12 +289,15 @@ export default function WeightLossPlans() {
           ) : (
             <AnimatedTitle
               prefix={ph.title}
-              items={ph.items?.length ? ph.items : ['Speed', 'Stability', 'Style', 'Somi ❤️']}
+              items={
+                ph.items?.length
+                  ? ph.items
+                  : ["Speed", "Stability", "Style", "Somi ❤️"]
+              }
               interval={2200}
               duration={450}
             />
           )}
-
 
           {plans.length >= 3 ? (
             <div>
@@ -307,11 +313,12 @@ export default function WeightLossPlans() {
                   {plans.map((p, i) => (
                     <CarouselItem
                       key={i}
-                      className="pl-2 basis-full md:basis-1/2 lg:basis-1/3 [content-visibility:auto] [contain-intrinsic-size:1400px_800px]"
+                      className="pl-2 basis-full md:basis-1/2 lg:basis-1/3 [content-visibility:auto]"
                       style={{ willChange: "transform" }}
                     >
-                      <CardContainer className="w-full">
-                        <CardBody
+                      {/* SIMPLE CARD (no 3D component) */}
+                      <div className="w-full">
+                        <div
                           className="
                             group/card relative w-full rounded-2xl
                             bg-darkprimary-foreground/20 shadow-sm ring-1 ring-black/5
@@ -323,32 +330,34 @@ export default function WeightLossPlans() {
                           {/* TOP (Header + Image) */}
                           <div className="z-10 w-full flex-1 flex flex-col">
                             {/* HEADER */}
-                            <div className="text-center pointer-events-none">
-                              <CardItem translateZ={40}>
-                                <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-secondary/10 px-3 py-0.5 text-xs font-semibold text-secondary">
+                            {/* HEADER */}
+                            <div className="text-left pointer-events-none">
+                              {/* pill */}
+                              <div>
+                                <div className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-3 py-0.5 text-xs font-semibold text-secondary">
                                   {p.priceLabel}
                                 </div>
-                              </CardItem>
+                              </div>
 
-                              <CardItem translateZ={60}>
-                                <div className="mt-2 flex items-end justify-center gap-1.5">
-                                  <span className="text-xl font-semibold text-gray-900">
-                                    {p.currency}
-                                  </span>
-                                  <span className="text-4xl leading-none text-darkprimary sm:text-5xl">
-                                    {p.price}
-                                  </span>
-                                  <span className="mb-1 text-xs font-semibold text-gray-500">
-                                    {p.per}
-                                  </span>
-                                </div>
-                              </CardItem>
+                              {/* price row */}
+                              <div className="mt-2 flex items-end gap-1.5">
+                                <span className="text-xl font-semibold text-gray-900">
+                                  {p.currency}
+                                </span>
+                                <span className="text-4xl leading-none text-darkprimary sm:text-5xl">
+                                  {p.price}
+                                </span>
+                                <span className="mb-1 text-xs font-semibold text-gray-500">
+                                  {p.per}
+                                </span>
+                              </div>
 
-                              <CardItem translateZ={60}>
+                              {/* name */}
+                              <div>
                                 <h3 className="mt-1 text-lg tracking-tight sm:text-2xl font-SofiaSans">
                                   {p.name}
                                 </h3>
-                              </CardItem>
+                              </div>
                             </div>
 
                             {/* IMAGE */}
@@ -402,13 +411,14 @@ export default function WeightLossPlans() {
                             {/* NOTE SLOT (fixed height) */}
                             <div className="mb-2 min-h-[32px] flex items-center justify-center px-2">
                               {p.plansNote ? (
-                                <p className="text-xs text-gray-500 text-center">{p.plansNote}</p>
+                                <p className="text-xs text-gray-500 text-center">
+                                  {p.plansNote}
+                                </p>
                               ) : null}
                             </div>
-
                           </div>
-                        </CardBody>
-                      </CardContainer>
+                        </div>
+                      </div>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
@@ -424,8 +434,8 @@ export default function WeightLossPlans() {
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {plans.map((p, i) => (
-                <CardContainer key={i} className="w-full">
-                  <CardBody
+                <div key={i} className="w-full">
+                  <div
                     className="
                       group/card relative w-full rounded-2xl
                       bg-darkprimary-foreground/20 shadow-sm ring-1 ring-black/5
@@ -438,13 +448,13 @@ export default function WeightLossPlans() {
                     <div className="z-10 w-full flex-1 flex flex-col">
                       {/* HEADER */}
                       <div className="text-center pointer-events-none">
-                        <CardItem translateZ={40}>
+                        <div>
                           <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-secondary/10 px-3 py-0.5 text-xs font-semibold text-secondary">
                             {p.priceLabel}
                           </div>
-                        </CardItem>
+                        </div>
 
-                        <CardItem translateZ={60}>
+                        <div>
                           <div className="mt-2 flex items-end justify-center gap-1.5">
                             <span className="text-xl font-semibold text-gray-900">
                               {p.currency}
@@ -456,13 +466,13 @@ export default function WeightLossPlans() {
                               {p.per}
                             </span>
                           </div>
-                        </CardItem>
+                        </div>
 
-                        <CardItem translateZ={60}>
+                        <div>
                           <h3 className="mt-1 text-lg font-bold tracking-tight sm:text-2xl font-SofiaSans">
                             {p.name}
                           </h3>
-                        </CardItem>
+                        </div>
                       </div>
 
                       {/* IMAGE */}
@@ -514,16 +524,17 @@ export default function WeightLossPlans() {
                         </Link>
                       </div>
 
-
                       {/* NOTE SLOT (fixed height) */}
                       <div className="mb-2 min-h-[32px] flex items-center justify-center px-2">
                         {p.plansNote ? (
-                          <p className="text-xs text-gray-500 text-center">{p.plansNote}</p>
+                          <p className="text-xs text-gray-500 text-center">
+                            {p.plansNote}
+                          </p>
                         ) : null}
                       </div>
                     </div>
-                  </CardBody>
-                </CardContainer>
+                  </div>
+                </div>
               ))}
             </div>
           )}
@@ -531,7 +542,11 @@ export default function WeightLossPlans() {
 
         <style jsx>{`
           .vial-shadow {
-            background: radial-gradient(closest-side, rgba(0, 0, 0, 0.28), transparent);
+            background: radial-gradient(
+              closest-side,
+              rgba(0, 0, 0, 0.28),
+              transparent
+            );
             opacity: 0.9;
             transform: translateY(6px) scale(0.85);
           }

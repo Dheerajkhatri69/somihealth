@@ -1,11 +1,11 @@
 "use client";
 
-import { Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
 import { NavbarSkeleton, MegaPanelSkeleton } from "@/components/LoadingSkeleton";
-
+import { MdOutlineTouchApp } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
 /* =================== ICONS =================== */
 const Chevron = ({ open }) => (
     <svg className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="currentColor">
@@ -76,7 +76,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                                     className="fx86 inline-flex font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-gray-100 text-darkprimary px-5 py-2 text-base font-semibold shadow-sm opacity-60 cursor-not-allowed select-none"
                                     style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                                 >
-                                    Testing
+                                    Labs
                                     <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
                                         <ArrowRight />
                                     </span>
@@ -347,13 +347,13 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                         </span>
                     </div>
 
-                    {/* Discover Testing pill - DISABLED + Coming Soon */}
+                    {/* Discover Labs pill - DISABLED + Coming Soon */}
                     <div className="relative inline-block w-full md:w-auto mt-4 mb-4">
                         <div
                             className="fx86 inline-flex min-w-[160px] font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto opacity-60 cursor-not-allowed select-none"
                             style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
                         >
-                            Testing
+                            Labs
                             <span className="ml-3 inline-flex h-8 w-8 items-center justify-center">
                                 <ArrowRight />
                             </span>
@@ -523,20 +523,18 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
         <div className="fixed inset-0 z-[60] bg-white">
             {/* Top bar inside overlay */}
             <div className="flex items-center justify-between px-4 py-3 md:px-6">
-                <button onClick={onClose} aria-label="Close menu" className="p-2">
-                    <CloseIcon />
-                </button>
+
                 <Link onClick={onClose} href="/underdevelopmentmainpage" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
                     {brand}
                 </Link>
                 {/* right icons (placeholders to match screenshot) */}
                 <div className="flex items-center gap-4">
                     <Link href="/pricing">
-                        <Sparkles />
+                        <MdOutlineTouchApp size={28} />
                     </Link>
-                    <Link href="/underdevelopmentmainpage/login">
-                        <User />
-                    </Link>
+                    <button onClick={onClose} aria-label="Close menu" className="p-2">
+                        <IoMdClose size={28} />
+                    </button>
                 </div>
             </div>
 
@@ -599,19 +597,7 @@ export default function Navbar({ brand = "somi" }) {
             {/* White top bar */}
             <div ref={wrapperRef} className="relative">
                 <nav className="mx-auto flex w-full items-center justify-between px-4 py-3 md:px-6">
-                    {/* Left: Hamburger (mobile) */}
-                    <button
-                        className="inline-flex items-center gap-2 rounded-md p-2 md:hidden"
-                        onClick={() => {
-                            setMobileOpen(true);
-                            setMobileStage(null);
-                        }}
-                        aria-label="Open menu"
-                    >
-                        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" />
-                        </svg>
-                    </button>
+
 
                     {/* Brand centered on mobile, left on desktop */}
                     <Link href="/underdevelopmentmainpage" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
@@ -662,11 +648,20 @@ export default function Navbar({ brand = "somi" }) {
                     {/* Right icons (mobile, for visual parity) */}
                     <div className="flex items-center gap-4 md:hidden">
                         <Link href="/pricing">
-                            <Sparkles />
+                            <MdOutlineTouchApp size={28} />
                         </Link>
-                        <Link href="/underdevelopmentmainpage/login">
-                            <User />
-                        </Link>
+                        <button
+                            className="inline-flex items-center gap-2 rounded-md p-2 md:hidden"
+                            onClick={() => {
+                                setMobileOpen(true);
+                                setMobileStage(null);
+                            }}
+                            aria-label="Open menu"
+                        >
+                            <svg className="h-7 w-7" viewBox="0 0 28 28" fill="none">
+                                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" />
+                            </svg>
+                        </button>
                     </div>
                 </nav>
 

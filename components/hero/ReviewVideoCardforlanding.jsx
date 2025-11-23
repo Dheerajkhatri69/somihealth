@@ -337,7 +337,7 @@ export default function ClientVideoReviews() {
   }
 
   return (
-    <section className="w-full -mt-20 md:-m-0 lg:-m-0 py-10 sm:py-14">
+    <section className="w-full py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <header className="mb-6 flex items-end justify-between gap-4">
           <h2 className="text-3xl sm:text-4xl font-SofiaSans text-darkprimary uppercase">

@@ -225,7 +225,7 @@ export default function AboutPage() {
 
                 {/* ====== HOW IT WORKS ====== */}
                 {content?.config?.showHowItWorks && (
-                    <section className="mx-auto max-w-6xl px-4 pb-16 md:px-6 lg:pb-24">
+                    <section className="pb-16 lg:pb-24">
                         <HowItWorksGnz />
                     </section>
                 )}

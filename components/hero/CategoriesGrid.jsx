@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
@@ -115,55 +115,44 @@ export default function CategoriesGrid() {
   const firstFour = useMemo(() => items.slice(0, 4), [items]);
 
   // Mobile state
-// ... (inside CategoriesGrid component)
-  // Mobile state
-  const [mobileApi, setMobileApi] = useState(null);
-  const [mobileCurrent, setMobileCurrent] = useState(0);
+  const [mobileApi, setMobileApi] = useState(null);
+  const [mobileCurrent, setMobileCurrent] = useState(0);
 
-  useEffect(() => {
-    if (!mobileApi) return;
-    
-    // --- START: ADDED/MODIFIED LOGIC ---
-    // 1. Get the Autoplay plugin instance
-    const autoplay = mobileApi.plugins().autoplay;
-    
-    // 2. Explicitly play/re-initialize autoplay if it exists
-    if (autoplay) {
-      autoplay.stop(); // Stop any existing instance
-      autoplay.play(); // Explicitly start Autoplay
-    }
-    // --- END: ADDED/MODIFIED LOGIC ---
+  useEffect(() => {
+    if (!mobileApi) return;
 
-    const onSelect = () =>
-      setMobileCurrent(mobileApi.selectedScrollSnap());
-    mobileApi.on("select", onSelect);
-    onSelect();
+    const onSelect = () => setMobileCurrent(mobileApi.selectedScrollSnap());
+    mobileApi.on("select", onSelect);
+    onSelect();
 
-    return () => {
-        mobileApi.off("select", onSelect);
-        // 3. Clean up Autoplay on unmount
-        if (autoplay) {
-            autoplay.stop();
-        }
+    return () => {
+      mobileApi.off("select", onSelect);
     };
-  }, [mobileApi]); // mobileApi is the only dependency needed
+  }, [mobileApi]);
 
-// ... (and make sure to include setApi={setMobileApi} on the mobile Carousel)
+  // ... (and make sure to include setApi={setMobileApi} on the mobile Carousel)
   // Reduced motion
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Autoplay Plugin
-  const autoplayPlugin = useMemo(
-    () =>
-      Autoplay({
-        delay: 2500,
-        stopOnInteraction: false,
-        stopOnMouseEnter: true,
-      }),
-    []
+  // Autoplay Plugins (separate for mobile & desktop)
+  const mobileAutoplay = useRef(
+    Autoplay({
+      delay: 2500,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    })
   );
+
+  const desktopAutoplay = useRef(
+    Autoplay({
+      delay: 2500,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    })
+  );
+
 
   if (error) {
     return (
@@ -195,11 +184,11 @@ export default function CategoriesGrid() {
           {/* ---------- MOBILE CAROUSEL (FIXED) ---------- */}
           <div className="lg:hidden">
             <Carousel
-                opts={{ align: "start", loop: true }}
-                plugins={prefersReducedMotion ? [] : [autoplayPlugin]}
-                className="w-full relative"
-                setApi={setMobileApi}
-              >
+              opts={{ align: "start", loop: true }}
+              plugins={prefersReducedMotion ? [] : [mobileAutoplay.current]}
+              className="w-full relative"
+              setApi={setMobileApi}
+            >
               <CarouselContent >
                 {items.map((it, i) => (
                   <CarouselItem
@@ -231,8 +220,8 @@ export default function CategoriesGrid() {
                   aria-selected={i === mobileCurrent}
                   onClick={() => mobileApi?.scrollTo(i)}
                   className={`h-1.5 w-24 rounded-full transition-colors ${i === mobileCurrent
-                      ? "bg-secondary"
-                      : "bg-secondary/40 hover:bg-secondary/60"
+                    ? "bg-secondary"
+                    : "bg-secondary/40 hover:bg-secondary/60"
                     }`}
                 />
               ))}
@@ -250,7 +239,7 @@ export default function CategoriesGrid() {
             <div className="hidden lg:block">
               <Carousel
                 opts={{ align: "start", loop: true }}
-                plugins={prefersReducedMotion ? [] : [autoplayPlugin]}
+                plugins={prefersReducedMotion ? [] : [desktopAutoplay.current]}
                 className="w-full relative"
               >
                 <CarouselContent className="-ml-2">
