@@ -23,6 +23,8 @@ import {
   Footprints,
   RectangleEllipsis,
   TicketSlash,
+  KeyRound,
+  Columns3,
 } from "lucide-react"
 
 import {
@@ -56,9 +58,10 @@ const frontendItems = [
   { title: "Feature Banner", url: "/dashboard/feature-banners", icon: TicketSlash, allowedRoles: ["A"] },
   { title: "Pricing Page", url: "/dashboard/pricing", icon: ChartCandlestick, allowedRoles: ["A"] },
   { title: "GH Content", url: "/dashboard/gh-content", icon: ScanHeart, allowedRoles: ["A"] },
+  { title: "Login Page Content", url: "/dashboard/login-page", icon: KeyRound, allowedRoles: ["A"] },
   { title: "FAQ Component", url: "/dashboard/faq", icon: HelpCircle, allowedRoles: ["A"] },
   { title: "Footer", url: "/dashboard/footerUI", icon: Footprints, allowedRoles: ["A"] },
-  { title: "Footer Pages", url: "/dashboard/footer", icon: Footprints, allowedRoles: ["A"] },
+  { title: "Footer Pages", url: "/dashboard/footer", icon: Columns3 , allowedRoles: ["A"] },
   { title: "Contact Forms/UI", url: "/dashboard/contactForms", icon: Contact, allowedRoles: ["A"] },
   { title: "About UI", url: "/dashboard/aboutUI", icon: RectangleEllipsis, allowedRoles: ["A"] },
 ]

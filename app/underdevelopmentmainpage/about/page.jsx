@@ -65,7 +65,7 @@ export default function AboutPage() {
     return (
         <>
             <Navbar />
-            <main className="bg-white text-slate-900">
+            <main className="bg-white text-slate-900 font-SofiaSans">
                 {/* ====== HERO ====== */}
                 {content?.config?.showHero && (
                     <section className="relative overflow-hidden bg-darkprimary">

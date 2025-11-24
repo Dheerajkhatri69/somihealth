@@ -184,9 +184,11 @@ const LandingPagePricing = () => {
               </button>
 
               {/* Center: brand logo — absolutely centered */}
-              <h1 className="absolute left-1/2 -translate-x-1/2 font-tagesschrift text-5xl md:text-7xl text-secondary font-bold text-center">
-                {D.brand}
-              </h1>
+              <Link href={D.backUrl}>
+                <h1 className="absolute left-1/2 -translate-x-1/2 font-tagesschrift text-5xl md:text-7xl text-secondary font-bold text-center">
+                  {D.brand}
+                </h1>
+              </Link>
 
               {/* Right: tooltip container */}
               <div className="mt-2">

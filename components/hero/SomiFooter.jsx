@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Instagram, Facebook, Phone, MapPin, Mail } from "lucide-react";
+import { Instagram, Facebook, Phone, MapPin, Mail, Copyright } from "lucide-react";
 import { FaTiktok } from "react-icons/fa";
 import { SiIndeed } from "react-icons/si";
 import Image from "next/image";
@@ -91,7 +91,7 @@ export default function SomiFooter() {
 
     return (
         <footer
-            className="relative mt-20 w-full text-white"
+            className="relative mt-20 w-full text-white font-SofiaSans"
             style={{ backgroundImage: "linear-gradient(#FFFFFF 0 230px, #364C78 230px 100%)" }}
         >
             {/* === TOP CTA CARD === */}
@@ -213,6 +213,11 @@ export default function SomiFooter() {
                                 </a>
                             </li>
                         </ul>
+                        <div className="flex items-center gap-1 mt-2">
+                           <Copyright size={16} className="mb-[2px]" />
+                            <span>{new Date().getFullYear()} Somi Health</span>
+                        </div>
+
 
                     </div>
 

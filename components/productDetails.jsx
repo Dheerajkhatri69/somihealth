@@ -25,15 +25,15 @@ export default function ProductDetails({ content }) {
         {/* MAIN WRAPPER */}
         <div className="relative">
 
-          {/* FLOATING IMAGE — takes 50% width on desktop */}
-          <div className="float-right md:shape-wrap md:ml-8 md:mb-6 hidden md:block w-1/2">
-            <div className="rounded-2xl overflow-hidden">
+          {/* FLOATING IMAGE — fixed 550x550 on laptop/desktop */}
+          <div className="float-right md:shape-wrap md:ml-8 md:mb-6 hidden md:block">
+            <div className="rounded-2xl overflow-hidden w-[550px] h-[550px]">
               <Image
                 src={image?.src}
                 alt={image?.alt}
-                width={1200}
-                height={800}
-                className="object-cover w-full h-auto"
+                width={550}
+                height={550}
+                className="object-cover w-full h-full"
               />
             </div>
           </div>

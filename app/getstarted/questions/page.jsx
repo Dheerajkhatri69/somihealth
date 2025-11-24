@@ -2282,7 +2282,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`heardAbout-${index}`}
-                      className={`flex items-center justify-center ${option == "Other"? "w-[320px]" : "w-[160px]"} text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option
+                      className={`flex items-center justify-center ${option == "Other" ? "w-[320px]" : "w-[160px]"} text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option
                         ? 'bg-secondary text-white'
                         : 'bg-white text-secondary'
                         }`}
@@ -2419,6 +2419,18 @@ export default function PatientRegistrationForm() {
                     <p>This notice is effective as of 03/15/2025</p>
                   </div>
 
+                  <div className="space-y-2">
+                    <h4 className="font-semibold">LEGALLY BINDING CONSENT & RELEASE</h4>
+                    <h4 className="font-semibold">By signing this document:</h4>
+                    <p>
+                      I confirm that I have had the opportunity to ask questions about this therapy and its alternatives. All questions were answered to my satisfaction.<br />
+                      I acknowledge that I am voluntarily consenting to receive peptide therapy, including with full knowledge of potential benefits and risks.<br />
+                      I understand this treatment is elective and cash-based.<br />
+                      I release and hold Somi Health and its affiliated providers, and associated pharmacies from any liability, claim, or damages arising from the use of peptide therapies as prescribed.<br />
+                      I agree to comply with the treatment plan, safety instructions, and follow-up requirements established by my provider.<br />
+                    </p>
+                  </div>
+
                   <div className="space-y-4 mt-6">
                     <div className="flex space-x-2">
                       <input
@@ -2486,7 +2498,7 @@ export default function PatientRegistrationForm() {
                         className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
                       />
                       <label htmlFor="agree-to-pay-checkbox" className="text-sm font-bold">
-                        I agree to pay the $25 Clinician review payment. This will be refunded if our provider determines you are NOT eligible for GLP-1 treatment.
+                        I agree to use electronic records and signatures and I acknowledge that I have read the related consumer disclosure.
                       </label>
                     </div>
                     {errors.agreetopay && (
