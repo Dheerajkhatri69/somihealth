@@ -2294,7 +2294,7 @@ export default function PatientRegistrationForm() {
                         className="hidden"
                         {...register('heardAbout')}
                       />
-                      <span>{option == "Other" ? "Others(family, friend or any specific name)" : option}</span>
+                      <span>{option == "Other" ? "Others(Friends or Family)" : option}</span>
                     </label>
                   ))}
                 </div>
@@ -2426,7 +2426,7 @@ export default function PatientRegistrationForm() {
                       I confirm that I have had the opportunity to ask questions about this therapy and its alternatives. All questions were answered to my satisfaction.<br />
                       I acknowledge that I am voluntarily consenting to receive peptide therapy, including with full knowledge of potential benefits and risks.<br />
                       I understand this treatment is elective and cash-based.<br />
-                      I release and hold Somi Health and its affiliated providers, and associated pharmacies from any liability, claim, or damages arising from the use of peptide therapies as prescribed.<br />
+                      I release and hold harmless Somi Health PLLC and its affiliated providers, and associated pharmacies from any liability, claim, or damages arising from the use of peptide therapies as prescribed.<br />
                       I agree to comply with the treatment plan, safety instructions, and follow-up requirements established by my provider.<br />
                     </p>
                   </div>

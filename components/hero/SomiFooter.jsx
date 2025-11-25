@@ -198,10 +198,13 @@ export default function SomiFooter() {
                                 </a>
                             </li>
 
-                            <li className="flex items-start gap-3">
-                                <MapPin className="mt-0.5 h-4 w-4 flex-none text-white/70" />
-                                <span>{footerData?.contactInfo?.address}</span>
-                            </li>
+                            {footerData?.contactInfo?.address && (
+                                <li className="flex items-start gap-3">
+                                    <MapPin className="mt-0.5 h-4 w-4 flex-none text-white/70" />
+                                    <span>{footerData?.contactInfo?.address}</span>
+                                </li>
+                            )}
+
 
                             <li className="flex items-start gap-3">
                                 <Mail className="mt-0.5 h-4 w-4 flex-none text-white/70" />
@@ -213,11 +216,6 @@ export default function SomiFooter() {
                                 </a>
                             </li>
                         </ul>
-                        <div className="flex items-center gap-1 mt-2">
-                           <Copyright size={16} className="mb-[2px]" />
-                            <span>{new Date().getFullYear()} Somi Health</span>
-                        </div>
-
 
                     </div>
 
@@ -262,6 +260,11 @@ export default function SomiFooter() {
                         </ul>
                     </div>
                 </div>
+                
+            <div className="flex items-center gap-1 mt-2">
+                <Copyright size={16} className="mb-[2px]" />
+                <span>{new Date().getFullYear()} Somi Health</span>
+            </div>
             </div>
         </footer>
     );

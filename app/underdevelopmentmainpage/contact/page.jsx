@@ -124,18 +124,18 @@ export default function ContactPage() {
                                                 </div>
                                             </div>
                                         </a>
-
-                                        <div className="flex items-center gap-3 rounded-xl bg-white/80 p-4 ring-1 ring-black/5">
-                                            <span className="rounded-lg bg-[#E9ECF1] p-2">
-                                                <MapPin className="h-5 w-5 text-[#232a3a]" />
-                                            </span>
-                                            <div>
-                                                <div className="text-xs uppercase tracking-wide text-slate-500">Address</div>
-                                                <div className="font-medium text-slate-900">
-                                                    {content?.contactInfo?.address?.display || 'United States (Remote-first)'}
+                                        {content?.contactInfo?.address?.display && (
+                                            <div className="flex items-center gap-3 rounded-xl bg-white/80 p-4 ring-1 ring-black/5">
+                                                <span className="rounded-lg bg-[#E9ECF1] p-2">
+                                                    <MapPin className="h-5 w-5 text-[#232a3a]" />
+                                                </span>
+                                                <div>
+                                                    <div className="text-xs uppercase tracking-wide text-slate-500">Address</div>
+                                                    <div className="font-medium text-slate-900">
+                                                        {content?.contactInfo?.address?.display}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
+                                            </div>)}
 
                                         <div className="flex items-center gap-3 rounded-xl bg-white/80 p-4 ring-1 ring-black/5">
                                             <span className="rounded-lg bg-[#E9ECF1] p-2">
@@ -176,18 +176,18 @@ export default function ContactPage() {
                                             {content?.sidebar?.expectations?.map((item, index) => (
                                                 <li key={index}>{item.text}</li>
                                             )) || (
-                                                <>
-                                                    <li>Replies within one business day.</li>
-                                                    <li>Care from licensed clinicians.</li>
-                                                    <li>No spam—just help when you need it.</li>
-                                                </>
-                                            )}
+                                                    <>
+                                                        <li>Replies within one business day.</li>
+                                                        <li>Care from licensed clinicians.</li>
+                                                        <li>No spam—just help when you need it.</li>
+                                                    </>
+                                                )}
                                         </ul>
 
                                         <div className="mt-6 text-sm text-slate-600">
-                                            {content?.sidebar?.callToAction?.text || 'Prefer to call?'} 
-                                            <a 
-                                                href={content?.sidebar?.callToAction?.link || 'tel:+17043866871'} 
+                                            {content?.sidebar?.callToAction?.text || 'Prefer to call?'}
+                                            <a
+                                                href={content?.sidebar?.callToAction?.link || 'tel:+17043866871'}
                                                 className="font-medium text-slate-900 underline"
                                             >
                                                 {' '}{content?.sidebar?.callToAction?.phone || '(704) 386-6871'}

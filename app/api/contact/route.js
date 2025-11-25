@@ -4,26 +4,37 @@ import ContactForm from '@/lib/model/contactForm';
 import ContactFormSettings from '@/lib/model/contactFormSettings';
 import { connectionSrt } from '@/lib/db';
 
-// Connect to MongoDB
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(connectionSrt);
   }
 }
 
-// GET - Fetch contact form submissions
+// GET - Fetch contact form submissions OR new-count
 export async function GET(request) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 10;
     const status = searchParams.get('status');
     const search = searchParams.get('search');
-    
+
+    const mode = searchParams.get('mode');           // 👈 NEW: mode for count
+    const markAsChecked = searchParams.get('markAsChecked') === '1'; // 👈 NEW
+
+    // ✅ 1) Sidebar: just get count of "new" records (seen === true)
+    if (mode === 'newCount') {
+      const count = await ContactForm.countDocuments({ seen: true });
+      return NextResponse.json({
+        success: true,
+        count,
+      });
+    }
+
     const skip = (page - 1) * limit;
-    
+
     // Build query
     let query = {};
     if (status && status !== 'all') {
@@ -37,14 +48,24 @@ export async function GET(request) {
         { phone: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     const submissions = await ContactForm.find(query)
       .sort({ submittedAt: -1 })
       .skip(skip)
       .limit(limit);
-    
+
     const total = await ContactForm.countDocuments(query);
-    
+
+    // ✅ 2) When admin opens the table with markAsChecked=1,
+    // mark only the records that were actually loaded as seen=false
+    if (markAsChecked && submissions.length > 0) {
+      const ids = submissions.map((s) => s._id);
+      await ContactForm.updateMany(
+        { _id: { $in: ids }, seen: true },
+        { $set: { seen: false, lastUpdated: new Date() } }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       result: submissions,
@@ -68,10 +89,10 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     await connectDB();
-    
+
     const body = await request.json();
     const { firstName, lastName, email, phone, interestedIn, comments } = body;
-    
+
     // Validate required fields
     if (!firstName || !email || !phone || !interestedIn) {
       return NextResponse.json(
@@ -79,7 +100,7 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-    
+
     // Check if form is active
     const settings = await ContactFormSettings.findOne();
     if (settings && !settings.config.isActive) {
@@ -88,23 +109,24 @@ export async function POST(request) {
         { status: 403 }
       );
     }
-    
+
     const submission = new ContactForm({
       firstName,
       lastName: lastName || '',
       email,
       phone,
       interestedIn,
-      comments: comments || ''
+      comments: comments || '',
+      seen: true, // 👈 explicitly new/unread
     });
-    
+
     await submission.save();
-    
+
     // TODO: Send notification email if enabled
     if (settings?.config.enableNotifications && settings?.config.notificationEmail) {
       // Implement email notification here
     }
-    
+
     return NextResponse.json({
       success: true,
       result: submission,
@@ -123,34 +145,35 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     await connectDB();
-    
+
     const body = await request.json();
-    const { id, status, notes } = body;
-    
+    const { id, status, notes, seen } = body; // 👈 allow seen in body if needed
+
     if (!id) {
       return NextResponse.json(
         { success: false, message: 'Submission ID is required' },
         { status: 400 }
       );
     }
-    
+
     const updateData = { lastUpdated: new Date() };
     if (status) updateData.status = status;
     if (notes !== undefined) updateData.notes = notes;
-    
+    if (typeof seen === 'boolean') updateData.seen = seen; // optional
+
     const submission = await ContactForm.findByIdAndUpdate(
       id,
       updateData,
       { new: true }
     );
-    
+
     if (!submission) {
       return NextResponse.json(
         { success: false, message: 'Submission not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({
       success: true,
       result: submission,
@@ -169,26 +192,26 @@ export async function PUT(request) {
 export async function DELETE(request) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
       return NextResponse.json(
         { success: false, message: 'Submission ID is required' },
         { status: 400 }
       );
     }
-    
+
     const submission = await ContactForm.findByIdAndDelete(id);
-    
+
     if (!submission) {
       return NextResponse.json(
         { success: false, message: 'Submission not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({
       success: true,
       message: 'Submission deleted successfully'

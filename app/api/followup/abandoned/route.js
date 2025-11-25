@@ -1,3 +1,4 @@
+// app/api/followup/abandoned/route.js
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { RefillsAbandoned } from '@/lib/model/refillsaAbandoned';
@@ -16,25 +17,33 @@ export async function POST(request) {
         const { userSessionId, firstSegment, lastSegmentReached, state, timestamp } = body;
 
         if (!userSessionId) {
-            return NextResponse.json({ success: false, message: 'Missing userSessionId' }, { status: 400 });
+            return NextResponse.json(
+                { success: false, message: 'Missing userSessionId' },
+                { status: 400 }
+            );
         }
 
         const updateFields = {
             firstSegment,
             lastSegmentReached,
             timestamp: timestamp ? new Date(timestamp) : new Date(),
+            seen: true, // ⭐ ALWAYS mark created/updated as seen
         };
+
         if (typeof state === 'number') updateFields.state = state;
 
         const result = await RefillsAbandoned.findOneAndUpdate(
             { userSessionId },
             { $set: updateFields },
-            { new: true, upsert: true }
+            { new: true, upsert: true, setDefaultsOnInsert: true }
         );
 
         return NextResponse.json({ success: true, result });
     } catch (error) {
-        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+        return NextResponse.json(
+            { success: false, message: error.message },
+            { status: 500 }
+        );
     }
 }
 
@@ -44,7 +53,10 @@ export async function GET() {
         const all = await RefillsAbandoned.find().sort({ updatedAt: -1 });
         return NextResponse.json({ success: true, result: all });
     } catch (error) {
-        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+        return NextResponse.json(
+            { success: false, message: error.message },
+            { status: 500 }
+        );
     }
 }
 
@@ -53,15 +65,32 @@ export async function DELETE(request) {
     try {
         const { searchParams } = new URL(request.url);
         const userSessionId = searchParams.get('userSessionId');
+
         if (!userSessionId) {
-            return NextResponse.json({ success: false, message: 'Missing userSessionId' }, { status: 400 });
+            return NextResponse.json(
+                { success: false, message: 'Missing userSessionId' },
+                { status: 400 }
+            );
         }
+
         const deleted = await RefillsAbandoned.findOneAndDelete({ userSessionId });
+
         if (!deleted) {
-            return NextResponse.json({ success: false, message: 'No record found for given userSessionId' }, { status: 404 });
+            return NextResponse.json(
+                { success: false, message: 'No record found for given userSessionId' },
+                { status: 404 }
+            );
         }
-        return NextResponse.json({ success: true, message: 'Deleted successfully', result: deleted });
+
+        return NextResponse.json({
+            success: true,
+            message: 'Deleted successfully',
+            result: deleted,
+        });
     } catch (error) {
-        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+        return NextResponse.json(
+            { success: false, message: error.message },
+            { status: 500 }
+        );
     }
 }

@@ -30,16 +30,17 @@ export default function ContactFormsDashboard() {
   const [pageContentLoading, setPageContentLoading] = useState(true);
   const [isEditingPageContent, setIsEditingPageContent] = useState(false);
   const [editingPageContent, setEditingPageContent] = useState({});
+  const [newlySeenIds, setNewlySeenIds] = useState([]);
+  const [newCount, setNewCount] = useState(0);
 
-  // Fetch submissions
   const fetchSubmissions = async () => {
     setSubmissionsLoading(true);
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: '10',
+        limit: "10",
         status: statusFilter,
-        search: searchTerm
+        search: searchTerm,
       });
 
       const res = await fetch(`/api/contact?${params}`);
@@ -48,13 +49,35 @@ export default function ContactFormsDashboard() {
       if (data.success) {
         setSubmissions(data.result);
         setTotalPages(data.pagination.pages);
+
+        // IMPORTANT FIX: convert both IDs to string
+        const newOnes = data.result.filter((item) => item.seen === true);
+        const newIds = newOnes.map((item) => String(item._id));
+
+        console.log("New IDs found:", newIds);
+        setNewlySeenIds(newIds);
       }
     } catch (error) {
-      console.error('Error fetching submissions:', error);
+      console.error("Error fetching submissions:", error);
     } finally {
       setSubmissionsLoading(false);
     }
   };
+  // AFTER page loads, mark all seen fields = false
+  useEffect(() => {
+    (async () => {
+      try {
+        await fetch("/api/contact/mark-seen", {
+          method: "POST",
+        });
+      } catch (err) {
+        console.error("Error marking contact forms as seen:", err);
+      } finally {
+        window.dispatchEvent(new Event("refreshSidebarCounts"));
+      }
+    })();
+  }, []);
+
 
   // Fetch settings
   const fetchSettings = async () => {
@@ -185,14 +208,144 @@ export default function ContactFormsDashboard() {
 
   return (
     <div className="p-6 w-full mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Contact Form Management</h1>
-        <p className="text-gray-600 mt-2">Manage form submissions and customize form settings</p>
-      </div>
 
       <div className="flex flex-col gap-6">
+        {/* Submissions List */}
+        <div>
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Form Submissions</h2>
+                <div className="flex gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search submissions..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="contacted">Contacted</SelectItem>
+                        <SelectItem value="in_progress">In Progress</SelectItem>
+                        <SelectItem value="resolved">Resolved</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
 
+            <div className="p-6">
+              {submissionsLoading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-20 bg-gray-200 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : submissions.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No submissions found
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {submissions.map((submission) => (
+                    <div
+                      key={submission._id}
+                      className={`border rounded-lg p-4 hover:bg-gray-50 relative ${newlySeenIds.includes(String(submission._id))
+                        ? "bg-green-100 border-green-500"
+                        : ""
+                        }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-medium text-gray-900">
+                              {submission.firstName} {submission.lastName}
+                            </h3>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[submission.status]}`}>
+                              {submission.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <Mail className="w-4 h-4" />
+                              {submission.email}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Phone className="w-4 h-4" />
+                              {submission.phone}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {new Date(submission.submittedAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Interested in: <span className="font-medium">{submission.interestedIn}</span>
+                          </p>
+                          {submission.comments && (
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                              {submission.comments}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          <button
+                            onClick={() => setSelectedSubmission(submission)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                            title="View details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteSubmission(submission._id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded"
+                            title="Delete submission"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-6">
+                  <div className="flex gap-2">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <button
+                        key={i + 1}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`px-3 py-2 rounded ${currentPage === i + 1
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
         {/* Settings Panel */}
         <div className="space-y-6">
           {/* Contact Page Content */}
@@ -556,136 +709,7 @@ export default function ContactFormsDashboard() {
             </div>
           </div>
         </div>
-        {/* Submissions List */}
-        <div>
-          <div className="bg-white rounded-lg shadow-sm border">
-            <div className="p-6 border-b">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Form Submissions</h2>
-                <div className="flex gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search submissions..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="contacted">Contacted</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="resolved">Resolved</SelectItem>
-                        <SelectItem value="closed">Closed</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
 
-            <div className="p-6">
-              {submissionsLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="animate-pulse">
-                      <div className="h-20 bg-gray-200 rounded"></div>
-                    </div>
-                  ))}
-                </div>
-              ) : submissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  No submissions found
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {submissions.map((submission) => (
-                    <div key={submission._id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-medium text-gray-900">
-                              {submission.firstName} {submission.lastName}
-                            </h3>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[submission.status]}`}>
-                              {submission.status}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <div className="flex items-center gap-1">
-                              <Mail className="w-4 h-4" />
-                              {submission.email}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Phone className="w-4 h-4" />
-                              {submission.phone}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              {new Date(submission.submittedAt).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Interested in: <span className="font-medium">{submission.interestedIn}</span>
-                          </p>
-                          {submission.comments && (
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                              {submission.comments}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex gap-2 ml-4">
-                          <button
-                            onClick={() => setSelectedSubmission(submission)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                            title="View details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => deleteSubmission(submission._id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded"
-                            title="Delete submission"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-center mt-6">
-                  <div className="flex gap-2">
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <button
-                        key={i + 1}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`px-3 py-2 rounded ${currentPage === i + 1
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Submission Details Modal */}

@@ -61,7 +61,7 @@ const frontendItems = [
   { title: "Login Page Content", url: "/dashboard/login-page", icon: KeyRound, allowedRoles: ["A"] },
   { title: "FAQ Component", url: "/dashboard/faq", icon: HelpCircle, allowedRoles: ["A"] },
   { title: "Footer", url: "/dashboard/footerUI", icon: Footprints, allowedRoles: ["A"] },
-  { title: "Footer Pages", url: "/dashboard/footer", icon: Columns3 , allowedRoles: ["A"] },
+  { title: "Footer Pages", url: "/dashboard/footer", icon: Columns3, allowedRoles: ["A"] },
   { title: "Contact Forms/UI", url: "/dashboard/contactForms", icon: Contact, allowedRoles: ["A"] },
   { title: "About UI", url: "/dashboard/aboutUI", icon: RectangleEllipsis, allowedRoles: ["A"] },
 ]
@@ -71,6 +71,9 @@ export function AppSidebar() {
   const [unseenCount, setUnseenCount] = useState(0)
   const [unseenQuestionnaireCount, setUnseenQuestionnaireCount] = useState(0)
   const [unseenReferralsCount, setUnseenReferralsCount] = useState(0)
+  const [unseenContactFormsCount, setUnseenContactFormsCount] = useState(0)  // 👈 NEW
+  const [unseenRefillsAbandonedCount, setUnseenRefillsAbandonedCount] = useState(0);
+
   const [userType, setUserType] = useState(null)
 
   useEffect(() => {
@@ -113,6 +116,29 @@ export function AppSidebar() {
       console.error("Failed to fetch unseen referrals count", e)
     }
   }
+  // 👇 NEW: contact form unseen (= seen === true) count
+  const fetchUnseenContactFormsCount = async () => {
+    try {
+      // adjust path "/api/contactForm" if your route is named differently
+      const res = await fetch("/api/contact?mode=newCount");
+      const data = await res.json();
+      setUnseenContactFormsCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch unseen contact forms count", e);
+    }
+  };
+  const fetchUnseenRefillsAbandonedCount = async () => {
+    try {
+      // This hits your new API for seen-count of RefillsAbandoned
+      const res = await fetch("/api/followup/abandoned/seen-count");
+      const data = await res.json();
+
+      // count = NEW ones (seen=true by default)
+      setUnseenRefillsAbandonedCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch refill-abandonment count", e);
+    }
+  };
 
   const refetchAllCounts = () => {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
@@ -120,6 +146,9 @@ export function AppSidebar() {
       fetchUnseenQuestionnaireCount();
       fetchUnseenReferralsCount();
       fetchAbandonmentCount(); // NEW
+      fetchUnseenContactFormsCount(); // 👈 NEW
+      fetchUnseenRefillsAbandonedCount();
+
     }
   };
 
@@ -156,6 +185,21 @@ export function AppSidebar() {
       window.removeEventListener("focus", handler)
     }
   }, [effectiveUserType])
+  // 👇 NEW effect for contact forms
+  useEffect(() => {
+    if (effectiveUserType === "A") {               // probably only admin needs this
+      fetchUnseenContactFormsCount();
+      const id = setInterval(fetchUnseenContactFormsCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchUnseenRefillsAbandonedCount();
+      const id = setInterval(fetchUnseenRefillsAbandonedCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
 
   const filteredItems = useMemo(() => {
     return sidebarItems.filter((item) => item.allowedRoles.includes(effectiveUserType || ""))
@@ -240,9 +284,9 @@ export function AppSidebar() {
                           <item.icon size={20} />
                           <span>{item.title}</span>
                         </span>
-                        {item.title === "Refills" && unseenCount > 0 && (
+                        {item.title === "Refills" && (unseenCount + unseenRefillsAbandonedCount) > 0 && (
                           <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                            {unseenCount}
+                            {unseenCount + unseenRefillsAbandonedCount}
                           </span>
                         )}
                         {item.title === "New Patients" && unseenQuestionnaireCount > 0 && (
@@ -284,9 +328,18 @@ export function AppSidebar() {
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild className={isActive ? "bg-white text-black" : ""}>
-                        <Link href={item.url} className="flex items-center gap-2">
-                          <item.icon size={20} />
-                          <span>{item.title}</span>
+                        <Link href={item.url} className="flex items-center justify-between w-full">
+                          <span className="flex items-center gap-2">
+                            <item.icon size={20} />
+                            <span>{item.title}</span>
+                          </span>
+
+                          {/* 👇 New badge for Contact Forms/UI */}
+                          {item.title === "Contact Forms/UI" && unseenContactFormsCount > 0 && (
+                            <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                              {unseenContactFormsCount}
+                            </span>
+                          )}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

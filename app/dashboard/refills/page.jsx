@@ -52,6 +52,21 @@ export default function RefillsPage() {
     const checkboxRef = useRef(null);
     const [newlySeenIds, setNewlySeenIds] = useState([]);
     const [newFormsCount, setNewFormsCount] = useState(0);
+    const [unseenRefillsAbandonedCount, setUnseenRefillsAbandonedCount] = useState(0);
+
+    useEffect(() => {
+        const fetchUnseenRefillsAbandonedCount = async () => {
+            try {
+                const res = await fetch("/api/followup/abandoned/seen-count");
+                const data = await res.json();
+                setUnseenRefillsAbandonedCount(data?.count ?? 0);
+            } catch (e) {
+                console.error("Failed to fetch refill-abandonment count", e);
+            }
+        };
+
+        fetchUnseenRefillsAbandonedCount();
+    }, []);
 
     // Filters state
     const [filters, setFilters] = useState({
@@ -217,14 +232,31 @@ export default function RefillsPage() {
                 </Select>
                 {session?.user?.accounttype === 'A' && (
                     <Link href="/dashboard/followup/abandonment">
-                        <Button
-                            variant="outline"
-                            className="bg-secondary text-white hover:text-white hover:bg-secondary"
-                        >
-                            Refills Abandoned
-                        </Button>
+                        <div className="relative inline-block">
+                            <Button
+                                variant="outline"
+                                className="bg-secondary text-white hover:text-white hover:bg-secondary pr-10"
+                            >
+                                Refills Abandoned
+                            </Button>
+
+                            {unseenRefillsAbandonedCount > 0 && (
+                                <span
+                                    className="
+                        absolute -top-2 -right-2
+                        bg-red-500 text-white text-xs font-bold
+                        rounded-full h-5 w-5 flex items-center justify-center
+                        border-2 border-white
+                        shadow
+                    "
+                                >
+                                    {unseenRefillsAbandonedCount}
+                                </span>
+                            )}
+                        </div>
                     </Link>
                 )}
+
             </div>
 
             {newFormsCount > 0 && (
