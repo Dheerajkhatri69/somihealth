@@ -974,9 +974,11 @@ export default function WebsiteHome() {
                                         {/* Video Thumbnail */}
                                         <div className="relative w-20 h-16 bg-gray-100 rounded overflow-hidden">
                                             {video.poster ? (
-                                                <img
+                                                <Image
                                                     src={video.poster}
                                                     alt={video.title}
+                                                    width={800}     // you can adjust
+                                                    height={450}    // you can adjust
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (

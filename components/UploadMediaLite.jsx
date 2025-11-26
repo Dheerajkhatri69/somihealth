@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-export default function UploadMediaLite({ onUploadComplete = () => {}, onDelete = () => {}, file }) {
+export default function UploadMediaLite({ onUploadComplete = () => { }, onDelete = () => { }, file }) {
   const [secureUrl, setSecureUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,41 +21,45 @@ export default function UploadMediaLite({ onUploadComplete = () => {}, onDelete 
   const isImageUrl = (url) => /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(url);
   const isTextUrl = (url) => /\.txt$/i.test(url);
 
-  const validateFile = (f) => {
+  const validateFile = useCallback((f) => {
     setError('');
     if (!f) return false;
     if (f.size > MAX_SIZE) {
       setError('File is larger than 10MB.');
       return false;
     }
-    // allow: images + text/plain
+
     const ok =
       f.type.startsWith('image/') ||
       f.type === 'text/plain' ||
-      // fallback for some browsers that don’t set type well:
       /\.(txt|jpg|jpeg|png|gif|webp|avif)$/i.test(f.name);
+
     if (!ok) {
       setError('Only images and plain text (.txt) are allowed.');
       return false;
     }
-    return true;
-  };
 
-  const readLocalPreviewIfText = async (f) => {
+    return true;
+  }, [MAX_SIZE, setError]);
+
+  const readLocalPreviewIfText = useCallback(async (f) => {
     if (!f) return;
+
     if (f.type === 'text/plain' || /\.txt$/i.test(f.name)) {
       const txt = await f.text();
-      setTextPreview(txt.slice(0, 8000)); // safety cap
+      setTextPreview(txt.slice(0, 8000));
     } else {
       setTextPreview('');
     }
-  };
+  }, [setTextPreview]);
 
-  const handleUpload = async (f) => {
+  const handleUpload = useCallback(async (f) => {
     if (!validateFile(f)) return;
+
     await readLocalPreviewIfText(f);
 
     setIsLoading(true);
+
     try {
       const formData = new FormData();
       formData.append('file', f);
@@ -76,7 +80,11 @@ export default function UploadMediaLite({ onUploadComplete = () => {}, onDelete 
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [
+    validateFile,
+    readLocalPreviewIfText,
+    onUploadComplete
+  ]);
 
   const onFileInputChange = (e) => {
     const f = e.target.files?.[0];
@@ -100,37 +108,40 @@ export default function UploadMediaLite({ onUploadComplete = () => {}, onDelete 
       e.preventDefault();
       e.stopPropagation();
     };
+
     const onDrop = (e) => {
       prevent(e);
       const f = e.dataTransfer?.files?.[0];
       if (f) handleUpload(f);
-      el.classList.remove('ring-2', 'ring-blue-500');
+      el.classList.remove("ring-2", "ring-blue-500");
     };
+
     const onDragOver = (e) => {
       prevent(e);
-      el.classList.add('ring-2', 'ring-blue-500');
+      el.classList.add("ring-2", "ring-blue-500");
     };
+
     const onDragLeave = (e) => {
       prevent(e);
-      el.classList.remove('ring-2', 'ring-blue-500');
+      el.classList.remove("ring-2", "ring-blue-500");
     };
 
-    el.addEventListener('dragover', onDragOver);
-    el.addEventListener('dragleave', onDragLeave);
-    el.addEventListener('drop', onDrop);
-    el.addEventListener('dragenter', prevent);
-    el.addEventListener('dragend', onDragLeave);
-    el.addEventListener('dragstart', prevent);
+    el.addEventListener("dragover", onDragOver);
+    el.addEventListener("dragleave", onDragLeave);
+    el.addEventListener("drop", onDrop);
+    el.addEventListener("dragenter", prevent);
+    el.addEventListener("dragend", onDragLeave);
+    el.addEventListener("dragstart", prevent);
 
     return () => {
-      el.removeEventListener('dragover', onDragOver);
-      el.removeEventListener('dragleave', onDragLeave);
-      el.removeEventListener('drop', onDrop);
-      el.removeEventListener('dragenter', prevent);
-      el.removeEventListener('dragend', onDragLeave);
-      el.removeEventListener('dragstart', prevent);
+      el.removeEventListener("dragover", onDragOver);
+      el.removeEventListener("dragleave", onDragLeave);
+      el.removeEventListener("drop", onDrop);
+      el.removeEventListener("dragenter", prevent);
+      el.removeEventListener("dragend", onDragLeave);
+      el.removeEventListener("dragstart", prevent);
     };
-  }, []);
+  }, [handleUpload]);
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -165,7 +176,7 @@ export default function UploadMediaLite({ onUploadComplete = () => {}, onDelete 
             >
               {/* upload icon */}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="opacity-80">
-                <path d="M12 16V4m0 0l-4 4m4-4l4 4M6 20h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 16V4m0 0l-4 4m4-4l4 4M6 20h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Choose file
             </button>
@@ -203,7 +214,7 @@ export default function UploadMediaLite({ onUploadComplete = () => {}, onDelete 
                 >
                   {/* trash icon */}
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M3 6h18M8 6v14m8-14v14M10 6l1-2h2l1 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M3 6h18M8 6v14m8-14v14M10 6l1-2h2l1 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                   Delete
                 </button>
@@ -237,7 +248,7 @@ export default function UploadMediaLite({ onUploadComplete = () => {}, onDelete 
                 >
                   Open file
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <path d="M7 17l10-10M11 7h6v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M7 17l10-10M11 7h6v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </a>
               </div>

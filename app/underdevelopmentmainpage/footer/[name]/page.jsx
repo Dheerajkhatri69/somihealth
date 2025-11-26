@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Navbar from "@/components/hero/Navbar";
 import SomiFooter from "@/components/hero/SomiFooter";
 import { Skeleton } from "@/components/ui/skeleton"; // ⬅ shadcn skeleton import
@@ -88,7 +88,7 @@ export default function FooterPage({ params }) {
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchContent = async () => {
+  const fetchContent = useCallback(async () => {
     try {
       const res = await fetch(`/api/footer/${params.name}`);
       const data = await res.json();
@@ -99,11 +99,12 @@ export default function FooterPage({ params }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.name]); // 👍 dependencies used inside the function
 
   useEffect(() => {
     fetchContent();
-  }, [params.name]);
+  }, [fetchContent]);
+  // 👍 react is happy now
 
   return (
     <>

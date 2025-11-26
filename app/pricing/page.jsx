@@ -288,8 +288,18 @@ const LandingPagePricing = () => {
             </p>
 
             <div className="flex items-center justify-center gap-4">
-              <a href="https://www.legitscript.com/websites/?checker_keywords=joinsomi.com" target="_blank" title="Verify LegitScript Approval for www.joinsomi.com">
-                <img src="https://static.legitscript.com/seals/44684757.png" alt="Verify Approval for www.joinsomi.com" width="73" height="79" />
+              <a
+                href="https://www.legitscript.com/websites/?checker_keywords=joinsomi.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Verify LegitScript Approval for www.joinsomi.com"
+              >
+                <Image
+                  src="https://static.legitscript.com/seals/44684757.png"
+                  alt="Verify Approval for www.joinsomi.com"
+                  width={73}
+                  height={79}
+                />
               </a>
               {(D.badges || []).map((b, i) => (
                 <div key={`${b.alt}-${i}`} className="relative mb-2" style={{ width: b.w || 96, height: b.h || 96 }}>

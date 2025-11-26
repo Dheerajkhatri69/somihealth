@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as Lucide from "lucide-react";
 /* -------------------- ROTATING LINE -------------------- */
 export function RotatingLine({ lines, interval = 2200, duration = 450, className = "" }) {
@@ -45,12 +45,14 @@ export function RotatingLine({ lines, interval = 2200, duration = 450, className
         return () => ro.disconnect();
     }, []);
 
-    const pickDifferentColor = (prev) => {
+    const pickDifferentColor = useCallback((prev) => {
         if (COLOR_CLASSES.length < 2) return prev;
+
         let idx = Math.floor(Math.random() * COLOR_CLASSES.length);
         if (idx === prev) idx = (idx + 1) % COLOR_CLASSES.length;
+
         return idx;
-    };
+    }, [COLOR_CLASSES]);
 
     useEffect(() => {
         if (lines.length < 2) return;
@@ -58,27 +60,33 @@ export function RotatingLine({ lines, interval = 2200, duration = 450, className
 
         const cycle = () => {
             if (!aliveRef.current) return;
+
             setAnimating(true);
             nextColorIdxRef.current = pickDifferentColor(curColorIdxRef.current);
 
             tRef.current = setTimeout(() => {
                 if (!aliveRef.current) return;
+
                 curRef.current = (curRef.current + 1) % lines.length;
                 nextRef.current = (nextRef.current + 1) % lines.length;
+
                 setCurrent(curRef.current);
                 setNext(nextRef.current);
+
                 curColorIdxRef.current = nextColorIdxRef.current;
                 setAnimating(false);
+
                 tRef.current = setTimeout(cycle, interval);
             }, duration);
         };
 
         tRef.current = setTimeout(cycle, interval);
+
         return () => {
             aliveRef.current = false;
             clearTimeout(tRef.current);
         };
-    }, [interval, duration, lines.length]);
+    }, [interval, duration, lines.length, pickDifferentColor]);
 
     const curColorClass = COLOR_CLASSES[curColorIdxRef.current];
     const nextColorClass = COLOR_CLASSES[nextColorIdxRef.current];

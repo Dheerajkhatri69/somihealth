@@ -6,6 +6,7 @@ import { useWebsiteData } from "@/contexts/WebsiteDataContext";
 import { NavbarSkeleton, MegaPanelSkeleton } from "@/components/LoadingSkeleton";
 import { MdOutlineTouchApp } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
+import Image from "next/image";
 /* =================== ICONS =================== */
 const Chevron = ({ open }) => (
     <svg className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="currentColor">
@@ -120,11 +121,16 @@ function MegaPanel({ menuKey, onNavigate }) {
 
                                     {/* Refill CTA Card */}
                                     {isRefill && data?.cta && (
+
                                         <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                                            <img
+
+                                            <Image
                                                 src={data.cta.img}
                                                 alt=""
-                                                className="h-full w-full object-cover"
+                                                fill
+                                                className="object-cover"
+                                                sizes="(max-width: 768px) 100vw, 50vw"
+                                                priority={false}   // set to true if this is above the fold
                                             />
 
                                             {/* gradient */}
@@ -135,23 +141,23 @@ function MegaPanel({ menuKey, onNavigate }) {
 
                                             {/* Title */}
                                             <div className="absolute left-4 top-4 right-4">
-                                                <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
+                                                <div className="whitespace-pre-line text-xl font-bold font-SofiaSans tracking-tight text-white drop-shadow">
                                                     {String(data?.cta?.title ?? "").replace(/\\n/g, "\n")}
                                                 </div>
                                             </div>
 
                                             {/* Disabled CTA Button + Coming Soon Badge */}
                                             <div className="absolute bottom-4 left-4">
-                                                <div
-                                                    className="relative inline-flex items-center gap-3 font-SofiaSans rounded-full bg-darkprimary px-5 py-2 font-semibold text-white opacity-60 cursor-not-allowed select-none"
-                                                >
+                                                <div className="relative inline-flex items-center gap-3 font-SofiaSans rounded-full bg-darkprimary px-5 py-2 font-semibold text-white opacity-60 cursor-not-allowed select-none">
                                                     {data.cta.button.label}
                                                     <span className="inline-flex h-7 w-7 items-center justify-center">
                                                         <ArrowRight />
                                                     </span>
                                                 </div>
                                             </div>
+
                                         </div>
+
                                     )}
                                 </div>
                             );
@@ -203,7 +209,14 @@ function MegaPanel({ menuKey, onNavigate }) {
                                     <li key={t.label}>
                                         <Link href={t.href} onClick={onNavigate} className="group flex items-center gap-4 rounded-xl p-2 border-l-2 duration-100 ease-in-out border-secondary hover:border-l-4 hover:border-secondary">
                                             <div className="flex h-12 w-12 items-center justify-center">
-                                                <img src={t.img} alt="" className="h-12 w-12 object-contain" />
+                                                <div className="relative h-12 w-12">
+                                                    <Image
+                                                        src={t.img}
+                                                        alt=""
+                                                        fill
+                                                        className="object-contain"
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <span className="text-lg font-SofiaSans font-medium text-gray-900">{t.label}</span>
@@ -221,9 +234,17 @@ function MegaPanel({ menuKey, onNavigate }) {
                         <div className="md:col-span-4">
                             <div className="text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
                             <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                                <img src={data.cta.img} alt="" className="h-full w-full object-cover" />
 
-                                {/* subtle gradient to improve readability */}
+                                {/* Optimized Image */}
+                                <Image
+                                    src={data.cta.img}
+                                    alt=""
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                />
+
+                                {/* subtle gradient */}
                                 <div
                                     className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
                                     aria-hidden="true"
@@ -231,7 +252,7 @@ function MegaPanel({ menuKey, onNavigate }) {
 
                                 {/* title – top-left */}
                                 <div className="absolute left-4 top-4 right-4">
-                                    <div className="whitespace-pre-line text-xl font-bold tracking-tight text-white drop-shadow">
+                                    <div className="whitespace-pre-line font-SofiaSans text-xl font-bold tracking-tight text-white drop-shadow">
                                         {String(data?.cta?.title ?? '').replace(/\\n/g, '\n')}
                                     </div>
                                 </div>
@@ -241,7 +262,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                                     <Link
                                         href={data.cta.button.href}
                                         onClick={onNavigate}
-                                        className="fx86 inline-flex items-center gap-3 font-SofiaSans  rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                                        className="fx86 inline-flex items-center gap-3 font-SofiaSans rounded-full hover:bg-transparent bg-darkprimary px-5 py-2 font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                                         style={{ "--fx86-base": "transparent" }}
                                     >
                                         {data.cta.button.label}
@@ -250,7 +271,9 @@ function MegaPanel({ menuKey, onNavigate }) {
                                         </span>
                                     </Link>
                                 </div>
+
                             </div>
+
                         </div>
                     </>
                 )}
@@ -395,13 +418,17 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
 
                     {/* CTA block */}
                     <div className="relative aspect-[16/11] mt-4 rounded-2xl overflow-hidden bg-gray-100">
-                        <img
+
+                        {/* Optimized image */}
+                        <Image
                             src={menuData.cta?.img}
                             alt=""
-                            className="h-full w-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 50vw"
                         />
 
-                        {/* subtle gradient to improve readability */}
+                        {/* subtle gradient */}
                         <div
                             className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60"
                             aria-hidden="true"
@@ -414,7 +441,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                             </div>
                         </div>
 
-                        {/* button – bottom-left (DISABLED + Coming Soon) */}
+                        {/* button – bottom-left */}
                         <div className="absolute bottom-4 left-4">
                             <div className="relative inline-flex items-center font-SofiaSans gap-3 rounded-full bg-secondary px-5 py-2 font-semibold text-white opacity-60 cursor-not-allowed select-none">
                                 {menuData.cta?.button?.label}
@@ -423,7 +450,9 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                 </span>
                             </div>
                         </div>
+
                     </div>
+
                 </>
 
             ) : (
@@ -468,22 +497,45 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                         {menuData.treatments?.map((t) => (
                             <li key={t.label} className="flex items-center gap-4">
                                 <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100">
-                                    <img src={t.img} alt="" className="h-12 w-12 object-contain" />
+                                    <div className="relative h-12 w-12">
+                                        <Image
+                                            src={t.img}
+                                            alt=""
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </div>
                                 </div>
-                                <Link href={t.href} onClick={onNavigate} className="flex items-center gap-3 font-SofiaSans text-lg font-medium">
+
+                                <Link
+                                    href={t.href}
+                                    onClick={onNavigate}
+                                    className="flex items-center gap-3 font-SofiaSans text-lg font-medium"
+                                >
                                     <span>{t.label}</span>
                                     {t.badge && (
-                                        <span className="rounded-full bg-darkprimary px-2 py-0.5 text-xs font-semibold text-white">NEW</span>
+                                        <span className="rounded-full bg-darkprimary px-2 py-0.5 text-xs font-semibold text-white">
+                                            NEW
+                                        </span>
                                     )}
                                 </Link>
                             </li>
+
                         ))}
                     </ul>
 
                     {/* CTA */}
                     <div className="mt-8 text-sm font-semibold uppercase tracking-wide text-darkprimary">Get Started</div>
                     <div className="relative aspect-[16/11] mt-4 mb-20 rounded-2xl overflow-hidden bg-gray-100">
-                        <img src={menuData.cta?.img} alt="" className="h-full w-full object-cover" />
+
+                        {/* Optimized hero image */}
+                        <Image
+                            src={menuData.cta?.img}
+                            alt=""
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                        />
 
                         {/* subtle gradient to improve readability */}
                         <div
@@ -494,7 +546,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                         {/* title – top-left */}
                         <div className="absolute left-4 top-4 right-4">
                             <div className="whitespace-pre-line text-xl font-SofiaSans font-bold tracking-tight text-white drop-shadow">
-                                {String(menuData?.cta?.title ?? '').replace(/\\n/g, '\n')}
+                                {String(menuData?.cta?.title ?? "").replace(/\\n/g, "\n")}
                             </div>
                         </div>
 
@@ -512,7 +564,9 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                                 </span>
                             </Link>
                         </div>
+
                     </div>
+
                 </>
             )}
 

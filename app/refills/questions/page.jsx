@@ -117,16 +117,17 @@ export default function PatientRegistrationForm() {
         }
         setUserSessionId(id);
     }, []);
+    // Extract watched values OUTSIDE the useEffect
+    const firstName = watch("firstName");
+    const lastName = watch("lastName");
+    const phone = watch("phone");
+    const email = watch("email");
 
-    // On segment change, update abandonment
     useEffect(() => {
-        const currentData = {
-            firstName: watch("firstName"),
-            lastName: watch("lastName"),
-            phone: watch("phone"),
-            email: watch("email"),
-        };
         if (!userSessionId) return;
+
+        const currentData = { firstName, lastName, phone, email };
+
         fetch("/api/followup/abandoned", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -137,8 +138,10 @@ export default function PatientRegistrationForm() {
                 state: 0,
                 timestamp: new Date().toISOString(),
             }),
-        });
-    }, [currentSegment]);
+        }).catch((err) => console.error("Failed to update abandoned:", err));
+
+    }, [currentSegment, userSessionId, firstName, lastName, phone, email]);
+    ;
 
     const onSubmit = async (data) => {
         const isValid = await trigger();
@@ -325,7 +328,7 @@ export default function PatientRegistrationForm() {
                 )}
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl">
-                {currentSegment === 0 && (
+                    {currentSegment === 0 && (
                         <>
                             <Label>Have you been approved for GLP-1 medication within the last 6 months by a Somi Health provider? <span className="text-red-500">*</span></Label>
                             <div className="flex gap-2 flex-col items-center">
@@ -383,7 +386,7 @@ export default function PatientRegistrationForm() {
                         </div>
                     )}
 
-                    
+
                     {currentSegment === 2 && (
                         <div className="space-y-2">
                             <Label htmlFor="currentWeight">What&apos;s your current weight? <span className="text-red-500">*</span></Label>

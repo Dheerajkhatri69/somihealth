@@ -186,6 +186,19 @@ Email: support@joinsomi.com\n
 Website: joinsomi.com`
     }
 ];
+const formatMessage = (message) => {
+    return message
+        .replace(/{customerName}/g, selectedPatientData.firstName + " " + selectedPatientData.lastName)
+        .replace(/{providerName}/g, session?.user?.fullname || "Somi Health Provider")
+        .replace(/{DOSE}/g, selectedPatientData.medicine === "Semaglutide"
+            ? selectedPatientData.semaglutideDose + "mg"
+            : selectedPatientData.tirzepatideDose + "mg")
+        .replace(/{opioidName}/g, selectedPatientData.medicineAllergy === "yes"
+            ? selectedPatientData.allergyList || "the opioid medication"
+            : "the opioid medication")
+        .replace(/{BMI}/g, selectedPatientData.bmi || "")
+        .replace(/{message}/g, selectedPatientData.providerNote || "");
+};
 
 export const EmailDialog = ({ selectedPatients, selectedEmail, selectedPatientData }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -195,7 +208,7 @@ export const EmailDialog = ({ selectedPatients, selectedEmail, selectedPatientDa
     const { data: session } = useSession();
     useEffect(() => {
         if (selectedTemplate !== "" && selectedPatientData) {
-            const message = preDefinedMessages[selectedTemplate]?.content || '';
+            const message = preDefinedMessages[selectedTemplate]?.content || "";
             setSelectedMessage(formatMessage(message));
         }
     }, [selectedPatientData, selectedTemplate]);
@@ -205,19 +218,6 @@ export const EmailDialog = ({ selectedPatients, selectedEmail, selectedPatientDa
     const TEMPLATE_ID = "template_33dgxbh";
     const PUBLIC_KEY = "JQNcCq1z7OUSglvd9";
 
-    const formatMessage = (message) => {
-        return message
-            .replace(/{customerName}/g, selectedPatientData.firstName + " " + selectedPatientData.lastName)
-            .replace(/{providerName}/g, session?.user?.fullname || "Somi Health Provider")
-            .replace(/{DOSE}/g, selectedPatientData.medicine === "Semaglutide"
-                ? selectedPatientData.semaglutideDose + "mg"
-                : selectedPatientData.tirzepatideDose + "mg")
-            .replace(/{opioidName}/g, selectedPatientData.medicineAllergy === "yes"
-                ? selectedPatientData.allergyList || "the opioid medication"
-                : "the opioid medication")
-            .replace(/{BMI}/g, selectedPatientData.bmi || "")
-            .replace(/{message}/g, selectedPatientData.providerNote || "");
-    };
 
     const handleSendEmail = async (message) => {
         if (!selectedEmail || !message) {

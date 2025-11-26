@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowDownNarrowWide, Menu, Plus, StepBack, StepForward, Timer } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Select,
     SelectContent,
@@ -51,6 +51,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DiagnosisCell } from "@/components/diagnosisCell";
 import { ClinicianAction, ClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 import PillSelect from "@/components/follow_refills";
+import Image from "next/image";
+
+const MDY_REGEX = /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/;
 
 export default function Dashboard() {
     const [patients, setPatients] = useState([]);
@@ -265,22 +268,24 @@ export default function Dashboard() {
         return parts.length > 1 ? parts[1] : '';
     }
 
-    function extractDate(val) {
+    const extractDate = useCallback((val) => {
         if (!val) return null;
         const parts = val.split('_');
         return parts.length > 1 ? new Date(parts[0]) : null;
-    }
-    function isFollowUpExpired(val) {
+    }, []);
+    const isFollowUpExpired = useCallback((val) => {
         const date = extractDate(val);
         if (!date) return false;
         return date < new Date();
-    }
-    function isRefillReminderDue(val) {
+    }, [extractDate]);
+
+    const isRefillReminderDue = useCallback((val) => {
         const date = extractDate(val);
         if (!date) return false;
         const now = new Date();
         return now >= date; // Due on or after the set date
-    }
+    }, [extractDate]);
+
 
     // Count patients for each interval
     const followUpCounts = patients.reduce((acc, patient) => {
@@ -323,13 +328,27 @@ export default function Dashboard() {
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [fromDateStr, setFromDateStr] = useState(""); // "MM / DD / YYYY"
     const [toDateStr, setToDateStr] = useState("");     // "MM / DD / YYYY"
-    const MDY_REGEX = /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/;
 
-    function parseMDYToUTC(dateStr, endOfDay = false) {
+    const parseMDYToUTC = useCallback((dateStr, endOfDay = false) => {
         if (!dateStr || !MDY_REGEX.test(dateStr)) return null;
-        const [mm, dd, yyyy] = dateStr.split("/").map((s) => parseInt(s.trim(), 10));
-        return new Date(Date.UTC(yyyy, mm - 1, dd, endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0, endOfDay ? 999 : 0));
-    }
+
+        const [mm, dd, yyyy] = dateStr
+            .split("/")
+            .map((s) => parseInt(s.trim(), 10));
+
+        return new Date(
+            Date.UTC(
+                yyyy,
+                mm - 1,
+                dd,
+                endOfDay ? 23 : 0,
+                endOfDay ? 59 : 0,
+                endOfDay ? 59 : 0,
+                endOfDay ? 999 : 0
+            )
+        );
+    }, []);
+
 
     function isWithinRange(isoZ, fromUtc, toUtc) {
         const t = new Date(isoZ).getTime(); // ISO with Z is UTC
@@ -338,8 +357,8 @@ export default function Dashboard() {
         const hi = toUtc ? toUtc.getTime() : +Infinity;
         return t >= lo && t <= hi; // inclusive
     }
-    const fromUtc = useMemo(() => parseMDYToUTC(fromDateStr, false), [fromDateStr]);
-    const toUtc = useMemo(() => parseMDYToUTC(toDateStr, true), [toDateStr]);
+    const fromUtc = useMemo(() => parseMDYToUTC(fromDateStr, false), [fromDateStr, parseMDYToUTC]);
+    const toUtc = useMemo(() => parseMDYToUTC(toDateStr, true), [parseMDYToUTC, toDateStr]);
 
     // Add this status counter function
     const getStatusCounts = (patients) => {
@@ -1265,22 +1284,28 @@ export default function Dashboard() {
                                     <TableCell>{patient.glpRecentInjection}</TableCell> */}
 
                                     <TableCell>{patient.medicine}</TableCell>
+
                                     <TableCell className="w-[200px] max-h-20">
                                         <div className="flex gap-1 overflow-x-auto">
                                             {patient.images?.map((image, index) => (
-                                                <img
+                                                <Image
                                                     key={index}
-                                                    src={image} // <-- Use image directly
+                                                    src={image}
                                                     alt={`Preview ${index + 1}`}
+                                                    width={48}      // h-12 = 48px
+                                                    height={48}     // w-12 = 48px
                                                     className="h-12 w-12 object-cover cursor-pointer rounded border flex-shrink-0"
-                                                    onClick={() => setSelectedImageInfo({
-                                                        images: patient.images,
-                                                        index: index
-                                                    })}
+                                                    onClick={() =>
+                                                        setSelectedImageInfo({
+                                                            images: patient.images,
+                                                            index: index,
+                                                        })
+                                                    }
                                                 />
                                             ))}
                                         </div>
                                     </TableCell>
+
 
                                     <TableCell className="whitespace-nowrap">
                                         {patient.semaglutideDose}{" unit: "}{patient.semaglutideUnit}
@@ -1477,13 +1502,17 @@ export default function Dashboard() {
                             <StepBack />
                         </Button>
 
-                        <div className="flex-1 max-h-[70vh] flex justify-center">
+                        <div className="flex-1 max-h-[70vh] flex justify-center relative">
                             {selectedImageInfo && (
-                                <img
-                                    src={selectedImageInfo.images[selectedImageInfo.index]}
-                                    alt="Full preview"
-                                    className="max-h-full max-w-full object-contain"
-                                />
+                                <div className="relative max-h-full max-w-full w-full h-full flex items-center justify-center">
+                                    <Image
+                                        src={selectedImageInfo.images[selectedImageInfo.index]}
+                                        alt="Full preview"
+                                        fill                // <-- dynamically fills container
+                                        className="object-contain"
+                                        sizes="100vw"       // <-- improves performance
+                                    />
+                                </div>
                             )}
                         </div>
 

@@ -266,14 +266,30 @@ export default function Page({ params }) {
 
           <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
             {[1, 2, 3, 6, 7, 8].map((num) => (
-              <img key={num} src={`/pricing/${num}.png`} alt={`Payment method ${num}`} className="h-8 md:h-10 object-contain" loading="lazy" />
+              <Image
+                key={num}
+                src={`/pricing/${num}.png`}
+                alt={`Payment method ${num}`}
+                width={40}         // adjust if needed
+                height={40}        // adjust if needed
+                className="h-8 md:h-10 w-auto object-contain"
+              />
             ))}
           </div>
+
           <div className="flex justify-center gap-2 items-center">
             <div className="mt-2 font-bold text-gray-600">Financing Available</div>
+
             <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
               {[9, 10, 11].map((num) => (
-                <img key={num} src={`/pricing/${num}.png`} alt={`Payment method ${num}`} className="h-6 md:h-8 object-contain" loading="lazy" />
+                <Image
+                  key={num}
+                  src={`/pricing/${num}.png`}
+                  alt={`Financing method ${num}`}
+                  width={32}        // adjust sizes
+                  height={32}
+                  className="h-6 md:h-8 w-auto object-contain"
+                />
               ))}
             </div>
           </div>

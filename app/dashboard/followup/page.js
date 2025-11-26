@@ -56,6 +56,36 @@ import FollowupShowAssig from "@/components/followupshowassign";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FollowupClinicianAction, FollowupClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 import PillSelect from "@/components/follow_refills";
+import Image from "next/image";
+
+
+const MDY_REGEX = /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/;
+function parseMDYToUTC(dateStr, endOfDay = false) {
+    if (!dateStr || !MDY_REGEX.test(dateStr)) return null;
+    const [mm, dd, yyyy] = dateStr.split("/").map((s) => parseInt(s.trim(), 10));
+
+    return new Date(
+        Date.UTC(
+            yyyy,
+            mm - 1,
+            dd,
+            endOfDay ? 23 : 0,
+            endOfDay ? 59 : 0,
+            endOfDay ? 59 : 0,
+            endOfDay ? 999 : 0
+        )
+    );
+}
+
+function isWithinRange(isoZ, fromUtc, toUtc) {
+    const t = new Date(isoZ).getTime();
+    if (Number.isNaN(t)) return false;
+
+    const lo = fromUtc ? fromUtc.getTime() : -Infinity;
+    const hi = toUtc ? toUtc.getTime() : +Infinity;
+
+    return t >= lo && t <= hi;
+}
 
 export default function FollowUp() {
     const [patients, setPatients] = useState([]);
@@ -188,13 +218,18 @@ export default function FollowUp() {
 
     useEffect(() => {
         if (selectedPatients.length > 0) {
-            const selectedPatient = patients.find(p => p.authid === selectedPatients[0]);
+            const selectedPatient = patients.find(
+                p => p.authid === selectedPatients[0]
+            );
+
             setSelectedEmail(selectedPatient?.email || '');
-            setSelectedPatientData(selectedPatient); // store full patient info
+            setSelectedPatientData(selectedPatient);
         } else {
             setSelectedEmail('');
+            setSelectedPatientData(null);
         }
-    }, [selectedPatients]);
+    }, [selectedPatients, patients]);
+
     const [deleteReason, setDeleteReason] = useState("");
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -286,24 +321,16 @@ export default function FollowUp() {
 
     const [fromDateStr, setFromDateStr] = useState(""); // "MM / DD / YYYY"
     const [toDateStr, setToDateStr] = useState("");     // "MM / DD / YYYY"
-    const MDY_REGEX = /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/;
 
-    function parseMDYToUTC(dateStr, endOfDay = false) {
-        if (!dateStr || !MDY_REGEX.test(dateStr)) return null;
-        const [mm, dd, yyyy] = dateStr.split("/").map((s) => parseInt(s.trim(), 10));
-        return new Date(Date.UTC(yyyy, mm - 1, dd, endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0, endOfDay ? 999 : 0));
-    }
+    const fromUtc = useMemo(
+        () => parseMDYToUTC(fromDateStr, false),
+        [fromDateStr]
+    );
 
-    function isWithinRange(isoZ, fromUtc, toUtc) {
-        const t = new Date(isoZ).getTime(); // ISO with Z is UTC
-        if (Number.isNaN(t)) return false;
-        const lo = fromUtc ? fromUtc.getTime() : -Infinity;
-        const hi = toUtc ? toUtc.getTime() : +Infinity;
-        return t >= lo && t <= hi; // inclusive
-    }
-    const fromUtc = useMemo(() => parseMDYToUTC(fromDateStr, false), [fromDateStr]);
-    const toUtc = useMemo(() => parseMDYToUTC(toDateStr, true), [toDateStr]);
-
+    const toUtc = useMemo(
+        () => parseMDYToUTC(toDateStr, true),
+        [toDateStr]
+    );
     // Add this status counter function
     const getStatusCounts = (patients) => {
         return {
@@ -1207,23 +1234,29 @@ export default function FollowUp() {
                                             {patient.images
                                                 ?.filter(image => typeof image === "string" && image.trim() !== "")
                                                 .map((image, index) => (
-                                                    <img
+                                                    <div
                                                         key={index}
-                                                        src={image}
-                                                        alt={`Preview ${index + 1}`}
-                                                        className="h-12 w-12 object-cover cursor-pointer rounded border flex-shrink-0"
+                                                        className="h-12 w-12 overflow-hidden rounded border flex-shrink-0 cursor-pointer"
                                                         onClick={() =>
                                                             setSelectedImageInfo({
-                                                                images: patient.images.filter(img => typeof img === "string" && img.trim() !== ""),
+                                                                images: patient.images.filter(
+                                                                    img => typeof img === "string" && img.trim() !== ""
+                                                                ),
                                                                 index: index,
                                                             })
                                                         }
-                                                    />
+                                                    >
+                                                        <Image
+                                                            src={image}
+                                                            alt={`Preview ${index + 1}`}
+                                                            width={48}
+                                                            height={48}
+                                                            className="object-cover h-12 w-12"
+                                                        />
+                                                    </div>
                                                 ))}
                                         </div>
                                     </TableCell>
-
-
                                     <TableCell className="whitespace-nowrap">
                                         {patient.semaglutideDose}{" unit: "}{patient.semaglutideUnit}
                                     </TableCell>
@@ -1426,11 +1459,14 @@ export default function FollowUp() {
 
                         <div className="flex-1 max-h-[70vh] flex justify-center">
                             {selectedImageInfo && (
-                                <img
-                                    src={selectedImageInfo.images[selectedImageInfo.index]}
-                                    alt="Full preview"
-                                    className="max-h-full max-w-full object-contain"
-                                />
+                                <div className="relative max-h-full max-w-full">
+                                    <Image
+                                        src={selectedImageInfo.images[selectedImageInfo.index]}
+                                        alt="Full preview"
+                                        fill            // ← lets the image auto-scale inside the container
+                                        className="object-contain"
+                                    />
+                                </div>
                             )}
                         </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Save, ArrowLeft, X } from 'lucide-react';
@@ -23,9 +23,8 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [routeId]);
-
-  async function load() {
+  // useCallback makes `load` stable so it can be safely used in useEffect
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       // menus for categories
@@ -44,7 +43,13 @@ export default function EditProductPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [routeId, router]);
+  // ↑ dependencies used inside the function
+
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   function handleInputChange(field, value) {
     setFormData(prev => {

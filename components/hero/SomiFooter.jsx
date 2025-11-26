@@ -221,16 +221,32 @@ export default function SomiFooter() {
 
                     {/* Badges */}
                     <div>
-                        <a href="https://www.legitscript.com/websites/?checker_keywords=joinsomi.com" target="_blank" title="Verify LegitScript Approval for www.joinsomi.com">
-                            <img src="https://static.legitscript.com/seals/44684757.png" alt="Verify Approval for www.joinsomi.com" width="73" height="79" />
+                        <a
+                            href="https://www.legitscript.com/websites/?checker_keywords=joinsomi.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Verify LegitScript Approval for www.joinsomi.com"
+                        >
+                            <Image
+                                src="https://static.legitscript.com/seals/44684757.png"
+                                alt="Verify Approval for www.joinsomi.com"
+                                width={73}
+                                height={79}
+                            />
                         </a>
                         {footerData?.badges?.map((badge, index) => (
-                            <img
+                            <div
                                 key={index}
-                                src={badge.image}
-                                alt={badge.alt}
-                                className="h-20 mb-4 w-auto hover:scale-105 transition-transform duration-200"
-                            />
+                                className="relative h-20 w-auto mb-4 hover:scale-105 transition-transform duration-200"
+                            >
+                                <Image
+                                    src={badge.image}
+                                    alt={badge.alt}
+                                    fill
+                                    className="object-contain"
+                                    sizes="80px"
+                                />
+                            </div>
                         ))}
                     </div>
 
@@ -260,11 +276,11 @@ export default function SomiFooter() {
                         </ul>
                     </div>
                 </div>
-                
-            <div className="flex items-center gap-1 mt-2">
-                <Copyright size={16} className="mb-[2px]" />
-                <span>{new Date().getFullYear()} Somi Health</span>
-            </div>
+
+                <div className="flex items-center gap-1 mt-2">
+                    <Copyright size={16} className="mb-[2px]" />
+                    <span>{new Date().getFullYear()} Somi Health</span>
+                </div>
             </div>
         </footer>
     );

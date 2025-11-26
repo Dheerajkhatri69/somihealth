@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useWebsiteData } from "@/contexts/WebsiteDataContext";
@@ -29,6 +29,13 @@ function ArrowRight() {
     </svg>
   );
 }
+// ⬆️ OUTSIDE COMPONENT (top of file)
+const COLOR_CLASSES = [
+  "text-[#9e9eff]",
+  "text-[#006db0]",
+  "text-[#0093af]",
+  "text-[#8a8aee]",
+];
 
 export function AnimatedTitle({
   items = [],
@@ -38,22 +45,20 @@ export function AnimatedTitle({
   duration = 450,
   className = "",
 }) {
-  const COLOR_CLASSES = [
-    "text-[#9e9eff]",
-    "text-[#006db0]",
-    "text-[#0093af]",
-    "text-[#8a8aee]",
-  ];
 
-  const safeItems = Array.isArray(items) && items.length > 0 ? items : [""];
-  const longestItem = useMemo(
-    () =>
-      safeItems.reduce(
-        (a, b) => (String(b).length > String(a).length ? b : a),
-        ""
-      ),
-    [safeItems]
+  // Memoize safeItems so it is stable
+  const safeItems = useMemo(
+    () => (Array.isArray(items) && items.length > 0 ? items : [""]),
+    [items]
   );
+
+  // Now safe to use as dependency
+  const longestItem = useMemo(() => {
+    return safeItems.reduce(
+      (a, b) => (String(b).length > String(a).length ? b : a),
+      ""
+    );
+  }, [safeItems]);
 
   const [animating, setAnimating] = useState(false);
 
@@ -70,12 +75,12 @@ export function AnimatedTitle({
   const aliveRef = useRef(true);
   const tRef = useRef(null);
 
-  const pickDifferentColor = (prev) => {
+  const pickDifferentColor = useCallback((prev) => {
     if (COLOR_CLASSES.length < 2) return prev;
     let idx = Math.floor(Math.random() * COLOR_CLASSES.length);
     if (idx === prev) idx = (idx + 1) % COLOR_CLASSES.length;
     return idx;
-  };
+  }, []);  // NO dependencies needed — COLOR_CLASSES is a constant
 
   useEffect(() => {
     aliveRef.current = true;
@@ -106,7 +111,7 @@ export function AnimatedTitle({
       aliveRef.current = false;
       if (tRef.current) clearTimeout(tRef.current);
     };
-  }, [interval, duration, safeItems.length]);
+  }, [interval, duration, safeItems.length, pickDifferentColor]);
 
   const currentText = safeItems[curItemIdxRef.current] ?? "";
   const nextText = safeItems[nextItemIdxRef.current] ?? "";

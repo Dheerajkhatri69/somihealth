@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,16 +13,17 @@ export default function FooterEditor({ params }) {
     const [page, setPage] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const loadPage = async () => {
+    const loadPage = useCallback(async () => {
         const res = await fetch(`/api/footer/${params.name}`);
         const data = await res.json();
         if (data.success) setPage(data.result);
         setLoading(false);
-    };
+    }, [params.name]);
+
 
     useEffect(() => {
         loadPage();
-    }, []);
+    }, [loadPage]);
 
     // ---- Add new block ----
     const addBlock = (type) => {
@@ -57,7 +58,7 @@ export default function FooterEditor({ params }) {
     };
 
     if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>
-        
+
     if (!page) return <p className="p-8">Page not found.</p>;
 
     return (

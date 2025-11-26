@@ -217,11 +217,11 @@ export default function CategoriesGrid() {
               {items.map((_, i) => (
                 <button
                   key={i}
-                  aria-selected={i === mobileCurrent}
+                  aria-pressed={i === mobileCurrent}
                   onClick={() => mobileApi?.scrollTo(i)}
                   className={`h-1.5 w-24 rounded-full transition-colors ${i === mobileCurrent
-                    ? "bg-secondary"
-                    : "bg-secondary/40 hover:bg-secondary/60"
+                      ? "bg-secondary"
+                      : "bg-secondary/40 hover:bg-secondary/60"
                     }`}
                 />
               ))}

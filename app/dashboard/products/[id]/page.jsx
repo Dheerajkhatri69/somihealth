@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Pencil, DollarSign, Package, Star } from 'lucide-react';
 import { Trash } from 'lucide-react';
@@ -14,22 +14,26 @@ export default function ProductDetailsPage() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => { load(); /* eslint-disable-next-line */ }, [routeId]);
-
-    async function load() {
+    const load = useCallback(async () => {
         setLoading(true);
         try {
             const p = await resolveProductByAnyKey(routeId);
-            if (!p) throw new Error('Not found');
+            if (!p) throw new Error("Not found");
+
             setProduct(p);
         } catch (e) {
             console.error(e);
-            router.push('/dashboard/products');
+            router.push("/dashboard/products");
         } finally {
             setLoading(false);
         }
-    }
+    }, [routeId, router]);
+    // ↑ dependencies used inside load()
 
+
+    useEffect(() => {
+        load();
+    }, [load]);
     async function onDelete() {
         if (!confirm('Delete this product?')) return;
         try {

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState, useEffect, useCallback } from "react"
 import { usePathname } from "next/navigation"
 import {
   History,
@@ -140,17 +140,29 @@ export function AppSidebar() {
     }
   };
 
-  const refetchAllCounts = () => {
+  const refetchAllCounts = useCallback(() => {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
       fetchUnseenCount();
       fetchUnseenQuestionnaireCount();
       fetchUnseenReferralsCount();
-      fetchAbandonmentCount(); // NEW
-      fetchUnseenContactFormsCount(); // 👈 NEW
+      fetchAbandonmentCount();
+      fetchUnseenContactFormsCount();
       fetchUnseenRefillsAbandonedCount();
-
     }
-  };
+  }, [effectiveUserType]);  // <-- only real dependency
+
+
+  useEffect(() => {
+    const handler = () => refetchAllCounts();
+
+    window.addEventListener("refreshSidebarCounts", handler);
+    window.addEventListener("focus", handler);
+
+    return () => {
+      window.removeEventListener("refreshSidebarCounts", handler);
+      window.removeEventListener("focus", handler);
+    };
+  }, [effectiveUserType, refetchAllCounts]);
 
   useEffect(() => {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
@@ -176,15 +188,6 @@ export function AppSidebar() {
     }
   }, [effectiveUserType])
 
-  useEffect(() => {
-    const handler = () => refetchAllCounts()
-    window.addEventListener("refreshSidebarCounts", handler)
-    window.addEventListener("focus", handler)
-    return () => {
-      window.removeEventListener("refreshSidebarCounts", handler)
-      window.removeEventListener("focus", handler)
-    }
-  }, [effectiveUserType])
   // 👇 NEW effect for contact forms
   useEffect(() => {
     if (effectiveUserType === "A") {               // probably only admin needs this

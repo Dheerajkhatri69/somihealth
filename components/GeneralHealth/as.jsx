@@ -321,12 +321,13 @@ const Page = ({ params }) => {
                     </div>
                     <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
                         {[1, 2, 3, 6, 7, 8].map((num) => (
-                            <img
+                            <Image
                                 key={num}
                                 src={`/pricing/${num}.png`}
                                 alt={`Payment method ${num}`}
-                                className="h-8 md:h-10 object-contain"
-                                loading="lazy"
+                                width={40}         // controls intrinsic size (does NOT affect UI)
+                                height={40}
+                                className="h-8 md:h-10 w-auto object-contain"
                             />
                         ))}
                     </div>
@@ -334,12 +335,13 @@ const Page = ({ params }) => {
                         <div className='mt-2 font-bold text-gray-600'>Financing Available</div>
                         <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-center mt-2">
                             {[9, 10, 11].map((num) => (
-                                <img
+                                <Image
                                     key={num}
                                     src={`/pricing/${num}.png`}
                                     alt={`Payment method ${num}`}
-                                    className="h-6 md:h-8 object-contain"
-                                    loading="lazy"
+                                    width={32}        // intrinsic width (does NOT affect styling)
+                                    height={32}
+                                    className="h-6 md:h-8 w-auto object-contain"
                                 />
                             ))}
                         </div>
@@ -379,11 +381,12 @@ const Page = ({ params }) => {
                         disabled={!summary.paypal}
                     >
                         <div className="flex items-center justify-center gap-3">
-                            <img
+                            <Image
                                 src="/pricing/8.png"
                                 alt="PayPal"
-                                className="h-6 md:h-8 object-contain"
-                                loading="lazy"
+                                width={32}        // intrinsic width (does NOT affect your Tailwind sizing)
+                                height={32}
+                                className="h-6 md:h-8 w-auto object-contain"
                             />
                             <span>Pay via PayPal</span>
                         </div>

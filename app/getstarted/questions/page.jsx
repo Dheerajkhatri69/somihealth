@@ -232,13 +232,18 @@ export default function PatientRegistrationForm() {
     setUserSessionId(id);
   }, []);
 
-  // Update database on every segment change
+  // 1️⃣ Watch values OUTSIDE the useEffect
+  const firstName = watch("firstName");
+  const lastName = watch("lastName");
+  const phone = watch("phone");
+  const email = watch("email");
+
   useEffect(() => {
     const currentData = {
-      firstName: watch("firstName"),
-      lastName: watch("lastName"),
-      phone: watch("phone"),
-      email: watch("email"),
+      firstName,
+      lastName,
+      phone,
+      email,
     };
 
     setLastVisitedSegment(currentSegment);
@@ -258,22 +263,20 @@ export default function PatientRegistrationForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     }).catch((err) => console.error("Segment update failed:", err));
-  }, [currentSegment]); // <-- runs on *every* segment change
 
-  // Update firstSegment if changed in Segment 0
+  }, [currentSegment, userSessionId, firstName, lastName, phone, email]);
+
   useEffect(() => {
     if (currentSegment !== 0 || !userSessionId) return;
 
-    const currentData = {
-      firstName: watch("firstName"),
-      lastName: watch("lastName"),
-      phone: watch("phone"),
-      email: watch("email"),
-    };
+    const currentData = { firstName, lastName, phone, email };
 
-    const changed = JSON.stringify(currentData) !== JSON.stringify(previousBasicData);
+    const changed =
+      JSON.stringify(currentData) !== JSON.stringify(previousBasicData);
+
     if (changed) {
       setPreviousBasicData(currentData);
+
       fetch("/api/abandoned", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -286,7 +289,16 @@ export default function PatientRegistrationForm() {
         }),
       }).catch((err) => console.error("Basic info update failed:", err));
     }
-  }, [watch("firstName"), watch("lastName"), watch("phone"), watch("email"), currentSegment]);
+  }, [
+    firstName,
+    lastName,
+    phone,
+    email,
+    currentSegment,
+    previousBasicData,
+    userSessionId,
+  ]);
+
 
   // Render ineligible state
   if (showIneligible) {

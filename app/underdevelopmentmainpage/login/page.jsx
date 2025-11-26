@@ -16,6 +16,7 @@ import {
     CardTitle,
     CardDescription,
 } from "@/components/ui/card";
+import Image from "next/image";
 
 export default function LoginPage() {
     const [show, setShow] = useState(false);
@@ -213,16 +214,20 @@ export default function LoginPage() {
                 </Card>
             </div>
 
-            {/* Right side image */}
             {hero.showRightPanel !== false && (
                 <div className="w-full hidden md:block bg-lightprimary-foreground md:w-1/2">
                     <div className="flex h-screen items-center justify-center">
                         <Card className="w-full max-w-xl m-2 border-0 shadow-none rounded-3xl">
-                            <img
-                                src={hero.imageSrc || "/hero/compounded-glp1.png"}
-                                alt={hero.imageAlt || "Somi — patient care"}
-                                className="h-full w-full object-cover rounded-3xl"
-                            />
+                            <div className="relative w-full h-[600px] rounded-3xl overflow-hidden">
+                                <Image
+                                    src={hero.imageSrc || "/hero/compounded-glp1.png"}
+                                    alt={hero.imageAlt || "Somi — patient care"}
+                                    fill
+                                    priority
+                                    className="object-cover rounded-3xl"
+                                />
+                            </div>
+
                         </Card>
                     </div>
                 </div>

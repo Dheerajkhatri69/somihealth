@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Plus, Edit, Save, X, Trash2, Eye, Mail, Phone, Calendar, Search, Filter, Settings, Image as ImageIcon, Globe } from 'lucide-react';
 import UploadMediaLite from '@/components/UploadMediaLite';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -33,8 +33,9 @@ export default function ContactFormsDashboard() {
   const [newlySeenIds, setNewlySeenIds] = useState([]);
   const [newCount, setNewCount] = useState(0);
 
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = useCallback(async () => {
     setSubmissionsLoading(true);
+
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -50,11 +51,8 @@ export default function ContactFormsDashboard() {
         setSubmissions(data.result);
         setTotalPages(data.pagination.pages);
 
-        // IMPORTANT FIX: convert both IDs to string
         const newOnes = data.result.filter((item) => item.seen === true);
         const newIds = newOnes.map((item) => String(item._id));
-
-        console.log("New IDs found:", newIds);
         setNewlySeenIds(newIds);
       }
     } catch (error) {
@@ -62,58 +60,55 @@ export default function ContactFormsDashboard() {
     } finally {
       setSubmissionsLoading(false);
     }
+  }, [currentPage, statusFilter, searchTerm]);
+
+  const markAllSeen = async () => {
+    try {
+      await fetch("/api/contact/mark-seen", { method: "POST" });
+    } catch (err) {
+      console.error("Error marking contact forms as seen:", err);
+    } finally {
+      window.dispatchEvent(new Event("refreshSidebarCounts"));
+    }
   };
-  // AFTER page loads, mark all seen fields = false
+
   useEffect(() => {
-    (async () => {
-      try {
-        await fetch("/api/contact/mark-seen", {
-          method: "POST",
-        });
-      } catch (err) {
-        console.error("Error marking contact forms as seen:", err);
-      } finally {
-        window.dispatchEvent(new Event("refreshSidebarCounts"));
-      }
-    })();
+    markAllSeen();
   }, []);
 
-
-  // Fetch settings
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     setSettingsLoading(true);
     try {
-      const res = await fetch('/api/contact-form-settings');
+      const res = await fetch("/api/contact-form-settings");
       const data = await res.json();
-
       if (data.success) {
         setSettings(data.result);
         setEditingSettings(data.result);
       }
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      console.error("Error fetching settings:", error);
     } finally {
       setSettingsLoading(false);
     }
-  };
+  }, []);
 
-  // Update submission status
-  const updateSubmissionStatus = async (id, status, notes = '') => {
+  const updateSubmissionStatus = async (id, status, notes = "") => {
     try {
-      const res = await fetch('/api/contact', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status, notes })
+      const res = await fetch("/api/contact", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status, notes }),
       });
 
       const data = await res.json();
+
       if (data.success) {
-        fetchSubmissions();
+        await fetchSubmissions(); // refresh table
         setSelectedSubmission(null);
-        setSubmissionNotes('');
+        setSubmissionNotes("");
       }
     } catch (error) {
-      console.error('Error updating submission:', error);
+      console.error("Error updating submission:", error);
     }
   };
 
@@ -155,12 +150,11 @@ export default function ContactFormsDashboard() {
   };
 
   // Fetch contact page content
-  const fetchPageContent = async () => {
+  const fetchPageContent = useCallback(async () => {
     setPageContentLoading(true);
     try {
       const res = await fetch('/api/contact-page-content');
       const data = await res.json();
-
       if (data.success) {
         setPageContent(data.result);
         setEditingPageContent(data.result);
@@ -170,7 +164,7 @@ export default function ContactFormsDashboard() {
     } finally {
       setPageContentLoading(false);
     }
-  };
+  }, []);
 
   // Save contact page content
   const savePageContent = async () => {
@@ -196,7 +190,7 @@ export default function ContactFormsDashboard() {
     fetchSubmissions();
     fetchSettings();
     fetchPageContent();
-  }, [currentPage, statusFilter, searchTerm]);
+  }, [fetchSubmissions, fetchSettings, fetchPageContent]);
 
   const statusColors = {
     new: 'bg-blue-100 text-blue-800',
