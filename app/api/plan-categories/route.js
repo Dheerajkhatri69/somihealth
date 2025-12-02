@@ -19,11 +19,12 @@ function dedupeByIdName(arr) {
         if (!key) continue;
         if (!seen.has(key)) {
             seen.add(key);
-            out.push({ idname: key, title: x.title || key, image: x.image || '' });
+            out.push({ ...x, idname: key });
         }
     }
     return out;
 }
+
 
 export async function GET() {
     try {
@@ -38,6 +39,10 @@ export async function GET() {
             idname: String(o.idname || '').toLowerCase(),
             title: o.title || o.idname || '',
             image: o.image || '',
+
+            // ⭐ ADD THESE 2 FIELDS
+            bannerBehind: o.bannerBehind || '',
+            bannerBehindShow: o.bannerBehindShow ?? false,
         }));
 
         // Pull from PricingWeightLoss.options (Weight Loss schema)
@@ -49,6 +54,10 @@ export async function GET() {
             idname: String(o.idname || '').toLowerCase(),
             title: o.title || o.idname || '',
             image: o.image || '',
+
+            // ⭐ SAME BANNER FIELDS
+            bannerBehind: o.bannerBehind || '',
+            bannerBehindShow: o.bannerBehindShow ?? false,
         }));
 
         // Merge landing options + weight loss options, then dedupe by idname

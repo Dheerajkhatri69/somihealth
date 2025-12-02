@@ -171,7 +171,7 @@ const LandingPagePricing = () => {
       </Head>
 
       <main>
-        <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center font-SofiaSans bg-gradient-to-br from-white to-blue-50 p-4">
           <div className="w-full max-w-7xl flex flex-col items-center">
             <div className="relative w-full flex items-start justify-between mb-12">
               {/* Left: Back button */}

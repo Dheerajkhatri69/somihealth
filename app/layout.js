@@ -7,10 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   metadataBase: new URL("https://www.app-joinsomi.com"),
-  title: {
-    default: "Async",
-    template: "%s · Async",
-  },
+  title: "Async", // <-- FIXED: No template, no auto suffix
   description: "Async — sign in to your account",
   applicationName: "Async",
   openGraph: {

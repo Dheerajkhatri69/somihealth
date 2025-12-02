@@ -132,7 +132,7 @@ const WeightLossPagePricing = () => {
             </Head>
 
             <main>
-                <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
+                <div className="min-h-[100dvh] flex flex-col font-SofiaSans items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
                     <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-gray-100 px-6 flex flex-col items-center">
                         {/* Header Section */}
                         <div className='w-full flex items-start justify-between'>

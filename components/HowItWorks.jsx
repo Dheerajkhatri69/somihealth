@@ -43,62 +43,55 @@ export default function HowItWorks({ content = HOW_IT_WORKS_CONTENT }) {
   return (
     <section className="w-full">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <div className="grid gap-10 md:grid-cols-2 items-center">
-          {/* LEFT — image */}
-          <div className="relative w-full h-[320px] sm:h-[400px] md:h-full overflow-hidden rounded-[24px] ring-1 ring-black/5 shadow-sm">
-            <Image
-              src={image?.src || "/images/placeholder.jpg"}
-              alt={image?.alt || ""}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-              priority
-            />
-          </div>
 
-          {/* RIGHT — steps */}
-          <div>
-            <h2 className="font-SofiaSans text-[28px] sm:text-[34px] text-[#2c3a57] mb-8">
-              {title}
-            </h2>
-
-            {/* No vertical line; number badge and text spaced with flex gaps */}
-            <ol className="space-y-8 sm:space-y-10 font-SofiaSans">
-              {steps.map((step) => (
-                <li key={step.number}>
-                  <div className="flex items-start gap-4 sm:gap-5">
-                    {/* Number badge */}
-                    <span className="mt-0.5 inline-flex h-10 w-10 flex-none items-center justify-center rounded-full border-2 border-gray-400 bg-white font-semibold text-[#2c3a57]">
-                      {step.number}
-                    </span>
-
-                    {/* Text */}
-                    <div className="min-w-0">
-                      <h3 className="text-base sm:text-lg font-semibold text-[#2c3a57]">
-                        {step.title}
-                      </h3>
-                      <p className="mt-1 sm:mt-2 text-[17px] leading-7 text-gray-700">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-
-            {/* CTA */}
-            {cta?.text && (
-              <div className="mt-8">
-                <a
-                  href={cta.href || "#"}
-                  className="inline-flex items-center justify-center rounded-full bg-[#2c3a57] px-6 py-3 text-white text-sm font-semibold shadow hover:opacity-90 transition"
-                >
-                  {cta.text}
-                </a>
-              </div>
-            )}
-          </div>
+        {/* IMAGE ON TOP — FULL WIDTH — NATURAL HEIGHT */}
+        <div className="w-full relative overflow-hidden rounded-[24px] ring-1 ring-black/5 shadow-sm mb-10">
+          <Image
+            src={image?.src || "/images/placeholder.jpg"}
+            alt={image?.alt || ""}
+            width={1600}
+            height={0}
+            className="w-full h-auto object-cover"
+            priority
+          />
         </div>
+
+        {/* CONTENT BELOW IMAGE */}
+        <h2 className="font-SofiaSans text-[28px] sm:text-[34px] text-[#2c3a57] mb-8">
+          {title}
+        </h2>
+
+        <ol className="space-y-8 sm:space-y-10 font-SofiaSans">
+          {steps.map((step) => (
+            <li key={step.number}>
+              <div className="flex items-start gap-4 sm:gap-5">
+                <span className="mt-0.5 inline-flex h-10 w-10 flex-none items-center justify-center rounded-full border-2 border-gray-400 bg-white font-semibold text-[#2c3a57]">
+                  {step.number}
+                </span>
+
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#2c3a57]">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1 sm:mt-2 text-[17px] leading-7 text-gray-700">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        {cta?.text && (
+          <div className="mt-8">
+            <a
+              href={cta.href || "#"}
+              className="inline-flex items-center justify-center rounded-full bg-[#2c3a57] px-6 py-3 text-white text-sm font-semibold shadow hover:opacity-90 transition"
+            >
+              {cta.text}
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

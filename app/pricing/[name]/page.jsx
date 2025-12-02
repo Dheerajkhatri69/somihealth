@@ -57,7 +57,27 @@ export default function Page({ params }) {
         const cRes = await fetch('/api/plan-categories', { cache: 'no-store' });
         const cJson = await cRes.json();
         const categories = Array.isArray(cJson?.result) ? cJson.result : [];
-        const found = categories.find((c) => c.idname === routeId);
+        let found = categories.find((c) => c.idname === routeId);
+
+        // ⭐ Find parent category (weightloss)
+        const weightloss = categories.find((c) => c.idname === "weightloss");
+
+        // ⭐ Sub-products of weightloss
+        const weightlossChildren = [
+          "semaglutide",
+          "tirzepatide",
+          "lipotropic-mic-b12"
+        ];
+
+        // ⭐ Inherit parent banner
+        if (weightloss && weightlossChildren.includes(routeId)) {
+          found = {
+            ...found,
+            bannerBehind: weightloss.bannerBehind,
+            bannerBehindShow: weightloss.bannerBehindShow
+          };
+        }
+
         if (!alive) return;
 
         if (!found) {
@@ -129,7 +149,7 @@ export default function Page({ params }) {
   const handlePayPalCheckout = () => { if (summary.paypal) window.open(summary.paypal, '_blank'); };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
+    <div className="min-h-[100dvh] flex flex-col font-SofiaSans items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
       <Link href="/pricing">
         <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">
           somi
@@ -194,10 +214,10 @@ export default function Page({ params }) {
                     ].join(' ')}
                   >
                     {/* Banner behind the card */}
-                    {isFirst && (
+                    {isFirst && meta?.bannerBehindShow && meta?.bannerBehind && (
                       <div className="h-8 bg-pink-200 px-4 py-4 border-b-8 border-white flex items-center justify-start">
                         <span className="text-secondary font-semibold text-sm">
-                          Recommended for New GLP-1 Patients
+                          {meta.bannerBehind}
                         </span>
                       </div>
                     )}
@@ -242,10 +262,6 @@ export default function Page({ params }) {
             <div className="flex justify-between text-gray-700 font-medium">
               <span>Selected Option</span>
               <span className="font-bold text-right text-secondary">{summary.label || '--'}</span>
-            </div>
-            <div className="flex justify-between text-gray-700 font-medium">
-              <span>Quantity</span>
-              <span className="font-bold text-secondary">{summary.quantity}</span>
             </div>
             <div className="flex justify-between text-gray-700 font-medium">
               <span>Subtotal</span>

@@ -132,9 +132,9 @@ export default function StoriesWithReviews() {
   }
 
   return (
-    <section className="relative w-full bg-white py-10 sm:py-14">
+    <section className="relative w-full bg-white">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <div className="bg-white rounded-3xl px-5 py-8 sm:px-8 sm:py-10">
+        <div className="bg-white rounded-3xl px-5 pt-8 sm:px-8 sm:py-10">
 
           {/* Top Header */}
           <div className="flex flex-col gap-5 sm:flex-row sm:justify-between">

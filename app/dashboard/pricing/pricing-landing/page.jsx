@@ -431,6 +431,46 @@ export default function PricingLandingDashboard() {
                                     />
                                 </div>
                             </div>
+                            {/* Banner Behind Settings */}
+                            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Banner Text
+                                    </label>
+                                    <input
+                                        type="text"
+                                        disabled={!isEditing}
+                                        value={opt.bannerBehind || ''}
+                                        onChange={(e) => {
+                                            const next = [...editing.options];
+                                            next[idx].bannerBehind = e.target.value;
+                                            update('options', next);
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg
+            focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Show Banner?
+                                    </label>
+                                    <select
+                                        disabled={!isEditing}
+                                        value={opt.bannerBehindShow ? 'true' : 'false'}
+                                        onChange={(e) => {
+                                            const next = [...editing.options];
+                                            next[idx].bannerBehindShow = e.target.value === 'true';
+                                            update('options', next);
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg
+            focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    >
+                                        <option value="false">No</option>
+                                        <option value="true">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
 
                             {isEditing && (
                                 <div className="mt-4">
