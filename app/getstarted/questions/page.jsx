@@ -856,37 +856,25 @@ export default function PatientRegistrationForm() {
 
               {/* Accordion Section */}
               <div className="border border-secondary rounded-xl overflow-hidden">
-                <details className="group">
-                  <summary className="cursor-pointer px-4 py-3 bg-white font-medium text-gray-700 flex justify-between items-center">
+                <div>
+                  <div className="cursor-pointer px-4 py-3 bg-white font-medium text-gray-700 flex justify-between items-center">
                     <span>BMI Requirements and Consent</span>
-                    <span className="transition-transform group-open:rotate-180"><ChevronUp /></span>
-                  </summary>
+                  </div>
 
                   <div className="px-4 py-4 space-y-3 text-gray-700">
                     <p>
-                      Traditionally, weight-loss medications are prescribed for individuals with a BMI of 30 or
-                      higher, or for those who are overweight and have related medical conditions. When these
-                      medications are used for someone with a BMI between 20–29 who does not have an associated
-                      health condition, this is considered <strong>off-label use</strong>.
+                      Traditionally, weight-loss medications are prescribed for individuals with a BMI of 30 or higher, or for those who are overweight and have related medical conditions. When these medications are used for someone with a BMI between 20–29 who does not have an associated health condition, this is considered off-label use.
                     </p>
 
                     <p>
-                      “Off-label” means the medication is being prescribed for a purpose, age group, dosage, or
-                      administration method that is not specifically approved by regulatory agencies such as the
-                      U.S. Food and Drug Administration (FDA). Although medications are tested and approved for
-                      certain uses, healthcare providers may determine—based on clinical experience or emerging
-                      research—that they may also be effective in other scenarios.
+                      “Off-label” means the medication is being prescribed for a purpose, age group, dosage, or method of administration that is not specifically approved by regulatory agencies such as the U.S. Food and Drug Administration (FDA). Although medications are tested and approved for certain uses, healthcare providers may determine—based on clinical experience or emerging research—that they can also be beneficial in other scenarios. In your case, potential benefits may include weight reduction even within this BMI range.
                     </p>
 
                     <p>
-                      In your case, potential benefits may include weight reduction even within this BMI range.
-                      If you choose to proceed with this off-label option, it’s important to follow the treatment
-                      plan closely and communicate any issues or concerns.
+                      If you choose to proceed with this off-label option, it’s important to follow the treatment plan closely and communicate any issues or concerns. Please reach out with any questions — we’re here to help.
                     </p>
-
-                    <p>Please reach out with any questions — we’re here to help.</p>
                   </div>
-                </details>
+                </div>
               </div>
 
               <div className="flex space-x-2">
