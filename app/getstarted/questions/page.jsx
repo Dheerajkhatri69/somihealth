@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 import UploadFile from "@/components/FileUpload";
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { ArrowDownWideNarrow, TriangleAlert } from 'lucide-react';
+import { ArrowDownWideNarrow, ChevronUp, TriangleAlert } from 'lucide-react';
 
 // Form validation schema
 const formSchema = z.object({
@@ -101,6 +101,7 @@ const formSchema = z.object({
     }, "You must be at least 18 years old"),
   consent: z.boolean().refine(val => val === true, "You must consent to proceed"),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
+  bmiConsent: z.boolean().refine(val => val === true, "You must agree to the BMI Consent"),
   treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
   agreetopay: z.boolean().refine(val => val === true, "You must consent to agree to pay"),
   glp1StartingWeight: z.string().optional(),
@@ -322,7 +323,7 @@ export default function PatientRegistrationForm() {
     }).catch((err) => console.error("Disqualified state update failed:", err));
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-2">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-2 font-SofiaSans">
         <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col items-center">
           <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
           <h2 className="text-xl md:text-2xl font-semibold text-gray-900 text-center mb-4">
@@ -358,7 +359,7 @@ export default function PatientRegistrationForm() {
   if (showSuccess) {
     // if (true) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4 font-SofiaSans">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
           <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
           {GLPPlan === 'no' && (
@@ -651,7 +652,7 @@ export default function PatientRegistrationForm() {
     switch (segmentId) {
       case 'personal': return ['firstName', 'lastName', 'phone', 'email'];
       case 'age': return ['isOver18'];
-      case 'bmiInfo': return [];
+      case 'bmiInfo': return ['bmiConsent'];
       case 'dob': return ['dob'];
       case 'address': return ['address', 'address2', 'city', 'state', 'zip', 'country'];
       case 'preference': return ['glp1Preference'];
@@ -691,7 +692,7 @@ export default function PatientRegistrationForm() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen " >
+    <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen font-SofiaSans" >
       {/* Sticky header for logo and progress bar */}
       <div className="fixed top-0 left-0 w-full z-40 bg-white">
         <div className="max-w-[500px] mx-auto flex flex-col items-center">
@@ -720,7 +721,6 @@ export default function PatientRegistrationForm() {
         {/* Form segments */}
         <form
           onSubmit={(e) => {
-            console.log('Form submit event triggered');
             handleSubmit(onSubmit)(e);
           }}
           className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl"
@@ -846,23 +846,67 @@ export default function PatientRegistrationForm() {
 
           {/* BMI Information segment */}
           {currentSegment === 2 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Body Max Index (BMI) requirement</h2>
+            <div className="space-y-6">
+              {/* Page Title */}
+              <h2 className="text-2xl font-semibold">BMI Requirements and Consent</h2>
+
               <p className="text-gray-600">
-                FDA guidelines for GLP-1 medications like Semaglutide and Tirzepatide require a BMI of at least 30, or a BMI of at least 27 with a weight-related condition such as:
+                Please review the information below to learn more about this product and its potential side effects.
               </p>
-              <ul className="list-disc pl-5 text-gray-600">
-                <li>Type 2 diabetes</li>
-                <li>Hypertension</li>
-                <li>High cholesterol</li>
-                <li>Sleep apnea</li>
-                <li>Cardiovascular disease</li>
-              </ul>
-              <p className="text-gray-600">
-                These criteria ensure the medication helps those who need GLP-1 therapies for weight loss management.
-              </p>
+
+              {/* Accordion Section */}
+              <div className="border border-secondary rounded-xl overflow-hidden">
+                <details className="group">
+                  <summary className="cursor-pointer px-4 py-3 bg-white font-medium text-gray-700 flex justify-between items-center">
+                    <span>BMI Requirements and Consent</span>
+                    <span className="transition-transform group-open:rotate-180"><ChevronUp /></span>
+                  </summary>
+
+                  <div className="px-4 py-4 space-y-3 text-gray-700">
+                    <p>
+                      Traditionally, weight-loss medications are prescribed for individuals with a BMI of 30 or
+                      higher, or for those who are overweight and have related medical conditions. When these
+                      medications are used for someone with a BMI between 20–29 who does not have an associated
+                      health condition, this is considered <strong>off-label use</strong>.
+                    </p>
+
+                    <p>
+                      “Off-label” means the medication is being prescribed for a purpose, age group, dosage, or
+                      administration method that is not specifically approved by regulatory agencies such as the
+                      U.S. Food and Drug Administration (FDA). Although medications are tested and approved for
+                      certain uses, healthcare providers may determine—based on clinical experience or emerging
+                      research—that they may also be effective in other scenarios.
+                    </p>
+
+                    <p>
+                      In your case, potential benefits may include weight reduction even within this BMI range.
+                      If you choose to proceed with this off-label option, it’s important to follow the treatment
+                      plan closely and communicate any issues or concerns.
+                    </p>
+
+                    <p>Please reach out with any questions — we’re here to help.</p>
+                  </div>
+                </details>
+              </div>
+
+              <div className="flex space-x-2">
+                <input
+                  type="checkbox"
+                  id="bmiConsent"
+                  {...register('bmiConsent')}
+                  className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
+                />
+                <label htmlFor="bmiConsent-checkbox" >
+                  By checking this box, you acknowledge the above statement.
+                </label>
+
+              </div>
+              {errors.bmiConsent && (
+                <p className="text-sm text-red-500">{errors.bmiConsent.message}</p>
+              )}
             </div>
           )}
+
 
           {/* Date of Birth segment */}
           {currentSegment === 3 && (
@@ -2571,7 +2615,6 @@ export default function PatientRegistrationForm() {
               <div className="flex justify-center mt-8">
                 <Button
                   onClick={() => {
-                    console.log('Final form data:', watch());
                     handleSubmit(onSubmit)();
                   }}
                   type="button"

@@ -253,7 +253,7 @@ export default function PatientRegistrationForm() {
 
     if (submissionStatus === 'success') {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4 font-SofiaSans">
                 <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
                     <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
                     <div className="space-y-2 p-4">
@@ -287,7 +287,7 @@ export default function PatientRegistrationForm() {
 
     if (showIneligible) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] font-SofiaSans">
                 <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col items-center">
                     <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
                     <h2 className="text-2xl font-semibold text-gray-900 text-center mb-4">
@@ -307,7 +307,7 @@ export default function PatientRegistrationForm() {
     }
 
     return (
-        <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen">
+        <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen font-SofiaSans">
             <div className="fixed top-0 left-0 w-full bg-white z-40">
                 <div className="max-w-[500px] mx-auto flex flex-col items-center">
                     <div className="font-tagesschrift text-center text-6xl mt-2 mb-2 text-secondary font-bold">somi</div>

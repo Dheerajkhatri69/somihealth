@@ -44,7 +44,7 @@ const LandingPage = () => {
     }
 
     return (
-        <div className="min-h-[100dvh] overflow-hidden flex flex-col items-center justify-center bg-white p-6">
+        <div className="min-h-[100dvh] overflow-hidden flex flex-col items-center justify-center bg-white p-6 font-SofiaSans">
 
             <div className="p-6 bg-white rounded-xl max-w-[500px] overflow-hidden  border border-gray-200 shadow-secondary shadow-2xl ">
 
