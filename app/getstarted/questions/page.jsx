@@ -365,14 +365,13 @@ export default function PatientRegistrationForm() {
           {GLPPlan === 'no' && (
             <>
               <div className="space-y-2 p-4">
-                <div className="relative w-full aspect-square max-w-[300px] mx-auto">
+                <div className="relative w-[424px] h-[300px] mx-auto">
                   <Image
-                    src="/getstartedend.jpg"
-                    alt="Weight Loss"
+                    src="/getstarted.jpg"
+                    alt="Longevity"
                     fill
-                    className="rounded-xl object-contain"
+                    className="rounded-xl object-cover"
                     priority
-                    sizes="(max-width: 768px) 100vw, 300px"
                   />
                 </div>
                 <h3 className="text-lg md:text-x text-center">
@@ -401,14 +400,13 @@ export default function PatientRegistrationForm() {
           {GLPPlan === 'yes' && (
             <>
               <div className="space-y-2 p-4">
-                <div className="relative w-full aspect-square max-w-[300px] mx-auto">
+                <div className="relative w-[424px] h-[300px] mx-auto">
                   <Image
-                    src="/getstartedend.jpg"
-                    alt="Weight Loss"
+                    src="/getstarted.jpg"
+                    alt="Longevity"
                     fill
-                    className="rounded-xl object-contain"
+                    className="rounded-xl object-cover"
                     priority
-                    sizes="(max-width: 768px) 100vw, 300px"
                   />
                 </div>
                 <h3 className="text-lg md:text-x text-center">
