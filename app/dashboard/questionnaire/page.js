@@ -41,6 +41,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import ButtonGroup from "@/components/ButtonGroup";
 
 export default function Dashboard() {
     const [data, setData] = useState([]);
@@ -253,8 +254,9 @@ export default function Dashboard() {
     const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
 
     return (
-        <div className="overflow-x-auto p-4">
+        <div className="overflow-x-auto px-4">
             {/* 🔹 Filters row */}
+            <ButtonGroup />
             <div className="flex flex-wrap gap-2 mb-4">
                 <Input
                     placeholder="Search by name, email, or ID..."

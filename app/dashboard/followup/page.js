@@ -57,6 +57,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FollowupClinicianAction, FollowupClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 import PillSelect from "@/components/follow_refills";
 import Image from "next/image";
+import MainFollowUpButtonGroup from "@/components/MainFollowUpButtonGroup";
 
 
 const MDY_REGEX = /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/;
@@ -640,7 +641,8 @@ export default function FollowUp() {
         )
     }
     return (
-        <div className="overflow-x-auto p-4">
+        <div className="overflow-x-auto px-4">
+            <MainFollowUpButtonGroup/>
             <div className="flex flex-wrap gap-2 mb-4">
                 {userType === 'C' && (
                     <Select value={viewMode} onValueChange={setViewMode}>

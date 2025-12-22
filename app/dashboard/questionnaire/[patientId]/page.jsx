@@ -92,6 +92,9 @@ export default function PatientUpdateForm({ params }) {
         agreetopay: false,
         status: '',
         PlanPurchased: '',
+        // Additional Information / Marketing source
+        heardAbout: '',
+        heardAboutOther: ''
     });
 
     useEffect(() => {
@@ -99,7 +102,6 @@ export default function PatientUpdateForm({ params }) {
             try {
                 const response = await fetch(`/api/questionnaire/${params.patientId}`);
                 const data = await response.json();
-                console.log(data.result);
                 if (data.success) {
                     setFormData(data.result);
                     // Set file URLs from the fetched data
@@ -195,6 +197,9 @@ export default function PatientUpdateForm({ params }) {
                 glp1Statement: formData.glp1Statement,
                 glp1DoseInfo: formData.glp1DoseInfo,
                 agreeTerms: formData.agreeTerms,
+                // Additional Information / Marketing source
+                heardAbout: formData.heardAbout,
+                heardAboutOther: formData.heardAboutOther
             };
 
             // Submit to /api/patients
@@ -798,12 +803,12 @@ export default function PatientUpdateForm({ params }) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="eatingDisorders">Eating Disorders</Label>
-                        <Input
-                            id="heartRate"
-                            name="heartRate"
-                            value={formData.eatingDisorders}
-                            onChange={handleInputChange}
-                        />
+                            <Input
+                                id="heartRate"
+                                name="heartRate"
+                                value={formData.eatingDisorders}
+                                onChange={handleInputChange}
+                            />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="labs">Labs</Label>

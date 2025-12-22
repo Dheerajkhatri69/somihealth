@@ -345,7 +345,7 @@ export default function PatientUpdateForm({ params }) {
 
                     {/* Basic Information Section Skeleton */}
                     <Skeleton className="h-5 w-32 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                         {[...Array(9)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-16" />
@@ -356,7 +356,7 @@ export default function PatientUpdateForm({ params }) {
 
                     {/* Address Section Skeleton */}
                     <Skeleton className="h-5 w-16 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                         {[...Array(5)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-20" />
@@ -367,7 +367,7 @@ export default function PatientUpdateForm({ params }) {
 
                     {/* Vitals Section Skeleton */}
                     <Skeleton className="h-5 w-12 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-24" />
@@ -378,7 +378,7 @@ export default function PatientUpdateForm({ params }) {
 
                     {/* Medical Information Section Skeleton */}
                     <Skeleton className="h-5 w-40 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -389,7 +389,7 @@ export default function PatientUpdateForm({ params }) {
 
                     {/* Weight Management Section Skeleton */}
                     <Skeleton className="h-5 w-36 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-32" />
@@ -400,7 +400,7 @@ export default function PatientUpdateForm({ params }) {
 
                     {/* GLP-1 Section Skeleton */}
                     <Skeleton className="h-5 w-24 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-36" />
@@ -411,7 +411,7 @@ export default function PatientUpdateForm({ params }) {
 
                     {/* Provider Section Skeleton */}
                     <Skeleton className="h-5 w-32 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -465,7 +465,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 <h3 className="text-sm font-semibold">Basic information</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
                         <Label htmlFor="dob">DOB</Label>
                         <Input
@@ -581,7 +581,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* Address Section */}
                 <h3 className="text-sm font-semibold">Address</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     {['address1', 'address2', 'city', 'state', 'zip', 'country'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -609,7 +609,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* Vitals Section */}
                 <h3 className="text-sm font-semibold">Vitals</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
                     <div className="space-y-2">
                         <Label htmlFor="bloodPressure">Blood Pressure</Label>
                         <Input
@@ -633,7 +633,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Medical History Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
                     {['takingMedication', 'medicineAllergy', 'majorSurgeries', 'bariatricSurgery', 'thyroidCancerHistory'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -704,7 +704,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Diagnosis Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2]">
                     <div className="space-y-2 col-span-full">
                         <Label htmlFor="diagnosis">Diagnosis</Label>
                         <Textarea
@@ -719,7 +719,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* Weight Progress Section */}
                 <h3 className="text-sm font-semibold">Weight Progress</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
                     {['startingWeight', 'currentWeight', 'goalWeight', 'weightChange12m'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -755,7 +755,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Weight Loss Medication Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fff7ed]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#fff7ed]">
                     <div className="space-y-2 col-span-full">
                         <Label htmlFor="weightLossMeds12m">Weight Loss Medication (Last 12 Months)</Label>
                         <Textarea
@@ -770,7 +770,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* GLP-1 Section */}
                 <h3 className="text-sm font-semibold">GLP-1</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
                     <div className="space-y-2">
                         <Label htmlFor="glpTaken">GLP-1 Taken</Label>
                         <Input
@@ -797,7 +797,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* Semaglutide Section */}
                 <h3 className="text-sm font-semibold">Semaglutide</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#ffe4e6]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#ffe4e6]">
                     {['semaglutideLastDose', 'semaglutideRequestedDose'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -816,7 +816,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* Tirzepatide Section */}
                 <h3 className="text-sm font-semibold">Tirzepetide</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                     {['tirzepetideLastDose', 'tirzepetideRequestedDose'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -834,7 +834,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Tirzepatide Details Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                     {['tirzepetidePlanPurchased', 'tirzepetideVial', 'tirzepetideDosingSchedule'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -871,7 +871,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Comments Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
                         <Label htmlFor="providerComments">Enter your questions and comments</Label>
                         <textarea
@@ -886,7 +886,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
                 </div>
                 {/* new field Selection */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#eefee2]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#eefee2]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="kidneyDisease">Kidney Disease</Label>
@@ -940,7 +940,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
                 </div>
                 {/* new field Selection */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#e2f7fe]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#e2f7fe]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="conditions">Conditions</Label>
@@ -1058,7 +1058,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* File Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Documents</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
                     <div className="space-y-2">
                         <Label>Document 1</Label>
                         <UploadFile
@@ -1077,7 +1077,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
                 </div>
 
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6fffa]">
+                <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6fffa]">
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">
                             <Label htmlFor="approvalStatus">Approval Status</Label>
@@ -1183,7 +1183,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
                 </div>
 
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
+                <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         <div className="space-y-2 ">
@@ -1233,7 +1233,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
                 {/* Open sheet */}
                 {(session?.user?.accounttype === 'C') && (
-                    <div className="w-full max-w-5xl mx-auto flex justify-center">
+                    <div className="w-full mx-auto flex justify-center">
                         <Button
                             type="button"
                             onClick={openDialog}
@@ -1244,7 +1244,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
                 )}
                 {/* Provider Note Section */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
                         <Label htmlFor="providerNote">Provider Note</Label>
                         <textarea

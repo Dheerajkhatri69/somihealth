@@ -52,6 +52,7 @@ import { DiagnosisCell } from "@/components/diagnosisCell";
 import { ClinicianAction, ClinicianStatusBadge } from "@/components/clinicianStatusBadge";
 import PillSelect from "@/components/follow_refills";
 import Image from "next/image";
+import MainButtonGroup from "@/components/MainButtonGroup";
 
 const MDY_REGEX = /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/;
 
@@ -209,10 +210,6 @@ export default function Dashboard() {
         }
     }, [userType, userId, ticketFilter]); // Updated dependency array
 
-    useEffect(() => {
-        console.log("dashboard localStorage user:", userType);
-    }, [userType]);
-
     const [selectedEmail, setSelectedEmail] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedPatients, setSelectedPatients] = useState([]);
@@ -260,6 +257,8 @@ export default function Dashboard() {
     // Add state for new filters
     const [followUpFilter, setFollowUpFilter] = useState('all');
     const [refillReminderFilter, setRefillReminderFilter] = useState('all');
+
+    const [heardAboutFilters, setHeardAboutFilters] = useState('all');
 
     // Helper to extract interval
     function extractInterval(val) {
@@ -371,6 +370,24 @@ export default function Dashboard() {
             disqualified: patients.filter(p => p.approvalStatus === 'disqualified').length,
         };
     };
+    const heardAboutOptions = useMemo(() => {
+        const set = new Set();
+
+        patients.forEach((item) => {
+            if (!item) return;
+
+            // If user chose "Other" and typed something → use typed value
+            if (item.heardAbout === "Other" && item.heardAboutOther) {
+                set.add(item.heardAboutOther.trim());
+            }
+            // Otherwise use the main field (Instagram, Facebook, TikTok, etc.)
+            else if (item.heardAbout) {
+                set.add(item.heardAbout.trim());
+            }
+        });
+
+        return Array.from(set);
+    }, [patients]);
     const filteredPatients = useMemo(() => {
         return patients.filter(patient => {
             const emailMatch = patient.email.toLowerCase().includes(emailFilter.toLowerCase());
@@ -421,7 +438,14 @@ export default function Dashboard() {
             const refillReminderMatch =
                 refillReminderFilter === 'all' ||
                 (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
+            const normalizedHeardAbout =
+                patient.heardAbout === "Other" && patient.heardAboutOther
+                    ? patient.heardAboutOther.trim()
+                    : (patient.heardAbout || "").trim();
 
+            const heardMatch =
+                heardAboutFilters === "all" ||
+                normalizedHeardAbout === heardAboutFilters;
             return (
                 emailOrNameMatch &&
                 pIdMatch &&
@@ -436,10 +460,11 @@ export default function Dashboard() {
                 clinicianMatch &&
                 createDateRangeMatch &&
                 followUpMatch &&
-                refillReminderMatch
+                refillReminderMatch &&
+                heardMatch
             );
         });
-    }, [patients, emailFilter, pIdFilter, genderFilter, dobFilter, cityFilter, medicineFilter, approvalFilter, semaglutideDoseOnly, semaglutideUnitFilter, tirzepatideDoseOnly, tirzepatideUnitFilter, clinicianFilter, allAssignedPids, cidToPidSet, fromUtc, toUtc, createDateFilter, isFollowUpExpired, followUpFilter, isRefillReminderDue, refillReminderFilter]);
+    }, [patients, emailFilter, pIdFilter, genderFilter, dobFilter, cityFilter, medicineFilter, approvalFilter, semaglutideDoseOnly, semaglutideUnitFilter, tirzepatideDoseOnly, tirzepatideUnitFilter, clinicianFilter, allAssignedPids, cidToPidSet, fromUtc, toUtc, createDateFilter, isFollowUpExpired, followUpFilter, isRefillReminderDue, refillReminderFilter, heardAboutFilters]);
 
     const statusCounts = useMemo(() => getStatusCounts(filteredPatients), [filteredPatients]);
 
@@ -632,7 +657,8 @@ export default function Dashboard() {
         );
     }
     return (
-        <div className="overflow-x-auto p-4">
+        <div className="overflow-x-auto px-4">
+            <MainButtonGroup />
             <div className="flex flex-wrap gap-2 mb-4">
                 {userType === 'C' && (
                     <Select value={ticketFilter} onValueChange={setTicketFilter}>
@@ -965,6 +991,23 @@ export default function Dashboard() {
                     />
 
                 </div>
+                <Select
+                    value={filteredPatients.heardAbout}
+                    onValueChange={setHeardAboutFilters}
+                    
+                >
+                    <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Hear about us" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Hear about us (All)</SelectItem>
+                        {heardAboutOptions.map((opt) => (
+                            <SelectItem key={opt} value={opt}>
+                                {opt}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
             {
                 (userType === 'A' || userType === 'C') && (

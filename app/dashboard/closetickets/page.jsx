@@ -27,6 +27,7 @@ import toast from 'react-hot-toast';
 import Link from "next/link";
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import CloseticketsButtonGroup from '@/components/CloseticketsButtonGroup';
 
 const Page = () => {
   const [patients, setPatients] = useState([]);
@@ -294,7 +295,8 @@ const Page = () => {
   }
 
   return (
-    <div className="rounded-md border bg-background/50 p-4">
+    <div className="rounded-md border bg-background/50 px-4">
+      <CloseticketsButtonGroup/>
       <div className="flex justify-between items-center mb-4">
         <h1 className='text-lg flex gap-1'><Trash />Close tickets</h1>
         <div className="relative w-64">

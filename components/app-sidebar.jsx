@@ -42,14 +42,55 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const sidebarItems = [
   { title: "Data Form", url: "/dashboard/addrecord", icon: Home, allowedRoles: ["A", "T"] },
-  { title: "Dashboard", url: "/dashboard", icon: Inbox, allowedRoles: ["A", "T", "C"] },
-  { title: "Follow up", url: "/dashboard/followup", icon: UserRoundPlus, allowedRoles: ["A", "T", "C"] },
-  { title: "New Patients", url: "/dashboard/questionnaire", icon: FilePlus2, allowedRoles: ["A", "T"] },
-  { title: "Abandonment", url: "/dashboard/abandonment", icon: AudioWaveform, allowedRoles: ["A"] },
-  { title: "Refills", url: "/dashboard/refills", icon: FilePlus, allowedRoles: ["A", "T"] },
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Inbox,
+    allowedRoles: ["A", "T", "C"],
+    highlight: ["/dashboard/main/longevity", "/dashboard/main/ed", "/dashboard/main/skinhair"]
+  },
+  {
+    title: "Follow up",
+    url: "/dashboard/followup",
+    icon: UserRoundPlus,
+    allowedRoles: ["A", "T", "C"],
+    highlight: ["/dashboard/followup/longevity", "/dashboard/followup/ed", "/dashboard/followup/skinhair"]
+  },
+  {
+    title: "New Patients",
+    url: "/dashboard/questionnaire",
+    icon: FilePlus2,
+    allowedRoles: ["A", "T"],
+    highlight: ["/dashboard/questionnaire/longevity", "/dashboard/questionnaire/ed", "/dashboard/questionnaire/skinhair"]
+  },
+  {
+    title: "Abandonment",
+    url: "/dashboard/abandonment",
+    icon: AudioWaveform,
+    allowedRoles: ["A"],
+    highlight: ["/dashboard/abandonment/longevity", "/dashboard/abandonment/ed", "/dashboard/abandonment/skinhair"]
+  },
+  {
+    title: "Refills",
+    url: "/dashboard/refills",
+    icon: FilePlus,
+    allowedRoles: ["A", "T"],
+    highlight: ["/dashboard/refills/longevity", "/dashboard/refills/ed", "/dashboard/refills/skinhair"]
+  },
+  {
+    title: "Refills Abandonment",
+    url: "/dashboard/followup/abandonment",
+    icon: AudioWaveform, allowedRoles: ["A"],
+    highlight: ["/dashboard/followup/longevityRefillabAndonment", "/dashboard/followup/edRefillabAndonment", "/dashboard/followup/skinhairRefillabAndonment"]
+  },
   { title: "Referrals", url: "/dashboard/referrals", icon: Settings2, allowedRoles: ["A"] },
   { title: "Email History", url: "/dashboard/emailhistorytable", icon: History, allowedRoles: ["A"] },
-  { title: "Close tickets", url: "/dashboard/closetickets", icon: Trash, allowedRoles: ["A"] },
+  {
+    title: "Close tickets",
+    url: "/dashboard/closetickets",
+    icon: Trash, allowedRoles: ["A"],
+    highlight: ["/dashboard/closetickets/longevity", "/dashboard/closetickets/ed", "/dashboard/closetickets/skinhair"]
+  },
 ]
 
 const frontendItems = [
@@ -73,6 +114,18 @@ export function AppSidebar() {
   const [unseenReferralsCount, setUnseenReferralsCount] = useState(0)
   const [unseenContactFormsCount, setUnseenContactFormsCount] = useState(0)  // 👈 NEW
   const [unseenRefillsAbandonedCount, setUnseenRefillsAbandonedCount] = useState(0);
+  const [longevityUnseenCount, setLongevityUnseenCount] = useState(0);
+  const [eDUnseenCount, setEDUnseenCount] = useState(0);
+  const [skinHairUnseenCount, setSkinHairUnseenCount] = useState(0);
+  const [longevityAbandonmentCount, setLongevityAbandonmentCount] = useState(0);
+  const [eDAbandonmentCount, setEDAbandonmentCount] = useState(0);
+  const [skinHairAbandonmentCount, setSkinHairAbandonmentCount] = useState(0);
+  const [refillLongevityUnseenCount, setRefillLongevityUnseenCount] = useState(0);
+  const [refillEDUnseenCount, setRefillEDUnseenCount] = useState(0);
+  const [refillSkinHairUnseenCount, setRefillSkinHairUnseenCount] = useState(0);
+  const [longevityRefillAbandonmentUnseenCount, setLongevityRefillAbandonmentUnseenCount] = useState(0);
+  const [edRefillAbandonmentUnseenCount, setEDRefillAbandonmentUnseenCount] = useState(0);
+  const [skinHairRefillAbandonmentUnseenCount, setSkinHairRefillAbandonmentUnseenCount] = useState(0);
 
   const [userType, setUserType] = useState(null)
 
@@ -139,7 +192,115 @@ export function AppSidebar() {
       console.error("Failed to fetch refill-abandonment count", e);
     }
   };
-
+  const fetchLongevityUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/longevity-questionnaire/unseen");
+      const data = await res.json();
+      setLongevityUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity unseen count", e);
+    }
+  };
+  const fetchEDUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/ed-questionnaire/unseen");
+      const data = await res.json();
+      setEDUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity unseen count", e);
+    }
+  };
+  const fetchSkinHairUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/skinhair-questionnaire/unseen");
+      const data = await res.json();
+      setSkinHairUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity unseen count", e);
+    }
+  };
+  // Longevity abandonment
+  const fetchLongevityAbandonmentCount = async () => {
+    try {
+      const res = await fetch("/api/longevity-abandonment/seen-count"); // states 0,1
+      const data = await res.json();
+      setLongevityAbandonmentCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity abandonment count", e);
+    }
+  };
+  const fetchEDAbandonmentCount = async () => {
+    try {
+      const res = await fetch("/api/ed-abandonment/seen-count"); // states 0,1
+      const data = await res.json();
+      setEDAbandonmentCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity abandonment count", e);
+    }
+  };
+  const fetchSkinHairAbandonmentCount = async () => {
+    try {
+      const res = await fetch("/api/skinhair-abandonment/seen-count"); // states 0,1
+      const data = await res.json();
+      setSkinHairAbandonmentCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity abandonment count", e);
+    }
+  };
+  const fetchRefillLongevityUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/longevity-refill-questionnaire/unseen");
+      const data = await res.json();
+      setRefillLongevityUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity unseen count", e);
+    }
+  };
+  const fetchRefillEDUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/ed-refill-questionnaire/unseen");
+      const data = await res.json();
+      setRefillEDUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch ED unseen count", e);
+    }
+  };
+  const fetchRefillSkinHairUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/skinhair-refill-questionnaire/unseen");
+      const data = await res.json();
+      setRefillLongevityUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch Skin Hair unseen count", e);
+    }
+  };
+  const fetchLongevityRefillAbandonmentUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/longevity-refill-abandonment/seen-count");
+      const data = await res.json();
+      setLongevityRefillAbandonmentUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch longevity unseen count", e);
+    }
+  };
+  const fetchEDRefillAbandonmentUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/ed-refill-abandonment/seen-count");
+      const data = await res.json();
+      setEDRefillAbandonmentUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch ED unseen count", e);
+    }
+  };
+  const fetchSkinHairRefillAbandonmentUnseenCount = async () => {
+    try {
+      const res = await fetch("/api/skinhair-refill-abandonment/seen-count");
+      const data = await res.json();
+      setSkinHairRefillAbandonmentUnseenCount(data?.count ?? 0);
+    } catch (e) {
+      console.error("Failed to fetch Skin hair unseen count", e);
+    }
+  };
   const refetchAllCounts = useCallback(() => {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
       fetchUnseenCount();
@@ -148,6 +309,15 @@ export function AppSidebar() {
       fetchAbandonmentCount();
       fetchUnseenContactFormsCount();
       fetchUnseenRefillsAbandonedCount();
+      fetchLongevityAbandonmentCount();
+      fetchEDAbandonmentCount();
+      fetchSkinHairAbandonmentCount();
+      fetchRefillLongevityUnseenCount();
+      fetchRefillEDUnseenCount();
+      fetchRefillSkinHairUnseenCount();
+      fetchLongevityRefillAbandonmentUnseenCount();
+      fetchEDRefillAbandonmentUnseenCount();
+      fetchSkinHairRefillAbandonmentUnseenCount();
     }
   }, [effectiveUserType]);  // <-- only real dependency
 
@@ -200,6 +370,90 @@ export function AppSidebar() {
     if (effectiveUserType === "A" || effectiveUserType === "T") {
       fetchUnseenRefillsAbandonedCount();
       const id = setInterval(fetchUnseenRefillsAbandonedCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchLongevityUnseenCount();
+      const id = setInterval(fetchLongevityUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchEDUnseenCount();
+      const id = setInterval(fetchEDUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchSkinHairUnseenCount();
+      const id = setInterval(fetchSkinHairUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchLongevityAbandonmentCount();
+      const id = setInterval(fetchLongevityAbandonmentCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchEDAbandonmentCount();
+      const id = setInterval(fetchEDAbandonmentCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchSkinHairAbandonmentCount();
+      const id = setInterval(fetchSkinHairAbandonmentCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchRefillLongevityUnseenCount();
+      const id = setInterval(fetchRefillLongevityUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchRefillEDUnseenCount();
+      const id = setInterval(fetchRefillEDUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchRefillSkinHairUnseenCount();
+      const id = setInterval(fetchRefillSkinHairUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchLongevityRefillAbandonmentUnseenCount();
+      const id = setInterval(fetchLongevityRefillAbandonmentUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchEDRefillAbandonmentUnseenCount();
+      const id = setInterval(fetchEDRefillAbandonmentUnseenCount, 30000);
+      return () => clearInterval(id);
+    }
+  }, [effectiveUserType]);
+  useEffect(() => {
+    if (effectiveUserType === "A" || effectiveUserType === "T") {
+      fetchSkinHairRefillAbandonmentUnseenCount();
+      const id = setInterval(fetchSkinHairRefillAbandonmentUnseenCount, 30000);
       return () => clearInterval(id);
     }
   }, [effectiveUserType]);
@@ -278,7 +532,9 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {filteredItems.map((item) => {
-                const isActive = pathname === item.url
+                const isActive =
+                  pathname === item.url ||
+                  (item.highlight && item.highlight.includes(pathname));
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild className={isActive ? "bg-white text-black" : ""}>
@@ -287,26 +543,33 @@ export function AppSidebar() {
                           <item.icon size={20} />
                           <span>{item.title}</span>
                         </span>
-                        {item.title === "Refills" && (unseenCount + unseenRefillsAbandonedCount) > 0 && (
+                        {item.title === "Refills" && (unseenCount + refillLongevityUnseenCount + refillEDUnseenCount + refillSkinHairUnseenCount) > 0 && (
                           <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                            {unseenCount + unseenRefillsAbandonedCount}
+                            {unseenCount + refillLongevityUnseenCount + refillEDUnseenCount + refillSkinHairUnseenCount}
                           </span>
                         )}
-                        {item.title === "New Patients" && unseenQuestionnaireCount > 0 && (
+                        {item.title === "Refills Abandonment" && (unseenRefillsAbandonedCount + longevityRefillAbandonmentUnseenCount + edRefillAbandonmentUnseenCount + skinHairRefillAbandonmentUnseenCount) > 0 && (
                           <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                            {unseenQuestionnaireCount}
+                            {unseenRefillsAbandonedCount + longevityRefillAbandonmentUnseenCount + edRefillAbandonmentUnseenCount + skinHairRefillAbandonmentUnseenCount}
                           </span>
                         )}
+                        {item.title === "New Patients" &&
+                          unseenQuestionnaireCount + longevityUnseenCount + eDUnseenCount + skinHairUnseenCount > 0 && (
+                            <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                              {unseenQuestionnaireCount + longevityUnseenCount + eDUnseenCount + skinHairUnseenCount}
+                            </span>
+                          )}
                         {item.title === "Referrals" && unseenReferralsCount > 0 && (
                           <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                             {unseenReferralsCount}
                           </span>
                         )}
-                        {item.title === "Abandonment" && abandonmentCount > 0 && (
-                          <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                            {abandonmentCount}
-                          </span>
-                        )}
+                        {item.title === "Abandonment" &&
+                          (abandonmentCount + longevityAbandonmentCount + eDAbandonmentCount + skinHairAbandonmentCount) > 0 && (
+                            <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                              {abandonmentCount + longevityAbandonmentCount + eDAbandonmentCount + skinHairAbandonmentCount}
+                            </span>
+                          )}
 
                       </Link>
                     </SidebarMenuButton>

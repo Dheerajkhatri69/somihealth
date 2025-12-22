@@ -53,12 +53,12 @@ const LandingPage = () => {
                         somi
                     </h1>
 
-                    <div className="relative w-[300px] h-[300px] mx-auto">
+                    <div className="relative w-[450px] h-[300px] mx-auto">
                         <Image
                             src="/getstarted.jpg"
-                            alt="Weight Loss"
+                            alt="Longevity"
                             fill
-                            className="rounded-xl object-contain"
+                            className="rounded-xl object-cover"
                             priority
                         />
                     </div>

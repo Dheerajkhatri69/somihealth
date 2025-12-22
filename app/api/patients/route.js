@@ -122,6 +122,9 @@ export async function POST(request) {
             // New fields for follow up and refill reminder
             followUp: body.followUp,
             refillReminder: body.refillReminder,
+            // Additional Information / Marketing source
+            heardAbout: body.heardAbout,
+            heardAboutOther: body.heardAboutOther
         });
 
         result = await newPatient.save();
@@ -181,6 +184,9 @@ export async function PUT(request) {
                     // New fields for follow up and refill reminder
                     followUp: body.followUp,
                     refillReminder: body.refillReminder,
+                    // Additional Information / Marketing source
+                    heardAbout: body.heardAbout,
+                    heardAboutOther: body.heardAboutOther
                 }
             },
             { new: true }

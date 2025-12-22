@@ -41,6 +41,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import ButtonGroupRefills from "@/components/ButtonGroupRefills";
 
 export default function RefillsPage() {
     const [data, setData] = useState([]);
@@ -52,22 +53,6 @@ export default function RefillsPage() {
     const checkboxRef = useRef(null);
     const [newlySeenIds, setNewlySeenIds] = useState([]);
     const [newFormsCount, setNewFormsCount] = useState(0);
-    const [unseenRefillsAbandonedCount, setUnseenRefillsAbandonedCount] = useState(0);
-
-    useEffect(() => {
-        const fetchUnseenRefillsAbandonedCount = async () => {
-            try {
-                const res = await fetch("/api/followup/abandoned/seen-count");
-                const data = await res.json();
-                setUnseenRefillsAbandonedCount(data?.count ?? 0);
-            } catch (e) {
-                console.error("Failed to fetch refill-abandonment count", e);
-            }
-        };
-
-        fetchUnseenRefillsAbandonedCount();
-    }, []);
-
     // Filters state
     const [filters, setFilters] = useState({
         search: '',
@@ -201,7 +186,8 @@ export default function RefillsPage() {
     const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
 
     return (
-        <div className="overflow-x-auto p-4">
+        <div className="overflow-x-auto px-4">
+            <ButtonGroupRefills/>
             <div className="flex flex-wrap gap-2 mb-4">
                 <Input
                     placeholder="Search by name, email, or ID..."
@@ -230,33 +216,7 @@ export default function RefillsPage() {
                         <SelectItem value="month">Last 30 Days</SelectItem>
                     </SelectContent>
                 </Select>
-                {session?.user?.accounttype === 'A' && (
-                    <Link href="/dashboard/followup/abandonment">
-                        <div className="relative inline-block">
-                            <Button
-                                variant="outline"
-                                className="bg-secondary text-white hover:text-white hover:bg-secondary pr-10"
-                            >
-                                Refills Abandoned
-                            </Button>
-
-                            {unseenRefillsAbandonedCount > 0 && (
-                                <span
-                                    className="
-                        absolute -top-2 -right-2
-                        bg-red-500 text-white text-xs font-bold
-                        rounded-full h-5 w-5 flex items-center justify-center
-                        border-2 border-white
-                        shadow
-                    "
-                                >
-                                    {unseenRefillsAbandonedCount}
-                                </span>
-                            )}
-                        </div>
-                    </Link>
-                )}
-
+                
             </div>
 
             {newFormsCount > 0 && (
