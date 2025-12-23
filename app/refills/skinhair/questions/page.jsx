@@ -16,16 +16,16 @@ const formSchema = z
         lastName: z.string().min(1, "Last name is required"),
         phone: z.string().min(1, "Phone number is required"),
         email: z.string().email("Invalid email address"),
-        skinhairApproved: z.enum(['yes', 'no'], { required_error: "Please select an option" ,invalid_type_error:"Please select an option" }),
-        medicationChanges: z.enum(['yes', 'no'], { required_error: "Please select an option", invalid_type_error:"Please select an option" }),
+        skinhairApproved: z.enum(['yes', 'no'], { required_error: "Please select an option", invalid_type_error: "Please select an option" }),
+        medicationChanges: z.enum(['yes', 'no'], { required_error: "Please select an option", invalid_type_error: "Please select an option" }),
         medicationChangesDetail: z.string().optional(),
-        currentTreatment: z.enum(['Finasteride', 'Minoxidil', 'Rx Hair', 'Rx Skin'], { 
-            required_error: "Please select your current treatment" ,
-            invalid_type_error: "Please select your current treatment" 
+        currentTreatment: z.enum(['Finasteride', 'Minoxidil', 'Rx Hair', 'Rx Skin'], {
+            required_error: "Please select your current treatment",
+            invalid_type_error: "Please select your current treatment"
         }),
-        sideEffects: z.enum(['yes', 'no'], { required_error: "Please select an option",invalid_type_error:"Please select an option" }),
+        sideEffects: z.enum(['yes', 'no'], { required_error: "Please select an option", invalid_type_error: "Please select an option" }),
         sideEffectsDetail: z.string().optional(),
-        happyWithTreatment: z.enum(['yes', 'no'], { required_error: "Please select an option",invalid_type_error:"Please select an option" }),
+        happyWithTreatment: z.enum(['yes', 'no'], { required_error: "Please select an option", invalid_type_error: "Please select an option" }),
         happyWithTreatmentDetail: z.string().optional(),
         providerQuestions: z.string().optional(),
     })
@@ -283,13 +283,14 @@ export default function SkinHairRefillForm() {
                 <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
                     <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
                     <div className="space-y-2 p-4">
-                        <div className="relative w-[400px] h-[300px] mx-auto">
+                        <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                             <Image
-                                src="https://res.cloudinary.com/dvmbfolrm/image/upload/v1764026867/fileUploader/w1jmxvaiwra357qqag1k.jpg"
-                                alt="Skin & Hair"
+                                src="/longevityrefill.jpg"
+                                alt="skinhairrefillsuccesspic"
                                 fill
                                 className="rounded-xl object-cover"
                                 priority
+                                sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
                             />
                         </div>
                         <h3 className="text-lg md:text-xl text-center text-black font-semibold">
@@ -331,7 +332,7 @@ export default function SkinHairRefillForm() {
         );
     }
 
-  return (
+    return (
         <div className="container mx-auto p-6 max-w-[500px] flex flex-col min-h-screen font-SofiaSans">
             <div className="fixed top-0 left-0 w-full bg-white z-40">
                 <div className="max-w-[500px] mx-auto flex flex-col items-center">
@@ -564,8 +565,8 @@ export default function SkinHairRefillForm() {
                     {currentSegment === 6 && (
                         <>
                             <Label htmlFor="providerQuestions">Any questions or concerns for your provider?</Label>
-                            <Input 
-                                id="providerQuestions" 
+                            <Input
+                                id="providerQuestions"
                                 {...register('providerQuestions')}
                                 onKeyDown={(e) => {
                                     // Prevent form submission when Enter is pressed

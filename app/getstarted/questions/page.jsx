@@ -42,12 +42,12 @@ const formSchema = z.object({
   goalWeight: z.string().min(1, "This field is required"),
   allergies: z.string().min(1, "This field is required"),
   // Conditions
-  conditions: z.array(z.string()).nonempty("Please select at least one option"),
-  familyConditions: z.array(z.string()).nonempty("Please select at least one option"),
-  diagnoses: z.array(z.string()).nonempty("Please select at least one option"),
+  conditions: z.array(z.string()).optional(),
+  familyConditions: z.array(z.string()).optional(),
+  diagnoses: z.array(z.string()).optional(),
   weightLossSurgery: z.array(z.string()).nonempty("Please select at least one option"),
   weightRelatedConditions: z.array(z.string()).nonempty("Please select at least one option"),
-  medications: z.array(z.string()).nonempty("Please select at least one option"),
+  medications: z.array(z.string()).optional(),
   kidneyDisease: z.string().min(1, "This field is required"),
   // History
   pastWeightLossMeds: z.array(z.string()).nonempty("Please select at least one option"),
@@ -101,21 +101,50 @@ const formSchema = z.object({
     }, "You must be at least 18 years old"),
   consent: z.boolean().refine(val => val === true, "You must consent to proceed"),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
-  bmiConsent: z.boolean().refine(val => val === true, "You must agree to the BMI Consent"),
+  bmiConsent: z.boolean().optional(),
   treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
   agreetopay: z.boolean().refine(val => val === true, "You must consent to agree to pay"),
   glp1StartingWeight: z.string().optional(),
   bloodPressure: z.string().min(1, "This field is required"),
   heartRate: z.string().min(1, "This field is required"),
+}).superRefine((data, ctx) => {
+  const isLipotropic = data.glp1Preference === 'Lipotropic MIC +B12';
+
+  const requireArray = (field, message) => {
+    if (isLipotropic) return;
+    const value = data[field];
+    if (!Array.isArray(value) || value.length === 0) {
+      ctx.addIssue({
+        path: [field],
+        code: z.ZodIssueCode.custom,
+        message,
+      });
+    }
+  };
+
+  if (!isLipotropic) {
+    if (data.bmiConsent !== true) {
+      ctx.addIssue({
+        path: ['bmiConsent'],
+        code: z.ZodIssueCode.custom,
+        message: "You must agree to the BMI Consent",
+      });
+    }
+  }
+
+  requireArray('conditions', "Please select at least one option");
+  requireArray('familyConditions', "Please select at least one option");
+  requireArray('diagnoses', "Please select at least one option");
+  requireArray('medications', "Please select at least one option");
 });
 
 const segments = [
+  { id: 'preference', name: 'GLP-1 Preference' },
   { id: 'personal', name: 'Personal Information' },
   { id: 'age', name: 'Age Verification' },
   { id: 'bmiInfo', name: 'BMI Information' },
   { id: 'dob', name: 'Date of Birth' },
   { id: 'address', name: 'Shipping Address' },
-  { id: 'preference', name: 'GLP-1 Preference' },
   { id: 'sex', name: 'Sex' },
   { id: 'height', name: 'Height' },
   { id: 'weight', name: 'Weight' },
@@ -184,7 +213,9 @@ export default function PatientRegistrationForm() {
   });
 
   const formValues = watch();
-  const schemaFields = Object.keys(formSchema.shape);
+  const glp1Preference = watch('glp1Preference');
+  const baseSchema = formSchema._def?.schema ?? formSchema;
+  const schemaFields = Object.keys(baseSchema.shape);
   const totalFields = schemaFields.length;
   const completedFields = schemaFields.filter(
     (key) => formValues[key] && !errors[key]
@@ -219,6 +250,25 @@ export default function PatientRegistrationForm() {
       setValue(field, currentValues.filter(item => item !== value));
     }
   };
+  const isLipotropic = glp1Preference === 'Lipotropic MIC +B12';
+  const shouldSkipSegment = (segmentId) => {
+    if (!isLipotropic) return false;
+    return ['bmiInfo', 'glp1StartingWeight', 'conditions', 'family', 'diagnoses', 'medications'].includes(segmentId);
+  };
+  const getNextSegmentIndex = (startIndex) => {
+    let nextIndex = startIndex + 1;
+    while (nextIndex < segments.length && shouldSkipSegment(segments[nextIndex].id)) {
+      nextIndex += 1;
+    }
+    return nextIndex;
+  };
+  const getPreviousSegmentIndex = (startIndex) => {
+    let prevIndex = startIndex - 1;
+    while (prevIndex >= 0 && shouldSkipSegment(segments[prevIndex].id)) {
+      prevIndex -= 1;
+    }
+    return prevIndex;
+  };
   const [userSessionId, setUserSessionId] = useState("");
   const [lastVisitedSegment, setLastVisitedSegment] = useState(0);
   const [previousBasicData, setPreviousBasicData] = useState(null);
@@ -238,6 +288,7 @@ export default function PatientRegistrationForm() {
   const lastName = watch("lastName");
   const phone = watch("phone");
   const email = watch("email");
+  const currentQuestion = segments[currentSegment]?.name || "";
 
   useEffect(() => {
     const currentData = {
@@ -256,6 +307,7 @@ export default function PatientRegistrationForm() {
       firstSegment: currentData,
       lastSegmentReached: currentSegment,
       state: 0,
+      question: currentQuestion,
       timestamp: new Date().toISOString(),
     };
 
@@ -268,7 +320,7 @@ export default function PatientRegistrationForm() {
   }, [currentSegment, userSessionId, firstName, lastName, phone, email]);
 
   useEffect(() => {
-    if (currentSegment !== 0 || !userSessionId) return;
+    if (currentSegment !== 1 || !userSessionId) return;
 
     const currentData = { firstName, lastName, phone, email };
 
@@ -286,6 +338,7 @@ export default function PatientRegistrationForm() {
           firstSegment: currentData,
           lastSegmentReached: currentSegment,
           state: 0,
+          question: currentQuestion,
           timestamp: new Date().toISOString(),
         }),
       }).catch((err) => console.error("Basic info update failed:", err));
@@ -318,6 +371,7 @@ export default function PatientRegistrationForm() {
         firstSegment: currentData,
         lastSegmentReached: currentSegment,
         state: 1,
+        question: currentQuestion,
         timestamp: new Date().toISOString(),
       }),
     }).catch((err) => console.error("Disqualified state update failed:", err));
@@ -357,7 +411,7 @@ export default function PatientRegistrationForm() {
 
   // Render success state
   if (showSuccess) {
-    // if (true) {
+  // if (true) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4 font-SofiaSans">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
@@ -365,13 +419,14 @@ export default function PatientRegistrationForm() {
           {GLPPlan === 'no' && (
             <>
               <div className="space-y-2 p-4">
-                <div className="relative w-[424px] h-[300px] mx-auto">
+                <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                   <Image
                     src="/getstarted.jpg"
                     alt="Longevity"
                     fill
                     className="rounded-xl object-cover"
                     priority
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
                   />
                 </div>
                 <h3 className="text-lg md:text-x text-center">
@@ -400,13 +455,14 @@ export default function PatientRegistrationForm() {
           {GLPPlan === 'yes' && (
             <>
               <div className="space-y-2 p-4">
-                <div className="relative w-[424px] h-[300px] mx-auto">
+                <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                   <Image
                     src="/getstarted.jpg"
                     alt="Longevity"
                     fill
                     className="rounded-xl object-cover"
                     priority
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
                   />
                 </div>
                 <h3 className="text-lg md:text-x text-center">
@@ -437,14 +493,17 @@ export default function PatientRegistrationForm() {
 
   const handleNext = async () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (currentSegment === 1) {
+    if (currentSegment === 2) {
       const isOver18Valid = watch('isOver18') === 'yes';
       if (!isOver18Valid) {
         setShowIneligible(true);
         return;
       }
       setShowIneligible(false);
-      setCurrentSegment(currentSegment + 1);
+      const nextIndex = getNextSegmentIndex(currentSegment);
+      if (nextIndex < segments.length) {
+        setCurrentSegment(nextIndex);
+      }
       return;
     }
 
@@ -534,14 +593,18 @@ export default function PatientRegistrationForm() {
       }
 
       setShowIneligible(false);
-      setCurrentSegment(currentSegment + 1);
+      const nextIndex = getNextSegmentIndex(currentSegment);
+      if (nextIndex < segments.length) {
+        setCurrentSegment(nextIndex);
+      }
     }
   };
 
   const handlePrevious = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (currentSegment > 0) {
-      setCurrentSegment(currentSegment - 1);
+      const previousIndex = getPreviousSegmentIndex(currentSegment);
+      setCurrentSegment(previousIndex >= 0 ? previousIndex : 0);
     }
   };
 
@@ -632,6 +695,7 @@ export default function PatientRegistrationForm() {
             firstSegment: currentData,
             lastSegmentReached: currentSegment,
             state: 2,
+            question: "Form Submitted",
             timestamp: new Date().toISOString(),
           }),
         });
@@ -724,8 +788,41 @@ export default function PatientRegistrationForm() {
           className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl"
           noValidate
         >
-          {/* Personal Information segment */}
+          {/* GLP-1 Preference segment */}
           {currentSegment === 0 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Weight Loss Treatment<span className="text-red-500">*</span></h2>
+              <div className="space-y-2">
+                <Label htmlFor="glp1StartingWeight">
+                  Pick your weight loss treatment
+                </Label>
+                <div className="flex gap-2 justify-center items-center flex-col">
+                  {['Semaglutide', 'Tirzepatide', 'Lipotropic MIC +B12'].map((option, index) => (
+                    <label
+                      key={index}
+                      htmlFor={`glp1Preference-${index}`}
+                      className={`flex items-center text-sm justify-center w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1Preference') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    >
+                      <input
+                        type="radio"
+                        id={`glp1Preference-${index}`}
+                        value={option}
+                        className="hidden"
+                        {...register('glp1Preference')}
+                      />
+                      <span >{option}</span>
+                    </label>
+                  ))}
+                </div>
+                {errors.glp1Preference && (
+                  <p className="text-sm text-red-500">{errors.glp1Preference.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Personal Information segment */}
+          {currentSegment === 1 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">GLP-1 Plan</h2>
               <div className="space-y-2">
@@ -810,7 +907,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Age verification segment */}
-          {currentSegment === 1 && (
+          {currentSegment === 2 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Age Verification</h2>
               <div className="space-y-2">
@@ -843,7 +940,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* BMI Information segment */}
-          {currentSegment === 2 && (
+          {currentSegment === 3 && (
             <div className="space-y-6">
               {/* Page Title */}
               <h2 className="text-2xl font-semibold">BMI Requirements and Consent</h2>
@@ -895,7 +992,7 @@ export default function PatientRegistrationForm() {
 
 
           {/* Date of Birth segment */}
-          {currentSegment === 3 && (
+          {currentSegment === 4 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Date of Birth</h2>
               <div className="space-y-2">
@@ -986,7 +1083,7 @@ export default function PatientRegistrationForm() {
             </div>
           )}
           {/* Address segment */}
-          {currentSegment === 4 && (
+          {currentSegment === 5 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Shipping Address</h2>
               <div className="space-y-4">
@@ -1065,35 +1162,6 @@ export default function PatientRegistrationForm() {
             </div>
           )}
 
-          {/* GLP-1 Preference segment */}
-          {currentSegment === 5 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Do you have a GLP-1 Preference<span className="text-red-500">*</span></h2>
-              <div className="space-y-2">
-                <div className="flex gap-2 justify-center flex-col">
-                  {['Semaglutide', 'Tirzepatide', 'None'].map((option, index) => (
-                    <label
-                      key={index}
-                      htmlFor={`glp1Preference-${index}`}
-                      className={`flex items-center text-sm justify-center w-[140px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1Preference') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
-                    >
-                      <input
-                        type="radio"
-                        id={`glp1Preference-${index}`}
-                        value={option}
-                        className="hidden"
-                        {...register('glp1Preference')}
-                      />
-                      <span >{option}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.glp1Preference && (
-                  <p className="text-sm text-red-500">{errors.glp1Preference.message}</p>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Sex segment */}
           {currentSegment === 6 && (
@@ -2560,7 +2628,7 @@ export default function PatientRegistrationForm() {
                 <div></div>
                 <Button
                   onClick={handleNext}
-                  disabled={GLPPlan === null}
+                  disabled={!glp1Preference}
                   type="button"
                   className="bg-secondary text-white hover:bg-secondary rounded-2xl"
                 >

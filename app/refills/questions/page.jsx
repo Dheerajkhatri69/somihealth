@@ -64,7 +64,30 @@ const segments = [
     'dosageDecision',
     'dosageNote'
 ];
+// Add this after segments array
+const segmentNames = {
+    0: 'glp1ApprovalCheck',
+    1: 'personal',
+    2: 'weight',
+    3: 'medicationChanges',
+    4: 'glp1Preference',
+    5: 'sideEffects',
+    6: 'happyWithMed',
+    7: 'dosageDecision',
+    8: 'dosageNote'
+};
 
+const segmentDisplayNames = {
+    0: 'GLP-1 Approval Check',
+    1: 'Personal Information',
+    2: 'Current Weight',
+    3: 'Medication Changes',
+    4: 'GLP-1 Preference',
+    5: 'Side Effects',
+    6: 'Medication Satisfaction',
+    7: 'Dosage Decision',
+    8: 'Provider Notes'
+};
 const ProgressBar = ({ progress }) => (
     <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
         <div className="bg-secondary h-2.5 rounded-full" style={{ width: `${progress}%` }} />
@@ -122,11 +145,27 @@ export default function PatientRegistrationForm() {
     const lastName = watch("lastName");
     const phone = watch("phone");
     const email = watch("email");
+    const currentQuestion = segments[currentSegment] || "";
 
+
+    // Fix the useEffect that tracks abandonment
     useEffect(() => {
         if (!userSessionId) return;
 
-        const currentData = { firstName, lastName, phone, email };
+        // Get current form values
+        const formValues = watch();
+
+        // Create currentData with proper field names matching your schema
+        const currentData = {
+            firstName: formValues.firstName || "",
+            lastName: formValues.lastName || "",
+            phone: formValues.phone || "",
+            email: formValues.email || "",
+        };
+
+        // Get the segment name based on currentSegment
+        const segmentName = segmentNames[currentSegment] || "unknown";
+        const segmentDisplayName = segmentDisplayNames[currentSegment] || "Unknown Segment";
 
         fetch("/api/followup/abandoned", {
             method: "POST",
@@ -135,13 +174,13 @@ export default function PatientRegistrationForm() {
                 userSessionId,
                 firstSegment: currentData,
                 lastSegmentReached: currentSegment,
-                state: 0,
+                state: 0, // Default state for abandonment
+                question: segmentDisplayName, // Use display name
                 timestamp: new Date().toISOString(),
             }),
         }).catch((err) => console.error("Failed to update abandoned:", err));
 
-    }, [currentSegment, userSessionId, firstName, lastName, phone, email]);
-    ;
+    }, [currentSegment, userSessionId]); // Remove the individual watch dependencies
 
     const onSubmit = async (data) => {
         const isValid = await trigger();
@@ -158,6 +197,7 @@ export default function PatientRegistrationForm() {
             }
             return;
         }
+
         setIsSubmitting(true);
         setSubmissionStatus(null);
 
@@ -173,26 +213,31 @@ export default function PatientRegistrationForm() {
                 body: JSON.stringify(submissionData)
             });
 
+            // Create currentData from submitted data
             const currentData = {
-                firstName: watch("firstName"),
-                lastName: watch("lastName"),
-                phone: watch("phone"),
-                email: watch("email"),
+                firstName: data.firstName || "",
+                lastName: data.lastName || "",
+                phone: data.phone || "",
+                email: data.email || "",
             };
 
             if (res.ok) {
                 setSubmissionStatus('success');
+
+                // Update abandonment tracking with state 2 (filled/completed)
                 fetch("/api/followup/abandoned", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         userSessionId,
                         firstSegment: currentData,
-                        lastSegmentReached: currentSegment,
-                        state: 2,
+                        lastSegmentReached: segments.length - 1, // Last segment
+                        state: 2, // Completed state
+                        question: "Form Submitted Successfully",
                         timestamp: new Date().toISOString(),
                     }),
                 });
+
                 localStorage.removeItem("refillsUserSessionId");
                 setUserSessionId("");
             } else {
@@ -204,7 +249,6 @@ export default function PatientRegistrationForm() {
             setIsSubmitting(false);
         }
     };
-
     const progress = Math.round(((currentSegment) / (segments.length - 1)) * 100);
 
     const goToNextSegment = async () => {
@@ -233,6 +277,7 @@ export default function PatientRegistrationForm() {
                         firstSegment: currentData,
                         lastSegmentReached: currentSegment,
                         state: 1,
+                        question: currentQuestion,
                         timestamp: new Date().toISOString(),
                     }),
                 });
@@ -247,24 +292,74 @@ export default function PatientRegistrationForm() {
 
     const goToPreviousSegment = () => {
         if (currentSegment > 0) {
+            // Get form values before navigating
+            const formValues = watch();
+            const currentData = {
+                firstName: formValues.firstName || "",
+                lastName: formValues.lastName || "",
+                phone: formValues.phone || "",
+                email: formValues.email || "",
+            };
+
             setCurrentSegment((prev) => prev - 1);
+
+            // Update abandonment tracking
+            fetch("/api/followup/abandoned", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userSessionId,
+                    firstSegment: currentData,
+                    lastSegmentReached: currentSegment - 1, // Previous segment
+                    state: 0,
+                    question: segmentDisplayNames[currentSegment - 1] || "Unknown Segment",
+                    timestamp: new Date().toISOString(),
+                }),
+            }).catch((err) => console.error("Failed to update abandoned:", err));
         }
     };
+    // Update the useEffect that generates session ID
+    useEffect(() => {
+        let id = localStorage.getItem("refillsUserSessionId");
+        if (!id) {
+            id = `REFILL-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            localStorage.setItem("refillsUserSessionId", id);
 
+            // Send initial abandonment tracking
+            fetch("/api/followup/abandoned", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userSessionId: id,
+                    firstSegment: {
+                        firstName: "",
+                        lastName: "",
+                        phone: "",
+                        email: "",
+                    },
+                    lastSegmentReached: 0,
+                    state: 0,
+                    question: "Form Started",
+                    timestamp: new Date().toISOString(),
+                }),
+            }).catch((err) => console.error("Failed to create abandonment record:", err));
+        }
+        setUserSessionId(id);
+    }, []);
     if (submissionStatus === 'success') {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4 font-SofiaSans">
                 <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
                     <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
                     <div className="space-y-2 p-4">
-                        <div className="relative w-full aspect-square max-w-[300px] mx-auto">
+                        <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                             <Image
-                                src="/getstartedend.jpg"
-                                alt="Weight Loss"
+                                src="/getstarted.jpg"
+                                alt="weighlossrefillsuccesspic"
                                 fill
-                                className="rounded-xl object-contain"
+                                className="rounded-xl object-cover"
                                 priority
-                                sizes="(max-width: 768px) 100vw, 300px"
+                                sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
                             />
                         </div>
                         <h3 className="text-lg md:text-x text-center text-black font-semibold">

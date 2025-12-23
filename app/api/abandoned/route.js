@@ -14,7 +14,14 @@ export async function POST(request) {
     await connectDB();
     try {
         const body = await request.json();
-        const { userSessionId, firstSegment, lastSegmentReached, state, timestamp } = body;
+        const {
+            userSessionId,
+            firstSegment,
+            lastSegmentReached,
+            state,
+            timestamp,
+            question,
+        } = body;
 
         if (!userSessionId) {
             return NextResponse.json(
@@ -29,6 +36,8 @@ export async function POST(request) {
             timestamp: timestamp ? new Date(timestamp) : new Date(),
             seen: true, // ✅ anytime data is created/updated, mark seen = true
         };
+
+        if (question !== undefined) updateFields.question = question;
 
         if (typeof state === 'number') updateFields.state = state;
 

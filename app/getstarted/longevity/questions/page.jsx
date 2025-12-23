@@ -620,13 +620,14 @@ export default function PatientRegistrationForm() {
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
           <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
           <div className="space-y-2 p-4">
-            <div className="relative w-[400px] h-[300px] mx-auto">
+            <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
               <Image
                 src="/longevitymain1.png"
                 alt="Longevity"
                 fill
                 className="rounded-xl object-cover"
                 priority
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
               />
             </div>
             <h3 className="text-lg md:text-x text-center">

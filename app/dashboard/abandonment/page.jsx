@@ -45,6 +45,7 @@ const DashboardStats = () => {
                     date: item.createdAt,
                     state: item.state,
                     segment: item.lastSegmentReached,
+                    question: item.question || "", // 👈 NEW COLUMN
                     email: item.firstSegment?.email || "",
                     name: `${item.firstSegment?.firstName || ""} ${item.firstSegment?.lastName || ""}`,
                     phone: item.firstSegment?.phone || "",
@@ -257,13 +258,14 @@ const DashboardStats = () => {
                                     <th className="px-4 py-2">NUMBER</th>
                                     <th className="px-4 py-2">DATE AND TIME</th>
                                     <th className="px-4 py-2">SEGMENT</th>
+                                    <th className="px-4 py-2">QUESTION</th> {/* 👈 NEW */}
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading
                                     ? Array.from({ length: 3 }).map((_, idx) => (
                                         <tr key={idx} className="border-b">
-                                            <td colSpan={5} className="px-4 py-2">
+                                            <td colSpan={6} className="px-4 py-2">
                                                 <Skeleton className="h-10 w-full rounded-md" />
                                             </td>
                                         </tr>
@@ -288,6 +290,7 @@ const DashboardStats = () => {
                                                 })}
                                             </td>
                                             <td className="px-4 py-2">{user.segment}</td>
+                                            <td className="px-4 py-2">{user.question}</td> {/* 👈 NEW */}
                                         </tr>
                                     ))}
                                 {!loading && paginatedData.length === 0 && (

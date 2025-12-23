@@ -579,6 +579,7 @@ export default function PatientUpdateForm({ params }) {
                             <SelectContent>
                                 <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
                                 <SelectItem value="Semaglutide">Semaglutide</SelectItem>
+                                <SelectItem value="Lipotropic MIC +B12">Lipotropic MIC +B12</SelectItem>
                                 <SelectItem value="None">None</SelectItem>
                             </SelectContent>
                         </Select>

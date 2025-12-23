@@ -14,7 +14,14 @@ export async function POST(request) {
     await connectDB();
     try {
         const body = await request.json();
-        const { userSessionId, firstSegment, lastSegmentReached, state, timestamp } = body;
+        const {
+            userSessionId,
+            firstSegment,
+            lastSegmentReached,
+            state,
+            timestamp,
+            question,
+        } = body;
 
         if (!userSessionId) {
             return NextResponse.json(
@@ -23,12 +30,20 @@ export async function POST(request) {
             );
         }
 
+        // In app/api/followup/abandoned/route.js POST handler
         const updateFields = {
-            firstSegment,
-            lastSegmentReached,
+            firstSegment: {
+                firstName: firstSegment?.firstName || "",
+                lastName: firstSegment?.lastName || "",
+                phone: firstSegment?.phone || "",
+                email: firstSegment?.email || "",
+            },
+            lastSegmentReached: lastSegmentReached || 0,
             timestamp: timestamp ? new Date(timestamp) : new Date(),
-            seen: true, // ⭐ ALWAYS mark created/updated as seen
+            seen: true,
         };
+
+        if (question !== undefined) updateFields.question = question;
 
         if (typeof state === 'number') updateFields.state = state;
 

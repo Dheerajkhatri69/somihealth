@@ -25,7 +25,7 @@ const formSchema = z.object({
     // Age verification
     isOver18: z.enum(['yes', 'no'], {
         required_error: "You must be at least 18 years old to register",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     // Address
     address: z.string().min(1, "Address is required"),
@@ -65,65 +65,65 @@ const formSchema = z.object({
     organConditions: z.array(z.string()).nonempty("Please select at least one option"),
     neurologicalConditions: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     cancerConditions: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     eyeConditions: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
 
     // Current medications
     currentMedications: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     medicationsList: z.string().optional(),
 
     // Allergies
     medicationAllergies: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     allergiesList: z.string().optional(),
 
     // Additional medical conditions - QUESTION 15
     medicalConditions: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     medicalConditionsList: z.string().optional(),
 
     // ED Symptoms
     erectionChallenges: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     erectionSustaining: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     erectionChange: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     // QUESTION 19 - Fixed to be radio buttons as per requirements
     sexualEncounters: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
     nonPrescriptionSupplements: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
 
     // Previous ED treatment
     previousEDMeds: z.enum(['yes', 'no'], {
         required_error: "This field is required",
-        invalid_type_error: "Please select an option" 
+        invalid_type_error: "Please select an option"
     }),
 
     // Uploads
@@ -359,13 +359,14 @@ export default function EDQuestionnaireForm() {
                     <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
 
                     <div className="space-y-2 p-4">
-                        <div className="relative w-[424px] h-[300px] mx-auto">
+                        <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                             <Image
                                 src="https://res.cloudinary.com/dvmbfolrm/image/upload/v1764026433/fileUploader/ndlhh6jb3defevddp7rq.jpg"
-                                alt="Success"
+                                alt="edsuccesspic"
                                 fill
                                 className="rounded-xl object-cover"
                                 priority
+                                sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
                             />
                         </div>
                         <h3 className="text-lg md:text-x text-center">

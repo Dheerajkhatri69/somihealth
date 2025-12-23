@@ -54,22 +54,15 @@ const LongevityLandingPage = () => {
                 somi
               </h1>
 
-              {/* <div className="relative w-[400px] h-[300px] mx-auto">
+
+              <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                 <Image
                   src="/longevitymain1.png"
                   alt="Longevity"
                   fill
                   className="rounded-xl object-cover"
                   priority
-                />
-              </div> */}
-              <div className="relative w-[450px] h-[300px] mx-auto">
-                <Image
-                  src="/longevitymain1.png"
-                  alt="Longevity"
-                  fill
-                  className="rounded-xl object-cover"
-                  priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
                 />
               </div>
 

@@ -281,6 +281,7 @@ export default function Dashboard() {
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="Semaglutide">Semaglutide</SelectItem>
                         <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
+                        <SelectItem value="Lipotropic MIC +B12">Lipotropic MIC +B12</SelectItem>
                     </SelectContent>
                 </Select>
 

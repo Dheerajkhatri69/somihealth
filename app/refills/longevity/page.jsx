@@ -53,13 +53,14 @@ const LandingPage = () => {
                         somi
                     </h1>
 
-                    <div className="relative w-[450px] h-[300px] mx-auto">
+                    <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                         <Image
                             src="/longevityrefill.jpg"
-                            alt="Longevity"
+                            alt="Longevityrefillwellcomepic"
                             fill
                             className="rounded-xl object-cover"
                             priority
+                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
                         />
                     </div>
                     <h2 className="text-2xl font-semibold mt-4 mb-2">
