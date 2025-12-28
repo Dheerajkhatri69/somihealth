@@ -690,7 +690,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`isOver18-${index}`}
-                                            className={`flex items-center w-[100px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('isOver18') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('isOver18') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -902,7 +902,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`nitrates-${index}`}
-                                            className={`flex items-center text-sm w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('nitratesMedication') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('nitratesMedication') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -940,7 +940,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`substance-${index}`}
-                                            className={`flex items-center px-4 text-xs max-w-[180px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('substanceUse')?.includes(substance) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center px-4 max-w-[180px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('substanceUse')?.includes(substance) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="checkbox"
@@ -982,7 +982,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`symptom-${index}`}
-                                            className={`flex items-center px-4 text-xs w-full py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('symptoms')?.includes(symptom) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center px-4 w-full py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('symptoms')?.includes(symptom) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="checkbox"
@@ -1029,7 +1029,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`cardio-${index}`}
-                                            className={`flex items-center px-4 text-xs max-w-[340px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('cardiovascularConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center px-4 w-full py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('cardiovascularConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="checkbox"
@@ -1070,7 +1070,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`uro-${index}`}
-                                            className={`flex items-center px-4 text-xs w-full py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('urologicalConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center px-4 w-full py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('urologicalConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="checkbox"
@@ -1110,7 +1110,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`blood-${index}`}
-                                            className={`flex items-center px-4 text-xs max-w-[220px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('bloodConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center px-4 max-w-[280px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('bloodConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="checkbox"
@@ -1152,7 +1152,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`organ-${index}`}
-                                            className={`flex items-center px-4 text-xs max-w-[220px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('organConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center px-4 max-w-[300px] py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('organConditions')?.includes(condition) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="checkbox"
@@ -1188,7 +1188,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`neuro-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('neurologicalConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('neurologicalConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1222,7 +1222,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`cancer-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('cancerConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('cancerConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1256,7 +1256,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`eye-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('eyeConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('eyeConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1289,7 +1289,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`currentMeds-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('currentMedications') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('currentMedications') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1336,7 +1336,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`allergies-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('medicationAllergies') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('medicationAllergies') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1383,7 +1383,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`medicalConditions-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('medicalConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('medicalConditions') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1431,7 +1431,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`challenges-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionChallenges') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionChallenges') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1458,7 +1458,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`sustaining-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionSustaining') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionSustaining') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1485,7 +1485,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`change-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionChange') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionChange') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1519,7 +1519,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`encounters-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('sexualEncounters') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('sexualEncounters') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1546,7 +1546,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`supplements-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('nonPrescriptionSupplements') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('nonPrescriptionSupplements') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1579,7 +1579,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`previousED-${index}`}
-                                            className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('previousEDMeds') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('previousEDMeds') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1663,7 +1663,7 @@ export default function EDQuestionnaireForm() {
                                         <label
                                             key={index}
                                             htmlFor={`heardAbout-${index}`}
-                                            className={`flex items-center justify-center ${option == "Other" ? "w-[320px]" : "w-[160px]"} text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option
+                                            className={`flex items-center justify-center ${option == "Other" ? "w-[320px]" : "w-[160px]"} px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option
                                                 ? 'bg-secondary text-white'
                                                 : 'bg-white text-secondary'
                                                 }`}
@@ -1726,8 +1726,8 @@ export default function EDQuestionnaireForm() {
                             <h2 className="text-xl font-semibold">Telehealth Consent to Treatment and HIPAA Notice</h2>
                             <div className="space-y-4">
                                 <div className="space-y-4">
-                                    <h3 className="font-semibold">Erectile Dysfunction Therapy Consent (Sildenafil, Tadalafil, and Mini Troches)</h3>
-                                    <p>This document confirms informed consent for prescription therapy including Sildenafil, Tadalafil, and compounded Mini Troches (Sildenafil + Tadalafil), intended for the treatment of erectile dysfunction and related conditions.</p>
+                                    <h3 className="font-semibold">Erectile Dysfunction Therapy Consent (Sildenafil, Tadalafil, and Fusion Mini Trochess)</h3>
+                                    <p>This document confirms informed consent for prescription therapy including Sildenafil, Tadalafil, and compounded Fusion Mini Troches (Sildenafil + Tadalafil), intended for the treatment of erectile dysfunction and related conditions.</p>
 
                                     <div className="space-y-2">
                                         <h4 className="font-semibold">A. Patient Informed Consent</h4>
@@ -1736,7 +1736,7 @@ export default function EDQuestionnaireForm() {
                                         <ul className="list-disc pl-5">
                                             <li><strong>Sildenafil:</strong> Improve erectile function by increasing blood flow to the penis</li>
                                             <li><strong>Tadalafil:</strong> Support erectile function and may also aid in urinary symptoms associated with benign prostatic hyperplasia</li>
-                                            <li><strong>Mini Troches (Sildenafil + Tadalafil):</strong> Provide a compounded option for convenience and flexibility in dosing</li>
+                                            <li><strong>Fusion Mini Troches (Sildenafil + Tadalafil):</strong> Provide a compounded option for convenience and flexibility in dosing</li>
                                         </ul>
                                         <p>Medications may be prepared by a compounding pharmacy that is not FDA-approved, but is FDA-monitored and third-party tested. Prices include the provider&apos;s time, medical supplies, and medication.</p>
                                         <p>I understand common side effects may include, but are not limited to:</p>
@@ -1838,7 +1838,7 @@ export default function EDQuestionnaireForm() {
                                         <h4 className="font-semibold">LEGALLY BINDING CONSENT & RELEASE</h4>
                                         <p>By signing this document:</p>
                                         <p>
-                                            I confirm that I have had the opportunity to ask questions about Sildenafil, Tadalafil, and Mini Troches therapy and any alternatives, and that all questions were answered to my satisfaction.<br />
+                                            I confirm that I have had the opportunity to ask questions about Sildenafil, Tadalafil, and Fusion Mini Troches therapy and any alternatives, and that all questions were answered to my satisfaction.<br />
                                             I acknowledge that I am voluntarily consenting to receive this therapy with full knowledge of potential risks and benefits.<br />
                                             I understand this treatment is elective and cash-based.<br />
                                             I release and hold harmless Somi Health PLLC, its affiliated providers, and associated pharmacies from any liability, claim, or damages arising from the use of this therapy as prescribed.<br />

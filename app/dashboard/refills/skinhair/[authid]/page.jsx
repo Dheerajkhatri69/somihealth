@@ -707,28 +707,25 @@ export default function SkinHairRefillAdminEditForm({ params }) {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
+                                    <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
+                                    <SelectItem value="Rx Hair (Finasteride, Minoxidil & Biotin)">Rx Hair (Finasteride, Minoxidil & Biotin)</SelectItem>
+                                    <SelectItem value="Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)">Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
-                                    <SelectItem value="0.25mg">0.25mg</SelectItem>
-                                    <SelectItem value="0.5mg">0.5mg</SelectItem>
-                                    <SelectItem value="1mg">1mg</SelectItem>
-                                    <SelectItem value="2.5mg">2.5mg</SelectItem>
-                                    <SelectItem value="5mg">5mg</SelectItem>
                                 </SelectContent>
                             </Select>
-                            {/* <Select
-                                value={formData.unit}
-                                onValueChange={(value) => handleSelectChange('unit', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="tablet">Tablet</SelectItem>
-                                    <SelectItem value="topical">Topical</SelectItem>
-                                    <SelectItem value="capsule">Capsule</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select> */}
+
+                            <div className="space-y-2">
+                                <Label htmlFor="unit">Unit</Label>
+                                <Input
+                                    id="unit"
+                                    name="unit"
+                                    value={formData.unit || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="Unit"
+                                />
+                            </div>
+
                         </div>
 
                     </div>

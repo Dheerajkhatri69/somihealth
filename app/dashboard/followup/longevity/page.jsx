@@ -752,33 +752,18 @@ export default function FollowUp() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="0.25">0.25 mg</SelectItem>
-                                        <SelectItem value="0.50">0.50 mg</SelectItem>
-                                        <SelectItem value="1.0">1 mg</SelectItem>
-                                        <SelectItem value="1.7">1.7 mg</SelectItem>
-                                        <SelectItem value="2.0">2.0 mg</SelectItem>
-                                        <SelectItem value="2.5">2.5 mg</SelectItem>
+                                        <SelectItem value="NAD+ 200mg/ml">NAD+ 200mg/ml</SelectItem>
+                                        <SelectItem value="Sermorelin 1mg/ml">Sermorelin 1mg/ml</SelectItem>
+                                        <SelectItem value="Glutathione 200mg/ml">Glutathione 200mg/ml</SelectItem>
                                         <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
-
-                                <Select value={unitFilter} onValueChange={setUnitFilter}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Unit" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="1.00 mg/2mL">1.00 mg/2mL</SelectItem>
-                                        <SelectItem value="2.00 mg/2mL">2.00 mg/2mL</SelectItem>
-                                        <SelectItem value="4.00 mg/2mL">4.00 mg/2mL</SelectItem>
-                                        <SelectItem value="6.80 mg/2mL">6.80 mg/2mL</SelectItem>
-                                        <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                        <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
-                                        <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
-                                        <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
-                                        <SelectItem value="None">None</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <Input
+                                    className="w-full"
+                                    placeholder="Unit (free text)"
+                                    value={unitFilter}
+                                    onChange={(e) => setUnitFilter(e.target.value)}
+                                />
                             </div>
                         </div>
 

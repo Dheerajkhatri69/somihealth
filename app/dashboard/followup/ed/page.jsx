@@ -737,7 +737,7 @@ export default function FollowUp() {
                                     <SelectItem value="all">All</SelectItem>
                                     <SelectItem value="Sildenafil (Generic of Viagra)">Sildenafil (Generic of Viagra)</SelectItem>
                                     <SelectItem value="Tadalafil (Generic of Cialis)">Tadalafil (Generic of Cialis)</SelectItem>
-                                    <SelectItem value="Mini Troches (Tadalafil/Sildenafil)">Mini Troches (Tadalafil/Sildenafil)</SelectItem>
+                                    <SelectItem value="Fusion Mini Troches (Tadalafil/Sildenafil)">Fusion Mini Troches (Tadalafil/Sildenafil)</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -764,23 +764,12 @@ export default function FollowUp() {
                                     </SelectContent>
                                 </Select>
 
-                                {/* <Select value={unitFilter} onValueChange={setUnitFilter}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Unit" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="1.00 mg/2mL">1.00 mg/2mL</SelectItem>
-                                        <SelectItem value="2.00 mg/2mL">2.00 mg/2mL</SelectItem>
-                                        <SelectItem value="4.00 mg/2mL">4.00 mg/2mL</SelectItem>
-                                        <SelectItem value="6.80 mg/2mL">6.80 mg/2mL</SelectItem>
-                                        <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                        <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
-                                        <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
-                                        <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
-                                        <SelectItem value="None">None</SelectItem>
-                                    </SelectContent>
-                                </Select> */}
+                                <Input
+                                    className="w-full"
+                                    placeholder="Unit (free text)"
+                                    value={unitFilter}
+                                    onChange={(e) => setUnitFilter(e.target.value)}
+                                />
                             </div>
                         </div>
 

@@ -1062,18 +1062,23 @@ export default function SkinHairQuestionnaireForm({ params }) {
                         </Select>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="dose">Dose</Label>
-                        <Input
-                            id="dose"
-                            name="dose"
-                            value={formData.dose || ""}
-                            onChange={handleInputChange}
-                            placeholder="Dose"
-                        />
-                    </div>
+                    <Select
+                        value={formData.dose}
+                        onValueChange={(value) => handleSelectChange('dose', value)}
+                    >
+                        <SelectTrigger className="w-1/2">
+                            <SelectValue placeholder="Dose" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
+                            <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
+                            <SelectItem value="Rx Hair (Finasteride, Minoxidil & Biotin)">Rx Hair (Finasteride, Minoxidil & Biotin)</SelectItem>
+                            <SelectItem value="Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)">Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)</SelectItem>
+                            <SelectItem value="None">None</SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                    {/* <div className="space-y-2">
+                    <div className="space-y-2">
                         <Label htmlFor="unit">Unit</Label>
                         <Input
                             id="unit"
@@ -1082,7 +1087,7 @@ export default function SkinHairQuestionnaireForm({ params }) {
                             onChange={handleInputChange}
                             placeholder="Unit"
                         />
-                    </div> */}
+                    </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="followUpInterval">Follow Up Interval</Label>

@@ -91,6 +91,8 @@ export async function POST(request) {
             semaglutideUnit: body.semaglutideUnit,
             tirzepatideDose: body.tirzepatideDose,
             tirzepatideUnit: body.tirzepatideUnit,
+            lipotropicDose: body.lipotropicDose,
+            lipotropicUnit: body.lipotropicUnit,
             providerNote: body.providerNote,
             createTimeDate: body.createTimeDate || new Date().toISOString(),
             closetickets: body.closetickets || false,
@@ -124,7 +126,28 @@ export async function POST(request) {
             refillReminder: body.refillReminder,
             // Additional Information / Marketing source
             heardAbout: body.heardAbout,
-            heardAboutOther: body.heardAboutOther
+            heardAboutOther: body.heardAboutOther,
+            // Lipotropic Fields
+            lipotropicAllergies: body.lipotropicAllergies,
+            lipotropicAllergiesDrop: body.lipotropicAllergiesDrop,
+            lipotropicGoals: body.lipotropicGoals,
+            lipotropicHistory: body.lipotropicHistory,
+            lipotropicLastTreatment: body.lipotropicLastTreatment,
+            lipotropicSatisfaction: body.lipotropicSatisfaction,
+            lipotropicStopReason: body.lipotropicStopReason,
+            averageMood: body.averageMood,
+            lipotropicDiagnoses: body.lipotropicDiagnoses,
+            lipotropicMedicalConditions: body.lipotropicMedicalConditions,
+            lipotropicMedicalConditionsDrop: body.lipotropicMedicalConditionsDrop,
+            lipotropicMeds: body.lipotropicMeds,
+            lipotropicMedsDrop: body.lipotropicMedsDrop,
+            lipotropicPregnant: body.lipotropicPregnant,
+            providerQuestions: body.providerQuestions,
+            providerQuestionsDrop: body.providerQuestionsDrop,
+            lipotropicConsent: body.lipotropicConsent,
+            lipotropicTerms: body.lipotropicTerms,
+            lipotropicTreatment: body.lipotropicTreatment,
+            lipotropicElectronic: body.lipotropicElectronic
         });
 
         result = await newPatient.save();
@@ -186,7 +209,29 @@ export async function PUT(request) {
                     refillReminder: body.refillReminder,
                     // Additional Information / Marketing source
                     heardAbout: body.heardAbout,
-                    heardAboutOther: body.heardAboutOther
+                    heardAbout: body.heardAbout,
+                    heardAboutOther: body.heardAboutOther,
+                    // Lipotropic Fields
+                    lipotropicAllergies: body.lipotropicAllergies,
+                    lipotropicAllergiesDrop: body.lipotropicAllergiesDrop,
+                    lipotropicGoals: body.lipotropicGoals,
+                    lipotropicHistory: body.lipotropicHistory,
+                    lipotropicLastTreatment: body.lipotropicLastTreatment,
+                    lipotropicSatisfaction: body.lipotropicSatisfaction,
+                    lipotropicStopReason: body.lipotropicStopReason,
+                    averageMood: body.averageMood,
+                    lipotropicDiagnoses: body.lipotropicDiagnoses,
+                    lipotropicMedicalConditions: body.lipotropicMedicalConditions,
+                    lipotropicMedicalConditionsDrop: body.lipotropicMedicalConditionsDrop,
+                    lipotropicMeds: body.lipotropicMeds,
+                    lipotropicMedsDrop: body.lipotropicMedsDrop,
+                    lipotropicPregnant: body.lipotropicPregnant,
+                    providerQuestions: body.providerQuestions,
+                    providerQuestionsDrop: body.providerQuestionsDrop,
+                    lipotropicConsent: body.lipotropicConsent,
+                    lipotropicTerms: body.lipotropicTerms,
+                    lipotropicTreatment: body.lipotropicTreatment,
+                    lipotropicElectronic: body.lipotropicElectronic
                 }
             },
             { new: true }

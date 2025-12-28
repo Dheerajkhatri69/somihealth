@@ -36,46 +36,46 @@ const formSchema = z.object({
   // Medical Information
   glp1Preference: z.string().min(1, "This field is required"),
   sex: z.string().min(1, "This field is required"),
-  heightFeet: z.string().min(1, "This field is required"),
-  heightInches: z.string().min(1, "This field is required"),
-  currentWeight: z.string().min(1, "This field is required"),
-  goalWeight: z.string().min(1, "This field is required"),
-  allergies: z.string().min(1, "This field is required"),
+  heightFeet: z.string().optional(),
+  heightInches: z.string().optional(),
+  currentWeight: z.string().optional(),
+  goalWeight: z.string().optional(),
+  allergies: z.string().optional(),
   // Conditions
   conditions: z.array(z.string()).optional(),
   familyConditions: z.array(z.string()).optional(),
   diagnoses: z.array(z.string()).optional(),
-  weightLossSurgery: z.array(z.string()).nonempty("Please select at least one option"),
-  weightRelatedConditions: z.array(z.string()).nonempty("Please select at least one option"),
+  weightLossSurgery: z.array(z.string()).optional(),
+  weightRelatedConditions: z.array(z.string()).optional(),
   medications: z.array(z.string()).optional(),
   kidneyDisease: z.string().min(1, "This field is required"),
   // History
-  pastWeightLossMeds: z.array(z.string()).nonempty("Please select at least one option"),
-  diets: z.array(z.string()).nonempty("Please select at least one option"),
-  glp1PastYear: z.array(z.string()).nonempty("Please select at least one option"),
+  pastWeightLossMeds: z.array(z.string()).optional(),
+  diets: z.array(z.string()).optional(),
+  glp1PastYear: z.array(z.string()).optional(),
   lastInjectionDate: z.string().optional().refine((val) => {
     if (!val) return true;
     return /^(0[1-9]|1[0-2])\s\/\s(0[1-9]|[12][0-9]|3[01])\s\/\s(19|20)\d{2}$/.test(val);
   }, "Please use MM / DD / YYYY format"),
-  otherConditions: z.string().min(1, "This field is required"),
-  currentMedications: z.string().min(1, "This field is required"),
-  surgeries: z.string().min(1, "This field is required"),
+  otherConditions: z.string().optional(),
+  currentMedications: z.string().optional(),
+  surgeries: z.string().optional(),
   // Additional Info
-  pregnant: z.string().min(1, "This field is required"),
-  breastfeeding: z.string().min(1, "This field is required"),
+  pregnant: z.string().optional(),
+  breastfeeding: z.string().optional(),
   healthcareProvider: z.string().min(1, "This field is required"),
-  eatingDisorders: z.string().min(1, "This field is required"),
-  labs: z.string().min(1, "This field is required"),
-  glp1Statement: z.string().min(1, "This field is required"),
+  eatingDisorders: z.string().optional(),
+  labs: z.string().optional(),
+  glp1Statement: z.string().optional(),
   glp1DoseInfo: z.string().optional(),
 
-  // 👇 NEW: How did you hear about us
+  // NEW: How did you hear about us
   heardAbout: z.enum(['Instagram', 'Facebook', 'TikTok', 'Other'], {
     required_error: "Please tell us how you heard about us",
-  }),
+  }).optional(),
   heardAboutOther: z.string().optional(),
 
-  agreeTerms: z.string().min(1, "This field is required"),
+  agreeTerms: z.string().optional(),
   prescriptionPhoto: z.string().optional(),
   idPhoto: z.string().min(1, "This field is required"),
   comments: z.string().optional(),
@@ -99,30 +99,108 @@ const formSchema = z.object({
       }
       return age >= 18;
     }, "You must be at least 18 years old"),
-  consent: z.boolean().refine(val => val === true, "You must consent to proceed"),
-  terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
+  consent: z.boolean().optional(),
+  terms: z.boolean().optional(),
   bmiConsent: z.boolean().optional(),
-  treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
-  agreetopay: z.boolean().refine(val => val === true, "You must consent to agree to pay"),
+  treatment: z.boolean().optional(),
+  agreetopay: z.boolean().optional(),
   glp1StartingWeight: z.string().optional(),
-  bloodPressure: z.string().min(1, "This field is required"),
-  heartRate: z.string().min(1, "This field is required"),
+  bloodPressure: z.string().optional(),
+  heartRate: z.string().optional(),
+
+  // Lipotropic Specific Fields
+  lipotropicAllergies: z.array(z.string()).optional(),
+  lipotropicGoals: z.array(z.string()).optional(),
+  lipotropicHistory: z.string().optional(),
+  lipotropicLastTreatment: z.string().optional(),
+  lipotropicSatisfaction: z.string().optional(),
+  lipotropicStopReason: z.string().optional(),
+  averageMood: z.string().optional(),
+  lipotropicDiagnoses: z.array(z.string()).optional(),
+  lipotropicAllergiesDrop: z.string().optional(),
+  lipotropicMedicalConditions: z.string().optional(), // Yes/no for Q10
+  lipotropicMedicalConditionsDrop: z.string().optional(), // Text for Q10
+  lipotropicMeds: z.string().optional(), // Yes/no for Q11
+  lipotropicMedsDrop: z.string().optional(), // Text for Q11
+  providerQuestions: z.string().optional(), // Yes/no for Q14
+  providerQuestionsDrop: z.string().optional(), // Text for Q14
+  lipotropicPregnant: z.string().optional(),
+
+  // Lipotropic Consent Checkboxes (All required)
+  lipotropicConsent: z.boolean().optional(),
+  lipotropicTerms: z.boolean().optional(),
+  lipotropicTreatment: z.boolean().optional(),
+  lipotropicElectronic: z.boolean().optional(),
 }).superRefine((data, ctx) => {
   const isLipotropic = data.glp1Preference === 'Lipotropic MIC +B12';
 
+  // Helper for adding requirement issues
+  const addRequiredIssue = (field, message) => {
+    if (!data[field] || (typeof data[field] === 'string' && data[field].trim() === '')) {
+      ctx.addIssue({
+        path: [field],
+        code: z.ZodIssueCode.custom,
+        message: message || "This field is required",
+      });
+    }
+  };
+
   const requireArray = (field, message) => {
-    if (isLipotropic) return;
     const value = data[field];
     if (!Array.isArray(value) || value.length === 0) {
       ctx.addIssue({
         path: [field],
         code: z.ZodIssueCode.custom,
-        message,
+        message: message || "Please select at least one option",
       });
     }
   };
 
-  if (!isLipotropic) {
+  if (isLipotropic) {
+    // === Lipotropic Validation ===
+    // Require Lipotropic Consent Checkboxes
+    if (data.lipotropicConsent !== true) {
+      ctx.addIssue({ path: ['lipotropicConsent'], code: z.ZodIssueCode.custom, message: "You must agree to the Telehealth Consent and HIPAA Notice" });
+    }
+    if (data.lipotropicTerms !== true) {
+      ctx.addIssue({ path: ['lipotropicTerms'], code: z.ZodIssueCode.custom, message: "You must agree to the Terms of Service" });
+    }
+    if (data.lipotropicTreatment !== true) {
+      ctx.addIssue({ path: ['lipotropicTreatment'], code: z.ZodIssueCode.custom, message: "You must consent to the treatment" });
+    }
+    if (data.lipotropicElectronic !== true) {
+      ctx.addIssue({ path: ['lipotropicElectronic'], code: z.ZodIssueCode.custom, message: "You must agree to electronic records usage" });
+    }
+
+  } else {
+    // === GLP-1 Validation ===
+    addRequiredIssue('heightFeet');
+    addRequiredIssue('heightInches');
+    addRequiredIssue('currentWeight');
+    addRequiredIssue('goalWeight');
+    addRequiredIssue('allergies');
+    addRequiredIssue('bloodPressure');
+    addRequiredIssue('heartRate');
+
+    // Conditional Validation for Female-Specific Fields
+    if (data.sex !== 'Male') {
+      addRequiredIssue('pregnant');
+      addRequiredIssue('breastfeeding');
+    }
+
+    addRequiredIssue('eatingDisorders');
+    addRequiredIssue('labs');
+    addRequiredIssue('glp1Statement');
+    addRequiredIssue('agreeTerms');
+
+    // heardAbout is handled separately due to conditional Other check
+    if (!data.heardAbout) {
+      ctx.addIssue({ path: ['heardAbout'], code: z.ZodIssueCode.custom, message: "Please tell us how you heard about us" });
+    }
+    if (data.heardAbout === 'Other') {
+      addRequiredIssue('heardAboutOther');
+    }
+
     if (data.bmiConsent !== true) {
       ctx.addIssue({
         path: ['bmiConsent'],
@@ -130,16 +208,59 @@ const formSchema = z.object({
         message: "You must agree to the BMI Consent",
       });
     }
-  }
+    if (data.consent !== true) ctx.addIssue({ path: ['consent'], code: z.ZodIssueCode.custom, message: "You must consent to proceed" });
+    if (data.terms !== true) ctx.addIssue({ path: ['terms'], code: z.ZodIssueCode.custom, message: "You must agree to the terms" });
+    if (data.treatment !== true) ctx.addIssue({ path: ['treatment'], code: z.ZodIssueCode.custom, message: "You must consent to treatment" });
+    if (data.agreetopay !== true) ctx.addIssue({ path: ['agreetopay'], code: z.ZodIssueCode.custom, message: "You must consent to agree to pay" });
 
-  requireArray('conditions', "Please select at least one option");
-  requireArray('familyConditions', "Please select at least one option");
-  requireArray('diagnoses', "Please select at least one option");
-  requireArray('medications', "Please select at least one option");
+    requireArray('conditions', "Please select at least one option");
+    requireArray('familyConditions', "Please select at least one option");
+    requireArray('diagnoses', "Please select at least one option");
+    requireArray('weightLossSurgery', "Please select at least one option");
+    requireArray('weightRelatedConditions', "Please select at least one option");
+    requireArray('medications', "Please select at least one option");
+    requireArray('pastWeightLossMeds', "Please select at least one option");
+    requireArray('diets', "Please select at least one option");
+    requireArray('glp1PastYear', "Please select at least one option");
+
+    addRequiredIssue('otherConditions');
+    addRequiredIssue('currentMedications');
+    addRequiredIssue('surgeries');
+  }
 });
 
-const segments = [
-  { id: 'preference', name: 'GLP-1 Preference' },
+// requireArray('medications', "Please select at least one option");
+// });
+
+// Define segments for Lipotropic Flow
+const lipoSegments = [
+  { id: 'preference', name: 'Weight Loss Treatment' },
+  { id: 'age', name: 'Age Verification' },
+  { id: 'lipotropicTakeaways', name: 'Key Takeaways' },
+  { id: 'dob', name: 'Date of Birth' },
+  { id: 'personal', name: 'Personal Information' },
+  { id: 'address', name: 'Shipping Address' },
+  { id: 'lipotropicAllergies', name: 'Allergies Check' }, // Q1
+  { id: 'sex', name: 'Sex' }, // Q2
+  { id: 'lipotropicGoals', name: 'Therapy Goals' }, // Q3
+  { id: 'lipotropicHistory', name: 'History' }, // Q4
+  { id: 'lipotropicLastTreatment', name: 'Treatment History' }, // Q5
+  { id: 'lipotropicMood', name: 'Mood' }, // Q6
+  { id: 'lipotropicDiagnoses', name: 'Diagnoses' }, // Q7
+  { id: 'lipotropicGeneralAllergies', name: 'Allergies' }, // Q8
+  { id: 'lipotropicKidney', name: 'Kidney Disease' }, // Q9
+  { id: 'lipotropicGeneralConditions', name: 'Medical Conditions' }, // Q10
+  { id: 'lipotropicSupplements', name: 'Medications & Supplements' }, // Q11
+  { id: 'lipotropicPregnancy', name: 'Pregnancy & Breastfeeding' }, // Q12
+  { id: 'provider', name: 'Healthcare Provider' }, // Q13
+  { id: 'lipotropicProviderQuestions', name: 'Questions' }, // Q14
+  { id: 'id', name: 'ID Upload' },
+  { id: 'lipotropicConsent', name: 'Consent' },
+];
+
+// Define segments for GLP-1 Flow
+const glp1Segments = [
+  { id: 'preference', name: 'Weight Loss Treatment' },
   { id: 'personal', name: 'Personal Information' },
   { id: 'age', name: 'Age Verification' },
   { id: 'bmiInfo', name: 'BMI Information' },
@@ -167,13 +288,13 @@ const segments = [
   { id: 'surgicalHistory', name: 'Surgical History' },
   { id: 'pregnancy', name: 'Pregnancy Status' },
   { id: 'breastfeeding', name: 'Breastfeeding' },
-  { id: 'provider', name: 'Healthcare Provider' },
+  { id: 'provider', name: 'Healthcare Provider' }, // Requested: After Breastfeeding
   { id: 'eating', name: 'Eating Disorders' },
   { id: 'labs', name: 'Lab Tests' },
   { id: 'statement', name: 'GLP-1 Statement' },
   { id: 'terms', name: 'Terms Agreement' },
   { id: 'prescription', name: 'Prescription Upload' },
-  { id: 'id', name: 'ID Upload' },
+  { id: 'id', name: 'ID Upload' }, // Requested: After Prescription
   { id: 'comments', name: 'Comments' },
   { id: 'consent', name: 'Telehealth Consent' },
 ];
@@ -214,6 +335,12 @@ export default function PatientRegistrationForm() {
 
   const formValues = watch();
   const glp1Preference = watch('glp1Preference');
+  const isLipotropic = glp1Preference === 'Lipotropic MIC +B12';
+
+  // DYNAMIC SEGMENT LIST SELECTION
+  // This solves the issue of conflicting orders and skip logic complexity
+  const segments = isLipotropic ? lipoSegments : glp1Segments;
+
   const baseSchema = formSchema._def?.schema ?? formSchema;
   const schemaFields = Object.keys(baseSchema.shape);
   const totalFields = schemaFields.length;
@@ -250,10 +377,17 @@ export default function PatientRegistrationForm() {
       setValue(field, currentValues.filter(item => item !== value));
     }
   };
-  const isLipotropic = glp1Preference === 'Lipotropic MIC +B12';
+
   const shouldSkipSegment = (segmentId) => {
-    if (!isLipotropic) return false;
-    return ['bmiInfo', 'glp1StartingWeight', 'conditions', 'family', 'diagnoses', 'medications'].includes(segmentId);
+    // Only handle internal skips (e.g. Gender based)
+    // The main flow structure is now handled by the 'segments' array definition above.
+
+    // Sex-based logic
+    if (watch('sex') === 'Male') {
+      if (['pregnancy', 'breastfeeding', 'lipotropicPregnancy'].includes(segmentId)) return true;
+    }
+
+    return false;
   };
   const getNextSegmentIndex = (startIndex) => {
     let nextIndex = startIndex + 1;
@@ -289,6 +423,7 @@ export default function PatientRegistrationForm() {
   const phone = watch("phone");
   const email = watch("email");
   const currentQuestion = segments[currentSegment]?.name || "";
+  const currentSegmentId = segments[currentSegment]?.id;
 
   useEffect(() => {
     const currentData = {
@@ -317,7 +452,7 @@ export default function PatientRegistrationForm() {
       body: JSON.stringify(payload),
     }).catch((err) => console.error("Segment update failed:", err));
 
-  }, [currentSegment, userSessionId, firstName, lastName, phone, email]);
+  }, [currentSegment, userSessionId, firstName, lastName, phone, email, currentQuestion]);
 
   useEffect(() => {
     if (currentSegment !== 1 || !userSessionId) return;
@@ -343,15 +478,7 @@ export default function PatientRegistrationForm() {
         }),
       }).catch((err) => console.error("Basic info update failed:", err));
     }
-  }, [
-    firstName,
-    lastName,
-    phone,
-    email,
-    currentSegment,
-    previousBasicData,
-    userSessionId,
-  ]);
+  }, [firstName, lastName, phone, email, currentSegment, previousBasicData, userSessionId, currentQuestion]);
 
 
   // Render ineligible state
@@ -411,7 +538,7 @@ export default function PatientRegistrationForm() {
 
   // Render success state
   if (showSuccess) {
-  // if (true) {
+    // if (true) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4 font-SofiaSans">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
@@ -493,7 +620,7 @@ export default function PatientRegistrationForm() {
 
   const handleNext = async () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (currentSegment === 2) {
+    if (currentSegmentId === 'age') {
       const isOver18Valid = watch('isOver18') === 'yes';
       if (!isOver18Valid) {
         setShowIneligible(true);
@@ -531,6 +658,7 @@ export default function PatientRegistrationForm() {
       let isIneligible = false;
 
       switch (currentSegmentId) {
+        // ... (Existing cases)
         case 'conditions':
           if (hasOtherOptionsSelected('conditions')) {
             isIneligible = true;
@@ -582,6 +710,30 @@ export default function PatientRegistrationForm() {
           break;
         case 'breastfeeding':
           if (currentValues.breastfeeding === 'yes') {
+            isIneligible = true;
+          }
+          break;
+
+        // Lipotropic Logic
+        case 'lipotropicAllergies': // Q1
+          const lAllergies = currentValues.lipotropicAllergies || [];
+          if (lAllergies.length > 0 && !lAllergies.includes('None of the above')) {
+            isIneligible = true;
+          }
+          break;
+        case 'lipotropicDiagnoses': // Q7
+          const lDiagnoses = currentValues.lipotropicDiagnoses || [];
+          if (lDiagnoses.length > 0 && !lDiagnoses.includes('None of the above')) {
+            isIneligible = true;
+          }
+          break;
+        case 'lipotropicKidney': // Q9 (Reuse kidneyDisease)
+          if (watch('kidneyDisease') === 'yes') {
+            isIneligible = true;
+          }
+          break;
+        case 'lipotropicPregnancy': // Q12
+          if (currentValues.lipotropicPregnant === 'Yes') {
             isIneligible = true;
           }
           break;
@@ -639,6 +791,10 @@ export default function PatientRegistrationForm() {
       const pastWeightLossMeds = Array.isArray(data.pastWeightLossMeds) ? data.pastWeightLossMeds : [data.pastWeightLossMeds].filter(Boolean);
       const diets = Array.isArray(data.diets) ? data.diets : [data.diets].filter(Boolean);
 
+      const lipotropicAllergies = Array.isArray(data.lipotropicAllergies) ? data.lipotropicAllergies : [data.lipotropicAllergies].filter(Boolean);
+      const lipotropicGoals = Array.isArray(data.lipotropicGoals) ? data.lipotropicGoals : [data.lipotropicGoals].filter(Boolean);
+      const lipotropicDiagnoses = Array.isArray(data.lipotropicDiagnoses) ? data.lipotropicDiagnoses : [data.lipotropicDiagnoses].filter(Boolean);
+
       const submissionData = {
         ...data,
         dateOfBirth: formattedDate,
@@ -652,6 +808,9 @@ export default function PatientRegistrationForm() {
         medications,
         pastWeightLossMeds,
         diets,
+        lipotropicAllergies,
+        lipotropicGoals,
+        lipotropicDiagnoses,
         bmi: bmi,
         goalBmi: goalBmi,
         prescriptionPhoto: fileUrls.file1,
@@ -749,6 +908,22 @@ export default function PatientRegistrationForm() {
       case 'id': return ['idPhoto'];
       case 'comments': return ['heardAbout', 'heardAboutOther', 'comments'];
       case 'consent': return ['consent', 'terms', 'treatment', 'agreetopay'];
+
+      // Lipotropic Fields
+      case 'lipotropicTakeaways': return []; // Info only
+      case 'lipotropicAllergies': return ['lipotropicAllergies'];
+      case 'lipotropicGoals': return ['lipotropicGoals'];
+      case 'lipotropicHistory': return ['lipotropicHistory'];
+      case 'lipotropicLastTreatment': return ['lipotropicLastTreatment', 'lipotropicSatisfaction', 'lipotropicStopReason'];
+      case 'lipotropicMood': return ['averageMood'];
+      case 'lipotropicDiagnoses': return ['lipotropicDiagnoses'];
+      case 'lipotropicGeneralAllergies': return ['lipotropicAllergiesDrop'];
+      case 'lipotropicKidney': return ['kidneyDisease'];
+      case 'lipotropicGeneralConditions': return ['lipotropicMedicalConditions', 'lipotropicMedicalConditionsDrop'];
+      case 'lipotropicSupplements': return ['lipotropicMeds', 'lipotropicMedsDrop'];
+      case 'lipotropicPregnancy': return ['lipotropicPregnant'];
+      case 'lipotropicProviderQuestions': return ['providerQuestions', 'providerQuestionsDrop'];
+      case 'lipotropicConsent': return ['lipotropicConsent', 'lipotropicTerms', 'lipotropicTreatment', 'lipotropicElectronic'];
       default: return [];
     }
   };
@@ -789,7 +964,7 @@ export default function PatientRegistrationForm() {
           noValidate
         >
           {/* GLP-1 Preference segment */}
-          {currentSegment === 0 && (
+          {currentSegmentId === 'preference' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Weight Loss Treatment<span className="text-red-500">*</span></h2>
               <div className="space-y-2">
@@ -801,7 +976,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`glp1Preference-${index}`}
-                      className={`flex items-center text-sm justify-center w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1Preference') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center justify-center w-[180px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('glp1Preference') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="radio"
@@ -814,17 +989,30 @@ export default function PatientRegistrationForm() {
                     </label>
                   ))}
                 </div>
-                {errors.glp1Preference && (
-                  <p className="text-sm text-red-500">{errors.glp1Preference.message}</p>
-                )}
+              </div>
+            </div>
+          )}
+
+          {/* Key Takeaways Segment (Lipotropic) */}
+          {currentSegmentId === 'lipotropicTakeaways' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Weight Loss (Lipotropic MIC+B12) Flow</h2>
+              <div className="space-y-4">
+                <h3 className="font-bold text-lg">Key takeaways</h3>
+                <p className="text-sm text-gray-700">
+                  Lipotropic (MIC) + B12 injections combine essential vitamins and lipotropic compounds that support weight management and overall well-being. These injections contain Methionine, Inositol, Choline, and Vitamin B12—each of which plays an important role in the body’s metabolic processes.
+                </p>
+                <p className="text-sm text-gray-700">
+                  While Lipotropic (MIC) + B12 injections can support metabolic function and energy levels, they are not a standalone solution for significant weight loss. Optimal results are achieved when used as part of a comprehensive weight management program that includes a balanced diet, regular physical activity, and healthy lifestyle changes.
+                </p>
               </div>
             </div>
           )}
 
           {/* Personal Information segment */}
-          {currentSegment === 1 && (
+          {currentSegmentId === 'personal' && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">GLP-1 Plan</h2>
+              <h2 className="text-xl font-semibold">{isLipotropic ? 'Plan' : 'GLP-1 Plan'}</h2>
               <div className="space-y-2">
                 <Label htmlFor="paid">
                   If you have paid for your medication pick &quot;YES&quot;.<br />
@@ -835,7 +1023,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`glp-${index}`}
-                      className={`flex items-center w-[100px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${GLPPlan === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${GLPPlan === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="radio"
@@ -857,8 +1045,8 @@ export default function PatientRegistrationForm() {
                 <ArrowDownWideNarrow />Let&apos;s get to know you!
               </h2>
 
-              {/* Show inputs only after GLPPlan is selected */}
-              {GLPPlan && (
+              {/* Show inputs only after GLPPlan is selected or if Lipotropic */}
+              {(GLPPlan || isLipotropic) && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -903,11 +1091,427 @@ export default function PatientRegistrationForm() {
                 </>
               )}
             </div>
+          )}
 
+          {/* Q1: Allergies Check */}
+          {currentSegmentId === 'lipotropicAllergies' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Are you allergic to any of the medications included in Lipotropic MIC+B12?</h2>
+              <div className="space-y-2">
+                <div className="flex flex-col gap-3">
+                  {['Methionine', 'Inositol', 'Choline', 'Vitamin B12', 'None of the above'].map((opt, index) => (
+                    <label key={index} className={`flex items-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('lipotropicAllergies')?.includes(opt) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                      <input type="checkbox" className="hidden"
+                        checked={watch('lipotropicAllergies')?.includes(opt) || false}
+                        onChange={(e) => handleCheckboxChange('lipotropicAllergies', opt, e.target.checked)}
+                      />
+                      <span>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+                {errors.lipotropicAllergies && <p className="text-sm text-red-500">{errors.lipotropicAllergies.message}</p>}
+              </div>
+            </div>
+          )}
+
+          {/* Q3: Therapy Goals */}
+          {currentSegmentId === 'lipotropicGoals' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">What are your goals for Lipotropic MIC+B12 therapy? (Multiple selection)</h2>
+              <div className="space-y-2">
+                <div className="flex flex-col gap-3">
+                  {['Weight Management', 'Energy boost', 'Better sleep', 'Mental clarity and focus', 'Overall wellness', 'All of the above'].map((opt, index) => (
+                    <label key={index} className={`flex items-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('lipotropicGoals')?.includes(opt) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                      <input type="checkbox" className="hidden"
+                        checked={watch('lipotropicGoals')?.includes(opt) || false}
+                        onChange={(e) => handleCheckboxChange('lipotropicGoals', opt, e.target.checked)}
+                      />
+                      <span>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+                {errors.lipotropicGoals && <p className="text-sm text-red-500">{errors.lipotropicGoals.message}</p>}
+              </div>
+            </div>
+          )}
+
+          {/* Q4: History & Q5: Last Treatment */}
+          {currentSegmentId === 'lipotropicHistory' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Have you previously used Lipotropic MIC+B12 in any form (Infusion, Injection or nasal Spray)?</h2>
+              <div className="flex gap-2 flex-col justify-center items-center">
+                {['Yes', 'No'].map((opt, index) => (
+                  <label key={index} className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('lipotropicHistory') === opt ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                    <input type="radio" value={opt} className="hidden" {...register('lipotropicHistory')} />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.lipotropicHistory && <p className="text-sm text-red-500">{errors.lipotropicHistory.message}</p>}
+            </div>
+          )}
+
+          {/* Q5: Treatment Details (Only if Yes to Q4) */}
+          {currentSegmentId === 'lipotropicLastTreatment' && (
+            <div className="space-y-4">
+              {watch('lipotropicHistory') === 'Yes' ? (
+                <>
+                  <h2 className="text-xl font-semibold">Treatment History</h2>
+                  <div className="space-y-2">
+                    <Label>When was your last Lipotropic MIC+B12 treatment?</Label>
+                    <Input {...register('lipotropicLastTreatment')} placeholder="e.g. 1 month ago" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Were you satisfied with your treatment?</Label>
+                    <Input {...register('lipotropicSatisfaction')} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Why did you stop the Lipotropic MIC+B12 treatment?</Label>
+                    <Input {...register('lipotropicStopReason')} />
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-600">Based on your previous answer, you can skip this section. Click Next to proceed.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Q6: Mood */}
+          {currentSegmentId === 'lipotropicMood' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">How would you rate your average mood?</h2>
+              <div className="flex flex-col gap-3">
+                {[
+                  'I often feel sad or irritable, with occasional better moments',
+                  'My mood is generally neutral, with ups and downs',
+                  "I'm usually in good spirits and enjoy most of my days",
+                  'I feel consistently happy and optimistic about life.'
+                ].map((opt, index) => (
+                  <label key={index} className={`flex items-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('averageMood') === opt ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                    <input type="radio" value={opt} className="hidden" {...register('averageMood')} />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.averageMood && <p className="text-sm text-red-500">{errors.averageMood.message}</p>}
+            </div>
+          )}
+
+          {/* Q7: Diagnoses */}
+          {currentSegmentId === 'lipotropicDiagnoses' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Have you been diagnosed with any of the following? <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span></h2>
+              <div className="flex flex-col gap-3">
+                {[
+                  'Severe anxiety or other psychological disorders',
+                  'Thyroid dysfunction',
+                  'Cardiovascular disease',
+                  'None of the above'
+                ].map((opt, index) => (
+                  <label key={index} className={`flex items-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('lipotropicDiagnoses')?.includes(opt) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                    <input type="checkbox" className="hidden"
+                      checked={watch('lipotropicDiagnoses')?.includes(opt) || false}
+                      onChange={(e) => handleCheckboxChange('lipotropicDiagnoses', opt, e.target.checked)}
+                    />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.lipotropicDiagnoses && <p className="text-sm text-red-500">{errors.lipotropicDiagnoses.message}</p>}
+            </div>
+          )}
+
+          {/* Q8: General Allergies */}
+          {currentSegmentId === 'lipotropicGeneralAllergies' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Do you have any allergies? <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span></h2>
+              <div className="flex gap-2 flex-col justify-center items-center">
+                {['Yes', 'No'].map((opt) => (
+                  <label key={opt} className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${(!['No', undefined, ''].includes(watch('lipotropicAllergiesDrop')) && opt === 'Yes') || (watch('lipotropicAllergiesDrop') === 'No' && opt === 'No') ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                    <input type="radio" name="lipoAllergies" value={opt} className="hidden"
+                      checked={opt === 'Yes' ? (watch('lipotropicAllergiesDrop') !== 'No' && watch('lipotropicAllergiesDrop') !== undefined) : watch('lipotropicAllergiesDrop') === 'No'}
+                      onChange={() => {
+                        if (opt === 'No') setValue('lipotropicAllergiesDrop', 'No');
+                        else setValue('lipotropicAllergiesDrop', '');
+                      }}
+                    />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+              </div>
+              {watch('lipotropicAllergiesDrop') !== 'No' && watch('lipotropicAllergiesDrop') !== undefined && (
+                <Textarea {...register('lipotropicAllergiesDrop')} placeholder="Please list your allergies" />
+              )}
+            </div>
+          )}
+
+          {/* Q9: Kidney */}
+          {currentSegmentId === 'lipotropicKidney' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">History of kidney disease or failure? Consulted a nephrologist? <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span></h2>
+              <div className="flex gap-2 justify-center flex-col items-center">
+                {['Yes', 'No'].map((option, index) => (
+                  <label
+                    key={index}
+                    htmlFor={`kidneyLipo${option}`}
+                    className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('kidneyDisease') === option.toLowerCase()
+                      ? 'bg-secondary text-white'
+                      : 'bg-white text-secondary'
+                      }`}
+                  >
+                    <input
+                      type="radio"
+                      id={`kidneyLipo${option}`}
+                      value={option.toLowerCase()}
+                      className="hidden"
+                      {...register('kidneyDisease')}
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.kidneyDisease && <p className="text-sm text-red-500">{errors.kidneyDisease.message}</p>}
+            </div>
+          )}
+
+          {/* Q10: Medical Conditions */}
+          {currentSegmentId === 'lipotropicGeneralConditions' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Have you ever been diagnosed with any medical conditions?</h2>
+              <div className="flex gap-2 flex-col justify-center items-center">
+                {['Yes', 'No'].map((opt) => (
+                  <label key={opt} className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('lipotropicMedicalConditions') === opt ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                    <input type="radio" value={opt} className="hidden" {...register('lipotropicMedicalConditions')} />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+              </div>
+              {watch('lipotropicMedicalConditions') === 'Yes' && (
+                <Textarea {...register('lipotropicMedicalConditionsDrop')} placeholder="Please list your medical conditions" />
+              )}
+            </div>
+          )}
+
+          {/* Q11: Meds & Supplements */}
+          {currentSegmentId === 'lipotropicSupplements' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Are you currently taking any medications or supplements</h2>
+              <div className="flex gap-2 flex-col justify-center items-center">
+                {['Yes', 'No'].map((opt) => (
+                  <label key={opt} className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('lipotropicMeds') === opt ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                    <input type="radio" value={opt} className="hidden" {...register('lipotropicMeds')} />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+              </div>
+              {watch('lipotropicMeds') === 'Yes' && (
+                <Textarea {...register('lipotropicMedsDrop')} placeholder="Please list your medications" />
+              )}
+            </div>
+          )}
+
+          {/* Q12: Lipotropic Pregnancy */}
+          {currentSegmentId === 'lipotropicPregnancy' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Pregnancy & Breastfeeding</h2>
+              <div className="space-y-4">
+                <Label>
+                  Are you pregnant or breastfeeding? <span className="text-red-500">*</span>
+                  <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
+                </Label>
+                <div className="flex gap-2 justify-center flex-col items-center">
+                  {['Yes', 'No'].map((option, index) => (
+                    <label
+                      key={index}
+                      htmlFor={`lipoPreg-${index}`}
+                      className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('lipotropicPregnant') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                    >
+                      <input
+                        type="radio"
+                        id={`lipoPreg-${index}`}
+                        value={option}
+                        className="hidden"
+                        {...register('lipotropicPregnant')}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+                {errors.lipotropicPregnant && (
+                  <p className="text-sm text-red-500">{errors.lipotropicPregnant.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Q14: Provider Questions */}
+          {currentSegmentId === 'lipotropicProviderQuestions' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Do you have any questions for the provider?</h2>
+              <div className="flex gap-2 flex-col justify-center items-center">
+                {['Yes', 'No'].map((opt) => (
+                  <label key={opt} className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('providerQuestions') === opt ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                    <input type="radio" value={opt} className="hidden" {...register('providerQuestions')} />
+                    <span>{opt}</span>
+                  </label>
+                ))}
+              </div>
+              {watch('providerQuestions') === 'Yes' && (
+                <Textarea {...register('providerQuestionsDrop')} placeholder="Type your questions here..." />
+              )}
+            </div>
+          )}
+
+          {/* Consent */}
+          {/* Consent */}
+          {currentSegmentId === 'lipotropicConsent' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Telehealth Consent to Treatment and HIPAA Notice</h2>
+              <div className="text-sm">
+                <h3 className="font-bold">Lipotropic MIC-B12 Injection Therapy Consent</h3>
+                <p className="mt-2">This document confirms informed consent for Lipotropic MIC-B12 therapy (Methionine, Inositol, Choline with Vitamin B12), a wellness and metabolic support medication.</p>
+
+                <h4 className="font-bold mt-4">A. Patient Informed Consent</h4>
+                <p>I request treatment at Somi Health and have disclosed all relevant medical information truthfully and completely. I acknowledge that I have been informed of alternative treatment options, potential risks, possible side effects, and expected benefits of Lipotropic MIC-B12 therapy.</p>
+                <p>Lipotropic MIC-B12 is typically administered via subcutaneous or intramuscular injection and is intended to support fat metabolism, energy production, and liver function. This medication may be provided by a compounding pharmacy that is not FDA-approved, but is FDA-regulated and third-party tested. Pricing includes the provider’s time, medical supplies, and medication.</p>
+                <p>I understand that common side effects may include, but are not limited to: injection site irritation, headache, nausea, dizziness, flushing, and fatigue. Rare but serious risks may include allergic reactions or other adverse events.</p>
+
+                <h4 className="font-bold mt-4">B. Patient Responsibilities</h4>
+                <p>I agree to:</p>
+                <ul className="list-disc pl-5">
+                  <li>Obtain compounded prescriptions only through Somi Health</li>
+                  <li>Provide a complete and accurate medical history</li>
+                  <li>Disclose any changes in medical condition, new symptoms, or pregnancy status</li>
+                  <li>Follow all prescribed dosing and administration instructions</li>
+                  <li>Properly store medication as instructed</li>
+                  <li>Seek medical attention if concerning symptoms occur</li>
+                </ul>
+                <p className="mt-2">I acknowledge that my provider may discontinue or modify therapy if:</p>
+                <ul className="list-disc pl-5">
+                  <li>I experience adverse reactions</li>
+                  <li>The treatment is ineffective</li>
+                  <li>I fail to comply with treatment instructions</li>
+                </ul>
+
+                <h4 className="font-bold mt-4">C. Safety Requirements</h4>
+                <p>I understand and agree to the following safety requirements:</p>
+                <ul className="list-disc pl-5">
+                  <li>Keep medication out of reach of children under 18 years of age</li>
+                  <li>Do not give, sell, or share medication with any other person</li>
+                  <li>Only use medication as prescribed</li>
+                </ul>
+
+                <h4 className="font-bold mt-4">D. Financial Acknowledgment</h4>
+                <p>I understand that Somi Health, LLC does not accept insurance for Lipotropic MIC-B12 therapy. This is a self-pay service.</p>
+                <p><strong>Same-Day Payment:</strong> Self-pay patients are required to pay all fees in full at the time of service. This includes visit fees, related services, and medications. Payment plans may be available.</p>
+                <p><strong>Self-Pay Patient Definition:</strong> If I do not have insurance or my insurance does not cover this service, I will be considered a self-pay patient.</p>
+                <p><strong>Refund Policy:</strong> No refunds, credits, or exchanges are permitted for medications once they have been dispensed, mixed, or have left the pharmacy. This policy exists to ensure product safety and integrity.</p>
+
+                <h4 className="font-bold mt-4">E. Somi Health Telehealth Practice State Disclosure</h4>
+                <p>I acknowledge that I am receiving healthcare services from Somi Health and understand that my care is governed by the laws of the state in which I am physically located at the time of my visit. I confirm that I am located in one of the following states: Arizona, Connecticut, Colorado, Florida, Georgia, Iowa, Kentucky, Minnesota, New Jersey, North Carolina, Oklahoma, Tennessee, Texas, or Washington D.C., New Hampshire</p>
+
+                <h4 className="font-bold mt-4">HIPAA Notice</h4>
+                <p>Your Information. Your Rights. Our Responsibilities.</p>
+                <p><strong>Introduction:</strong> This notice explains how your medical information may be used or disclosed and how you can access this information. Please review it carefully.</p>
+                <p><strong>Your Rights:</strong> You have the right to: Receive a copy of your medical records; Request corrections to your records; Request confidential communications; Ask us to limit use or disclosure of your information; Receive a list of disclosures; Obtain a copy of this privacy notice; Designate an authorized representative; File a complaint if you believe your privacy rights have been violated.</p>
+
+                <h4 className="font-bold mt-4">Contact Information</h4>
+                <p>Somi Health<br />4111 E Rose Lake Dr<br />Charlotte, NC 28217<br />(704) 386-6871<br />joinsomi.com<br />Effective Date: 03/15/2025</p>
+
+                <h4 className="font-bold mt-4">Legally Binding Consent & Release</h4>
+                <p>By signing this document:</p>
+                <ul className="list-disc pl-5">
+                  <li>I confirm that I have had the opportunity to ask questions about Lipotropic MIC-B12 therapy and its alternatives and that all questions were answered to my satisfaction.</li>
+                  <li>I acknowledge that I am voluntarily consenting to receive Lipotropic MIC-B12 therapy with full knowledge of potential benefits and risks.</li>
+                  <li>I understand this treatment is elective and cash-based.</li>
+                  <li>I release and hold harmless Somi Health PLLC, its affiliated providers, and associated pharmacies from any and all liability, claims, or damages arising from the use of this therapy as prescribed.</li>
+                  <li>I agree to comply with my provider’s treatment plan, safety guidelines, and follow-up requirements.</li>
+                </ul>
+
+                <p className="mt-4">I have read the Somi Health telehealth consent form and HIPAA Privacy Notice at: <a href="https://joinsomi.com/telehealth-consent/" target="_blank" rel="noreferrer" className="text-blue-500 underline">https://joinsomi.com/telehealth-consent/</a></p>
+                <p>I have read the Somi Health Terms of Service at: <a href="https://joinsomi.com/terms-of-use/" target="_blank" rel="noreferrer" className="text-blue-500 underline">https://joinsomi.com/terms-of-use/</a></p>
+              </div>
+
+              <div className="space-y-4 mt-6">
+                {/* 1. Telehealth & HIPAA */}
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    id="lipotropicConsent"
+                    className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
+                    {...register('lipotropicConsent')}
+                  />
+                  <label htmlFor="lipotropicConsent" className="text-sm">
+                    I have read the Somi Health telehealth consent form and HIPAA Privacy Notice at{' '}
+                    <a
+                      href="https://joinsomi.com/telehealth-consent/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-secondary hover:underline"
+                    >
+                      https://joinsomi.com/telehealth-consent/
+                    </a>
+                  </label>
+                </div>
+                {errors.lipotropicConsent && <p className="text-sm text-red-500">{errors.lipotropicConsent.message}</p>}
+
+                {/* 2. Terms of Service */}
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    id="lipotropicTerms"
+                    className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
+                    {...register('lipotropicTerms')}
+                  />
+                  <label htmlFor="lipotropicTerms" className="text-sm">
+                    I have read the Somi Health Terms of Service at{' '}
+                    <a
+                      href="https://joinsomi.com/terms-of-use/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-secondary hover:underline"
+                    >
+                      https://joinsomi.com/terms-of-use/
+                    </a>
+                  </label>
+                </div>
+                {errors.lipotropicTerms && <p className="text-sm text-red-500">{errors.lipotropicTerms.message}</p>}
+
+                {/* 3. Voluntary Consent */}
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    id="lipotropicTreatment"
+                    className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
+                    {...register('lipotropicTreatment')}
+                  />
+                  <label htmlFor="lipotropicTreatment" className="text-sm">
+                    I have read and understood this document and voluntarily consent to treatment.
+                  </label>
+                </div>
+                {errors.lipotropicTreatment && <p className="text-sm text-red-500">{errors.lipotropicTreatment.message}</p>}
+
+                {/* 4. Electronic Records */}
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    id="lipotropicElectronic"
+                    className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
+                    {...register('lipotropicElectronic')}
+                  />
+                  <label htmlFor="lipotropicElectronic" className="text-sm font-bold">
+                    I agree to the use of electronic records and electronic signatures and acknowledge that I have read the related consumer disclosures.
+                  </label>
+                </div>
+                {errors.lipotropicElectronic && <p className="text-sm text-red-500">{errors.lipotropicElectronic.message}</p>}
+              </div>
+            </div>
           )}
 
           {/* Age verification segment */}
-          {currentSegment === 2 && (
+          {currentSegmentId === 'age' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Age Verification</h2>
               <div className="space-y-2">
@@ -940,7 +1544,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* BMI Information segment */}
-          {currentSegment === 3 && (
+          {currentSegmentId === 'bmiInfo' && (
             <div className="space-y-6">
               {/* Page Title */}
               <h2 className="text-2xl font-semibold">BMI Requirements and Consent</h2>
@@ -992,7 +1596,7 @@ export default function PatientRegistrationForm() {
 
 
           {/* Date of Birth segment */}
-          {currentSegment === 4 && (
+          {currentSegmentId === 'dob' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Date of Birth</h2>
               <div className="space-y-2">
@@ -1083,7 +1687,7 @@ export default function PatientRegistrationForm() {
             </div>
           )}
           {/* Address segment */}
-          {currentSegment === 5 && (
+          {currentSegmentId === 'address' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Shipping Address</h2>
               <div className="space-y-4">
@@ -1164,7 +1768,7 @@ export default function PatientRegistrationForm() {
 
 
           {/* Sex segment */}
-          {currentSegment === 6 && (
+          {currentSegmentId === 'sex' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Sex assigned at birth<span className="text-red-500">*</span></h2>
               <div className="space-y-2">
@@ -1173,7 +1777,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`sex-${index}`}
-                      className={`flex items-center w-[140px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('sex') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center w-[140px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('sex') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="radio"
@@ -1194,7 +1798,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Height segment */}
-          {currentSegment === 7 && (
+          {currentSegmentId === 'height' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Height</h2>
               <div className="space-y-4">
@@ -1287,7 +1891,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Weight segment */}
-          {currentSegment === 8 && (
+          {currentSegmentId === 'weight' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Weight</h2>
               <div className="space-y-2">
@@ -1323,7 +1927,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* GLP-1 Starting Weight segment */}
-          {currentSegment === 9 && (
+          {currentSegmentId === 'glp1StartingWeight' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">GLP-1 Medication</h2>
               <div className="space-y-2">
@@ -1350,7 +1954,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Blood Pressure segment */}
-          {currentSegment === 10 && (
+          {currentSegmentId === 'bloodPressure' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Blood Pressure</h2>
               <div className="space-y-2">
@@ -1396,7 +2000,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Heart Rate segment */}
-          {currentSegment === 11 && (
+          {currentSegmentId === 'heartRate' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Heart Rate</h2>
               <div className="space-y-2">
@@ -1442,7 +2046,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Allergies segment */}
-          {currentSegment === 12 && (
+          {currentSegmentId === 'allergies' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Allergies</h2>
               <div className="space-y-2">
@@ -1462,7 +2066,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Medical Conditions segment */}
-          {currentSegment === 13 && (
+          {currentSegmentId === 'conditions' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Medical Conditions</h2>
               <div className="space-y-2">
@@ -1509,7 +2113,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Family History segment */}
-          {currentSegment === 14 && (
+          {currentSegmentId === 'family' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Family History</h2>
               <div className="space-y-2">
@@ -1549,7 +2153,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Diagnoses segment */}
-          {currentSegment === 15 && (
+          {currentSegmentId === 'diagnoses' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Diagnoses</h2>
               <div className="space-y-2">
@@ -1592,7 +2196,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Weight Loss Surgery segment */}
-          {currentSegment === 16 && (
+          {currentSegmentId === 'surgery' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Weight Loss Surgery</h2>
               <div className="space-y-2">
@@ -1634,7 +2238,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Weight Related Conditions segment */}
-          {currentSegment === 17 && (
+          {currentSegmentId === 'weightConditions' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Weight Related Conditions</h2>
               <div className="space-y-2">
@@ -1694,7 +2298,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Medications segment */}
-          {currentSegment === 18 && (
+          {currentSegmentId === 'medications' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Medications</h2>
               <div className="space-y-2">
@@ -1735,7 +2339,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Kidney Health segment */}
-          {currentSegment === 19 && (
+          {currentSegmentId === 'kidney' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Kidney Health</h2>
               <div className="space-y-4">
@@ -1749,7 +2353,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`kidney${option}`}
-                      className={`flex items-center w-[100px] text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('kidneyDisease') === option.toLowerCase()
+                      className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('kidneyDisease') === option.toLowerCase()
                         ? 'bg-secondary text-white'
                         : 'bg-white text-secondary'
                         }`}
@@ -1774,7 +2378,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Past Weight Loss Medications segment */}
-          {currentSegment === 20 && (
+          {currentSegmentId === 'pastMeds' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Past Weight Loss Medications</h2>
               <div className="space-y-2">
@@ -1826,7 +2430,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Diets segment */}
-          {currentSegment === 21 && (
+          {currentSegmentId === 'diets' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Lifestyle Changes</h2>
               <div className="space-y-2">
@@ -1874,7 +2478,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* GLP-1 History segment */}
-          {currentSegment === 22 && (
+          {currentSegmentId === 'glp1History' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">GLP-1 History</h2>
               <div className="space-y-4">
@@ -2003,7 +2607,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Other Medical Info segment */}
-          {currentSegment === 23 && (
+          {currentSegmentId === 'otherMedical' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Other Medical Info</h2>
               <div className="space-y-2">
@@ -2023,7 +2627,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Current Medications segment */}
-          {currentSegment === 24 && (
+          {currentSegmentId === 'currentMeds' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Current Medications</h2>
               <div className="space-y-2">
@@ -2043,7 +2647,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Surgical History segment */}
-          {currentSegment === 25 && (
+          {currentSegmentId === 'surgicalHistory' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Surgical History</h2>
               <div className="space-y-2">
@@ -2063,7 +2667,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Pregnancy Status segment */}
-          {currentSegment === 26 && (
+          {currentSegmentId === 'pregnancy' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Pregnancy Status</h2>
               <div className="space-y-4">
@@ -2076,7 +2680,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`pregnant-${index}`}
-                      className={`flex items-center text-sm w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('pregnant') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('pregnant') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="radio"
@@ -2097,7 +2701,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Breastfeeding segment */}
-          {currentSegment === 27 && (
+          {currentSegmentId === 'breastfeeding' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Breastfeeding</h2>
               <div className="space-y-4">
@@ -2110,7 +2714,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`breastfeeding-${index}`}
-                      className={`flex items-center w-[100px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('breastfeeding') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                      className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('breastfeeding') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                     >
                       <input
                         type="radio"
@@ -2131,12 +2735,12 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Healthcare Provider segment */}
-          {currentSegment === 28 && (
+          {currentSegmentId === 'provider' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Healthcare Provider</h2>
               <div className="space-y-4">
                 <Label>
-                  Are you under the care of a healthcare provider? <span className="text-red-500">*</span>
+                  {isLipotropic ? "Are you under the care of a physician?" : "Are you under the care of a healthcare provider?"} <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex gap-2 justify-center flex-col items-center">
                   {['yes', 'no'].map((option, index) => (
@@ -2164,7 +2768,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Eating Disorders segment */}
-          {currentSegment === 29 && (
+          {currentSegmentId === 'eating' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Eating Disorders</h2>
               <div className="space-y-4">
@@ -2203,7 +2807,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Lab Tests segment */}
-          {currentSegment === 30 && (
+          {currentSegmentId === 'labs' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Lab Tests</h2>
               <div className="space-y-4">
@@ -2236,7 +2840,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* GLP-1 Statement segment */}
-          {currentSegment === 31 && (
+          {currentSegmentId === 'statement' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">GLP-1 Statement</h2>
               <div className="space-y-2">
@@ -2295,7 +2899,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Terms Agreement segment */}
-          {currentSegment === 32 && (
+          {currentSegmentId === 'terms' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Terms Agreement</h2>
               <div className="space-y-4">
@@ -2328,7 +2932,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Prescription Upload segment */}
-          {currentSegment === 33 && (
+          {currentSegmentId === 'prescription' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Prescription Upload</h2>
               <div className="space-y-2">
@@ -2353,7 +2957,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* ID Upload segment */}
-          {currentSegment === 34 && (
+          {currentSegmentId === 'id' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">ID Upload</h2>
               <div className="space-y-2">
@@ -2378,7 +2982,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* How did you hear about us + Comments segment */}
-          {currentSegment === 35 && (
+          {currentSegmentId === 'comments' && (
             <div className="space-y-6">
               {/* How did you hear about us */}
               <div className="space-y-3">
@@ -2392,7 +2996,7 @@ export default function PatientRegistrationForm() {
                     <label
                       key={index}
                       htmlFor={`heardAbout-${index}`}
-                      className={`flex items-center justify-center ${option == "Other" ? "w-[320px]" : "w-[160px]"} text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option
+                      className={`flex items-center justify-center ${option == "Other" ? "w-[320px]" : "w-[160px]"} px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option
                         ? 'bg-secondary text-white'
                         : 'bg-white text-secondary'
                         }`}
@@ -2450,7 +3054,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Telehealth Consent segment */}
-          {currentSegment === 36 && (
+          {currentSegmentId === 'consent' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Telehealth Consent to Treatment and HIPAA Notice</h2>
               <div className="space-y-4">
@@ -2639,7 +3243,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Other segments */}
-          {currentSegment > 0 && currentSegment < segments.length - 1 && (
+          {currentSegment > 0 && currentSegment < segments.length - 1 && currentSegmentId !== 'lipotropicConsent' && (
             <div className="space-y-4">
               {/* Segment content */}
               <div className="flex justify-between mt-8">
@@ -2669,7 +3273,20 @@ export default function PatientRegistrationForm() {
               <div className="flex justify-center mt-8">
                 <Button
                   onClick={() => {
-                    handleSubmit(onSubmit)();
+                    handleSubmit(onSubmit, (errors) => {
+                      console.log('Validation Errors:', errors);
+
+                      // Highlight the first error field
+                      const firstError = Object.keys(errors)[0];
+                      if (firstError) {
+                        const element = document.getElementById(firstError);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          element.focus();
+                        }
+                        // toast.error(`Please fix the error in ${firstError}: ${errors[firstError].message}`);
+                      }
+                    })();
                   }}
                   type="button"
                   className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"

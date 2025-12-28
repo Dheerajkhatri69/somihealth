@@ -94,7 +94,29 @@ export default function PatientUpdateForm({ params }) {
         PlanPurchased: '',
         // Additional Information / Marketing source
         heardAbout: '',
-        heardAboutOther: ''
+        heardAbout: '',
+        heardAboutOther: '',
+        // Lipotropic Fields from Questionnaire
+        lipotropicAllergies: [],
+        lipotropicAllergiesDrop: '',
+        lipotropicGoals: [],
+        lipotropicHistory: '',
+        lipotropicLastTreatment: '',
+        lipotropicSatisfaction: '',
+        lipotropicStopReason: '',
+        averageMood: '',
+        lipotropicDiagnoses: [],
+        lipotropicMedicalConditions: '',
+        lipotropicMedicalConditionsDrop: '',
+        lipotropicMeds: '',
+        lipotropicMedsDrop: '',
+        lipotropicPregnant: '',
+        providerQuestions: '',
+        providerQuestionsDrop: '',
+        lipotropicConsent: false,
+        lipotropicTerms: false,
+        lipotropicTreatment: false,
+        lipotropicElectronic: false,
     });
 
     useEffect(() => {
@@ -199,7 +221,28 @@ export default function PatientUpdateForm({ params }) {
                 agreeTerms: formData.agreeTerms,
                 // Additional Information / Marketing source
                 heardAbout: formData.heardAbout,
-                heardAboutOther: formData.heardAboutOther
+                heardAboutOther: formData.heardAboutOther,
+                // Lipotropic Fields
+                lipotropicAllergies: formData.lipotropicAllergies,
+                lipotropicAllergiesDrop: formData.lipotropicAllergiesDrop,
+                lipotropicGoals: formData.lipotropicGoals,
+                lipotropicHistory: formData.lipotropicHistory,
+                lipotropicLastTreatment: formData.lipotropicLastTreatment,
+                lipotropicSatisfaction: formData.lipotropicSatisfaction,
+                lipotropicStopReason: formData.lipotropicStopReason,
+                averageMood: formData.averageMood,
+                lipotropicDiagnoses: formData.lipotropicDiagnoses,
+                lipotropicMedicalConditions: formData.lipotropicMedicalConditions,
+                lipotropicMedicalConditionsDrop: formData.lipotropicMedicalConditionsDrop,
+                lipotropicMeds: formData.lipotropicMeds,
+                lipotropicMedsDrop: formData.lipotropicMedsDrop,
+                lipotropicPregnant: formData.lipotropicPregnant,
+                providerQuestions: formData.providerQuestions,
+                providerQuestionsDrop: formData.providerQuestionsDrop,
+                lipotropicConsent: formData.lipotropicConsent,
+                lipotropicTerms: formData.lipotropicTerms,
+                lipotropicTreatment: formData.lipotropicTreatment,
+                lipotropicElectronic: formData.lipotropicElectronic
             };
 
             // Submit to /api/patients
@@ -260,10 +303,10 @@ export default function PatientUpdateForm({ params }) {
                     // Redirect to questionnaire list after successful submission
                     router.push('/dashboard/questionnaire');
                 } else {
-                    throw new Error(deleteResult.message || 'Failed to delete questionnaire data');
+                    throw new Error(deleteResult.result?.message || deleteResult.message || 'Failed to delete questionnaire data');
                 }
             } else {
-                throw new Error(result.message || 'Failed to update patient data');
+                throw new Error(result.result?.message || result.message || 'Failed to update patient data');
             }
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -613,6 +656,149 @@ export default function PatientUpdateForm({ params }) {
                             onChange={handleInputChange}
                         />
                     </div>
+                </div>
+
+                {/* Lipotropic Information */}
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f7fa]">
+                    <div className="space-y-4 col-span-full">
+                        <h3 className="text-lg font-semibold">Lipotropic Information</h3>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicGoals">Weight Loss Goals</Label>
+                        <Textarea
+                            id="lipotropicGoals"
+                            value={Array.isArray(formData.lipotropicGoals) ? formData.lipotropicGoals.join(', ') : formData.lipotropicGoals}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicAllergies">Allergies</Label>
+                        <Textarea
+                            id="lipotropicAllergies"
+                            value={Array.isArray(formData.lipotropicAllergies) ? formData.lipotropicAllergies.join(', ') : formData.lipotropicAllergies}
+                            readOnly
+                        />
+                    </div>
+                    {formData.lipotropicAllergiesDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="lipotropicAllergiesDrop">Allergy Details</Label>
+                            <Textarea
+                                id="lipotropicAllergiesDrop"
+                                value={formData.lipotropicAllergiesDrop}
+                                readOnly
+                            />
+                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicDiagnoses">Diagnosed Conditions</Label>
+                        <Textarea
+                            id="lipotropicDiagnoses"
+                            value={Array.isArray(formData.lipotropicDiagnoses) ? formData.lipotropicDiagnoses.join(', ') : formData.lipotropicDiagnoses}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicHistory">Medical History</Label>
+                        <Textarea
+                            id="lipotropicHistory"
+                            value={formData.lipotropicHistory}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicLastTreatment">Last Treatment</Label>
+                        <Input
+                            id="lipotropicLastTreatment"
+                            value={formData.lipotropicLastTreatment}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicSatisfaction">Satisfaction with Last Treatment</Label>
+                        <Input
+                            id="lipotropicSatisfaction"
+                            value={formData.lipotropicSatisfaction}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicStopReason">Reason for Stopping</Label>
+                        <Textarea
+                            id="lipotropicStopReason"
+                            value={formData.lipotropicStopReason}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="averageMood">Average Mood</Label>
+                        <Input
+                            id="averageMood"
+                            value={formData.averageMood}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicMedicalConditions">Other Medical Conditions?</Label>
+                        <Input
+                            id="lipotropicMedicalConditions"
+                            value={formData.lipotropicMedicalConditions}
+                            readOnly
+                        />
+                    </div>
+                    {formData.lipotropicMedicalConditionsDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="lipotropicMedicalConditionsDrop">Condition Details</Label>
+                            <Textarea
+                                id="lipotropicMedicalConditionsDrop"
+                                value={formData.lipotropicMedicalConditionsDrop}
+                                readOnly
+                            />
+                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicMeds">Taking Medications?</Label>
+                        <Input
+                            id="lipotropicMeds"
+                            value={formData.lipotropicMeds}
+                            readOnly
+                        />
+                    </div>
+                    {formData.lipotropicMedsDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="lipotropicMedsDrop">Medication Details</Label>
+                            <Textarea
+                                id="lipotropicMedsDrop"
+                                value={formData.lipotropicMedsDrop}
+                                readOnly
+                            />
+                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicPregnant">Pregnant/Breastfeeding/Planning?</Label>
+                        <Input
+                            id="lipotropicPregnant"
+                            value={formData.lipotropicPregnant}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="providerQuestions">Questions for Provider?</Label>
+                        <Input
+                            id="providerQuestions"
+                            value={formData.providerQuestions}
+                            readOnly
+                        />
+                    </div>
+                    {formData.providerQuestionsDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="providerQuestionsDrop">Question Details</Label>
+                            <Textarea
+                                id="providerQuestionsDrop"
+                                value={formData.providerQuestionsDrop}
+                                readOnly
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Health Conditions */}

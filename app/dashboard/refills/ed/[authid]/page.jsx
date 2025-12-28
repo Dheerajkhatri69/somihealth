@@ -19,7 +19,7 @@ import toast from "react-hot-toast";
 const medicationOptions = {
     'Sildenafil (Generic of Viagra)': ['25mg', '50mg', '100mg'],
     'Tadalafil (Generic of Cialis)': ['5mg', '10mg', '20mg'],
-    'Mini Troches (Tadalafil/Sildenafil)': ['5/35mg', '10/40mg']
+    'Fusion Mini Troches (Tadalafil/Sildenafil)': ['5/35mg', '10/40mg']
 };
 
 export default function EDRefillAdminEditForm({ params }) {
@@ -641,8 +641,8 @@ export default function EDRefillAdminEditForm({ params }) {
                                                 <SelectItem value="Switch to Sildenafil 25mg">Switch to Sildenafil 25mg</SelectItem>
                                                 <SelectItem value="Switch to Sildenafil 50mg">Switch to Sildenafil 50mg</SelectItem>
                                                 <SelectItem value="Switch to Sildenafil 100mg">Switch to Sildenafil 100mg</SelectItem>
-                                                <SelectItem value="Switch to Mini Troches 5/35mg">Switch to Mini Troches 5/35mg</SelectItem>
-                                                <SelectItem value="Switch to Mini Troches 10/40mg">Switch to Mini Troches 10/40mg</SelectItem>
+                                                <SelectItem value="Switch to Fusion Mini Troches 5/35mg">Switch to Fusion Mini Troches 5/35mg</SelectItem>
+                                                <SelectItem value="Switch to Fusion Mini Troches 10/40mg">Switch to Fusion Mini Troches 10/40mg</SelectItem>
                                             </>
                                         )}
                                         {formData.medicationDecision === 'increase' && (
@@ -653,8 +653,8 @@ export default function EDRefillAdminEditForm({ params }) {
                                                 <SelectItem value="Increase dose Sildenafil 25mg">Increase dose Sildenafil 25mg</SelectItem>
                                                 <SelectItem value="Increase dose Sildenafil 50mg">Increase dose Sildenafil 50mg</SelectItem>
                                                 <SelectItem value="Increase dose Sildenafil 100mg">Increase dose Sildenafil 100mg</SelectItem>
-                                                <SelectItem value="Increase dose Mini Troches 5/35mg">Increase dose Mini Troches 5/35mg</SelectItem>
-                                                <SelectItem value="Increase dose Mini Troches 10/40mg">Increase dose Mini Troches 10/40mg</SelectItem>
+                                                <SelectItem value="Increase dose Fusion Mini Troches 5/35mg">Increase dose Fusion Mini Troches 5/35mg</SelectItem>
+                                                <SelectItem value="Increase dose Fusion Mini Troches 10/40mg">Increase dose Fusion Mini Troches 10/40mg</SelectItem>
                                             </>
                                         )}
                                         {formData.medicationDecision === 'decrease' && (
@@ -665,8 +665,8 @@ export default function EDRefillAdminEditForm({ params }) {
                                                 <SelectItem value="Decrease dose Sildenafil 25mg">Decrease dose Sildenafil 25mg</SelectItem>
                                                 <SelectItem value="Decrease dose Sildenafil 50mg">Decrease dose Sildenafil 50mg</SelectItem>
                                                 <SelectItem value="Decrease dose Sildenafil 100mg">Decrease dose Sildenafil 100mg</SelectItem>
-                                                <SelectItem value="Decrease dose Mini Troches 5/35mg">Decrease dose Mini Troches 5/35mg</SelectItem>
-                                                <SelectItem value="Decrease dose Mini Troches 10/40mg">Decrease dose Mini Troches 10/40mg</SelectItem>
+                                                <SelectItem value="Decrease dose Fusion Mini Troches 5/35mg">Decrease dose Fusion Mini Troches 5/35mg</SelectItem>
+                                                <SelectItem value="Decrease dose Fusion Mini Troches 10/40mg">Decrease dose Fusion Mini Troches 10/40mg</SelectItem>
                                             </>
                                         )}
                                     </SelectContent>
@@ -798,19 +798,14 @@ export default function EDRefillAdminEditForm({ params }) {
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
-                            {/* <Select
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 60 mg / 2 mL)"
                                 value={formData.unit}
-                                onValueChange={(value) => handleSelectChange('unit', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="tablet">Tablet</SelectItem>
-                                    <SelectItem value="troche">Troche</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select> */}
+                                onChange={(e) =>
+                                    handleSelectChange("unit", e.target.value)
+                                }
+                            />
                         </div>
 
                     </div>

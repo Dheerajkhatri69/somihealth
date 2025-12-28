@@ -45,6 +45,8 @@ export async function GET(request, { params }) {
                 semaglutideUnit: patient.semaglutideUnit,
                 tirzepatideDose: patient.tirzepatideDose,
                 tirzepatideUnit: patient.tirzepatideUnit,
+                lipotropicDose: patient.lipotropicDose,
+                lipotropicUnit: patient.lipotropicUnit,
                 createTimeDate: patient.createTimeDate,
                 images: patient.images,
                 file1: patient.file1,

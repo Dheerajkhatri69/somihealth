@@ -67,7 +67,7 @@ const LongevityLandingPage = () => {
               </div>
 
               <h2 className="text-2xl font-semibold mt-4 mb-2">
-                Start Your Longevity Journey Today!
+                Your Vitality starts today
               </h2>
 
               <p className="text-gray-700 mb-6">

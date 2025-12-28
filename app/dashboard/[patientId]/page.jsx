@@ -113,6 +113,8 @@ export default function PatientUpdateForm({ params }) {
         semaglutideUnit: '',
         tirzepatideDose: '',
         tirzepatideUnit: '',
+        lipotropicDose: '',
+        lipotropicUnit: '',
         providerNote: '',
         createTimeDate: '',
         closetickets: false,
@@ -123,6 +125,27 @@ export default function PatientUpdateForm({ params }) {
         refillReminder: '', // new field
         followUpInterval: '', // for select
         refillReminderInterval: '', // for select
+        // Lipotropic Fields
+        lipotropicAllergies: [],
+        lipotropicAllergiesDrop: '',
+        lipotropicGoals: [],
+        lipotropicHistory: '',
+        lipotropicLastTreatment: '',
+        lipotropicSatisfaction: '',
+        lipotropicStopReason: '',
+        averageMood: '',
+        lipotropicDiagnoses: [],
+        lipotropicMedicalConditions: '',
+        lipotropicMedicalConditionsDrop: '',
+        lipotropicMeds: '',
+        lipotropicMedsDrop: '',
+        lipotropicPregnant: '',
+        providerQuestions: '',
+        providerQuestionsDrop: '',
+        lipotropicConsent: false,
+        lipotropicTerms: false,
+        lipotropicTreatment: false,
+        lipotropicElectronic: false,
     });
     const [images, setImages] = useState([
         { file: null, preview: null },
@@ -269,7 +292,28 @@ export default function PatientUpdateForm({ params }) {
             refillReminder,
             images: imageUrls,
             file1: fileUrls.file1,
-            file2: fileUrls.file2
+            file2: fileUrls.file2,
+            // Lipotropic Fields
+            lipotropicAllergies: formData.lipotropicAllergies,
+            lipotropicAllergiesDrop: formData.lipotropicAllergiesDrop,
+            lipotropicGoals: formData.lipotropicGoals,
+            lipotropicHistory: formData.lipotropicHistory,
+            lipotropicLastTreatment: formData.lipotropicLastTreatment,
+            lipotropicSatisfaction: formData.lipotropicSatisfaction,
+            lipotropicStopReason: formData.lipotropicStopReason,
+            averageMood: formData.averageMood,
+            lipotropicDiagnoses: formData.lipotropicDiagnoses,
+            lipotropicMedicalConditions: formData.lipotropicMedicalConditions,
+            lipotropicMedicalConditionsDrop: formData.lipotropicMedicalConditionsDrop,
+            lipotropicMeds: formData.lipotropicMeds,
+            lipotropicMedsDrop: formData.lipotropicMedsDrop,
+            lipotropicPregnant: formData.lipotropicPregnant,
+            providerQuestions: formData.providerQuestions,
+            providerQuestionsDrop: formData.providerQuestionsDrop,
+            lipotropicConsent: formData.lipotropicConsent,
+            lipotropicTerms: formData.lipotropicTerms,
+            lipotropicTreatment: formData.lipotropicTreatment,
+            lipotropicElectronic: formData.lipotropicElectronic
         };
 
         try {
@@ -290,7 +334,7 @@ export default function PatientUpdateForm({ params }) {
                 setIsDialogOpen(true);
             } else {
                 setMessageHead("Error");
-                setMessage(data.result.message || "Failed to update patient");
+                setMessage(data.result?.message || data.message || "Failed to update patient");
                 setIsSuccess(false);
                 setIsDialogOpen(true);
             }
@@ -797,6 +841,159 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Semaglutide Section */}
+                {/* Lipotropic Information */}
+                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f7fa]">
+                    <div className="space-y-4 col-span-full">
+                        <h3 className="text-lg font-semibold">Lipotropic Information</h3>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicGoals">Weight Loss Goals</Label>
+                        <Textarea
+                            id="lipotropicGoals"
+                            value={Array.isArray(formData.lipotropicGoals) ? formData.lipotropicGoals.join(', ') : formData.lipotropicGoals}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicAllergies">Allergies</Label>
+                        <Textarea
+                            id="lipotropicAllergies"
+                            value={Array.isArray(formData.lipotropicAllergies) ? formData.lipotropicAllergies.join(', ') : formData.lipotropicAllergies}
+                            readOnly
+                        />
+                    </div>
+                    {formData.lipotropicAllergiesDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="lipotropicAllergiesDrop">Allergy Details</Label>
+                            <Textarea
+                                id="lipotropicAllergiesDrop"
+                                value={formData.lipotropicAllergiesDrop}
+                                readOnly
+                            />
+                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicDiagnoses">Diagnosed Conditions</Label>
+                        <Textarea
+                            id="lipotropicDiagnoses"
+                            value={Array.isArray(formData.lipotropicDiagnoses) ? formData.lipotropicDiagnoses.join(', ') : formData.lipotropicDiagnoses}
+                            readOnly
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicHistory">Medical History</Label>
+                        <Textarea
+                            id="lipotropicHistory"
+                            name="lipotropicHistory"
+                            value={formData.lipotropicHistory}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicLastTreatment">Last Treatment</Label>
+                        <Input
+                            id="lipotropicLastTreatment"
+                            name="lipotropicLastTreatment"
+                            value={formData.lipotropicLastTreatment}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicSatisfaction">Satisfaction with Last Treatment</Label>
+                        <Input
+                            id="lipotropicSatisfaction"
+                            name="lipotropicSatisfaction"
+                            value={formData.lipotropicSatisfaction}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicStopReason">Reason for Stopping</Label>
+                        <Textarea
+                            id="lipotropicStopReason"
+                            name="lipotropicStopReason"
+                            value={formData.lipotropicStopReason}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="averageMood">Average Mood</Label>
+                        <Input
+                            id="averageMood"
+                            name="averageMood"
+                            value={formData.averageMood}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicMedicalConditions">Other Medical Conditions?</Label>
+                        <Input
+                            id="lipotropicMedicalConditions"
+                            name="lipotropicMedicalConditions"
+                            value={formData.lipotropicMedicalConditions}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    {formData.lipotropicMedicalConditionsDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="lipotropicMedicalConditionsDrop">Condition Details</Label>
+                            <Textarea
+                                id="lipotropicMedicalConditionsDrop"
+                                name="lipotropicMedicalConditionsDrop"
+                                value={formData.lipotropicMedicalConditionsDrop}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicMeds">Taking Medications?</Label>
+                        <Input
+                            id="lipotropicMeds"
+                            name="lipotropicMeds"
+                            value={formData.lipotropicMeds}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    {formData.lipotropicMedsDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="lipotropicMedsDrop">Medication Details</Label>
+                            <Textarea
+                                id="lipotropicMedsDrop"
+                                name="lipotropicMedsDrop"
+                                value={formData.lipotropicMedsDrop}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="lipotropicPregnant">Pregnant/Breastfeeding/Planning?</Label>
+                        <Input
+                            id="lipotropicPregnant"
+                            name="lipotropicPregnant"
+                            value={formData.lipotropicPregnant}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="providerQuestions">Questions for Provider?</Label>
+                        <Input
+                            id="providerQuestions"
+                            value={formData.providerQuestions}
+                            readOnly
+                        />
+                    </div>
+                    {formData.providerQuestionsDrop && (
+                        <div className="space-y-2">
+                            <Label htmlFor="providerQuestionsDrop">Question Details</Label>
+                            <Textarea
+                                id="providerQuestionsDrop"
+                                value={formData.providerQuestionsDrop}
+                                readOnly
+                            />
+                        </div>
+                    )}
+                </div>
+
                 <h3 className="text-sm font-semibold">Semaglutide</h3>
                 <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#ffe4e6]">
                     {['semaglutideLastDose', 'semaglutideRequestedDose'].map((field) => (
@@ -1103,9 +1300,12 @@ export default function PatientUpdateForm({ params }) {
                     <div className="space-y-2">
                         <Label>Semaglutide Dose</Label>
                         <div className="flex gap-2">
+                            {/* Dose Dropdown */}
                             <Select
                                 value={formData.semaglutideDose}
-                                onValueChange={(value) => handleSelectChange('semaglutideDose', value)}
+                                onValueChange={(value) =>
+                                    handleSelectChange("semaglutideDose", value)
+                                }
                             >
                                 <SelectTrigger className="w-1/2">
                                     <SelectValue placeholder="Dose" />
@@ -1120,68 +1320,91 @@ export default function PatientUpdateForm({ params }) {
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Select
+
+                            {/* Unit FREE TEXT */}
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 1 mg / 2 mL)"
                                 value={formData.semaglutideUnit}
-                                onValueChange={(value) => handleSelectChange('semaglutideUnit', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="1.00 mg/2mL">1.00 mg/2mL</SelectItem>
-                                    <SelectItem value="2.00 mg/2mL">2.00 mg/2mL</SelectItem>
-                                    <SelectItem value="4.00 mg/2mL">4.00 mg/2mL</SelectItem>
-                                    <SelectItem value="6.80 mg/2mL">6.80 mg/2mL</SelectItem>
-                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                    <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
-                                    <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
-                                    <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                onChange={(e) =>
+                                    handleSelectChange("semaglutideUnit", e.target.value)
+                                }
+                            />
                         </div>
                     </div>
 
-                    {/* Tirzepatide Dose */}
                     <div className="space-y-2">
                         <Label>Tirzepatide Dose</Label>
                         <div className="flex gap-2">
+                            {/* Dose Dropdown */}
                             <Select
                                 value={formData.tirzepatideDose}
-                                onValueChange={(value) => handleSelectChange('tirzepatideDose', value)}
+                                onValueChange={(value) =>
+                                    handleSelectChange("tirzepatideDose", value)
+                                }
                             >
                                 <SelectTrigger className="w-1/2">
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.50">2.50mg</SelectItem>
-                                    <SelectItem value="5.00">5.00mg</SelectItem>
-                                    <SelectItem value="7.50">7.50mg</SelectItem>
-                                    <SelectItem value="10.00">10.00mg</SelectItem>
-                                    <SelectItem value="12.50">12.50mg</SelectItem>
-                                    <SelectItem value="15.00">15.00mg</SelectItem>
+                                    <SelectItem value="2.50">2.50 mg</SelectItem>
+                                    <SelectItem value="5.00">5.00 mg</SelectItem>
+                                    <SelectItem value="7.50">7.50 mg</SelectItem>
+                                    <SelectItem value="10.00">10.00 mg</SelectItem>
+                                    <SelectItem value="12.50">12.50 mg</SelectItem>
+                                    <SelectItem value="15.00">15.00 mg</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Select
+
+                            {/* Unit FREE TEXT */}
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 60 mg / 2 mL)"
                                 value={formData.tirzepatideUnit}
-                                onValueChange={(value) => handleSelectChange('tirzepatideUnit', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                    <SelectItem value="20.00 mg/2mL">20.00 mg/2mL</SelectItem>
-                                    <SelectItem value="30.00 mg/2mL">30.00 mg/2mL</SelectItem>
-                                    <SelectItem value="40.00 mg/2mL">40.00 mg/2mL</SelectItem>
-                                    <SelectItem value="50.00 mg/2mL">50.00 mg/2mL</SelectItem>
-                                    <SelectItem value="60.00 mg/2mL">60.00 mg/2mL</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                onChange={(e) =>
+                                    handleSelectChange("tirzepatideUnit", e.target.value)
+                                }
+                            />
                         </div>
                     </div>
+
+                    <div className="space-y-2">
+                        <Label>Lipotropic MIC+B12 Dose</Label>
+                        <div className="flex gap-2">
+                            {/* Dose Dropdown */}
+                            <Select
+                                value={formData.lipotropicDose}
+                                onValueChange={(value) =>
+                                    handleSelectChange("lipotropicDose", value)
+                                }
+                            >
+                                <SelectTrigger className="w-1/2">
+                                    <SelectValue placeholder="Dose" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="2.50">2.50 mg</SelectItem>
+                                    <SelectItem value="5.00">5.00 mg</SelectItem>
+                                    <SelectItem value="7.50">7.50 mg</SelectItem>
+                                    <SelectItem value="10.00">10.00 mg</SelectItem>
+                                    <SelectItem value="12.50">12.50 mg</SelectItem>
+                                    <SelectItem value="15.00">15.00 mg</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* Unit FREE TEXT */}
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 60 mg / 2 mL)"
+                                value={formData.lipotropicUnit}
+                                onChange={(e) =>
+                                    handleSelectChange("lipotropicUnit", e.target.value)
+                                }
+                            />
+                        </div>
+                    </div>
+
                 </div>
 
                 <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">

@@ -285,7 +285,7 @@ export default function SkinHairRefillForm() {
                     <div className="space-y-2 p-4">
                         <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
                             <Image
-                                src="/longevityrefill.jpg"
+                                src="https://res.cloudinary.com/dvmbfolrm/image/upload/v1764026867/fileUploader/w1jmxvaiwra357qqag1k.jpg"
                                 alt="skinhairrefillsuccesspic"
                                 fill
                                 className="rounded-xl object-cover"

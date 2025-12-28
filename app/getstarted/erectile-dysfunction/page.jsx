@@ -68,10 +68,14 @@ const ErectileDysfunctionPage = () => {
 
 
                             <h2 className="text-2xl font-semibold mt-4 mb-2">
-                                Start Your Erectile Dysfunction Journey Today!
+                                Elevate your intimacy.
                             </h2>
 
                             <p className="text-gray-700 mb-6">
+                                No hidden fees, Free Expedited shipping
+                            </p>
+
+                            <p className="text-white -mb-10">
                                 No hidden fees, No monthly subscription, Free Expedited shipping
                             </p>
 

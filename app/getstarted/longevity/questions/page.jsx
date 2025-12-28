@@ -922,7 +922,7 @@ export default function PatientRegistrationForm() {
               <Label>Are you over 18? <span className="text-red-500">*</span></Label>
               <div className="flex gap-2 justify-center flex-col items-center">
                 {['yes', 'no'].map((option, index) => (
-                  <label key={index} className={`flex items-center w-[100px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('isOver18') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                  <label key={index} className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('isOver18') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
                     <input type="radio" value={option} className="hidden" {...register('isOver18')} />
                     <span>{option === 'yes' ? 'Yes' : 'No'}</span>
                   </label>
@@ -988,7 +988,7 @@ export default function PatientRegistrationForm() {
               <h2 className="text-xl font-semibold">Sex assigned at birth <span className="text-red-500">*</span></h2>
               <div className="flex gap-2 justify-center flex-col">
                 {['Male', 'Female'].map((option, index) => (
-                  <label key={index} className={`flex items-center w-[140px] justify-center text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('sex') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                  <label key={index} className={`flex items-center w-[140px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('sex') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
                     <input type="radio" value={option} className="hidden" {...register('sex')} />
                     <span>{option}</span>
                   </label>
@@ -1166,7 +1166,7 @@ export default function PatientRegistrationForm() {
               <Label>Please select one option <span className="text-red-500">*</span></Label>
               <div className="flex flex-col gap-3">
                 {['Instagram', 'Facebook', 'TikTok', 'Other'].map((option, index) => (
-                  <label key={index} className={`flex items-center justify-center ${option == "Other" ? "w-[320px]" : "w-[160px]"} text-sm px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                  <label key={index} className={`flex items-center justify-center ${option == "Other" ? "w-[320px]" : "w-[160px]"} px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('heardAbout') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
                     <input type="radio" value={option} className="hidden" {...register('heardAbout')} />
                     <span>{option == "Other" ? "Others(Friends or Family)" : option}</span>
                   </label>

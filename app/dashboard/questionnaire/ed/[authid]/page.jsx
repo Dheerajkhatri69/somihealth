@@ -29,7 +29,7 @@ import { upload } from "@imagekit/next";
 const medicationOptions = {
     'Sildenafil (Generic of Viagra)': ['25mg', '50mg', '100mg'],
     'Tadalafil (Generic of Cialis)': ['5mg', '10mg', '20mg'],
-    'Mini Troches (Tadalafil/Sildenafil)': ['5/35mg', '10/40mg']
+    'Fusion Mini Troches (Tadalafil/Sildenafil)': ['5/35mg', '10/40mg']
 };
 
 export default function EDQuestionnaireForm({ params }) {
@@ -1124,7 +1124,7 @@ export default function EDQuestionnaireForm({ params }) {
                                     <SelectContent>
                                         <SelectItem value="Sildenafil (Generic of Viagra)">Sildenafil (Generic of Viagra)</SelectItem>
                                         <SelectItem value="Tadalafil (Generic of Cialis)">Tadalafil (Generic of Cialis)</SelectItem>
-                                        <SelectItem value="Mini Troches (Tadalafil/Sildenafil)">Mini Troches (Tadalafil/Sildenafil)</SelectItem>
+                                        <SelectItem value="Fusion Mini Troches (Tadalafil/Sildenafil)">Fusion Mini Troches (Tadalafil/Sildenafil)</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -1148,22 +1148,14 @@ export default function EDQuestionnaireForm({ params }) {
                                 </div>
                             )}
 
-                            {/* <div className="space-y-2">
-                                <Label htmlFor="unit">Unit</Label>
-                                <Select
-                                    value={formData.unit || ""}
-                                    onValueChange={(value) => handleSelectChange('unit', value)}
-                                >
-                                    <SelectTrigger id="unit" className="w-full">
-                                        <SelectValue placeholder="Select unit" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="per tablet">per tablet</SelectItem>
-                                        <SelectItem value="per troche">per troche</SelectItem>
-                                        <SelectItem value="None">None</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div> */}
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 60 mg / 2 mL)"
+                                value={formData.unit}
+                                onChange={(e) =>
+                                    handleSelectChange("unit", e.target.value)
+                                }
+                            />
 
                             <div className="space-y-2 col-span-full">
                                 <Label htmlFor="providerNote">Provider Note</Label>

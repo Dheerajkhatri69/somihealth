@@ -244,9 +244,11 @@ export default function FollowUp() {
     const [approvalFilter, setApprovalFilter] = useState('all');
 
     const [semaglutideDoseOnly, setSemaglutideDoseOnly] = useState('all');
-    const [semaglutideUnitFilter, setSemaglutideUnitFilter] = useState('all');
+    const [semaglutideUnitFilter, setSemaglutideUnitFilter] = useState('');
     const [tirzepatideDoseOnly, setTirzepatideDoseOnly] = useState('all');
-    const [tirzepatideUnitFilter, setTirzepatideUnitFilter] = useState('all');
+    const [tirzepatideUnitFilter, setTirzepatideUnitFilter] = useState('');
+    const [lipotropicDoseOnly, setLipotropicDoseOnly] = useState('all');
+    const [lipotropicUnitFilter, setLipotropicUnitFilter] = useState('');
     const [createDateFilter, setCreateDateFilter] = useState("");
     const [selectedImageInfo, setSelectedImageInfo] = useState(null);
 
@@ -366,12 +368,16 @@ export default function FollowUp() {
 
         const semaglutideMatch = (
             (semaglutideDoseOnly === 'all' || patient.semaglutideDose == semaglutideDoseOnly) &&
-            (semaglutideUnitFilter === 'all' || patient.semaglutideUnit === semaglutideUnitFilter)
+            (semaglutideUnitFilter === '' || patient.semaglutideUnit === semaglutideUnitFilter)
         );
 
         const tirzepatideMatch = (
             (tirzepatideDoseOnly === 'all' || patient.tirzepatideDose == tirzepatideDoseOnly) &&
-            (tirzepatideUnitFilter === 'all' || patient.tirzepatideUnit === tirzepatideUnitFilter)
+            (tirzepatideUnitFilter === '' || patient.tirzepatideUnit === tirzepatideUnitFilter)
+        );
+        const lipotropicMatch = (
+            (lipotropicDoseOnly === 'all' || patient.lipotropicDose == lipotropicDoseOnly) &&
+            (lipotropicUnitFilter === '' || patient.lipotropicUnit === lipotropicUnitFilter)
         );
 
         const clinicianMatch =
@@ -394,7 +400,7 @@ export default function FollowUp() {
             (refillDue && extractInterval(patient.refillReminder) === refillReminderFilter);
 
         return emailOrNameMatch && pIdMatch && genderMatch && dobMatch && cityMatch &&
-            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch && followUpMatch && refillReminderMatch;
+            medicineMatch && semaglutideMatch && tirzepatideMatch && approvalMatch && createDateMatch && clinicianMatch && createDateRangeMatch && followUpMatch && refillReminderMatch && lipotropicMatch;
     });
 
     const statusCounts = getStatusCounts(filteredPatients);
@@ -642,7 +648,7 @@ export default function FollowUp() {
     }
     return (
         <div className="overflow-x-auto px-4">
-            <MainFollowUpButtonGroup/>
+            <MainFollowUpButtonGroup />
             <div className="flex flex-wrap gap-2 mb-4">
                 {userType === 'C' && (
                     <Select value={viewMode} onValueChange={setViewMode}>
@@ -751,10 +757,11 @@ export default function FollowUp() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        {/* Semaglutide Dose Filter */}
                         <div className="space-y-1">
                             <label className="text-sm font-medium px-2">Semaglutide Dose</label>
+
                             <div className="flex gap-2">
+                                {/* Dose dropdown */}
                                 <Select value={semaglutideDoseOnly} onValueChange={setSemaglutideDoseOnly}>
                                     <SelectTrigger className="w-1/2">
                                         <SelectValue placeholder="Dose" />
@@ -771,61 +778,74 @@ export default function FollowUp() {
                                     </SelectContent>
                                 </Select>
 
-                                <Select value={semaglutideUnitFilter} onValueChange={setSemaglutideUnitFilter}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Unit" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="1.00 mg/2mL">1.00 mg/2mL</SelectItem>
-                                        <SelectItem value="2.00 mg/2mL">2.00 mg/2mL</SelectItem>
-                                        <SelectItem value="4.00 mg/2mL">4.00 mg/2mL</SelectItem>
-                                        <SelectItem value="6.80 mg/2mL">6.80 mg/2mL</SelectItem>
-                                        <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                        <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
-                                        <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
-                                        <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
-                                        <SelectItem value="None">None</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                {/* Unit FREE TEXT */}
+                                <Input
+                                    className="w-full"
+                                    placeholder="Unit (free text)"
+                                    value={semaglutideUnitFilter}
+                                    onChange={(e) => setSemaglutideUnitFilter(e.target.value)}
+                                />
                             </div>
                         </div>
 
-                        {/* Tirzepatide Dose Filter */}
                         <div className="space-y-1">
                             <label className="text-sm font-medium px-2">Tirzepatide Dose</label>
+
                             <div className="flex gap-2">
+                                {/* Dose dropdown */}
                                 <Select value={tirzepatideDoseOnly} onValueChange={setTirzepatideDoseOnly}>
                                     <SelectTrigger className="w-1/2">
                                         <SelectValue placeholder="Dose" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="2.50">2.50mg</SelectItem>
-                                        <SelectItem value="5.00">5.00mg</SelectItem>
-                                        <SelectItem value="7.50">7.50mg</SelectItem>
-                                        <SelectItem value="10.00">10.00mg</SelectItem>
-                                        <SelectItem value="12.50">12.50mg</SelectItem>
-                                        <SelectItem value="15.00">15.00mg</SelectItem>
+                                        <SelectItem value="2.50">2.50 mg</SelectItem>
+                                        <SelectItem value="5.00">5.00 mg</SelectItem>
+                                        <SelectItem value="7.50">7.50 mg</SelectItem>
+                                        <SelectItem value="10.00">10.00 mg</SelectItem>
+                                        <SelectItem value="12.50">12.50 mg</SelectItem>
+                                        <SelectItem value="15.00">15.00 mg</SelectItem>
                                         <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
 
-                                <Select value={tirzepatideUnitFilter} onValueChange={setTirzepatideUnitFilter}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Unit" />
+                                {/* Unit FREE TEXT */}
+                                <Input
+                                    className="w-full"
+                                    placeholder="Unit (free text)"
+                                    value={tirzepatideUnitFilter}
+                                    onChange={(e) => setTirzepatideUnitFilter(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium px-2">Lipotropic Dose</label>
+
+                            <div className="flex gap-2">
+                                {/* Dose dropdown */}
+                                <Select value={lipotropicDoseOnly} onValueChange={setLipotropicDoseOnly}>
+                                    <SelectTrigger className="w-1/2">
+                                        <SelectValue placeholder="Dose" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                        <SelectItem value="20.00 mg/2mL">20.00 mg/2mL</SelectItem>
-                                        <SelectItem value="30.00 mg/2mL">30.00 mg/2mL</SelectItem>
-                                        <SelectItem value="40.00 mg/2mL">40.00 mg/2mL</SelectItem>
-                                        <SelectItem value="50.00 mg/2mL">50.00 mg/2mL</SelectItem>
-                                        <SelectItem value="60.00 mg/2mL">60.00 mg/2mL</SelectItem>
+                                        <SelectItem value="2.50">2.50 mg</SelectItem>
+                                        <SelectItem value="5.00">5.00 mg</SelectItem>
+                                        <SelectItem value="7.50">7.50 mg</SelectItem>
+                                        <SelectItem value="10.00">10.00 mg</SelectItem>
+                                        <SelectItem value="12.50">12.50 mg</SelectItem>
+                                        <SelectItem value="15.00">15.00 mg</SelectItem>
                                         <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
+
+                                {/* Unit FREE TEXT */}
+                                <Input
+                                    className="w-full"
+                                    placeholder="Unit (free text)"
+                                    value={lipotropicUnitFilter}
+                                    onChange={(e) => setLipotropicUnitFilter(e.target.value)}
+                                />
                             </div>
                         </div>
 
@@ -1154,6 +1174,7 @@ export default function FollowUp() {
 
                                 {/* Tirzepatide */}
                                 <TableHead className="whitespace-nowrap">Tirzepatide Dose</TableHead>
+                                <TableHead className="whitespace-nowrap">Lipotropic Dose</TableHead>
 
                                 <TableHead className="whitespace-nowrap">Follow-Up/Refills</TableHead>
 
@@ -1265,6 +1286,9 @@ export default function FollowUp() {
 
                                     <TableCell className="whitespace-nowrap">
                                         {patient.tirzepatideDose}{" unit: "}{patient.tirzepatideUnit}
+                                    </TableCell>
+                                    <TableCell className="whitespace-nowrap">
+                                        {patient.lipotropicDose}{" unit: "}{patient.lipotropicUnit}
                                     </TableCell>
                                     <TableCell>{patient.followUpRefills ? "Yes" : "No"}</TableCell>
 

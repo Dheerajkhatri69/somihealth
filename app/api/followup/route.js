@@ -62,6 +62,8 @@ export async function POST(request) {
             semaglutideUnit: body.semaglutideUnit,
             tirzepatideDose: body.tirzepatideDose,
             tirzepatideUnit: body.tirzepatideUnit,
+            lipotropicDose: body.lipotropicDose,
+            lipotropicUnit: body.lipotropicUnit,
             createTimeDate: body.createTimeDate || new Date().toISOString(),
             closetickets: body.closetickets || false,
             Reasonclosetickets: body.Reasonclosetickets,

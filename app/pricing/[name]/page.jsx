@@ -173,8 +173,12 @@ export default function Page({ params }) {
 
           {/* Image */}
           {isGLP1 ? (
-            <div className="relative w-36 h-36 md:w-[180px] md:h-[180px] mb-4">
-              <Image src={meta?.image || '/pricing/generic.jpg'} alt={meta?.title || ''} fill className="object-contain rounded-xl" priority />
+            <div className="relative w-full h-40 md:h-56 my-4">
+              <Image src={
+                meta?.title === "Compounded Semaglutide" ? "https://res.cloudinary.com/dvmbfolrm/image/upload/v1764361470/fileUploader/ibkdhccmr757f0tmao7s.jpg" :
+                meta?.title === "Lipotropic MIC+B12" ?  'https://res.cloudinary.com/dvmbfolrm/image/upload/v1764359105/fileUploader/mmjr6rcbyf2wjzywkihh.jpg' :
+                "https://res.cloudinary.com/dvmbfolrm/image/upload/v1764363731/fileUploader/scnelqa3ni9gwacrneso.jpg"} 
+                 alt={meta?.title || ''} fill className="object-cover rounded-2xl" priority />
             </div>
           ) : (
             <div className="relative w-full h-40 md:h-56 my-4">

@@ -55,6 +55,8 @@ export default function UpdateFollowUp({ params }) {
             semaglutideUnit: '',
             tirzepatideDose: '',
             tirzepatideUnit: '',
+            lipotropicDose: '',
+            lipotropicUnit: '',
             createTimeDate: '',
             providerComments: '',
             providerNote: '',
@@ -810,13 +812,15 @@ export default function UpdateFollowUp({ params }) {
                             </Select>
                         </div>
                     )}
-                    {/* Semaglutide Dose */}
                     <div className="space-y-2">
                         <Label>Semaglutide Dose</Label>
                         <div className="flex gap-2">
+                            {/* Dose Dropdown */}
                             <Select
                                 value={formData.semaglutideDose}
-                                onValueChange={(value) => handleSelectChange('semaglutideDose', value)}
+                                onValueChange={(value) =>
+                                    handleSelectChange("semaglutideDose", value)
+                                }
                             >
                                 <SelectTrigger className="w-1/2">
                                     <SelectValue placeholder="Dose" />
@@ -830,71 +834,91 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectItem value="2.5">2.5 mg</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
+                            </Select>
 
-                            </Select>
-                            <Select
+                            {/* Unit FREE TEXT */}
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 1 mg / 2 mL)"
                                 value={formData.semaglutideUnit}
-                                onValueChange={(value) => handleSelectChange('semaglutideUnit', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="1.00 mg/2mL">1.00 mg/2mL</SelectItem>
-                                    <SelectItem value="2.00 mg/2mL">2.00 mg/2mL</SelectItem>
-                                    <SelectItem value="4.00 mg/2mL">4.00 mg/2mL</SelectItem>
-                                    <SelectItem value="6.80 mg/2mL">6.80 mg/2mL</SelectItem>
-                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                    <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
-                                    <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
-                                    <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                onChange={(e) =>
+                                    handleSelectChange("semaglutideUnit", e.target.value)
+                                }
+                            />
                         </div>
                     </div>
 
-                    {/* Tirzepatide Dose */}
                     <div className="space-y-2">
                         <Label>Tirzepatide Dose</Label>
                         <div className="flex gap-2">
+                            {/* Dose Dropdown */}
                             <Select
                                 value={formData.tirzepatideDose}
-                                onValueChange={(value) => handleSelectChange('tirzepatideDose', value)}
+                                onValueChange={(value) =>
+                                    handleSelectChange("tirzepatideDose", value)
+                                }
                             >
                                 <SelectTrigger className="w-1/2">
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.50">2.50mg</SelectItem>
-                                    <SelectItem value="5.00">5.00mg</SelectItem>
-                                    <SelectItem value="7.50">7.50mg</SelectItem>
-                                    <SelectItem value="10.00">10.00mg</SelectItem>
-                                    <SelectItem value="12.50">12.50mg</SelectItem>
-                                    <SelectItem value="15.00">15.00mg</SelectItem>
+                                    <SelectItem value="2.50">2.50 mg</SelectItem>
+                                    <SelectItem value="5.00">5.00 mg</SelectItem>
+                                    <SelectItem value="7.50">7.50 mg</SelectItem>
+                                    <SelectItem value="10.00">10.00 mg</SelectItem>
+                                    <SelectItem value="12.50">12.50 mg</SelectItem>
+                                    <SelectItem value="15.00">15.00 mg</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
 
-                            <Select
+                            {/* Unit FREE TEXT */}
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 60 mg / 2 mL)"
                                 value={formData.tirzepatideUnit}
-                                onValueChange={(value) => handleSelectChange('tirzepatideUnit', value)}
+                                onChange={(e) =>
+                                    handleSelectChange("tirzepatideUnit", e.target.value)
+                                }
+                            />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Lipotropic Dose</Label>
+                        <div className="flex gap-2">
+                            {/* Dose Dropdown */}
+                            <Select
+                                value={formData.lipotropicDose}
+                                onValueChange={(value) =>
+                                    handleSelectChange("lipotropicDose", value)
+                                }
                             >
                                 <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
+                                    <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                    <SelectItem value="20.00 mg/2mL">20.00 mg/2mL</SelectItem>
-                                    <SelectItem value="30.00 mg/2mL">30.00 mg/2mL</SelectItem>
-                                    <SelectItem value="40.00 mg/2mL">40.00 mg/2mL</SelectItem>
-                                    <SelectItem value="50.00 mg/2mL">50.00 mg/2mL</SelectItem>
-                                    <SelectItem value="60.00 mg/2mL">60.00 mg/2mL</SelectItem>
+                                    <SelectItem value="2.50">2.50 mg</SelectItem>
+                                    <SelectItem value="5.00">5.00 mg</SelectItem>
+                                    <SelectItem value="7.50">7.50 mg</SelectItem>
+                                    <SelectItem value="10.00">10.00 mg</SelectItem>
+                                    <SelectItem value="12.50">12.50 mg</SelectItem>
+                                    <SelectItem value="15.00">15.00 mg</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
+
+                            {/* Unit FREE TEXT */}
+                            <Input
+                                className="w-1/2"
+                                placeholder="Unit (e.g. 60 mg / 2 mL)"
+                                value={formData.lipotropicUnit}
+                                onChange={(e) =>
+                                    handleSelectChange("lipotropicUnit", e.target.value)
+                                }
+                            />
                         </div>
                     </div>
+
                 </div>
                 <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

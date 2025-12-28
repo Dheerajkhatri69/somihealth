@@ -293,7 +293,7 @@ export default function EDQuestionnaireDashboard() {
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="Sildenafil (Generic of Viagra)">Sildenafil (Generic of Viagra)</SelectItem>
                         <SelectItem value="Tadalafil (Generic of Cialis)">Tadalafil (Generic of Cialis)</SelectItem>
-                        <SelectItem value="Mini Troches (Tadalafil/Sildenafil)">Mini Troches (Tadalafil/Sildenafil)</SelectItem>
+                        <SelectItem value="Fusion Mini Troches (Tadalafil/Sildenafil)">Fusion Mini Troches (Tadalafil/Sildenafil)</SelectItem>
                     </SelectContent>
                 </Select>
 

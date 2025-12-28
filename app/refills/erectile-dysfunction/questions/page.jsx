@@ -91,7 +91,7 @@ const ProgressBar = ({ progress }) => (
 const medicationOptions = {
     'Sildenafil (Generic of Viagra)': ['25mg', '50mg', '100mg'],
     'Tadalafil (Generic of Cialis)': ['5mg', '10mg', '20mg'],
-    'Mini Troches (Tadalafil/Sildenafil)': ['5/35mg', '10/40mg']
+    'Fusion Mini Troches (Tadalafil/Sildenafil)': ['5/35mg', '10/40mg']
 };
 
 // All change options as specified
