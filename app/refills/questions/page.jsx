@@ -520,9 +520,9 @@ export default function PatientRegistrationForm() {
 
                     {currentSegment === 4 && (
                         <>
-                            <Label>Which GLP-1 medication are you currently taking <span className="text-red-500">*</span></Label>
+                            <Label>Which medication are you currently taking <span className="text-red-500">*</span></Label>
                             <div className="flex flex-col gap-2 items-center">
-                                {['Semaglutide', 'Tirzepatide'].map(option => (
+                                {['Semaglutide', 'Tirzepatide', 'Lipotropic MIC +B12'].map(option => (
                                     <label key={option} className="radio-style">
                                         <input
                                             type="radio"

@@ -593,7 +593,7 @@ export default function PatientRegistrationForm() {
                   />
                 </div>
                 <h3 className="text-lg md:text-x text-center">
-                  Thank you for completing your GLP-1 Medical Intake form
+                  Thank you for completing your Weight Loss Medical Intake form
                 </h3>
 
                 <p className="text-gray-600 text-center">
@@ -996,7 +996,7 @@ export default function PatientRegistrationForm() {
           {/* Key Takeaways Segment (Lipotropic) */}
           {currentSegmentId === 'lipotropicTakeaways' && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Weight Loss (Lipotropic MIC+B12) Flow</h2>
+              <h2 className="text-xl font-semibold">Weight Loss (Lipotropic MIC+B12)</h2>
               <div className="space-y-4">
                 <h3 className="font-bold text-lg">Key takeaways</h3>
                 <p className="text-sm text-gray-700">
@@ -1014,10 +1014,15 @@ export default function PatientRegistrationForm() {
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">{isLipotropic ? 'Plan' : 'GLP-1 Plan'}</h2>
               <div className="space-y-2">
-                <Label htmlFor="paid">
-                  If you have paid for your medication pick &quot;YES&quot;.<br />
-                  If you have not paid for your medications pick &quot;NO&quot; <span className="text-red-500">*</span>
-                </Label>
+                {
+                  isLipotropic ?
+                    null :
+                    <Label htmlFor="paid">
+                      If you have paid for your medication pick &quot;YES&quot;.<br />
+                      If you have not paid for your medications pick &quot;NO&quot; <span className="text-red-500">*</span>
+                    </Label>
+                }
+
                 <div className="flex gap-2 justify-center flex-col items-center">
                   {['yes', 'no'].map((option, index) => (
                     <label
