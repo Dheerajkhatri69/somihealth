@@ -70,11 +70,13 @@ export default function Page({ params }) {
         ];
 
         // ⭐ Inherit parent banner
+        // ⭐ Inherit parent banner if NONE is set on child
         if (weightloss && weightlossChildren.includes(routeId)) {
           found = {
             ...found,
-            bannerBehind: weightloss.bannerBehind,
-            bannerBehindShow: weightloss.bannerBehindShow
+            // Only use parent banner if child doesn't have one
+            bannerBehind: found.bannerBehind || weightloss.bannerBehind,
+            bannerBehindShow: found.bannerBehindShow ?? weightloss.bannerBehindShow
           };
         }
 
@@ -176,9 +178,9 @@ export default function Page({ params }) {
             <div className="relative w-full h-40 md:h-56 my-4">
               <Image src={
                 meta?.title === "Compounded Semaglutide" ? "https://res.cloudinary.com/dvmbfolrm/image/upload/v1764361470/fileUploader/ibkdhccmr757f0tmao7s.jpg" :
-                meta?.title === "Lipotropic MIC+B12" ?  'https://res.cloudinary.com/dvmbfolrm/image/upload/v1764359105/fileUploader/mmjr6rcbyf2wjzywkihh.jpg' :
-                "https://res.cloudinary.com/dvmbfolrm/image/upload/v1764363731/fileUploader/scnelqa3ni9gwacrneso.jpg"} 
-                 alt={meta?.title || ''} fill className="object-cover rounded-2xl" priority />
+                  meta?.title === "Lipotropic MIC+B12" ? 'https://res.cloudinary.com/dvmbfolrm/image/upload/v1764359105/fileUploader/mmjr6rcbyf2wjzywkihh.jpg' :
+                    "https://res.cloudinary.com/dvmbfolrm/image/upload/v1764363731/fileUploader/scnelqa3ni9gwacrneso.jpg"}
+                alt={meta?.title || ''} fill className="object-cover rounded-2xl" priority />
             </div>
           ) : (
             <div className="relative w-full h-40 md:h-56 my-4">

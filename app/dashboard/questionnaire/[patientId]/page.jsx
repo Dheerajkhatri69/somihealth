@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import toast from 'react-hot-toast';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function PatientUpdateForm({ params }) {
     const [submitting, setSubmitting] = useState(false);
@@ -117,6 +118,7 @@ export default function PatientUpdateForm({ params }) {
         lipotropicTerms: false,
         lipotropicTreatment: false,
         lipotropicElectronic: false,
+        bmiConsent: false,
     });
 
     useEffect(() => {
@@ -151,6 +153,10 @@ export default function PatientUpdateForm({ params }) {
 
     const handleSelectChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleCheckboxChange = (name, checked) => {
+        setFormData(prev => ({ ...prev, [name]: checked }));
     };
 
     const handleSubmit = async (e) => {
@@ -242,7 +248,13 @@ export default function PatientUpdateForm({ params }) {
                 lipotropicConsent: formData.lipotropicConsent,
                 lipotropicTerms: formData.lipotropicTerms,
                 lipotropicTreatment: formData.lipotropicTreatment,
-                lipotropicElectronic: formData.lipotropicElectronic
+                lipotropicElectronic: formData.lipotropicElectronic,
+                // GLP-1 Consent Fields
+                bmiConsent: formData.bmiConsent,
+                consent: formData.consent,
+                terms: formData.terms,
+                treatment: formData.treatment,
+                agreetopay: formData.agreetopay
             };
 
             // Submit to /api/patients
@@ -332,7 +344,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
 
                     {/* Basic Information Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                         {[...Array(9)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-16" />
@@ -342,7 +354,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
 
                     {/* Address Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                         {[...Array(5)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-20" />
@@ -352,7 +364,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
 
                     {/* Vitals Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-24" />
@@ -362,7 +374,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
 
                     {/* Medical Information Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -372,7 +384,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
 
                     {/* Weight Management Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-32" />
@@ -382,7 +394,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
 
                     {/* GLP-1 Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-36" />
@@ -391,7 +403,7 @@ export default function PatientUpdateForm({ params }) {
                         ))}
                     </div>
 
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -421,7 +433,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Basic Information */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
                         <Label htmlFor="PlanPurchased">Plan Purchased</Label>
                         <Input
@@ -497,7 +509,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Address Information */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     <div className="space-y-2">
                         <Label htmlFor="address">Address</Label>
                         <Input
@@ -555,7 +567,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Medical Information */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
                     <div className="space-y-2">
                         <Label htmlFor="heightFeet">Height (Feet)</Label>
                         <Input
@@ -628,7 +640,7 @@ export default function PatientUpdateForm({ params }) {
                         </Select>
                     </div>
                 </div>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfbfc]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfbfc]">
                     <div className="space-y-2">
                         <Label htmlFor="glp1StartingWeight">GLP 1 Starting Weight</Label>
                         <Input
@@ -659,7 +671,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Lipotropic Information */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f7fa]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f7fa]">
                     <div className="space-y-4 col-span-full">
                         <h3 className="text-lg font-semibold">Lipotropic Information</h3>
                     </div>
@@ -802,7 +814,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Health Conditions */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#fee2e2]">
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="allergies">Allergies</Label>
@@ -913,7 +925,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Medical History */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="pastWeightLossMeds">Past Weight Loss Medications</Label>
@@ -947,7 +959,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Health Status */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#dbeafe]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#dbeafe]">
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="pregnant">Pregnant</Label>
@@ -1016,7 +1028,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* GLP-1 Information */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                     <div className="space-y-2">
                         <Label htmlFor="glp1Statement">GLP-1 Statement</Label>
                         <Textarea
@@ -1037,7 +1049,7 @@ export default function PatientUpdateForm({ params }) {
                     </div>
                 </div>
                 {/* GLP-1 History Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
                     <div className="space-y-2">
                         <Label htmlFor="glp1PastYear">GLP-1 Past Year</Label>
                         <Input
@@ -1060,89 +1072,8 @@ export default function PatientUpdateForm({ params }) {
                     </div>
                 </div>
 
-                {/* Terms and Consent */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="agreeTerms">Agree to Terms</Label>
-                            <Select
-                                value={formData.agreeTerms ? 'yes' : 'no'}
-                                onValueChange={(value) => handleSelectChange('agreeTerms', value === 'yes')}
-                            >
-                                <SelectTrigger id="agreeTerms">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="yes">Yes</SelectItem>
-                                    <SelectItem value="no">No</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="consent">Consent</Label>
-                            <Select
-                                value={formData.consent ? 'yes' : 'no'}
-                                onValueChange={(value) => handleSelectChange('consent', value === 'yes')}
-                            >
-                                <SelectTrigger id="consent">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="yes">Yes</SelectItem>
-                                    <SelectItem value="no">No</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="terms">Terms of Services</Label>
-                            <Select
-                                value={formData.terms ? 'yes' : 'no'}
-                                onValueChange={(value) => handleSelectChange('terms', value === 'yes')}
-                            >
-                                <SelectTrigger id="terms">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="yes">Yes</SelectItem>
-                                    <SelectItem value="no">No</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="treatment">Consent to treatment</Label>
-                            <Select
-                                value={formData.treatment ? 'yes' : 'no'}
-                                onValueChange={(value) => handleSelectChange('treatment', value === 'yes')}
-                            >
-                                <SelectTrigger id="treatment">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="yes">Yes</SelectItem>
-                                    <SelectItem value="no">No</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="agreetopay">I agree to pay the $25 </Label>
-                            <Select
-                                value={formData.agreetopay ? 'yes' : 'no'}
-                                onValueChange={(value) => handleSelectChange('agreetopay', value === 'yes')}
-                            >
-                                <SelectTrigger id="agreetopay">
-                                    <SelectValue placeholder="Select option" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="yes">Yes</SelectItem>
-                                    <SelectItem value="no">No</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                </div>
-
                 {/* File Upload Section */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
                     <div className="space-y-2">
                         <Label>Prescription Photo</Label>
                         <UploadFile
@@ -1174,7 +1105,7 @@ export default function PatientUpdateForm({ params }) {
                 </div>
 
                 {/* Comments */}
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                     <div className="space-y-2">
                         <Label htmlFor="comments">Comments</Label>
                         <Textarea
@@ -1183,6 +1114,129 @@ export default function PatientUpdateForm({ params }) {
                             value={formData.comments}
                             onChange={handleInputChange}
                         />
+                    </div>
+                </div>
+
+                {/* Consent and Agreements Section */}
+                <h3 className="text-sm font-semibold">Consent and Agreements</h3>
+
+                {/* GLP-1 Consent & Terms */}
+                <div className="space-y-4 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <h4 className="text-sm font-medium text-gray-700">GLP-1 Consent & Terms</h4>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="bmiConsent"
+                            checked={formData.bmiConsent}
+                            onCheckedChange={(checked) => handleCheckboxChange('bmiConsent', checked)}
+                        />
+                        <Label htmlFor="bmiConsent" className="text-sm">
+                            BMI Consent
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="consent"
+                            checked={formData.consent}
+                            onCheckedChange={(checked) => handleCheckboxChange('consent', checked)}
+                        />
+                        <Label htmlFor="consent" className="text-sm">
+                            Telehealth Consent - I consent to treatment and acknowledge the risks and benefits
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="terms"
+                            checked={formData.terms}
+                            onCheckedChange={(checked) => handleCheckboxChange('terms', checked)}
+                        />
+                        <Label htmlFor="terms" className="text-sm">
+                            Terms of Service - I agree to the terms and conditions
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="treatment"
+                            checked={formData.treatment}
+                            onCheckedChange={(checked) => handleCheckboxChange('treatment', checked)}
+                        />
+                        <Label htmlFor="treatment" className="text-sm">
+                            Treatment Consent - I understand the treatment plan and agree to follow it
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="agreetopay"
+                            checked={formData.agreetopay}
+                            onCheckedChange={(checked) => handleCheckboxChange('agreetopay', checked)}
+                        />
+                        <Label htmlFor="agreetopay" className="text-sm">
+                            Payment Agreement - I agree to pay the $25 clinician review fee
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="agreeTerms"
+                            checked={formData.agreeTerms}
+                            onCheckedChange={(checked) => handleCheckboxChange('agreeTerms', checked)}
+                        />
+                        <Label htmlFor="agreeTerms" className="text-sm">
+                            General Agreement - I agree to all terms
+                        </Label>
+                    </div>
+                </div>
+
+                {/* Lipotropic Consent & Terms */}
+                <div className="space-y-4 p-6 border rounded-xl shadow-sm bg-[#f1f9f8]">
+                    <h4 className="text-sm font-medium text-gray-700">Lipotropic Consent & Terms</h4>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicConsent"
+                            checked={formData.lipotropicConsent}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicConsent', checked)}
+                        />
+                        <Label htmlFor="lipotropicConsent" className="text-sm">
+                            Telehealth Consent & HIPAA Notice - I acknowledge and agree
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicTerms"
+                            checked={formData.lipotropicTerms}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicTerms', checked)}
+                        />
+                        <Label htmlFor="lipotropicTerms" className="text-sm">
+                            Terms of Service - I agree to the terms and conditions
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicTreatment"
+                            checked={formData.lipotropicTreatment}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicTreatment', checked)}
+                        />
+                        <Label htmlFor="lipotropicTreatment" className="text-sm">
+                            Treatment Consent - I consent to the treatment
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicElectronic"
+                            checked={formData.lipotropicElectronic}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicElectronic', checked)}
+                        />
+                        <Label htmlFor="lipotropicElectronic" className="text-sm">
+                            Electronic Records Agreement - I agree to electronic records usage
+                        </Label>
                     </div>
                 </div>
 

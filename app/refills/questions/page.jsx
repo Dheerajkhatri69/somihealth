@@ -425,7 +425,7 @@ export default function PatientRegistrationForm() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6 bg-white rounded-xl border border-gray-200 shadow-secondary shadow-2xl">
                     {currentSegment === 0 && (
                         <>
-                            <Label>Have you been approved for GLP-1 medication within the last 6 months by a Somi Health provider? <span className="text-red-500">*</span></Label>
+                            <Label>Have you been approved for Weight Loss medication within the last 6 months by a Somi Health provider? <span className="text-red-500">*</span></Label>
                             <div className="flex gap-2 flex-col items-center">
                                 {['yes', 'no'].map((option) => (
                                     <label key={option} className="radio-style">

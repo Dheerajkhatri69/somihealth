@@ -64,7 +64,7 @@ export default function SkinHairQuestionnaireForm({ params }) {
         acnePhotos: "",
 
         // Hair-Specific Fields
-        hairLossPattern: "",
+        hairLossPattern: [],
         hairLossStart: "",
         scalpSymptoms: [],
         medicalDiagnoses: [],
@@ -279,6 +279,8 @@ export default function SkinHairQuestionnaireForm({ params }) {
         }
     };
 
+
+
     const removeImage = (index) => {
         setImages(prev =>
             prev.map((img, i) =>
@@ -298,7 +300,6 @@ export default function SkinHairQuestionnaireForm({ params }) {
             "pregnantBreastfeeding",
             "currentlyUsingMedication",
             "medicationAllergies",
-            "hairLossPattern",
             "hairLossStart",
         ];
 
@@ -440,7 +441,7 @@ export default function SkinHairQuestionnaireForm({ params }) {
                             </div>
                         )}
                     </div>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                         {[...Array(9)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-16" />
@@ -811,21 +812,54 @@ export default function SkinHairQuestionnaireForm({ params }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                             <div className="space-y-2">
                                 <Label>Hair Loss Pattern</Label>
-                                <Select
-                                    value={formData.hairLossPattern || ""}
-                                    onValueChange={(value) => handleSelectChange('hairLossPattern', value)}
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="thinning_crown">Noticeable thinning or bald patches at the crown</SelectItem>
-                                        <SelectItem value="uneven_thinning">Uneven thinning throughout the scalp</SelectItem>
-                                        <SelectItem value="receding_hairline">A receding or retreating hairline</SelectItem>
-                                        <SelectItem value="excessive_shedding">Excessive shedding during washing or styling</SelectItem>
-                                        <SelectItem value="none">None of the above</SelectItem>
-                                    </SelectContent>
-                                </Select>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                                    {[
+                                        { value: 'thinning_crown', label: 'Noticeable thinning or bald patches at the crown' },
+                                        { value: 'uneven_thinning', label: 'Uneven thinning throughout the scalp' },
+                                        { value: 'receding_hairline', label: 'A receding or retreating hairline' },
+                                        { value: 'excessive_shedding', label: 'Excessive shedding during washing or styling' },
+                                        { value: 'none', label: 'None of the above' }
+                                    ].map((option) => (
+                                        <div key={option.value} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                checked={formData.hairLossPattern?.includes(option.value) || false}
+                                                onCheckedChange={(checked) => {
+                                                    // Handle "None" exclusivity logic
+                                                    if (checked) {
+                                                        if (option.value === 'none') {
+                                                            // If "None" selected, clear others and set only "none"
+                                                            setFormData(prev => ({ ...prev, hairLossPattern: ['none'] }));
+                                                        } else {
+                                                            // If other selected, add it but remove "none" if present
+                                                            const current = formData.hairLossPattern || [];
+                                                            const filtered = current.filter(xv => xv !== 'none');
+                                                            setFormData(prev => ({ ...prev, hairLossPattern: [...filtered, option.value] }));
+                                                        }
+                                                    } else {
+                                                        // Just remove the unchecked value
+                                                        handleArrayChange('hairLossPattern', option.value, false);
+                                                    }
+                                                }}
+                                            />
+                                            <Label className="text-sm font-normal cursor-pointer" onClick={() => {
+                                                const checked = !formData.hairLossPattern?.includes(option.value);
+                                                // Replicate logic above for label click
+                                                if (checked) {
+                                                    if (option.value === 'none') {
+                                                        setFormData(prev => ({ ...prev, hairLossPattern: ['none'] }));
+                                                    } else {
+                                                        const current = formData.hairLossPattern || [];
+                                                        const filtered = current.filter(xv => xv !== 'none');
+                                                        setFormData(prev => ({ ...prev, hairLossPattern: [...filtered, option.value] }));
+                                                    }
+                                                } else {
+                                                    handleArrayChange('hairLossPattern', option.value, false);
+                                                }
+                                            }}>{option.label}</Label>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="space-y-2">
@@ -1042,7 +1076,7 @@ export default function SkinHairQuestionnaireForm({ params }) {
 
                 {/* Provider Fields */}
                 <h3 className="text-sm font-semibold">Provider Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
+                <div className="grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
                     <div className="space-y-2">
                         <Label htmlFor="approvalStatus">Approval Status</Label>
                         <Select
@@ -1062,71 +1096,79 @@ export default function SkinHairQuestionnaireForm({ params }) {
                         </Select>
                     </div>
 
-                    <Select
-                        value={formData.dose}
-                        onValueChange={(value) => handleSelectChange('dose', value)}
-                    >
-                        <SelectTrigger className="w-1/2">
-                            <SelectValue placeholder="Dose" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
-                            <SelectItem value="Minoxidil 2.5mg">Minoxidil 2.5mg</SelectItem>
-                            <SelectItem value="Rx Hair (Finasteride, Minoxidil & Biotin)">Rx Hair (Finasteride, Minoxidil & Biotin)</SelectItem>
-                            <SelectItem value="Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)">Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)</SelectItem>
-                            <SelectItem value="None">None</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className="flex gap-2">
+                        <div className="space-y-2 w-full">
+                            <Label htmlFor="dose">Dose</Label>
+                            <Select
+                                value={formData.dose}
+                                onValueChange={(value) => handleSelectChange('dose', value)}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Dose" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
+                                    <SelectItem value="Minoxidil 2.5mg">Minoxidil 2.5mg</SelectItem>
+                                    <SelectItem value="Rx Hair (Finasteride, Minoxidil & Biotin)">Rx Hair (Finasteride, Minoxidil & Biotin)</SelectItem>
+                                    <SelectItem value="Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)">Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="unit">Unit</Label>
-                        <Input
-                            id="unit"
-                            name="unit"
-                            value={formData.unit || ""}
-                            onChange={handleInputChange}
-                            placeholder="Unit"
-                        />
+                        <div className="space-y-2 w-full">
+                            <Label htmlFor="unit">Unit</Label>
+                            <Input
+                                id="unit"
+                                name="unit"
+                                className="w-full"
+                                value={formData.unit || ""}
+                                onChange={handleInputChange}
+                                placeholder="Unit"
+                            />
+                        </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="followUpInterval">Follow Up Interval</Label>
-                        <Select
-                            value={uiState.followUpInterval || ""}
-                            onValueChange={(value) => handleUISelectChange('followUpInterval', value)}
-                        >
-                            <SelectTrigger id="followUpInterval" className="w-full">
-                                <SelectValue placeholder="Select interval" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="7d">7 Days</SelectItem>
-                                <SelectItem value="14d">14 Days</SelectItem>
-                                <SelectItem value="30d">30 Days</SelectItem>
-                                <SelectItem value="None">None</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    <div className="flex gap-2">
+                        <div className="space-y-2 w-full">
+                            <Label htmlFor="followUpInterval">Follow Up Interval</Label>
+                            <Select
+                                value={uiState.followUpInterval || ""}
+                                onValueChange={(value) => handleUISelectChange('followUpInterval', value)}
+                            >
+                                <SelectTrigger id="followUpInterval" className="w-full">
+                                    <SelectValue placeholder="Select interval" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="7d">7 Days</SelectItem>
+                                    <SelectItem value="14d">14 Days</SelectItem>
+                                    <SelectItem value="30d">30 Days</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="refillReminderInterval">Refill Reminder Interval</Label>
-                        <Select
-                            value={uiState.refillReminderInterval || ""}
-                            onValueChange={(value) => handleUISelectChange('refillReminderInterval', value)}
-                        >
-                            <SelectTrigger id="refillReminderInterval" className="w-full">
-                                <SelectValue placeholder="Select interval" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="4w">4 weeks</SelectItem>
-                                <SelectItem value="5w">5 weeks</SelectItem>
-                                <SelectItem value="6w">6 weeks</SelectItem>
-                                <SelectItem value="8w">8 weeks</SelectItem>
-                                <SelectItem value="10w">10 weeks</SelectItem>
-                                <SelectItem value="12w">12 weeks</SelectItem>
-                                <SelectItem value="13w">13 weeks</SelectItem>
-                                <SelectItem value="None">None</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className="space-y-2 w-full">
+                            <Label htmlFor="refillReminderInterval">Refill Reminder Interval</Label>
+                            <Select
+                                value={uiState.refillReminderInterval || ""}
+                                onValueChange={(value) => handleUISelectChange('refillReminderInterval', value)}
+                            >
+                                <SelectTrigger id="refillReminderInterval" className="w-full">
+                                    <SelectValue placeholder="Select interval" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="4w">4 weeks</SelectItem>
+                                    <SelectItem value="5w">5 weeks</SelectItem>
+                                    <SelectItem value="6w">6 weeks</SelectItem>
+                                    <SelectItem value="8w">8 weeks</SelectItem>
+                                    <SelectItem value="10w">10 weeks</SelectItem>
+                                    <SelectItem value="12w">12 weeks</SelectItem>
+                                    <SelectItem value="13w">13 weeks</SelectItem>
+                                    <SelectItem value="None">None</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="space-y-2 col-span-full">
@@ -1139,6 +1181,42 @@ export default function SkinHairQuestionnaireForm({ params }) {
                             placeholder="Provider notes..."
                             rows={4}
                         />
+                    </div>
+                </div>
+
+                <h3 className="text-sm font-semibold mt-6">Consent and Agreements</h3>
+                <div className="space-y-4 p-6 border rounded-xl shadow-sm bg-[#f1f5f9] mb-6">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="consent"
+                            checked={formData.consent || false}
+                            onCheckedChange={(checked) => handleCheckboxChange('consent', checked)}
+                        />
+                        <Label htmlFor="consent" className="text-sm">
+                            I consent to treatment and acknowledge the risks and benefits
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="terms"
+                            checked={formData.terms || false}
+                            onCheckedChange={(checked) => handleCheckboxChange('terms', checked)}
+                        />
+                        <Label htmlFor="terms" className="text-sm">
+                            I agree to the terms and conditions
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="treatment"
+                            checked={formData.treatment || false}
+                            onCheckedChange={(checked) => handleCheckboxChange('treatment', checked)}
+                        />
+                        <Label htmlFor="treatment" className="text-sm">
+                            I understand the treatment plan and agree to follow it
+                        </Label>
                     </div>
                 </div>
 

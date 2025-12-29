@@ -17,13 +17,8 @@ import { Badge } from '@/components/ui/badge';
 // Form validation schema for Hair treatments
 const formSchema = z.object({
     // Hair specific fields
-    hairLossPattern: z.enum([
-        'thinning_crown',
-        'uneven_thinning',
-        'receding_hairline',
-        'excessive_shedding',
-        'none'
-    ], { required_error: "Please describe your hair loss pattern", invalid_type_error: "Please describe your hair loss pattern" }),
+    // Hair specific fields
+    hairLossPattern: z.array(z.string()).nonempty("Please describe your hair loss pattern"),
     hairLossStart: z.enum([
         'rapid_onset',
         'gradual_onset',
@@ -83,6 +78,7 @@ export default function HairForm() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [userSessionId, setUserSessionId] = useState("");
     const [basicData, setBasicData] = useState(null);
+    const [showIneligible, setShowIneligible] = useState(false);
 
     const {
         register,
@@ -209,6 +205,28 @@ export default function HairForm() {
             return;
         }
 
+        // Handle disqualifying conditions
+        if (currentSegmentFields.includes('medicalDiagnoses')) {
+            const selectedDiagnoses = watch('medicalDiagnoses') || [];
+            const disqualifyingDiagnoses = [
+                'Elevated prostate-specific antigen (PSA)',
+                'Prostate cancer',
+                'Thyroid disorders',
+                'Liver disease',
+                'Family history of prostate cancer in biological parents, siblings, or children',
+                'Family history of early-onset prostate cancer (diagnosed at age 55 or younger)'
+            ];
+
+            const hasDisqualifyingCondition = selectedDiagnoses.some(diagnosis =>
+                disqualifyingDiagnoses.includes(diagnosis)
+            );
+
+            if (hasDisqualifyingCondition) {
+                setShowIneligible(true);
+                return;
+            }
+        }
+
         // Handle conditional skipping
         let skipCount = 0;
 
@@ -315,6 +333,63 @@ export default function HairForm() {
         }
     };
 
+    if (showIneligible) {
+        // Track ineligible state
+        if (userSessionId) {
+            const currentData = {
+                firstName: basicData?.firstName || "",
+                lastName: basicData?.lastName || "",
+                phone: basicData?.phone || "",
+                email: basicData?.email || "",
+            };
+
+            fetch("/api/skinhair-abandonment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userSessionId,
+                    firstSegment: currentData,
+                    lastSegmentReached: currentSegment,
+                    state: 1, // INELIGIBLE
+                    question: segments[currentSegment]?.name,
+                    timestamp: new Date().toISOString(),
+                }),
+            }).catch((err) => console.error("Ineligible abandonment failed:", err));
+        }
+
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-2 font-SofiaSans">
+                <div className="w-full max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg flex flex-col items-center">
+                    <div className="font-tagesschrift text-center text-6xl mb-2 text-secondary font-bold">somi</div>
+                    <h2 className="text-xl md:text-2xl font-semibold text-gray-900 text-center mb-4">
+                        Based on your responses, you currently do not meet the criteria for hair loss medication.
+                        <br />
+                        <br />
+                        If you&apos;ve made a payment or purchased a plan, 100% of your money will be refunded - No questions asked.
+                    </h2>
+                    <div className="relative w-36 h-36 mb-2">
+                        <Image
+                            src="/pricing/guaranteed.png"
+                            alt="Guaranteed"
+                            fill
+                            className="rounded-xl object-contain"
+                            priority
+                        />
+                    </div>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            window.location.href = "https://joinsomi.com/";
+                        }}
+                        className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+                    >
+                        Go Back
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     if (showSuccess) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4 font-SofiaSans">
@@ -390,8 +465,14 @@ export default function HairForm() {
                                     { value: 'excessive_shedding', label: 'Excessive shedding during washing or styling' },
                                     { value: 'none', label: 'None of the above' },
                                 ].map((option, index) => (
-                                    <label key={index} className={`flex items-center px-4 py-3 border border-blue-400 rounded-2xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('hairLossPattern') === option.value ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
-                                        <input type="radio" value={option.value} className="hidden" {...register('hairLossPattern')} />
+                                    <label key={index} className={`flex items-center px-4 py-3 border border-blue-400 rounded-2xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${watch('hairLossPattern')?.includes(option.value) ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
+                                        <input
+                                            type="checkbox"
+                                            value={option.value}
+                                            className="hidden"
+                                            checked={watch('hairLossPattern')?.includes(option.value) || false}
+                                            onChange={(e) => handleCheckboxChange('hairLossPattern', option.value, e.target.checked)}
+                                        />
                                         <span>{option.label}</span>
                                     </label>
                                 ))}
@@ -449,6 +530,7 @@ export default function HairForm() {
                         <div className="space-y-4">
                             <h2 className="text-xl font-semibold">Medical History <span className="text-red-500">*</span></h2>
                             <Label>Have you been diagnosed with any of the following, either currently or in the past?</Label>
+                            <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span>
                             <div className="flex flex-col gap-3">
                                 {[
                                     'Elevated prostate-specific antigen (PSA)',

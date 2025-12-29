@@ -147,7 +147,13 @@ export async function POST(request) {
             lipotropicConsent: body.lipotropicConsent,
             lipotropicTerms: body.lipotropicTerms,
             lipotropicTreatment: body.lipotropicTreatment,
-            lipotropicElectronic: body.lipotropicElectronic
+            lipotropicElectronic: body.lipotropicElectronic,
+            // GLP-1 Consent Fields
+            bmiConsent: body.bmiConsent,
+            consent: body.consent,
+            terms: body.terms,
+            treatment: body.treatment,
+            agreetopay: body.agreetopay
         });
 
         result = await newPatient.save();
@@ -231,7 +237,13 @@ export async function PUT(request) {
                     lipotropicConsent: body.lipotropicConsent,
                     lipotropicTerms: body.lipotropicTerms,
                     lipotropicTreatment: body.lipotropicTreatment,
-                    lipotropicElectronic: body.lipotropicElectronic
+                    lipotropicElectronic: body.lipotropicElectronic,
+                    // GLP-1 Consent Fields
+                    bmiConsent: body.bmiConsent,
+                    consent: body.consent,
+                    terms: body.terms,
+                    treatment: body.treatment,
+                    agreetopay: body.agreetopay
                 }
             },
             { new: true }

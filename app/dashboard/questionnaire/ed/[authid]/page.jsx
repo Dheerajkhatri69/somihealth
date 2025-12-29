@@ -915,8 +915,8 @@ export default function EDQuestionnaireForm({ params }) {
                                 <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="yes">Yes</SelectItem>
-                                <SelectItem value="no">No</SelectItem>
+                                <SelectItem value="1-5">1-5</SelectItem>
+                                <SelectItem value="5+">5+</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -1147,16 +1147,17 @@ export default function EDQuestionnaireForm({ params }) {
                                     </Select>
                                 </div>
                             )}
-
-                            <Input
-                                className="w-1/2"
-                                placeholder="Unit (e.g. 60 mg / 2 mL)"
-                                value={formData.unit}
-                                onChange={(e) =>
-                                    handleSelectChange("unit", e.target.value)
-                                }
-                            />
-
+                            <div className="space-y-2">
+                                <Label htmlFor="unit">Unit</Label>
+                                <Input
+                                    className="w-full"
+                                    placeholder="Unit (e.g. 60 mg / 2 mL)"
+                                    value={formData.unit}
+                                    onChange={(e) =>
+                                        handleSelectChange("unit", e.target.value)
+                                    }
+                                />
+                            </div>
                             <div className="space-y-2 col-span-full">
                                 <Label htmlFor="providerNote">Provider Note</Label>
                                 <Textarea
@@ -1235,59 +1236,53 @@ export default function EDQuestionnaireForm({ params }) {
                     </div>
                 </div>
 
-                {/* Consent Checkboxes */}
-                {
-                    isFirstSubmit ?
-                        <>
-                            <h3 className="text-sm font-semibold">Consent and Agreements</h3>
-                            <div className="space-y-4 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="consent"
-                                        checked={formData.consent}
-                                        onCheckedChange={(checked) => handleCheckboxChange('consent', checked)}
-                                    />
-                                    <Label htmlFor="consent" className="text-sm">
-                                        I consent to treatment and acknowledge the risks and benefits
-                                    </Label>
-                                </div>
+                <h3 className="text-sm font-semibold">Consent and Agreements</h3>
+                <div className="space-y-4 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="consent"
+                            checked={formData.consent}
+                            onCheckedChange={(checked) => handleCheckboxChange('consent', checked)}
+                        />
+                        <Label htmlFor="consent" className="text-sm">
+                            I consent to treatment and acknowledge the risks and benefits
+                        </Label>
+                    </div>
 
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="terms"
-                                        checked={formData.terms}
-                                        onCheckedChange={(checked) => handleCheckboxChange('terms', checked)}
-                                    />
-                                    <Label htmlFor="terms" className="text-sm">
-                                        I agree to the terms and conditions
-                                    </Label>
-                                </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="terms"
+                            checked={formData.terms}
+                            onCheckedChange={(checked) => handleCheckboxChange('terms', checked)}
+                        />
+                        <Label htmlFor="terms" className="text-sm">
+                            I agree to the terms and conditions
+                        </Label>
+                    </div>
 
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="treatment"
-                                        checked={formData.treatment}
-                                        onCheckedChange={(checked) => handleCheckboxChange('treatment', checked)}
-                                    />
-                                    <Label htmlFor="treatment" className="text-sm">
-                                        I understand the treatment plan and agree to follow it
-                                    </Label>
-                                </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="treatment"
+                            checked={formData.treatment}
+                            onCheckedChange={(checked) => handleCheckboxChange('treatment', checked)}
+                        />
+                        <Label htmlFor="treatment" className="text-sm">
+                            I understand the treatment plan and agree to follow it
+                        </Label>
+                    </div>
 
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="agreetopay"
-                                        checked={formData.agreetopay}
-                                        onCheckedChange={(checked) => handleCheckboxChange('agreetopay', checked)}
-                                    />
-                                    <Label htmlFor="agreetopay" className="text-sm">
-                                        I agree to pay for treatment
-                                    </Label>
-                                </div>
-                            </div>
-                        </>
-                        : null
-                }
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="agreetopay"
+                            checked={formData.agreetopay}
+                            onCheckedChange={(checked) => handleCheckboxChange('agreetopay', checked)}
+                        />
+                        <Label htmlFor="agreetopay" className="text-sm">
+                            I agree to pay for treatment
+                        </Label>
+                    </div>
+                </div>
+
 
                 {/* Submit Button */}
                 <Button type="submit" className="w-full bg-secondary text-white" disabled={isSubmitting}>

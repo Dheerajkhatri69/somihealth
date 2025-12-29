@@ -111,7 +111,7 @@ const formSchema = z.object({
         invalid_type_error: "Please select an option"
     }),
     // QUESTION 19 - Fixed to be radio buttons as per requirements
-    sexualEncounters: z.enum(['yes', 'no'], {
+    sexualEncounters: z.enum(['1-5', '5+'], {
         required_error: "This field is required",
         invalid_type_error: "Please select an option"
     }),
@@ -207,7 +207,9 @@ export default function EDQuestionnaireForm() {
     });
 
     const formValues = watch();
-    const schemaFields = Object.keys(formSchema.shape);
+    // Safely get shape from schema which might be ZodEffects due to superRefine
+    const schemaShape = formSchema._def.schema ? formSchema._def.schema.shape : formSchema.shape;
+    const schemaFields = Object.keys(schemaShape);
     const totalFields = schemaFields.length;
     const completedFields = schemaFields.filter(
         (key) => formValues[key] && !errors[key]
@@ -486,15 +488,25 @@ export default function EDQuestionnaireForm() {
                 return;
             }
 
+            let count = 1;
+            if (currentSegmentId === 'previousTreatment' && watch('previousEDMeds') === 'no') {
+                count = 2;
+            }
+
             setShowIneligible(false);
-            setCurrentSegment(currentSegment + 1);
+            setCurrentSegment(currentSegment + count);
         }
     };
 
     const handlePrevious = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         if (currentSegment > 0) {
-            setCurrentSegment(currentSegment - 1);
+            const currentSegmentId = segments[currentSegment].id;
+            let decrement = 1;
+            if (currentSegmentId === 'idUpload' && watch('previousEDMeds') === 'no') {
+                decrement = 2;
+            }
+            setCurrentSegment(currentSegment - decrement);
         }
     };
 
@@ -1515,7 +1527,7 @@ export default function EDQuestionnaireForm() {
                                     In a typical month, how many sexual encounters do you have? <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="flex gap-2 justify-center flex-col items-center">
-                                    {['yes', 'no'].map((option, index) => (
+                                    {['1-5', '5+'].map((option, index) => (
                                         <label
                                             key={index}
                                             htmlFor={`encounters-${index}`}
@@ -1528,7 +1540,7 @@ export default function EDQuestionnaireForm() {
                                                 className="hidden"
                                                 {...register('sexualEncounters')}
                                             />
-                                            <span>{option === 'yes' ? 'Yes' : 'No'}</span>
+                                            <span>{option === '1-5' ? '1-5' : '5+'}</span>
                                         </label>
                                     ))}
                                 </div>

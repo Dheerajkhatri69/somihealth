@@ -1053,30 +1053,36 @@ export default function LongevityQuestionnaireForm({ params }) {
                             </div>
 
                             <div className="flex gap-2">
-                                <Select
-                                    value={formData.dose}
-                                    onValueChange={(value) => handleSelectChange('dose', value)}
-                                >
-                                    <SelectTrigger className="w-1/2">
-                                        <SelectValue placeholder="Dose" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="NAD+ 200mg/ml">NAD+ 200mg/ml</SelectItem>
-                                        <SelectItem value="Sermorelin 1mg/ml">Sermorelin 1mg/ml</SelectItem>
-                                        <SelectItem value="Glutathione 200mg/ml">Glutathione 200mg/ml</SelectItem>
-                                        <SelectItem value="None">None</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Input
-                                    className="w-1/2"
-                                    placeholder="Unit (e.g. 60 mg / 2 mL)"
-                                    value={formData.unit}
-                                    onChange={(e) =>
-                                        handleSelectChange("unit", e.target.value)
-                                    }
-                                />
-                            </div>
+                                <div className="space-y-2 w-full">
+                                    <Label htmlFor="dose">Dose</Label>
+                                    <Select
+                                        value={formData.dose}
+                                        onValueChange={(value) => handleSelectChange('dose', value)}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Dose" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="NAD+ 200mg/ml">NAD+ 200mg/ml</SelectItem>
+                                            <SelectItem value="Sermorelin 1mg/ml">Sermorelin 1mg/ml</SelectItem>
+                                            <SelectItem value="Glutathione 200mg/ml">Glutathione 200mg/ml</SelectItem>
+                                            <SelectItem value="None">None</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
+                                <div className="space-y-2 w-full">
+                                    <Label htmlFor="unit">Unit</Label>
+                                    <Input
+                                        id="unit"
+                                        name="unit"
+                                        className="w-full"
+                                        value={formData.unit || ""}
+                                        onChange={handleInputChange}
+                                        placeholder="Unit"
+                                    />
+                                </div>
+                            </div>
 
                         </div>
                     </>

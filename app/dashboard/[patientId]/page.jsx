@@ -20,6 +20,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Eye, Fullscreen, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import {
     ImageKitAbortError,
@@ -146,6 +147,13 @@ export default function PatientUpdateForm({ params }) {
         lipotropicTerms: false,
         lipotropicTreatment: false,
         lipotropicElectronic: false,
+        // GLP-1 Consent Fields
+        bmiConsent: false,
+        consent: false,
+        terms: false,
+        treatment: false,
+        agreetopay: false,
+        agreeTerms: false,
     });
     const [images, setImages] = useState([
         { file: null, preview: null },
@@ -243,6 +251,10 @@ export default function PatientUpdateForm({ params }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleCheckboxChange = (name, checked) => {
+        setFormData(prev => ({ ...prev, [name]: checked }));
+    };
+
     const handleImageChange = (index, e) => {
         const file = e.target.files[0];
         if (file) {
@@ -313,7 +325,14 @@ export default function PatientUpdateForm({ params }) {
             lipotropicConsent: formData.lipotropicConsent,
             lipotropicTerms: formData.lipotropicTerms,
             lipotropicTreatment: formData.lipotropicTreatment,
-            lipotropicElectronic: formData.lipotropicElectronic
+            lipotropicElectronic: formData.lipotropicElectronic,
+            // GLP-1 Consent Fields
+            bmiConsent: formData.bmiConsent,
+            consent: formData.consent,
+            terms: formData.terms,
+            treatment: formData.treatment,
+            agreetopay: formData.agreetopay,
+            agreeTerms: formData.agreeTerms
         };
 
         try {
@@ -842,7 +861,7 @@ export default function PatientUpdateForm({ params }) {
 
                 {/* Semaglutide Section */}
                 {/* Lipotropic Information */}
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f7fa]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f7fa]">
                     <div className="space-y-4 col-span-full">
                         <h3 className="text-lg font-semibold">Lipotropic Information</h3>
                     </div>
@@ -1482,6 +1501,130 @@ export default function PatientUpdateForm({ params }) {
                         />
                     </div>
                 </div>
+
+                {/* Consent and Agreements Section */}
+                <h3 className="text-sm font-semibold">Consent and Agreements</h3>
+
+                {/* GLP-1 Consent & Terms */}
+                <div className="space-y-4 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <h4 className="text-sm font-medium text-gray-700">GLP-1 Consent & Terms</h4>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="bmiConsent"
+                            checked={formData.bmiConsent}
+                            onCheckedChange={(checked) => handleCheckboxChange('bmiConsent', checked)}
+                        />
+                        <Label htmlFor="bmiConsent" className="text-sm">
+                            BMI Consent
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="consent"
+                            checked={formData.consent}
+                            onCheckedChange={(checked) => handleCheckboxChange('consent', checked)}
+                        />
+                        <Label htmlFor="consent" className="text-sm">
+                            Telehealth Consent - I consent to treatment and acknowledge the risks and benefits
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="terms"
+                            checked={formData.terms}
+                            onCheckedChange={(checked) => handleCheckboxChange('terms', checked)}
+                        />
+                        <Label htmlFor="terms" className="text-sm">
+                            Terms of Service - I agree to the terms and conditions
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="treatment"
+                            checked={formData.treatment}
+                            onCheckedChange={(checked) => handleCheckboxChange('treatment', checked)}
+                        />
+                        <Label htmlFor="treatment" className="text-sm">
+                            Treatment Consent - I understand the treatment plan and agree to follow it
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="agreetopay"
+                            checked={formData.agreetopay}
+                            onCheckedChange={(checked) => handleCheckboxChange('agreetopay', checked)}
+                        />
+                        <Label htmlFor="agreetopay" className="text-sm">
+                            Payment Agreement - I agree to pay the $25 clinician review fee
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="agreeTerms"
+                            checked={formData.agreeTerms}
+                            onCheckedChange={(checked) => handleCheckboxChange('agreeTerms', checked)}
+                        />
+                        <Label htmlFor="agreeTerms" className="text-sm">
+                            General Agreement - I agree to all terms
+                        </Label>
+                    </div>
+                </div>
+
+                {/* Lipotropic Consent & Terms */}
+                <div className="space-y-4 p-6 border rounded-xl shadow-sm bg-[#f1f9f8]">
+                    <h4 className="text-sm font-medium text-gray-700">Lipotropic Consent & Terms</h4>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicConsent"
+                            checked={formData.lipotropicConsent}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicConsent', checked)}
+                        />
+                        <Label htmlFor="lipotropicConsent" className="text-sm">
+                            Telehealth Consent & HIPAA Notice - I acknowledge and agree
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicTerms"
+                            checked={formData.lipotropicTerms}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicTerms', checked)}
+                        />
+                        <Label htmlFor="lipotropicTerms" className="text-sm">
+                            Terms of Service - I agree to the terms and conditions
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicTreatment"
+                            checked={formData.lipotropicTreatment}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicTreatment', checked)}
+                        />
+                        <Label htmlFor="lipotropicTreatment" className="text-sm">
+                            Treatment Consent - I consent to the treatment
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="lipotropicElectronic"
+                            checked={formData.lipotropicElectronic}
+                            onCheckedChange={(checked) => handleCheckboxChange('lipotropicElectronic', checked)}
+                        />
+                        <Label htmlFor="lipotropicElectronic" className="text-sm">
+                            Electronic Records Agreement - I agree to electronic records usage
+                        </Label>
+                    </div>
+                </div>
+
                 <Button type="submit" className="w-full">
                     {session?.user?.accounttype === 'C' ? 'Submit Patient' : 'Update Patient'}
                 </Button>

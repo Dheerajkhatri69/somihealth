@@ -196,55 +196,41 @@ export default function AdminWeightLossPage() {
                                         }}
                                     />
                                 </div>
-                            </div>
 
-                            {/* Price Section */}
-                            {/* <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Price Note</label>
-                                    <input
-                                        type="text"
-                                        disabled={!isEditing}
-                                        value={opt.price?.note || ''}
-                                        onChange={(e) => {
-                                            const next = [...editing.options];
-                                            next[idx].price = { ...(opt.price || {}), note: e.target.value };
-                                            update('options', next);
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                                        placeholder="e.g., AS LOW AS"
-                                    />
+                                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Banner Text</label>
+                                        <input
+                                            type="text"
+                                            disabled={!isEditing}
+                                            value={opt.bannerBehind || ''}
+                                            onChange={(e) => {
+                                                const next = [...editing.options];
+                                                next[idx].bannerBehind = e.target.value;
+                                                update('options', next);
+                                            }}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                            placeholder="e.g., Most Popular"
+                                        />
+                                    </div>
+                                    <div className="flex items-center pt-8">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                disabled={!isEditing}
+                                                checked={opt.bannerBehindShow || false}
+                                                onChange={(e) => {
+                                                    const next = [...editing.options];
+                                                    next[idx].bannerBehindShow = e.target.checked;
+                                                    update('options', next);
+                                                }}
+                                                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Show Banner</span>
+                                        </label>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Price Amount</label>
-                                    <input
-                                        type="number"
-                                        disabled={!isEditing}
-                                        value={opt.price?.amount || 0}
-                                        onChange={(e) => {
-                                            const next = [...editing.options];
-                                            next[idx].price = { ...(opt.price || {}), amount: Number(e.target.value || 0) };
-                                            update('options', next);
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Price Unit</label>
-                                    <input
-                                        type="text"
-                                        disabled={!isEditing}
-                                        value={opt.price?.unit || ''}
-                                        onChange={(e) => {
-                                            const next = [...editing.options];
-                                            next[idx].price = { ...(opt.price || {}), unit: e.target.value };
-                                            update('options', next);
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                                        placeholder="e.g., /mo"
-                                    />
-                                </div>
-                            </div> */}
+                            </div>
 
                             {isEditing && (
                                 <div className="mt-4">
@@ -260,10 +246,10 @@ export default function AdminWeightLossPage() {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div >
 
             {/* Badges */}
-            <div className="mt-6 bg-white rounded-lg shadow-sm border">
+            < div className="mt-6 bg-white rounded-lg shadow-sm border" >
                 <div className="p-6 border-b flex items-center justify-between">
                     <h2 className="text-xl font-semibold">Badges</h2>
                     {isEditing && (
@@ -351,10 +337,10 @@ export default function AdminWeightLossPage() {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div >
 
             {/* Guarantee Section */}
-            <div className="mt-6 bg-white rounded-lg shadow-sm border">
+            < div className="mt-6 bg-white rounded-lg shadow-sm border" >
                 <div className="p-6 border-b">
                     <h2 className="text-xl font-semibold">Guarantee Section</h2>
                 </div>
@@ -423,10 +409,10 @@ export default function AdminWeightLossPage() {
                         />
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Actions */}
-            <div className="flex gap-2 pt-6">
+            < div className="flex gap-2 pt-6" >
                 <button
                     onClick={saveContent}
                     disabled={!isEditing || saving}
@@ -446,18 +432,20 @@ export default function AdminWeightLossPage() {
                     <X className="w-4 h-4" />
                     Cancel
                 </button>
-            </div>
+            </div >
 
-            {message && (
-                <div className={`mt-4 p-3 rounded ${message.includes('Failed') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                    }`}>
-                    {message}
-                </div>
-            )}
+            {
+                message && (
+                    <div className={`mt-4 p-3 rounded ${message.includes('Failed') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                        }`}>
+                        {message}
+                    </div>
+                )
+            }
 
             <div className="mt-6 text-sm text-gray-600">
                 This data powers your weight loss pricing page.
             </div>
-        </div>
+        </div >
     );
 }

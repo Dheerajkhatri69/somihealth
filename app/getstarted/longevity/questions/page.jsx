@@ -20,7 +20,7 @@ const formSchema = z.object({
   //Choose your treatment 
   treatmentChoose: z.string({ required_error: "Please Choose your treatment", invalid_type_error: "Please Choose your treatment" }).min(1, "Please Choose your treatment"),
   //What is your treatment goal
-  treatmentGoal: z.string({ required_error: "Please Choose your treatment goal", invalid_type_error: "Please Choose your treatment goal" }).min(1, "Please Choose your treatment goal"),
+  treatmentGoal: z.array(z.string()).min(1, "Please select at least one treatment goal"),
   //Previous treatment with Glutathione? 
   previousTreatment: z.enum(['yes', 'no'], {
     required_error: "Please select an option",
@@ -34,7 +34,7 @@ const formSchema = z.object({
   // When was your last Glutathione treatment?
   // Were you satisfied with your treatment?
   // Why did you stop the Glutathione treatment?
-  lastSatisfiedStop: z.string({ required_error: "This field is required", invalid_type_error: "This field is required" }).min(1, "This field is required"),
+  lastSatisfiedStop: z.string().optional(),
   //Is there anything else you want your clinician to know about your health or condition?
   clinicianToKnowAboutYourHealth: z.enum(['yes', 'no'], {
     required_error: "Please select an option",
@@ -161,6 +161,13 @@ const formSchema = z.object({
         code: z.ZodIssueCode.custom,
         message: "Please select an option",
         path: ["negativeReactions"],
+      });
+    }
+    if (!data.lastSatisfiedStop) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "This field is required",
+        path: ["lastSatisfiedStop"],
       });
     }
   }
@@ -342,6 +349,31 @@ export default function PatientRegistrationForm() {
       setValue(field, currentValues.filter(item => item !== value));
     }
   };
+
+  // Custom handler for treatment goal with "All of the above" logic
+  const handleTreatmentGoalChange = (goal, checked) => {
+    const currentGoals = watch("treatmentGoal") || [];
+
+    if (goal === "All of the above") {
+      // If "All of the above" is selected, clear all others
+      if (checked) {
+        setValue("treatmentGoal", ["All of the above"]);
+      } else {
+        setValue("treatmentGoal", []);
+      }
+    } else {
+      // If any OTHER option is selected
+      if (checked) {
+        // Remove "All of the above" if it was selected
+        const filtered = currentGoals.filter(g => g !== "All of the above");
+        setValue("treatmentGoal", [...filtered, goal]);
+      } else {
+        // Just remove the unchecked option
+        setValue("treatmentGoal", currentGoals.filter(g => g !== goal));
+      }
+    }
+  };
+
   // Generate session ID once
   useEffect(() => {
     let id = localStorage.getItem("longevitySessionId");
@@ -438,7 +470,7 @@ export default function PatientRegistrationForm() {
         isIneligible = true;
       }
       if (currentSegmentId === 'previousTreatment' && watch("previousTreatment") === 'no') {
-        count++;
+        count += 2;
       }
       if (currentSegmentId === "clinicianNotes") {
         if (watch("treatmentChoose") !== "Sermorelin") {
@@ -465,7 +497,9 @@ export default function PatientRegistrationForm() {
 
     const segmentFields = getSegmentFields(segments[currentSegment].id);
     const currentSegmentId = segments[currentSegment].id;
-    if (currentSegmentId === 'lastSatisfiedStop' && watch("previousTreatment") === 'no') {
+    if (currentSegmentId === 'clinicianNotes' && watch("previousTreatment") === 'no') {
+      setCurrentSegment(currentSegment - 3);
+    } else if (currentSegmentId === 'lastSatisfiedStop' && watch("previousTreatment") === 'no') {
       setCurrentSegment(currentSegment - 2);
     } else if (currentSegment > 0) {
       setCurrentSegment(currentSegment - 1);
@@ -699,6 +733,7 @@ export default function PatientRegistrationForm() {
           {currentSegment === 1 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Treatment Goal</h2>
+              <Label>Select one or more options <span className="text-red-500">*</span></Label>
 
               {/* Dynamic Options */}
               <div className="flex flex-col gap-3 items-center">
@@ -724,12 +759,12 @@ export default function PatientRegistrationForm() {
                   <label
                     key={i}
                     className={`flex items-center justify-center w-[280px] px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer transition-all duration-150 
-                    ${watch("treatmentGoal") === goal ? "bg-secondary text-white" : "bg-white text-secondary"}`}
+                    ${watch("treatmentGoal")?.includes(goal) ? "bg-secondary text-white" : "bg-white text-secondary"}`}
                   >
                     <input
-                      type="radio"
-                      value={goal}
-                      {...register("treatmentGoal")}
+                      type="checkbox"
+                      checked={watch("treatmentGoal")?.includes(goal) || false}
+                      onChange={(e) => handleTreatmentGoalChange(goal, e.target.checked)}
                       className="hidden"
                     />
                     <span>{goal}</span>
@@ -777,9 +812,7 @@ export default function PatientRegistrationForm() {
 
           {currentSegment === 4 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">When was your last {watch("treatmentChoose")} treatment?<br />
-                Were you satisfied with your treatment?<br />
-                Why did you stop the {watch("treatmentChoose")} treatment?<span className="text-red-500">*</span></h2>
+              <h2 className="text-xl font-semibold">When was your last {watch("treatmentChoose")} treatment?<span className="text-red-500">*</span></h2>
               <Textarea {...register("lastSatisfiedStop")} placeholder="Leave a Description" />
               {errors.lastSatisfiedStop && <p className="text-sm text-red-500">{errors.lastSatisfiedStop.message}</p>}
             </div>

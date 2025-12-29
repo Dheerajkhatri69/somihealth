@@ -10,6 +10,7 @@ import UploadFile from "@/components/FileUpload";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function LongevityUpdateForm({ params }) {
     const router = useRouter();
@@ -50,6 +51,10 @@ export default function LongevityUpdateForm({ params }) {
     const handleSelect = (name, value) =>
         setFormData((prev) => ({ ...prev, [name]: value }));
 
+    const handleCheckboxChange = (name, checked) => {
+        setFormData(prev => ({ ...prev, [name]: checked }));
+    };
+
     // -------------------------------------------
     // Submit Handler
     // -------------------------------------------
@@ -88,7 +93,7 @@ export default function LongevityUpdateForm({ params }) {
                 <div className="w-full space-y-6 p-6 border rounded-xl shadow-sm bg-white">
 
                     {/* Basic Information Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                         {[...Array(9)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-16" />
@@ -98,7 +103,7 @@ export default function LongevityUpdateForm({ params }) {
                     </div>
 
                     {/* Address Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                         {[...Array(5)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-20" />
@@ -108,7 +113,7 @@ export default function LongevityUpdateForm({ params }) {
                     </div>
 
                     {/* Vitals Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-24" />
@@ -118,7 +123,7 @@ export default function LongevityUpdateForm({ params }) {
                     </div>
 
                     {/* Medical Information Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -128,7 +133,7 @@ export default function LongevityUpdateForm({ params }) {
                     </div>
 
                     {/* Weight Management Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-32" />
@@ -138,7 +143,7 @@ export default function LongevityUpdateForm({ params }) {
                     </div>
 
                     {/* GLP-1 Section Skeleton */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-36" />
@@ -147,7 +152,7 @@ export default function LongevityUpdateForm({ params }) {
                         ))}
                     </div>
 
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -253,7 +258,17 @@ export default function LongevityUpdateForm({ params }) {
                 </div>
                 <div>
                     <Label>Treatment Goal</Label>
-                    <Input name="treatmentGoal" value={formData.treatmentGoal || ""} onChange={handleChange} />
+                    <Input
+                        name="treatmentGoal"
+                        value={Array.isArray(formData.treatmentGoal) ? formData.treatmentGoal.join(", ") : formData.treatmentGoal || ""}
+                        onChange={(e) =>
+                            setFormData((prev) => ({
+                                ...prev,
+                                treatmentGoal: e.target.value.split(",").map((x) => x.trim()).filter(x => x),
+                            }))
+                        }
+                        placeholder="Enter goals separated by commas"
+                    />
                 </div>
                 <div>
                     <Label>Previous Treatment (yes/no)</Label>
@@ -517,51 +532,36 @@ export default function LongevityUpdateForm({ params }) {
             </section>
 
             {/* ---------------- FINAL CHECKBOXES ---------------- */}
-            <section className="p-6 border rounded-xl bg-[#fcffe8] shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <Label>Consent</Label>
-                    <Select
-                        value={formData.consent ? "yes" : "no"}
-                        onValueChange={(v) =>
-                            handleSelect("consent", v === "yes")
-                        }
-                    >
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="yes">Yes</SelectItem>
-                            <SelectItem value="no">No</SelectItem>
-                        </SelectContent>
-                    </Select>
+            <section className="p-6 border rounded-xl bg-[#fcffe8] shadow-sm grid grid-cols-1 gap-6">
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="consent"
+                        checked={formData.consent || false}
+                        onCheckedChange={(checked) => handleCheckboxChange('consent', checked)}
+                    />
+                    <Label htmlFor="consent" className="text-sm">
+                        I consent to treatment and acknowledge the risks and benefits
+                    </Label>
                 </div>
-                <div>
-                    <Label>Terms</Label>
-                    <Select
-                        value={formData.terms ? "yes" : "no"}
-                        onValueChange={(v) =>
-                            handleSelect("terms", v === "yes")
-                        }
-                    >
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="yes">Yes</SelectItem>
-                            <SelectItem value="no">No</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="terms"
+                        checked={formData.terms || false}
+                        onCheckedChange={(checked) => handleCheckboxChange('terms', checked)}
+                    />
+                    <Label htmlFor="terms" className="text-sm">
+                        I agree to the terms and conditions
+                    </Label>
                 </div>
-                <div>
-                    <Label>Treatment Consent</Label>
-                    <Select
-                        value={formData.treatment ? "yes" : "no"}
-                        onValueChange={(v) =>
-                            handleSelect("treatment", v === "yes")
-                        }
-                    >
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="yes">Yes</SelectItem>
-                            <SelectItem value="no">No</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="treatment"
+                        checked={formData.treatment || false}
+                        onCheckedChange={(checked) => handleCheckboxChange('treatment', checked)}
+                    />
+                    <Label htmlFor="treatment" className="text-sm">
+                        I understand the treatment plan and agree to follow it
+                    </Label>
                 </div>
             </section>
 

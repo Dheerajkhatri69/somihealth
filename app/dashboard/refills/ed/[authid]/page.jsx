@@ -357,7 +357,7 @@ export default function EDRefillAdminEditForm({ params }) {
                 {/* Personal Information Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Personal Information</h3>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                         <div className="space-y-2">
                             <Label htmlFor="firstName">First Name *</Label>
                             <Input
@@ -405,7 +405,7 @@ export default function EDRefillAdminEditForm({ params }) {
                 {/* Refill Questionnaire Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Refill Questionnaire</h3>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
+                    <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
                         {/* ED Approval Check */}
                         <div className="space-y-2">
                             <Label>Approved within last 6 months? *</Label>
@@ -692,7 +692,7 @@ export default function EDRefillAdminEditForm({ params }) {
                 {/* Image Upload Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Images</h3>
-                    <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
+                    <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-white">
                         <div className="flex justify-between flex-wrap items-center gap-4">
                             {images.map((imageUrl, index) => (
                                 <div key={index} className="relative group w-[200px] h-48">
@@ -758,7 +758,7 @@ export default function EDRefillAdminEditForm({ params }) {
 
                 {/* Administrative Section */}
                 <div className="space-y-4">
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
 
                         <div className="space-y-2">
                             <Label htmlFor="approvalStatus">Approval Status</Label>
@@ -778,39 +778,47 @@ export default function EDRefillAdminEditForm({ params }) {
                                 </SelectContent>
                             </Select>
                         </div>
+                        
                         <div className="flex gap-2">
-                            <Select
-                                value={formData.dose}
-                                onValueChange={(value) => handleSelectChange('dose', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Dose" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="25mg">25mg</SelectItem>
-                                    <SelectItem value="50mg">50mg</SelectItem>
-                                    <SelectItem value="100mg">100mg</SelectItem>
-                                    <SelectItem value="5mg">5mg</SelectItem>
-                                    <SelectItem value="10mg">10mg</SelectItem>
-                                    <SelectItem value="20mg">20mg</SelectItem>
-                                    <SelectItem value="5/35mg">5/35mg</SelectItem>
-                                    <SelectItem value="10/40mg">10/40mg</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Input
-                                className="w-1/2"
-                                placeholder="Unit (e.g. 60 mg / 2 mL)"
-                                value={formData.unit}
-                                onChange={(e) =>
-                                    handleSelectChange("unit", e.target.value)
-                                }
-                            />
+                            <div className="space-y-2 w-full">
+                                <Label htmlFor="dose">Dose</Label>
+                                <Select
+                                    value={formData.dose}
+                                    onValueChange={(value) => handleSelectChange('dose', value)}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Dose" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="25mg">25mg</SelectItem>
+                                        <SelectItem value="50mg">50mg</SelectItem>
+                                        <SelectItem value="100mg">100mg</SelectItem>
+                                        <SelectItem value="5mg">5mg</SelectItem>
+                                        <SelectItem value="10mg">10mg</SelectItem>
+                                        <SelectItem value="20mg">20mg</SelectItem>
+                                        <SelectItem value="5/35mg">5/35mg</SelectItem>
+                                        <SelectItem value="10/40mg">10/40mg</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2 w-full">
+                                <Label htmlFor="unit">Unit</Label>
+                                <Input
+                                    id="unit"
+                                    name="unit"
+                                    className="w-full"
+                                    value={formData.unit || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="Unit"
+                                />
+                            </div>
                         </div>
 
                     </div>
                     {/* Follow-up and Refill Reminder */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
+                    <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label>Follow Up</Label>
@@ -852,7 +860,7 @@ export default function EDRefillAdminEditForm({ params }) {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                         <div className="space-y-2">
                             <Label htmlFor="providerNote">Provider Note</Label>
                             <Textarea

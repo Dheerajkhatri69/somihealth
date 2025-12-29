@@ -464,7 +464,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                 {/* Personal Information Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Personal Information</h3>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                         <div className="space-y-2">
                             <Label htmlFor="firstName">First Name *</Label>
                             <Input
@@ -512,7 +512,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                 {/* Medical Information Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Medical Information</h3>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                         <div className="space-y-2">
                             <Label htmlFor="dob">Date of Birth</Label>
                             <Input
@@ -575,7 +575,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                 {/* Address Information Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Address Information</h3>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                         <div className="space-y-2">
                             <Label htmlFor="address1">Address Line 1</Label>
                             <Input
@@ -637,7 +637,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                 {/* Refill Questionnaire Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Refill Questionnaire</h3>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
+                    <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
                         {/* Approval Check */}
                         <div className="space-y-2">
                             <Label>Approved within last 6 months? *</Label>
@@ -830,7 +830,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                 {/* Image Upload Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Images</h3>
-                    <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-white">
+                    <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-white">
                         <div className="flex justify-between flex-wrap items-center gap-4">
                             {images.map((imageUrl, index) => (
                                 <div key={index} className="relative group w-[200px] h-48">
@@ -897,7 +897,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                 {/* File Upload Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Documents</h3>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
                         <div className="space-y-2">
                             <Label>Document 1</Label>
                             <UploadFile
@@ -930,7 +930,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                 </div>
                 {/* Administrative Section */}
                 <div className="space-y-4">
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
 
                         <div className="space-y-2">
                             <Label htmlFor="approvalStatus">Approval Status</Label>
@@ -951,33 +951,40 @@ export default function LongevityRefillAdminEditForm({ params }) {
                             </Select>
                         </div>
                         <div className="flex gap-2">
-                            <Select
-                                value={formData.dose}
-                                onValueChange={(value) => handleSelectChange('dose', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Dose" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="NAD+ 200mg/ml">NAD+ 200mg/ml</SelectItem>
-                                    <SelectItem value="Sermorelin 1mg/ml">Sermorelin 1mg/ml</SelectItem>
-                                    <SelectItem value="Glutathione 200mg/ml">Glutathione 200mg/ml</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Input
-                                className="w-1/2"
-                                placeholder="Unit (e.g. 60 mg / 2 mL)"
-                                value={formData.unit}
-                                onChange={(e) =>
-                                    handleSelectChange("unit", e.target.value)
-                                }
-                            />
+                            <div className="space-y-2 w-full">
+                                <Label htmlFor="dose">Dose</Label>
+                                <Select
+                                    value={formData.dose}
+                                    onValueChange={(value) => handleSelectChange('dose', value)}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Dose" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="NAD+ 200mg/ml">NAD+ 200mg/ml</SelectItem>
+                                        <SelectItem value="Sermorelin 1mg/ml">Sermorelin 1mg/ml</SelectItem>
+                                        <SelectItem value="Glutathione 200mg/ml">Glutathione 200mg/ml</SelectItem>
+                                        <SelectItem value="None">None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2 w-full">
+                                <Label htmlFor="unit">Unit</Label>
+                                <Input
+                                    id="unit"
+                                    name="unit"
+                                    className="w-full"
+                                    value={formData.unit || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="Unit"
+                                />
+                            </div>
                         </div>
 
                     </div>
                     {/* ADD THIS SECTION FOR FOLLOW-UP AND REFILL REMINDER */}
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
+                    <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label>Follow Up</Label>
@@ -1019,7 +1026,7 @@ export default function LongevityRefillAdminEditForm({ params }) {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                    <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                         <div className="space-y-2">
                             <Label htmlFor="providerNote">Provider Note</Label>
                             <textarea
