@@ -1071,7 +1071,7 @@ export default function SkinHairQuestionnaireForm({ params }) {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
-                            <SelectItem value="Finasteride 1mg">Finasteride 1mg</SelectItem>
+                            <SelectItem value="Minoxidil 2.5mg">Minoxidil 2.5mg</SelectItem>
                             <SelectItem value="Rx Hair (Finasteride, Minoxidil & Biotin)">Rx Hair (Finasteride, Minoxidil & Biotin)</SelectItem>
                             <SelectItem value="Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)">Rx Skin (Azelaic acid, Niacinamide, Clindamycin & Tretinoin)</SelectItem>
                             <SelectItem value="None">None</SelectItem>
