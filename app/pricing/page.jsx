@@ -210,7 +210,7 @@ const LandingPagePricing = () => {
 
             {/* ---------- Options ---------- */}
             <div className="w-full max-w-3xl mx-auto mt-2 mb-2 space-y-3">
-              {(D.options || []).map((opt) => (
+              {(D.options || []).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((opt) => (
                 <Link
                   key={opt.idname || opt.title}
                   href={opt.href || '#'}

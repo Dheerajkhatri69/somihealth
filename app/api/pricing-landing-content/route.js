@@ -30,10 +30,10 @@ function defaultDoc() {
             { src: '/pay/affirm-badge.webp', alt: 'Affirm' },
         ],
         options: [
-            { title: 'Weight Loss', idname: 'weightloss', price: { note: 'AS LOW AS', amount: 196, unit: '/mo' }, href: '/pricing/weightLoss', image: '' },
-            { title: 'Longevity', idname: 'longevity', price: { note: 'AS LOW AS', amount: 188, unit: '/mo' }, href: '/pricing/longevity', image: '' },
-            { title: 'Erectile Dysfunction', idname: 'erectiledysfunction', price: { note: 'AS LOW AS', amount: 182, unit: '/mo' }, href: '/pricing/erectileDysfunction', image: '' },
-            { title: 'Skin+Hair', idname: 'skinhair', price: { note: 'AS LOW AS', amount: 182, unit: '/mo' }, href: '/pricing/skinhair', image: '' },
+            { title: 'Weight Loss', idname: 'weightloss', price: { note: 'AS LOW AS', amount: 196, unit: '/mo' }, href: '/pricing/weightLoss', image: '', order: 1 },
+            { title: 'Longevity', idname: 'longevity', price: { note: 'AS LOW AS', amount: 188, unit: '/mo' }, href: '/pricing/longevity', image: '', order: 2 },
+            { title: 'Erectile Dysfunction', idname: 'erectiledysfunction', price: { note: 'AS LOW AS', amount: 182, unit: '/mo' }, href: '/pricing/erectileDysfunction', image: '', order: 3 },
+            { title: 'Skin+Hair', idname: 'skinhair', price: { note: 'AS LOW AS', amount: 182, unit: '/mo' }, href: '/pricing/skinhair', image: '', order: 4 },
         ],
         config: { isActive: true },
     };

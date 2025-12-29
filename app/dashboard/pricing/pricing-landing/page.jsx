@@ -326,7 +326,7 @@ export default function PricingLandingDashboard() {
                 <div className="p-6 space-y-6">
                     {(editing.options || []).map((opt, idx) => (
                         <div key={idx} className="border border-gray-200 rounded-lg p-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                                     <input
@@ -355,6 +355,24 @@ export default function PricingLandingDashboard() {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                                    <input
+                                        type="number"
+                                        disabled={!isEditing}
+                                        value={opt.order ?? 0}
+                                        onChange={(e) => {
+                                            const next = [...editing.options];
+                                            next[idx].order = Number(e.target.value || 0);
+                                            update('options', next);
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                        placeholder="1, 2, 3..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Href</label>
                                     <input
