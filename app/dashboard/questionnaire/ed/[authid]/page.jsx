@@ -111,6 +111,7 @@ export default function EDQuestionnaireForm({ params }) {
         dose: "",
         unit: "",
         currentMedication: "",
+        currentDose: "",
 
         // System
         patientId: "",
@@ -389,7 +390,7 @@ export default function EDQuestionnaireForm({ params }) {
                             </div>
                         )}
                     </div>
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                         {[...Array(9)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-16" />
@@ -949,6 +950,47 @@ export default function EDQuestionnaireForm({ params }) {
                             <SelectContent>
                                 <SelectItem value="yes">Yes</SelectItem>
                                 <SelectItem value="no">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                {/* Medication Interest (Patient Response) */}
+                <h3 className="text-sm font-semibold">Medication Interest (Patient Selection)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#dcfce7]">
+                    <div className="space-y-2">
+                        <Label htmlFor="patientInterestedMedication">Interested Medication</Label>
+                        <Select
+                            value={formData.currentMedication || ""}
+                            onValueChange={(value) => {
+                                handleSelectChange('currentMedication', value);
+                                handleSelectChange('currentDose', '');
+                            }}
+                        >
+                            <SelectTrigger id="patientInterestedMedication" className="w-full bg-white/50">
+                                <SelectValue placeholder="Select medication" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Sildenafil (Generic of Viagra)">Sildenafil (Generic of Viagra)</SelectItem>
+                                <SelectItem value="Tadalafil (Generic of Cialis)">Tadalafil (Generic of Cialis)</SelectItem>
+                                <SelectItem value="Fusion Mini Troches (Tadalafil/Sildenafil)">Fusion Mini Troches (Tadalafil/Sildenafil)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="patientInterestedDose">Interested Dose</Label>
+                        <Select
+                            value={formData.currentDose || ""}
+                            onValueChange={(value) => handleSelectChange('currentDose', value)}
+                        >
+                            <SelectTrigger id="patientInterestedDose" className="w-full bg-white/50">
+                                <SelectValue placeholder="Select dose" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {formData.currentMedication && medicationOptions[formData.currentMedication]?.map((dose) => (
+                                    <SelectItem key={dose} value={dose}>{dose}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>

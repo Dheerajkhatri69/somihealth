@@ -1402,12 +1402,8 @@ export default function PatientUpdateForm({ params }) {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.50">2.50 mg</SelectItem>
-                                    <SelectItem value="5.00">5.00 mg</SelectItem>
-                                    <SelectItem value="7.50">7.50 mg</SelectItem>
-                                    <SelectItem value="10.00">10.00 mg</SelectItem>
-                                    <SelectItem value="12.50">12.50 mg</SelectItem>
-                                    <SelectItem value="15.00">15.00 mg</SelectItem>
+                                    <SelectItem value="25MG/50MG/50MG/330MCG (30ML VIAL)">25MG/50MG/50MG/330MCG (30ML VIAL)</SelectItem>
+                                    <SelectItem value="25MG/50MG/50MG/330MCG (10ML VIAL)">25MG/50MG/50MG/330MCG (10ML VIAL)</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>

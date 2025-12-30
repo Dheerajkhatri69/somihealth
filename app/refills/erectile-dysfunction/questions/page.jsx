@@ -592,7 +592,7 @@ export default function EDRefillForm() {
                     {currentSegment === 3 && (
                         <div className="space-y-4">
                             <Label>
-                                Which ED medication are you currently taking? <span className="text-red-500">*</span>
+                                Which ED medication are you interested in? <span className="text-red-500">*</span>
                             </Label>
 
                             {/* Medication selection - using button-style design */}

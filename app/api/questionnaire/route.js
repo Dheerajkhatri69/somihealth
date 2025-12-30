@@ -128,6 +128,7 @@ export async function POST(request) {
             terms: body.terms || false,
             treatment: body.treatment || false,
             agreetopay: body.agreetopay || false,
+            bmiConsent: body.bmiConsent || false,
             questionnaire: true,
             PlanPurchased: body.PlanPurchased,
             status: body.status || 'draft',

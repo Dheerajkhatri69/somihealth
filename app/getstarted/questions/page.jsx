@@ -319,7 +319,7 @@ export default function PatientRegistrationForm() {
   const [fileUrls, setFileUrls] = useState({ file1: '', file2: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [GLPPlan, setGLPPlan] = useState(null);
+
   const {
     register,
     handleSubmit,
@@ -327,6 +327,7 @@ export default function PatientRegistrationForm() {
     watch,
     trigger,
     setValue,
+    setError,
     control,
   } = useForm({
     resolver: zodResolver(formSchema),
@@ -543,74 +544,39 @@ export default function PatientRegistrationForm() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4 font-SofiaSans">
         <div className="w-full max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg flex flex-col items-center">
           <div className="font-tagesschrift text-center text-4xl -mb-4 md:text-6xl text-secondary font-bold">somi</div>
-          {GLPPlan === 'no' && (
-            <>
-              <div className="space-y-2 p-4">
-                <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
-                  <Image
-                    src="/getstarted.jpg"
-                    alt="Longevity"
-                    fill
-                    className="rounded-xl object-cover"
-                    priority
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
-                  />
-                </div>
-                <h3 className="text-lg md:text-x text-center">
-                  <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Clinician Review Fee.</span>
-                </h3>
-
-                <p className="text-gray-600 text-center">
-                  <span className='font-bold'>Note:</span> $25 Clinician review Fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
-                </p>
-                <p className="text-gray-600 text-center">
-                  Please allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patience.
-                </p>
+          <>
+            <div className="space-y-2 p-4">
+              <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
+                <Image
+                  src="/getstarted.jpg"
+                  alt="Longevity"
+                  fill
+                  className="rounded-xl object-cover"
+                  priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
+                />
               </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  window.location.href = 'https://buy.stripe.com/8x2cN60eG8mAgigaeQ3ks01';
-                }}
-                className="bg-green-500 text-white hover:text-white hover:bg-green-500 rounded-2xl"
-              >
-                Pay Here
-              </Button>
-            </>
-          )}
+              <h3 className="text-lg md:text-x text-center">
+                <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Clinician Review Fee.</span>
+              </h3>
 
-          {GLPPlan === 'yes' && (
-            <>
-              <div className="space-y-2 p-4">
-                <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mx-auto mt-4 mb-6">
-                  <Image
-                    src="/getstarted.jpg"
-                    alt="Longevity"
-                    fill
-                    className="rounded-xl object-cover"
-                    priority
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 80vw, 800px"
-                  />
-                </div>
-                <h3 className="text-lg md:text-x text-center">
-                  Thank you for completing your Weight Loss Medical Intake form
-                </h3>
-
-                <p className="text-gray-600 text-center">
-                  Please allow up to 24 hours for one of our clinicians to carefully review your submitted form and get back to you. Thanks for your patience.
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  window.location.href = 'https://joinsomi.com/';
-                }}
-                className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
-              >
-                End
-              </Button>
-            </>
-          )}
+              <p className="text-gray-600 text-center">
+                <span className='font-bold'>Note:</span> $25 Clinician review Fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
+              </p>
+              <p className="text-gray-600 text-center">
+                Please allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patience.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                window.location.href = 'https://buy.stripe.com/8x2cN60eG8mAgigaeQ3ks01';
+              }}
+              className="bg-green-500 text-white hover:text-white hover:bg-green-500 rounded-2xl"
+            >
+              Pay Here
+            </Button>
+          </>
 
         </div>
       </div>
@@ -633,6 +599,25 @@ export default function PatientRegistrationForm() {
       }
       return;
     }
+
+    // Manual validation for bmiInfo segment - bmiConsent is required for Semaglutide/Tirzepatide
+    if (currentSegmentId === 'bmiInfo') {
+      const bmiConsentValue = watch('bmiConsent');
+      if (bmiConsentValue !== true) {
+        // Set error manually since the base schema has bmiConsent as optional
+        setError('bmiConsent', {
+          type: 'manual',
+          message: 'You must agree to the BMI Consent',
+        });
+        return;
+      }
+      const nextIndex = getNextSegmentIndex(currentSegment);
+      if (nextIndex < segments.length) {
+        setCurrentSegment(nextIndex);
+      }
+      return;
+    }
+
 
     const segmentFields = getSegmentFields(segments[currentSegment].id);
     const isValid = await trigger(segmentFields);
@@ -716,10 +701,7 @@ export default function PatientRegistrationForm() {
 
         // Lipotropic Logic
         case 'lipotropicAllergies': // Q1
-          const lAllergies = currentValues.lipotropicAllergies || [];
-          if (lAllergies.length > 0 && !lAllergies.includes('None of the above')) {
-            isIneligible = true;
-          }
+          // Removed ineligibility check for Lipotropic allergies
           break;
         case 'lipotropicDiagnoses': // Q7
           const lDiagnoses = currentValues.lipotropicDiagnoses || [];
@@ -817,7 +799,7 @@ export default function PatientRegistrationForm() {
         idPhoto: fileUrls.file2,
         authid: `P${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`,
         questionnaire: true,
-        PlanPurchased: GLPPlan,
+
       };
 
       // Make API call to save data
@@ -1013,45 +995,15 @@ export default function PatientRegistrationForm() {
           {currentSegmentId === 'personal' && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">{isLipotropic ? 'Plan' : 'GLP-1 Plan'}</h2>
-              <div className="space-y-2">
-                {
-                  isLipotropic ?
-                    null :
-                    <Label htmlFor="paid">
-                      If you have paid for your medication pick &quot;YES&quot;.<br />
-                      If you have not paid for your medications pick &quot;NO&quot; <span className="text-red-500">*</span>
-                    </Label>
-                }
 
-                <div className="flex gap-2 justify-center flex-col items-center">
-                  {['yes', 'no'].map((option, index) => (
-                    <label
-                      key={index}
-                      htmlFor={`glp-${index}`}
-                      className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer md:hover:bg-secondary md:hover:text-white transition-all duration-150 ${GLPPlan === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
-                    >
-                      <input
-                        type="radio"
-                        id={`glp-${index}`}
-                        name="glp-plan"
-                        value={option}
-                        className="hidden"
-                        onChange={() => setGLPPlan(option)}
-                        checked={GLPPlan === option}
-                      />
-                      <span>{option === 'yes' ? 'Yes' : 'No'}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
 
               {/* Show the heading always */}
               <h2 className="text-xl font-semibold flex gap-2 items-center">
                 <ArrowDownWideNarrow />Let&apos;s get to know you!
               </h2>
 
-              {/* Show inputs only after GLPPlan is selected or if Lipotropic */}
-              {(GLPPlan || isLipotropic) && (
+              {/* Show inputs always */}
+              {(
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -1231,7 +1183,7 @@ export default function PatientRegistrationForm() {
           {/* Q8: General Allergies */}
           {currentSegmentId === 'lipotropicGeneralAllergies' && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Do you have any allergies? <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-secondary text-white rounded-full">Disqualifier</span></h2>
+              <h2 className="text-xl font-semibold">Do you have any allergies?</h2>
               <div className="flex gap-2 flex-col justify-center items-center">
                 {['Yes', 'No'].map((opt) => (
                   <label key={opt} className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${(!['No', undefined, ''].includes(watch('lipotropicAllergiesDrop')) && opt === 'Yes') || (watch('lipotropicAllergiesDrop') === 'No' && opt === 'No') ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}>
@@ -3296,7 +3248,7 @@ export default function PatientRegistrationForm() {
                   type="button"
                   className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
                 >
-                  {GLPPlan === 'yes' ? "Submit" : "Continue To Payment"}
+                  {isLipotropic ? "Submit" : "Continue To Payment"}
                 </Button>
               </div>
             </div>

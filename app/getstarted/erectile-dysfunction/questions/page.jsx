@@ -142,6 +142,10 @@ const formSchema = z.object({
     terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
     treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
     agreetopay: z.boolean().refine(val => val === true, "You must consent to agree to pay"),
+
+    // Medication Interest
+    currentMedication: z.string().min(1, "Please select an ED medication"),
+    currentDose: z.string().min(1, "Please select your dose"),
 });
 
 const segments = [
@@ -166,11 +170,19 @@ const segments = [
     { id: 'edSymptoms1', name: 'ED Symptoms Part 1' },
     { id: 'edSymptoms2', name: 'ED Symptoms Part 2' },
     { id: 'previousTreatment', name: 'Previous ED Treatment' },
+    { id: 'interestedMedication', name: 'Medication Selection' },
     { id: 'edMedUpload', name: 'ED Medication Upload' },
     { id: 'idUpload', name: 'ID Upload' },
     { id: 'comments', name: 'Comments & Feedback' },
     { id: 'consent', name: 'Telehealth Consent' },
 ];
+
+// Medication options
+const medicationOptions = {
+    'Sildenafil (Generic of Viagra)': ['25mg', '50mg', '100mg'],
+    'Tadalafil (Generic of Cialis)': ['5mg', '10mg', '20mg'],
+    'Fusion Mini Troches (Tadalafil/Sildenafil)': ['5/35mg', '10/40mg']
+};
 
 // Custom progress bar component
 const ProgressBar = ({ progress }) => {
@@ -219,6 +231,8 @@ export default function EDQuestionnaireForm() {
     const lastName = watch("lastName");
     const phone = watch("phone");
     const email = watch("email");
+    const currentMedication = watch("currentMedication");
+    const currentDose = watch("currentDose");
 
     // Helper function to handle checkbox changes
     const handleCheckboxChange = (field, value, checked) => {
@@ -489,7 +503,7 @@ export default function EDQuestionnaireForm() {
             }
 
             let count = 1;
-            if (currentSegmentId === 'previousTreatment' && watch('previousEDMeds') === 'no') {
+            if (currentSegmentId === 'interestedMedication' && watch('previousEDMeds') === 'no') {
                 count = 2;
             }
 
@@ -599,6 +613,7 @@ export default function EDQuestionnaireForm() {
             case 'edSymptoms1': return ['erectionChallenges', 'erectionSustaining', 'erectionChange'];
             case 'edSymptoms2': return ['sexualEncounters', 'nonPrescriptionSupplements'];
             case 'previousTreatment': return ['previousEDMeds'];
+            case 'interestedMedication': return ['currentMedication', 'currentDose'];
             case 'edMedUpload': return ['edMedicationPhoto'];
             case 'idUpload': return ['idPhoto'];
             case 'comments': return ['heardAbout', 'heardAboutOther', 'comments'];
@@ -1518,7 +1533,7 @@ export default function EDQuestionnaireForm() {
                     )}
 
                     {/* ED Symptoms Part 2 segment - QUESTIONS 19, 20 */}
-                    {currentSegment === 19 && (
+                    {segments[currentSegment].id === 'edSymptoms2' && (
                         <div className="space-y-4">
                             <h2 className="text-xl font-semibold">Additional ED Information</h2>
 
@@ -1579,7 +1594,7 @@ export default function EDQuestionnaireForm() {
                     )}
 
                     {/* Previous ED Treatment segment - QUESTION 21 */}
-                    {currentSegment === 20 && (
+                    {segments[currentSegment].id === 'previousTreatment' && (
                         <div className="space-y-4">
                             <h2 className="text-xl font-semibold">Previous ED Treatment</h2>
                             <div className="space-y-4">
@@ -1611,8 +1626,57 @@ export default function EDQuestionnaireForm() {
                         </div>
                     )}
 
+                    {/* Interested Medication Selection segment */}
+                    {segments[currentSegment].id === 'interestedMedication' && (
+                        <div className="space-y-4 text-center">
+                            <Label className="text-xl font-semibold mb-4 block">
+                                Which ED medication are you interested in? <span className="text-red-500">*</span>
+                            </Label>
+
+                            {/* Medication selection - using button-style design */}
+                            <div className="space-y-4 flex flex-col items-center">
+                                {Object.entries(medicationOptions).map(([medication, doses]) => (
+                                    <div key={medication} className="space-y-3 w-full flex flex-col items-center">
+                                        {/* Medication option as button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setValue('currentMedication', medication);
+                                                setValue('currentDose', ''); // Reset dose when changing medication
+                                            }}
+                                            className={`w-full flex items-center max-w-[280px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${currentMedication === medication ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                        >
+                                            <span className="text-sm font-medium">{medication}</span>
+                                        </button>
+
+                                        {/* Show doses only if this medication is selected */}
+                                        {currentMedication === medication && (
+                                            <div className="space-y-2 w-full flex flex-col items-center">
+                                                <Label className="text-sm text-gray-600">Select your preferred dose:</Label>
+                                                <div className="flex flex-wrap gap-2 justify-center">
+                                                    {doses.map((dose) => (
+                                                        <button
+                                                            key={dose}
+                                                            type="button"
+                                                            onClick={() => setValue('currentDose', dose)}
+                                                            className={`flex items-center text-sm justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${currentDose === dose ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                                        >
+                                                            {dose}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                {errors.currentDose && <p className="text-sm text-red-500">{errors.currentDose.message}</p>}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            {errors.currentMedication && <p className="text-sm text-red-500">{errors.currentMedication.message}</p>}
+                        </div>
+                    )}
+
                     {/* ED Medication Upload segment - QUESTION 22 */}
-                    {currentSegment === 21 && (
+                    {segments[currentSegment].id === 'edMedUpload' && (
                         <div className="space-y-4">
                             <h2 className="text-xl font-semibold">ED Medication Upload</h2>
                             <div className="space-y-2">
@@ -1636,7 +1700,7 @@ export default function EDQuestionnaireForm() {
                     )}
 
                     {/* ID Upload segment - QUESTION 23 */}
-                    {currentSegment === 22 && (
+                    {segments[currentSegment].id === 'idUpload' && (
                         <div className="space-y-4">
                             <h2 className="text-xl font-semibold">ID Upload</h2>
                             <div className="space-y-2">
@@ -1661,7 +1725,7 @@ export default function EDQuestionnaireForm() {
                     )}
 
                     {/* How did you hear about us + Comments segment */}
-                    {currentSegment === 23 && (
+                    {segments[currentSegment].id === 'comments' && (
                         <div className="space-y-6">
                             {/* How did you hear about us */}
                             <div className="space-y-3">
@@ -1733,7 +1797,7 @@ export default function EDQuestionnaireForm() {
                     )}
 
                     {/* Telehealth Consent segment */}
-                    {currentSegment === 24 && (
+                    {segments[currentSegment].id === 'consent' && (
                         <div className="space-y-4">
                             <h2 className="text-xl font-semibold">Telehealth Consent to Treatment and HIPAA Notice</h2>
                             <div className="space-y-4">
