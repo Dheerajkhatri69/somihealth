@@ -5,7 +5,6 @@ import { useWebsiteData } from "@/contexts/WebsiteDataContext";
 import ProductCard from "@/components/ProductCard";
 import { notFound } from "next/navigation";
 import ClientVideoReviews from "@/components/hero/ReviewVideoCard";
-import CompoundedExplainer from "@/components/hero/compounded-glp1";
 import HowItWorksGnz from "@/components/hero/HowItworks";
 import { TabsDemo } from "@/components/hero/Results";
 import FaqPro from "@/components/hero/Faq";
@@ -154,7 +153,6 @@ export default function ProductTypePage({ params }) {
             {!["Erectile Dysfunction", "Skin+Hair"].includes((title || "").trim()) && (
                 <ClientVideoReviews />
             )}
-            <CompoundedExplainer />
             <HowItWorksGnz />
             {title === "Weight Loss" ? <></> : <TabsDemo />}
             <FaqPro />

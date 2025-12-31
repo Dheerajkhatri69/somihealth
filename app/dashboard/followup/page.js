@@ -768,12 +768,13 @@ export default function FollowUp() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="0.25">0.25 mg</SelectItem>
-                                        <SelectItem value="0.50">0.50 mg</SelectItem>
-                                        <SelectItem value="1.0">1 mg</SelectItem>
-                                        <SelectItem value="1.7">1.7 mg</SelectItem>
-                                        <SelectItem value="2.0">2.0 mg</SelectItem>
-                                        <SelectItem value="2.5">2.5 mg</SelectItem>
+                                        <SelectItem value="0.25mg, 0.5mg & 1mg for 12 weeks">0.25mg, 0.5mg & 1mg for 12 weeks</SelectItem>
+                                        <SelectItem value="0.5mg for 12 weeks">0.5mg for 12 weeks</SelectItem>
+                                        <SelectItem value="1mg for 12 weeks">1mg for 12 weeks</SelectItem>
+                                        <SelectItem value="1.7mg for 7 weeks">1.7mg for 7 weeks</SelectItem>
+                                        <SelectItem value="2mg for 6 weeks">2mg for 6 weeks</SelectItem>
+                                        <SelectItem value="2.5mg for 5 weeks">2.5mg for 5 weeks</SelectItem>
+                                        <SelectItem value="Micro Dosing">Micro Dosing</SelectItem>
                                         <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -799,12 +800,16 @@ export default function FollowUp() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All</SelectItem>
-                                        <SelectItem value="2.50">2.50 mg</SelectItem>
-                                        <SelectItem value="5.00">5.00 mg</SelectItem>
-                                        <SelectItem value="7.50">7.50 mg</SelectItem>
-                                        <SelectItem value="10.00">10.00 mg</SelectItem>
-                                        <SelectItem value="12.50">12.50 mg</SelectItem>
-                                        <SelectItem value="15.00">15.00 mg</SelectItem>
+                                        <SelectItem value="2.5mg, 5mg & 7.5mg for 12 weeks">2.5mg, 5mg & 7.5mg for 12 weeks</SelectItem>
+                                        <SelectItem value="5mg for 12 weeks">5mg for 12 weeks</SelectItem>
+                                        <SelectItem value="7.5mg for 8 weeks">7.5mg for 8 weeks</SelectItem>
+                                        <SelectItem value="10mg for 6 weeks">10mg for 6 weeks</SelectItem>
+                                        <SelectItem value="12mg for 5 weeks">12mg for 5 weeks</SelectItem>
+                                        <SelectItem value="15mg for 4 weeks">15mg for 4 weeks</SelectItem>
+                                        <SelectItem value="Micro Dosing">Micro Dosing</SelectItem>
+                                        <SelectItem value="5mg for 6 weeks">5mg for 6 weeks</SelectItem>
+                                        <SelectItem value="7.5mg for 4 weeks">7.5mg for 4 weeks</SelectItem>
+                                        <SelectItem value="2.5mg, 5mg, 7.5mg, 10mg & 12mg for 6 months">2.5mg, 5mg, 7.5mg, 10mg & 12mg for 6 months</SelectItem>
                                         <SelectItem value="None">None</SelectItem>
                                     </SelectContent>
                                 </Select>

@@ -426,7 +426,7 @@ export default function FollowUpForm({ params }) {
                 </div>
 
                 <h3 className="text-sm font-semibold">Basic information</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
                         <Label htmlFor="dob">DOB</Label>
                         <Input
@@ -532,7 +532,7 @@ export default function FollowUpForm({ params }) {
 
                 {/* Address Section */}
                 <h3 className="text-sm font-semibold">Address</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -600,7 +600,7 @@ export default function FollowUpForm({ params }) {
 
                 {/* Current Medication Section */}
                 <h3 className="text-sm font-semibold">Current Medication Details</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
                     <div className="space-y-2">
                         <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
                         <Input
@@ -677,7 +677,7 @@ export default function FollowUpForm({ params }) {
                     </div>
                 </div>
 
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
                         <Label htmlFor="providerComments">Enter your questions and comments</Label>
                         <textarea
@@ -742,7 +742,7 @@ export default function FollowUpForm({ params }) {
                 </div>
                 {/* File Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Documents</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
                     <div className="space-y-2">
                         <Label>Document 1</Label>
                         <UploadFile
@@ -761,116 +761,7 @@ export default function FollowUpForm({ params }) {
                     </div>
                 </div>
 
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
-
-                    {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
-                        <div className="space-y-2">
-                            <Label htmlFor="approvalStatus">Approval Status</Label>
-                            <Select
-                                value={formData.approvalStatus}
-                                onValueChange={(value) => handleSelectChange('approvalStatus', value)}
-                            >
-                                <SelectTrigger id="approvalStatus" className="w-full">
-                                    <SelectValue placeholder="Select approval status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="approved">Approved</SelectItem>
-                                    <SelectItem value="denied">Denied</SelectItem>
-                                    <SelectItem value="pending">Pending / Request a call</SelectItem>
-                                    <SelectItem value="disqualified">Disqualified / Close</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )}
-                    {/* Semaglutide Dose */}
-                    <div className="space-y-2">
-                        <Label>Semaglutide Dose</Label>
-                        <div className="flex gap-2">
-                            <Select
-                                value={formData.semaglutideDose}
-                                onValueChange={(value) => handleSelectChange('semaglutideDose', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Dose" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="0.25">0.25 mg</SelectItem>
-                                    <SelectItem value="0.50">0.50 mg</SelectItem>
-                                    <SelectItem value="1.0">1 mg</SelectItem>
-                                    <SelectItem value="1.7">1.7 mg</SelectItem>
-                                    <SelectItem value="2.0">2.0 mg</SelectItem>
-                                    <SelectItem value="2.5">2.5 mg</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-
-                            </Select>
-                            <Select
-                                value={formData.semaglutideUnit}
-                                onValueChange={(value) => handleSelectChange('semaglutideUnit', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="1.00 mg/2mL">1.00 mg/2mL</SelectItem>
-                                    <SelectItem value="2.00 mg/2mL">2.00 mg/2mL</SelectItem>
-                                    <SelectItem value="4.00 mg/2mL">4.00 mg/2mL</SelectItem>
-                                    <SelectItem value="6.80 mg/2mL">6.80 mg/2mL</SelectItem>
-                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                    <SelectItem value="15.00 mg/3mL">15.00 mg/3mL</SelectItem>
-                                    <SelectItem value="20.00 mg/4mL">20.00 mg/4mL</SelectItem>
-                                    <SelectItem value="25.00 mg/5mL">25.00 mg/5mL</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-
-                    {/* Tirzepatide Dose */}
-                    <div className="space-y-2">
-                        <Label>Tirzepatide Dose</Label>
-                        <div className="flex gap-2">
-                            <Select
-                                value={formData.tirzepatideDose}
-                                onValueChange={(value) => handleSelectChange('tirzepatideDose', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Dose" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="2.50">2.50mg</SelectItem>
-                                    <SelectItem value="5.00">5.00mg</SelectItem>
-                                    <SelectItem value="7.50">7.50mg</SelectItem>
-                                    <SelectItem value="10.00">10.00mg</SelectItem>
-                                    <SelectItem value="12.50">12.50mg</SelectItem>
-                                    <SelectItem value="15.00">15.00mg</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            <Select
-                                value={formData.tirzepatideUnit}
-                                onValueChange={(value) => handleSelectChange('tirzepatideUnit', value)}
-                            >
-                                <SelectTrigger className="w-1/2">
-                                    <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10.00 mg/2mL">10.00 mg/2mL</SelectItem>
-                                    <SelectItem value="20.00 mg/2mL">20.00 mg/2mL</SelectItem>
-                                    <SelectItem value="30.00 mg/2mL">30.00 mg/2mL</SelectItem>
-                                    <SelectItem value="40.00 mg/2mL">40.00 mg/2mL</SelectItem>
-                                    <SelectItem value="50.00 mg/2mL">50.00 mg/2mL</SelectItem>
-                                    <SelectItem value="60.00 mg/2mL">60.00 mg/2mL</SelectItem>
-                                    <SelectItem value="None">None</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
                         <Label htmlFor="providerNote">Provider Note</Label>
                         <textarea

@@ -9,13 +9,14 @@ import NumberTicker from "@/components/NumberTicker";
 import HowItWorksGnz from "@/components/hero/HowItworks";
 import SomiFooter from "@/components/hero/SomiFooter";
 import Navbar from "@/components/hero/Navbar";
+import CompoundedExplainer from "@/components/hero/compounded-glp1";
 
 // Icon mapping
 const iconMap = {
-  HeartPulse,
-  ShieldCheck,
-  Sparkles,
-  Wallet
+    HeartPulse,
+    ShieldCheck,
+    Sparkles,
+    Wallet
 };
 
 export default function AboutPage() {
@@ -160,36 +161,36 @@ export default function AboutPage() {
                                     />
                                 );
                             }) || (
-                                <>
-                                    <ValueCard
-                                        icon={<HeartPulse className="h-5 w-5" />}
-                                        title="Expert-led Care"
-                                        text="Clinicians who listen, personalize, and guide you through every step."
-                                    />
-                                    <ValueCard
-                                        icon={<ShieldCheck className="h-5 w-5" />}
-                                        title="Safe & Transparent"
-                                        text="Clear dosing, clear expectations, and pricing you can trust."
-                                    />
-                                    <ValueCard
-                                        icon={<Sparkles className="h-5 w-5" />}
-                                        title="Personalized Plans"
-                                        text="Treatments tailored to your biology and your goals."
-                                    />
-                                    <ValueCard
-                                        icon={<Wallet className="h-5 w-5" />}
-                                        title="No Hidden Fees"
-                                        text="Upfront pricing—no surprises, no confusion."
-                                    />
-                                </>
-                            )}
+                                    <>
+                                        <ValueCard
+                                            icon={<HeartPulse className="h-5 w-5" />}
+                                            title="Expert-led Care"
+                                            text="Clinicians who listen, personalize, and guide you through every step."
+                                        />
+                                        <ValueCard
+                                            icon={<ShieldCheck className="h-5 w-5" />}
+                                            title="Safe & Transparent"
+                                            text="Clear dosing, clear expectations, and pricing you can trust."
+                                        />
+                                        <ValueCard
+                                            icon={<Sparkles className="h-5 w-5" />}
+                                            title="Personalized Plans"
+                                            text="Treatments tailored to your biology and your goals."
+                                        />
+                                        <ValueCard
+                                            icon={<Wallet className="h-5 w-5" />}
+                                            title="No Hidden Fees"
+                                            text="Upfront pricing—no surprises, no confusion."
+                                        />
+                                    </>
+                                )}
                         </div>
                     </section>
                 )}
 
                 {/* ====== PROOF / STATS ====== */}
                 {content?.config?.showStats && (
-                    <section className="mx-auto max-w-6xl px-4 py-16 md:px-6 lg:py-24">
+                    <section className="mx-auto max-w-6xl px-4 py-16 md:px-6 lg:pt-24">
                         <div>
                             <h3 className="font-SofiaSans text-3xl md:text-4xl">
                                 {content?.stats?.title || 'Care that actually supports you'}
@@ -208,21 +209,22 @@ export default function AboutPage() {
                                         suffix={stat.suffix}
                                     />
                                 )) || (
-                                    <>
-                                        <Stat
-                                            label="Avg. care response time (min)"
-                                            value={12}
-                                            suffix="m"
-                                        />
-                                        <Stat label="Personalized plans delivered" value={2500} />
-                                        <Stat label="Patient satisfaction" value={98} suffix="%" />
-                                    </>
-                                )}
+                                        <>
+                                            <Stat
+                                                label="Avg. care response time (min)"
+                                                value={12}
+                                                suffix="m"
+                                            />
+                                            <Stat label="Personalized plans delivered" value={2500} />
+                                            <Stat label="Patient satisfaction" value={98} suffix="%" />
+                                        </>
+                                    )}
                             </div>
                         </div>
                     </section>
                 )}
 
+                <CompoundedExplainer />
                 {/* ====== HOW IT WORKS ====== */}
                 {content?.config?.showHowItWorks && (
                     <section className="pb-16 lg:pb-24">

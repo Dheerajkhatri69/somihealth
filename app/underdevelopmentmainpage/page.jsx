@@ -1,6 +1,5 @@
 import FeatureBanner from "@/components/FeatureBanner";
 import CategoriesGrid from "@/components/hero/CategoriesGrid";
-import CompoundedExplainer from "@/components/hero/compounded-glp1";
 import Faq from "@/components/hero/Faq";
 import Hero from "@/components/hero/Hero";
 import HowItWorksGnz from "@/components/hero/HowItworks";
@@ -22,7 +21,6 @@ export default async function Home() {
       <WeightLossPlans />
       <ClientVideoReviews />
       <StoriesWithReviews />
-      <CompoundedExplainer />
       <HowItWorksGnz />
       <TabsDemo />
       <Faq />

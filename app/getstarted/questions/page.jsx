@@ -3248,7 +3248,7 @@ export default function PatientRegistrationForm() {
                   type="button"
                   className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
                 >
-                  {isLipotropic ? "Submit" : "Continue To Payment"}
+                  Submit
                 </Button>
               </div>
             </div>

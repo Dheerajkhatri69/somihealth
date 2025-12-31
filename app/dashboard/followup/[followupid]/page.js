@@ -298,7 +298,7 @@ export default function UpdateFollowUp({ params }) {
 
                     {/* Basic Information Section Skeleton */}
                     <Skeleton className="h-5 w-32 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                         {[...Array(9)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-16" />
@@ -309,7 +309,7 @@ export default function UpdateFollowUp({ params }) {
 
                     {/* Address Section Skeleton */}
                     <Skeleton className="h-5 w-16 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                         {[...Array(5)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-20" />
@@ -320,7 +320,7 @@ export default function UpdateFollowUp({ params }) {
 
                     {/* Vitals Section Skeleton */}
                     <Skeleton className="h-5 w-12 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef9c3]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-24" />
@@ -331,7 +331,7 @@ export default function UpdateFollowUp({ params }) {
 
                     {/* Medical Information Section Skeleton */}
                     <Skeleton className="h-5 w-40 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fce7f3]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -342,7 +342,7 @@ export default function UpdateFollowUp({ params }) {
 
                     {/* Weight Management Section Skeleton */}
                     <Skeleton className="h-5 w-36 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-32" />
@@ -353,7 +353,7 @@ export default function UpdateFollowUp({ params }) {
 
                     {/* GLP-1 Section Skeleton */}
                     <Skeleton className="h-5 w-24 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#fef3c7]">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-36" />
@@ -364,7 +364,7 @@ export default function UpdateFollowUp({ params }) {
 
                     {/* Provider Section Skeleton */}
                     <Skeleton className="h-5 w-32 mt-6 mb-4" />
-                    <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
+                    <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#f3e8ff]">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="space-y-2">
                                 <Skeleton className="h-4 w-28" />
@@ -447,7 +447,7 @@ export default function UpdateFollowUp({ params }) {
                 </div>
 
                 <h3 className="text-sm font-semibold">Basic information</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#ede9f9]">
                     <div className="space-y-2">
                         <Label htmlFor="dob">DOB</Label>
                         <Input
@@ -553,7 +553,7 @@ export default function UpdateFollowUp({ params }) {
 
                 {/* Address Section */}
                 <h3 className="text-sm font-semibold">Address</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0f2fe]">
                     {['address1', 'address2', 'city', 'state', 'zip'].map((field) => (
                         <div key={field} className="space-y-2">
                             <Label htmlFor={field}>
@@ -621,7 +621,7 @@ export default function UpdateFollowUp({ params }) {
 
                 {/* Current Medication Section */}
                 <h3 className="text-sm font-semibold">Current Medication Details</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#e0e7ff]">
                     <div className="space-y-2">
                         <Label htmlFor="currentGlp1Medication">Current GLP-1 Medication</Label>
                         <Input
@@ -697,7 +697,7 @@ export default function UpdateFollowUp({ params }) {
                         />
                     </div>
                 </div>
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
                         <Label htmlFor="providerComments">Enter your questions and comments</Label>
                         <textarea
@@ -771,7 +771,7 @@ export default function UpdateFollowUp({ params }) {
                 </div>
                 {/* File Upload Section */}
                 <h3 className="text-sm font-semibold">Upload Documents</h3>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
+                <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#f5f3ff]">
                     <div className="space-y-2">
                         <Label>Document 1</Label>
                         <UploadFile
@@ -790,7 +790,7 @@ export default function UpdateFollowUp({ params }) {
                     </div>
                 </div>
 
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
+                <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#f0fdf4]">
 
                     {(session?.user?.accounttype === 'A' || session?.user?.accounttype === 'C') && (
                         <div className="space-y-2">
@@ -826,12 +826,13 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="0.25">0.25 mg</SelectItem>
-                                    <SelectItem value="0.50">0.50 mg</SelectItem>
-                                    <SelectItem value="1.0">1 mg</SelectItem>
-                                    <SelectItem value="1.7">1.7 mg</SelectItem>
-                                    <SelectItem value="2.0">2.0 mg</SelectItem>
-                                    <SelectItem value="2.5">2.5 mg</SelectItem>
+                                    <SelectItem value="0.25mg, 0.5mg & 1mg for 12 weeks">0.25mg, 0.5mg & 1mg for 12 weeks</SelectItem>
+                                    <SelectItem value="0.5mg for 12 weeks">0.5mg for 12 weeks</SelectItem>
+                                    <SelectItem value="1mg for 12 weeks">1mg for 12 weeks</SelectItem>
+                                    <SelectItem value="1.7mg for 7 weeks">1.7mg for 7 weeks</SelectItem>
+                                    <SelectItem value="2mg for 6 weeks">2mg for 6 weeks</SelectItem>
+                                    <SelectItem value="2.5mg for 5 weeks">2.5mg for 5 weeks</SelectItem>
+                                    <SelectItem value="Micro Dosing">Micro Dosing</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -862,12 +863,16 @@ export default function UpdateFollowUp({ params }) {
                                     <SelectValue placeholder="Dose" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="2.50">2.50 mg</SelectItem>
-                                    <SelectItem value="5.00">5.00 mg</SelectItem>
-                                    <SelectItem value="7.50">7.50 mg</SelectItem>
-                                    <SelectItem value="10.00">10.00 mg</SelectItem>
-                                    <SelectItem value="12.50">12.50 mg</SelectItem>
-                                    <SelectItem value="15.00">15.00 mg</SelectItem>
+                                    <SelectItem value="2.5mg, 5mg & 7.5mg for 12 weeks">2.5mg, 5mg & 7.5mg for 12 weeks</SelectItem>
+                                    <SelectItem value="5mg for 12 weeks">5mg for 12 weeks</SelectItem>
+                                    <SelectItem value="7.5mg for 8 weeks">7.5mg for 8 weeks</SelectItem>
+                                    <SelectItem value="10mg for 6 weeks">10mg for 6 weeks</SelectItem>
+                                    <SelectItem value="12mg for 5 weeks">12mg for 5 weeks</SelectItem>
+                                    <SelectItem value="15mg for 4 weeks">15mg for 4 weeks</SelectItem>
+                                    <SelectItem value="Micro Dosing">Micro Dosing</SelectItem>
+                                    <SelectItem value="5mg for 6 weeks">5mg for 6 weeks</SelectItem>
+                                    <SelectItem value="7.5mg for 4 weeks">7.5mg for 4 weeks</SelectItem>
+                                    <SelectItem value="2.5mg, 5mg, 7.5mg, 10mg & 12mg for 6 months">2.5mg, 5mg, 7.5mg, 10mg & 12mg for 6 months</SelectItem>
                                     <SelectItem value="None">None</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -916,7 +921,7 @@ export default function UpdateFollowUp({ params }) {
                     </div>
 
                 </div>
-                <div className="w-full max-w-5xl mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
+                <div className="w-full mx-auto grid grid-cols-1 gap-6 p-6 border rounded-xl shadow-sm bg-[#e6ffea]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         <div className="space-y-2 ">
@@ -966,7 +971,7 @@ export default function UpdateFollowUp({ params }) {
 
 
                 {(session?.user?.accounttype === 'C') && (
-                    <div className="w-full max-w-5xl mx-auto flex justify-center">
+                    <div className="w-full mx-auto flex justify-center">
                         <Button
                             type="button"
                             onClick={openDialog}
@@ -977,7 +982,7 @@ export default function UpdateFollowUp({ params }) {
                     </div>
                 )}
 
-                <div className="w-full max-w-5xl mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
+                <div className="w-full mx-auto p-6 border rounded-xl shadow-sm bg-[#f1f5f9]">
                     <div className="space-y-2">
                         <Label htmlFor="providerNote">Provider Note</Label>
                         <textarea

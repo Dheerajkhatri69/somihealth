@@ -6,7 +6,6 @@ import ProductHero from "@/components/ProductHero";
 import HowItWorks from "@/components/HowItWorks";
 import { notFound } from "next/navigation";
 import ClientVideoReviews from "@/components/hero/ReviewVideoCard";
-import CompoundedExplainer from "@/components/hero/compounded-glp1";
 import HowItWorksGnz from "@/components/hero/HowItworks";
 import FaqPro from "@/components/hero/Faq";
 import SomiFooter from "@/components/hero/SomiFooter";
@@ -41,7 +40,6 @@ export default function ProductPage({ params }) {
       {!["erectile-dysfunction", "skin-hair"].includes((productType || "").trim()) && (
         <ClientVideoReviews />
       )}
-      <CompoundedExplainer />
       <HowItWorksGnz />
       <FaqPro />
       <SomiFooter />
