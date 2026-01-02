@@ -557,24 +557,20 @@ export default function PatientRegistrationForm() {
                 />
               </div>
               <h3 className="text-lg md:text-x text-center">
-                <span className='text-black'>Click on </span><span className='font-bold text-secondary'>&quot;Pay Here&quot;</span><span className='text-black'> to complete the $25 Clinician Review Fee.</span>
+                Thank you for completing your Weight Loss Medical Intake Form
               </h3>
-
               <p className="text-gray-600 text-center">
-                <span className='font-bold'>Note:</span> $25 Clinician review Fee will be refunded if our Nurse practitioner determines you are <br /><span className='font-bold'>NOT</span> eligible for GLP-1 Medication
-              </p>
-              <p className="text-gray-600 text-center">
-                Please allow up to 24 hours for a Nurse Practitioner to carefully review your submitted form and get back to you. Thanks for your patience.
+                Please allow up to 24 hours for one of our clinicians to carefully review your submitted form and get back to you. Thanks for your patience.
               </p>
             </div>
             <Button
               variant="outline"
               onClick={() => {
-                window.location.href = 'https://buy.stripe.com/8x2cN60eG8mAgigaeQ3ks01';
+                window.location.href = 'https://joinsomi.com/';
               }}
-              className="bg-green-500 text-white hover:text-white hover:bg-green-500 rounded-2xl"
+              className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
             >
-              Pay Here
+              End
             </Button>
           </>
 
