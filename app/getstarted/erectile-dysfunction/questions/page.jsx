@@ -2066,18 +2066,25 @@ export default function EDQuestionnaireForm() {
 
                     {/* Final segment */}
                     {currentSegment === segments.length - 1 && (
-                        <div className="space-y-4">
-                            <div className="flex justify-center mt-8">
-                                <Button
-                                    onClick={() => {
-                                        handleSubmit(onSubmit)();
-                                    }}
-                                    type="button"
-                                    className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
-                                >
-                                    Submit
-                                </Button>
-                            </div>
+                        <div className="space-y-4"> <div className="relative flex justify-center mt-8 items-center">
+                            <Button
+                                variant="outline"
+                                onClick={handlePrevious}
+                                type="button"
+                                className="absolute left-0 bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    handleSubmit(onSubmit)();
+                                }}
+                                type="button"
+                                className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
+                            >
+                                Submit
+                            </Button>
+                        </div>
                         </div>
                     )}
                 </form>
