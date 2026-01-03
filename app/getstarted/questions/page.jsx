@@ -210,7 +210,9 @@ const formSchema = z.object({
     }
 
     // Q12: Pregnancy
-    addRequiredIssue('lipotropicPregnant', "Please select Yes or No");
+    if (data.sex !== 'Male') {
+      addRequiredIssue('lipotropicPregnant', "Please select Yes or No");
+    }
 
     // Q14: Questions
     addRequiredIssue('providerQuestions', "Please select Yes or No");
@@ -741,6 +743,16 @@ export default function PatientRegistrationForm() {
       if (currentSegmentId === 'lipotropicAllergies' && !checkRequired('lipotropicAllergies', "Please select at least one option")) return;
       if (currentSegmentId === 'lipotropicGoals' && !checkRequired('lipotropicGoals', "Please select at least one option")) return;
       if (currentSegmentId === 'lipotropicHistory' && !checkRequired('lipotropicHistory')) return;
+
+      // Validate Treatment History fields if user answered "Yes" to previous treatment
+      if (currentSegmentId === 'lipotropicLastTreatment' && watch('lipotropicHistory') === 'Yes') {
+        let valid = true;
+        if (!checkRequired('lipotropicLastTreatment', "Please specify when you had your last treatment")) valid = false;
+        if (!checkRequired('lipotropicSatisfaction', "Please specify if you were satisfied with treatment")) valid = false;
+        if (!checkRequired('lipotropicStopReason', "Please specify why you stopped the treatment")) valid = false;
+        if (!valid) return;
+      }
+
       if (currentSegmentId === 'lipotropicDiagnoses' && !checkRequired('lipotropicDiagnoses', "Please select at least one option")) return;
       if (currentSegmentId === 'lipotropicMood' && !checkRequired('averageMood', "Please select an option")) return;
 
@@ -760,9 +772,27 @@ export default function PatientRegistrationForm() {
         }
       }
 
-      if (currentSegmentId === 'lipotropicGeneralConditions' && !checkRequired('lipotropicMedicalConditions')) return;
-      if (currentSegmentId === 'lipotropicSupplements' && !checkRequired('lipotropicMeds')) return;
-      if (currentSegmentId === 'lipotropicProviderQuestions' && !checkRequired('providerQuestions')) return;
+
+      if (currentSegmentId === 'lipotropicGeneralConditions') {
+        if (!checkRequired('lipotropicMedicalConditions')) return;
+        if (watch('lipotropicMedicalConditions') === 'Yes' && !checkRequired('lipotropicMedicalConditionsDrop', "Please list your conditions")) return;
+      }
+
+      if (currentSegmentId === 'lipotropicSupplements') {
+        if (!checkRequired('lipotropicMeds')) return;
+        if (watch('lipotropicMeds') === 'Yes' && !checkRequired('lipotropicMedsDrop', "Please list your medications")) return;
+      }
+
+      if (currentSegmentId === 'lipotropicProviderQuestions') {
+        if (!checkRequired('providerQuestions')) return;
+        if (watch('providerQuestions') === 'Yes' && !checkRequired('providerQuestionsDrop', "Please type your questions")) return;
+      }
+
+      if (currentSegmentId === 'lipotropicKidney' && !checkRequired('kidneyDisease', "Please select Yes or No")) return;
+      if (currentSegmentId === 'lipotropicPregnancy' && !checkRequired('lipotropicPregnant', "Please select Yes or No")) return;
+
+      // Ensure idPhoto is checked if we are on the ID segment (it spans both flows but let's be safe)
+      if (currentSegmentId === 'id' && !checkRequired('idPhoto', "Please upload your ID")) return;
 
     } else {
       // GLP-1 Flow
@@ -928,7 +958,7 @@ export default function PatientRegistrationForm() {
 
     try {
       // Calculate BMI
-      const heightInches = parseInt(data.heightFeet) * 12 + parseInt(data.heightInches);
+      const heightInches = parseInt(data.heightFeet || '0') * 12 + parseInt(data.heightInches || '0');
       // const bmi = (parseInt(data.currentWeight) / (heightInches * heightInches)) * 703;
       // const bmi = bmi;
 
@@ -1296,16 +1326,19 @@ export default function PatientRegistrationForm() {
                 <>
                   <h2 className="text-xl font-semibold">Treatment History</h2>
                   <div className="space-y-2">
-                    <Label>When was your last Lipotropic MIC+B12 treatment?</Label>
+                    <Label>When was your last Lipotropic MIC+B12 treatment? <span className="text-red-500">*</span></Label>
                     <Input {...register('lipotropicLastTreatment')} placeholder="e.g. 1 month ago" />
+                    {errors.lipotropicLastTreatment && <p className="text-sm text-red-500">{errors.lipotropicLastTreatment.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Were you satisfied with your treatment?</Label>
+                    <Label>Were you satisfied with your treatment? <span className="text-red-500">*</span></Label>
                     <Input {...register('lipotropicSatisfaction')} />
+                    {errors.lipotropicSatisfaction && <p className="text-sm text-red-500">{errors.lipotropicSatisfaction.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Why did you stop the Lipotropic MIC+B12 treatment?</Label>
+                    <Label>Why did you stop the Lipotropic MIC+B12 treatment? <span className="text-red-500">*</span></Label>
                     <Input {...register('lipotropicStopReason')} />
+                    {errors.lipotropicStopReason && <p className="text-sm text-red-500">{errors.lipotropicStopReason.message}</p>}
                   </div>
                 </>
               ) : (
@@ -3456,7 +3489,7 @@ export default function PatientRegistrationForm() {
           )}
 
           {/* Other segments */}
-          {currentSegment > 0 && currentSegment < segments.length - 1 && currentSegmentId !== 'lipotropicConsent' && (
+          {currentSegment > 0 && currentSegment < segments.length - 1 && (
             <div className="space-y-4">
               {/* Segment content */}
               <div className="flex justify-between mt-8">
@@ -3483,12 +3516,12 @@ export default function PatientRegistrationForm() {
           {currentSegment === segments.length - 1 && (
             <div className="space-y-4">
               {/* Final segment content */}
-              <div className="relative flex justify-center mt-8 items-center">
+              <div className="flex justify-between mt-8">
                 <Button
                   variant="outline"
                   onClick={handlePrevious}
                   type="button"
-                  className="absolute left-0 bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+                  className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
                 >
                   Previous
                 </Button>
@@ -3505,14 +3538,13 @@ export default function PatientRegistrationForm() {
                           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                           element.focus();
                         }
-                        // toast.error(`Please fix the error in ${firstError}: ${errors[firstError].message}`);
                       }
                     })();
                   }}
                   type="button"
-                  className="bg-green-400 text-white hover:bg-green-500 rounded-2xl"
+                  className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
                 >
-                  Submit
+                  Submit Form
                 </Button>
               </div>
             </div>

@@ -1407,17 +1407,17 @@ export default function PatientRegistrationForm() {
               </div>
               {errors.treatment && <p className="text-sm text-red-500">{errors.treatment.message}</p>}
             </div>
-            <div className="relative flex justify-center mt-8 items-center">
+            <div className="flex justify-between mt-8">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
                 type="button"
-                className="absolute left-0 bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
+                className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl"
               >
                 Previous
               </Button>
 
-              <Button type="submit" className="bg-green-400 text-white hover:bg-green-500 rounded-2xl">Submit</Button>
+              <Button type="submit" className="bg-secondary text-white hover:text-white hover:bg-secondary rounded-2xl">Submit Form</Button>
             </div>
           </div>
           )}
