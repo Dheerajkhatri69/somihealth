@@ -154,6 +154,7 @@ const formSchema = z.object({
   consent: z.boolean().refine(val => val === true, "You must consent to proceed"),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms"),
   treatment: z.boolean().refine(val => val === true, "You must consent to treatment"),
+  agreetopay: z.boolean().refine(val => val === true, "You must consent to Agree"),
 }).superRefine((data, ctx) => {
   if (data.previousTreatment === 'yes') {
     if (!data.negativeReactions) {
@@ -595,7 +596,7 @@ export default function PatientRegistrationForm() {
       case "healthcareProvider": return ["healthcareProvider"];
       case "idPhoto": return ["idPhoto"];
       case "heardAbout": return ["heardAbout", "heardAboutOther"];
-      case "consent": return ["consent", "terms", "treatment"];
+      case "consent": return ["consent", "terms", "treatment","agreetopay"];
       default: return [];
     }
   };
@@ -1406,6 +1407,20 @@ export default function PatientRegistrationForm() {
                 </label>
               </div>
               {errors.treatment && <p className="text-sm text-red-500">{errors.treatment.message}</p>}
+              <div className="flex space-x-2 mb-10">
+                <input
+                  type="checkbox"
+                  id="agreetopay"
+                  {...register('agreetopay')}
+                  className="h-4 w-4 mt-1 text-secondary border-secondary rounded"
+                />
+                <label htmlFor="agree-to-pay-checkbox" className="text-sm font-bold">
+                  I agree to use electronic records and signatures and I acknowledge that I have read the related consumer disclosure.
+                </label>
+              </div>
+              {errors.agreetopay && (
+                <p className="text-sm text-red-500">{errors.agreetopay.message}</p>
+              )}
             </div>
             <div className="flex justify-between mt-8">
               <Button

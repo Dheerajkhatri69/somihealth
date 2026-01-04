@@ -563,6 +563,16 @@ export default function LongevityUpdateForm({ params }) {
                         I understand the treatment plan and agree to follow it
                     </Label>
                 </div>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="agreetopay"
+                        checked={formData.agreetopay || false}
+                        onCheckedChange={(checked) => handleCheckboxChange('agreetopay', checked)}
+                    />
+                    <Label htmlFor="agreetopay" className="text-sm">
+                        I agree to use electronic records and signatures and I acknowledge that I have read the related consumer disclosure.
+                    </Label>
+                </div>
             </section>
 
             {/* ---------------- SUBMIT BUTTON ---------------- */}

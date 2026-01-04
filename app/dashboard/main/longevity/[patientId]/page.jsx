@@ -100,6 +100,7 @@ export default function LongevityQuestionnaireForm({ params }) {
         consent: false,
         terms: false,
         treatment: false,
+        agreetopay: false,
 
         // === Images and Files ===
         idPhoto: "",
@@ -1182,6 +1183,16 @@ export default function LongevityQuestionnaireForm({ params }) {
                         />
                         <Label htmlFor="treatment" className="text-sm">
                             I understand the treatment plan and agree to follow it
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="agreetopay"
+                            checked={formData.agreetopay || false}
+                            onCheckedChange={(checked) => handleCheckboxChange('agreetopay', checked)}
+                        />
+                        <Label htmlFor="agreetopay" className="text-sm">
+                            I agree to use electronic records and signatures and I acknowledge that I have read the related consumer disclosure.
                         </Label>
                     </div>
                 </div>
