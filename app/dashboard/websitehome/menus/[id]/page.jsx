@@ -214,7 +214,7 @@ export default function MenuDetailPage() {
             ? { label: '', href: '' }
             : {
               label: formData.discover?.label || '',
-              href: `/underdevelopmentmainpage/${slugify(formData.name)}`,
+              href: `/${slugify(formData.name)}`,
             },
       };
 
@@ -588,7 +588,7 @@ export default function MenuDetailPage() {
                 <div>
                   <Label className="text-sm font-medium">Href *</Label>
                   <Input
-                    value={`/underdevelopmentmainpage/${slugify(formData.name)}`}
+                    value={`/${slugify(formData.name)}`}
                     readOnly
                     required
                     className="mt-1 bg-gray-50"

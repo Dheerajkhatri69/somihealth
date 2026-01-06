@@ -131,10 +131,10 @@ export default function ProTypeHero({ content = HERO_CONTENT, onCta = () => { } 
     const pathname = usePathname();
 
     const pricingMap = {
-        "/underdevelopmentmainpage/weight-loss": "/pricing/weightLoss",
-        "/underdevelopmentmainpage/longevity": "/pricing/longevity",
-        "/underdevelopmentmainpage/erectile-dysfunction": "/pricing/erectileDysfunction",
-        "/underdevelopmentmainpage/skinhair": "/pricing/skinhair",
+        "/weight-loss": "/pricing/weightLoss",
+        "/longevity": "/pricing/longevity",
+        "/erectile-dysfunction": "/pricing/erectileDysfunction",
+        "/skinhair": "/pricing/skinhair",
     };
 
     // fallback route

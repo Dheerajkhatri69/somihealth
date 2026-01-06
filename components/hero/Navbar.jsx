@@ -578,7 +578,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
             {/* Top bar inside overlay */}
             <div className="flex items-center justify-between px-4 py-3 md:px-6">
 
-                <Link onClick={onClose} href="/underdevelopmentmainpage" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
+                <Link onClick={onClose} href="/" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
                     {brand}
                 </Link>
                 {/* right icons (placeholders to match screenshot) */}
@@ -654,7 +654,7 @@ export default function Navbar({ brand = "somi" }) {
 
 
                     {/* Brand centered on mobile, left on desktop */}
-                    <Link href="/underdevelopmentmainpage" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
+                    <Link href="/" className="text-5xl text-secondary font-bold font-tagesschrift tracking-tight md:order-none">
                         {brand}
                     </Link>
 
@@ -691,7 +691,7 @@ export default function Navbar({ brand = "somi" }) {
 
 
                         <Link
-                            href="/underdevelopmentmainpage/login"
+                            href="/login"
                             className="fx-outline rounded-full font-SofiaSans border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-900 hover:border-transparent"
                             style={{ "--fx-fill": "var(--tw-bg-secondary, #16a34a)" }}  // set fill color; or use a hex
                         >

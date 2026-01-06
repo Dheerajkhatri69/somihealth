@@ -67,7 +67,7 @@ export default function LoginPage() {
     const hero = content?.hero || {};
     const config = content?.config || {};
 
-    const backHref = branding.backLinkHref || "/underdevelopmentmainpage";
+    const backHref = branding.backLinkHref || "/";
     const backLabel = branding.backLinkLabel || "Back";
 
     return (

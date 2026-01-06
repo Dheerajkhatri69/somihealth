@@ -6,21 +6,21 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  metadataBase: new URL("https://www.app-joinsomi.com"),
-  title: "Async", // <-- FIXED: No template, no auto suffix
-  description: "Async — sign in to your account",
+  metadataBase: new URL("https://www.joinsomi.com"),
+  title: "Somi Health", // <-- FIXED: No template, no auto suffix
+  description: "Somi Health",
   applicationName: "Async",
   openGraph: {
-    title: "Async",
-    siteName: "Async",
-    description: "Async — sign in to your account",
-    url: "https://www.app-joinsomi.com",
+    title: "Somi Health",
+    siteName: "Somi Health",
+    description: "Somi Health",
+    url: "https://www.joinsomi.com",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Async",
-    description: "Async — sign in to your account",
+    title: "Somi Health",
+    description: "Somi Health",
   },
   alternates: { canonical: "/" },
 };

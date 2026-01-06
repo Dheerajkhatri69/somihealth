@@ -94,7 +94,7 @@ export async function POST(request) {
     }
     // For simple menus, discover is required but we can default href
     if (body.type !== 'categorized') {
-      const computedHref = `/underdevelopmentmainpage/${slugify(body.slug || body.name || '')}`;
+      const computedHref = `/${slugify(body.slug || body.name || '')}`;
       body.discover = body.discover || {};
       if (!body.discover.href) body.discover.href = computedHref;
       if (!body.discover.label) {
@@ -144,7 +144,7 @@ export async function PUT(request) {
         body.update.slug = slugify(body.update.name);
       }
       if (body.update.type !== 'categorized') {
-        const computedHref = `/underdevelopmentmainpage/${slugify(body.update.slug || body.update.name || '')}`;
+        const computedHref = `/${slugify(body.update.slug || body.update.name || '')}`;
         body.update.discover = body.update.discover || {};
         if (!body.update.discover.href) body.update.discover.href = computedHref;
       }
@@ -185,7 +185,7 @@ export async function PUT(request) {
       updateData.slug = slugify(updateData.name);
     }
     if (updateData.type !== 'categorized') {
-      const computedHref = `/underdevelopmentmainpage/${slugify(updateData.slug || updateData.name || '')}`;
+      const computedHref = `/${slugify(updateData.slug || updateData.name || '')}`;
       updateData.discover = updateData.discover || {};
       if (!updateData.discover.href) updateData.discover.href = computedHref;
     }

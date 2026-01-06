@@ -13,7 +13,7 @@ export default function FaqPro() {
     footerTitle: 'Still have questions?',
     footerDescription: "Can't find the answer you're looking for? Please chat to our friendly team.",
     footerButtonText: 'Get in touch',
-    footerButtonLink: '/underdevelopmentmainpage/contact',
+    footerButtonLink: '/contact',
   });
   const [loading, setLoading] = useState(true);
 

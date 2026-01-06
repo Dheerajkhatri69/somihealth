@@ -270,7 +270,7 @@ async function removeProductFromMenuTreatments(product) {
 
     // Remove by productId first (most reliable), then by href as a fallback (legacy)
     const productId = product._id?.toString?.() || product.id || null;
-    const treatmentHref = `/underdevelopmentmainpage/${product.category}/${product.slug}`;
+    const treatmentHref = `/${product.category}/${product.slug}`;
 
     // Find any menus that may contain this treatment
     const menus = await Menu.find({
@@ -320,7 +320,7 @@ async function syncProductToMenuTreatments(product) {
     const treatment = {
       productId, // <-- new field
       label: product.label,
-      href: `/underdevelopmentmainpage/${product.category}/${product.slug}`,
+      href: `/${product.category}/${product.slug}`,
       img: product.heroImage,
       badge: product.trustpilot || ''
     };
@@ -371,7 +371,7 @@ async function updateTreatmentHrefsForProductSlugChange(oldProduct, newProduct) 
           needsUpdate = true;
           return {
             ...treatment,
-            href: `/underdevelopmentmainpage/${newProduct.category}/${newProduct.slug}`,
+            href: `/${newProduct.category}/${newProduct.slug}`,
             label: newProduct.label,
             img: newProduct.heroImage,
             badge: newProduct.trustpilot || ''

@@ -44,15 +44,15 @@ export default function SomiFooter() {
         navigationLinks: [
             { text: "Referrals", href: "/referrals", target: "_self", rel: "", sortOrder: 0 },
             { text: "Patient GLP-1 Packet", href: "/docs/patient-glp1-packet.pdf", target: "_blank", rel: "noopener noreferrer", sortOrder: 1 },
-            { text: "About Us", href: "/underdevelopmentmainpage/about", target: "_self", rel: "", sortOrder: 2 },
-            { text: "Contact Us", href: "/underdevelopmentmainpage/contact", target: "_self", rel: "", sortOrder: 3 },
+            { text: "About Us", href: "/about", target: "_self", rel: "", sortOrder: 2 },
+            { text: "Contact Us", href: "/contact", target: "_self", rel: "", sortOrder: 3 },
         ],
         legalLinks: [
-            { text: "HIPAA Privacy", href: "/underdevelopmentmainpage/footer/hipaa", sortOrder: 0 },
-            { text: "Terms of Service", href: "/underdevelopmentmainpage/footer/terms", sortOrder: 1 },
-            { text: "Shipping & Returns", href: "/underdevelopmentmainpage/footer/shipping-returns", sortOrder: 2 },
-            { text: "Telehealth Consent", href: "/underdevelopmentmainpage/footer/telehealth-consent", sortOrder: 3 },
-            { text: "Cookie Policy", href: "/underdevelopmentmainpage/footer/cookies", sortOrder: 4 },
+            { text: "HIPAA Privacy", href: "/footer/hipaa", sortOrder: 0 },
+            { text: "Terms of Service", href: "/footer/terms", sortOrder: 1 },
+            { text: "Shipping & Returns", href: "/footer/shipping-returns", sortOrder: 2 },
+            { text: "Telehealth Consent", href: "/footer/telehealth-consent", sortOrder: 3 },
+            { text: "Cookie Policy", href: "/footer/cookies", sortOrder: 4 },
         ],
     });
     const [loading, setLoading] = useState(true);

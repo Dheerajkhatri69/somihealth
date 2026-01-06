@@ -189,7 +189,7 @@ export default function WeightLossPlans() {
         label: product?.ctas?.secondary?.label || "Learn More",
         href:
           product?.ctas?.secondary?.href ||
-          `/underdevelopmentmainpage/${product.category}/${product.slug}`,
+          `/${product.category}/${product.slug}`,
       },
       plansNote: product?.plansNote || "",
     }));
