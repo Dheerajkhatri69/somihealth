@@ -7,7 +7,7 @@ import Image from "next/image";
 export default function ProductCard({ item, ctaHref, isLink = false }) {
     const primary = item?.primary || {
         label: "Get Started",
-        href: ctaHref || "/getstarted",
+        href: ctaHref || "/pricing",
     };
 
     const secondary = item?.secondary || {

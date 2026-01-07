@@ -37,7 +37,7 @@ export default function ProductTypePage({ params }) {
 
         const primary = {
             label: p?.ctas?.primary?.label || "Get Started",
-            href: p?.ctas?.primary?.href || "/getstarted",
+            href: p?.ctas?.primary?.href || "/pricing",
         };
         const secondary = {
             label: p?.ctas?.secondary?.label || "Learn More",

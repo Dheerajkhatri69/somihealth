@@ -28,7 +28,12 @@ const BackIcon = () => (
         <path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
-
+const refillPathMap = {
+    "Weight Loss": "/refills",
+    "Longevity": "/refills/longevity",
+    "Erectile Dysfunction": "/refills/erectile-dysfunction",
+    "Skin+Hair": "/refills/skinhair",
+};
 /* =================== DESKTOP MEGA PANEL =================== */
 function MegaPanel({ menuKey, onNavigate }) {
     const { getMenuBySlug, isLoading } = useWebsiteData();
@@ -36,6 +41,7 @@ function MegaPanel({ menuKey, onNavigate }) {
 
     if (isLoading) return <MegaPanelSkeleton />;
     if (!data) return null;
+
 
     return (
         <div
@@ -188,7 +194,7 @@ function MegaPanel({ menuKey, onNavigate }) {
                                 )
                             }
                             <Link
-                                href={"/refills"}
+                                href={refillPathMap[data.discover.label]}
                                 onClick={onNavigate}
                                 className="fx86 inline-flex mt-4 min-w-[200px] font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
                                 style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
