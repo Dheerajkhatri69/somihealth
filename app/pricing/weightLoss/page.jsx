@@ -142,7 +142,7 @@ const WeightLossPagePricing = () => {
                                     {data.backLabel || "Back"}
                                 </div>
                             </Link>
-                            <Link href={"https://joinsomi.com/"}>
+                            <Link href="/">
                                 <h1 className="font-tagesschrift text-5xl md:text-7xl text-secondary font-bold mb-2 text-center">
                                     {data.brand || "somi"}
                                 </h1>

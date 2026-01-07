@@ -175,16 +175,17 @@ const LandingPagePricing = () => {
           <div className="w-full max-w-7xl flex flex-col items-center">
             <div className="relative w-full flex items-start justify-between mb-12">
               {/* Left: Back button */}
-              <button
-                className="flex text-xs items-center hover:underline text-secondary cursor-pointer mt-2"
-                onClick={() => { window.location.href = D.backUrl; }}
-              >
-                <ChevronLeft size={18} />
-                {D.backLabel}
-              </button>
+              <Link href='/'>
+                <button
+                  className="flex text-xs items-center hover:underline text-secondary cursor-pointer mt-2"
+                >
+                  <ChevronLeft size={18} />
+                  {D.backLabel}
+                </button>
+              </Link>
 
               {/* Center: brand logo — absolutely centered */}
-              <Link href={D.backUrl}>
+              <Link href='/'>
                 <h1 className="absolute left-1/2 -translate-x-1/2 font-tagesschrift text-5xl md:text-7xl text-secondary font-bold text-center">
                   {D.brand}
                 </h1>
