@@ -29,7 +29,7 @@ const BackIcon = () => (
     </svg>
 );
 const refillPathMap = {
-    "Weight Loss": "/refills",
+    "Weight Loss": "/refills/weightloss",
     "Longevity": "/refills/longevity",
     "Erectile Dysfunction": "/refills/erectile-dysfunction",
     "Skin+Hair": "/refills/skinhair",

@@ -73,7 +73,7 @@ const LandingPage = () => {
                     </p>
 
 
-                    <Link href="/refills/questions">
+                    <Link href="/refills/weightloss/questions">
                         <button className="bg-secondary hover:bg-secondary text-white font-semibold py-3 px-6 rounded-full transition duration-300">
                             Start
                         </button>
