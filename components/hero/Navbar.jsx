@@ -486,7 +486,7 @@ function MobileOverlay({ open, onClose, stage, setStage, onNavigate, brand = "so
                     }
 
                     <Link
-                        href={"/refills"}
+                        href={refillPathMap[data.discover.label]}
                         onClick={onNavigate}
                         className="fx86 inline-flex mt-4 font-SofiaSans w-full items-center justify-between border border-darkprimary rounded-3xl bg-transparent text-darkprimary px-5 py-2 text-base font-semibold shadow-sm md:w-auto"
                         style={{ "--fx86-base": "transparent", "--fx86-glow": "#364c781d" }}
