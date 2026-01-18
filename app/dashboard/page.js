@@ -1508,7 +1508,7 @@ export default function Dashboard() {
                     </Table>
                 )}
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex items-center justify-end space-x-2 py-4 mb-20">
                 <div className="flex-1 text-sm text-muted-foreground">
                     Showing {indexOfFirstRow + 1}-{Math.min(indexOfLastRow, filteredPatients.length)} of{" "}
                     {filteredPatients.length} patients
