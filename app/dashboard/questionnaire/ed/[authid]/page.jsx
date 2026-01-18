@@ -859,7 +859,7 @@ export default function EDQuestionnaireForm({ params }) {
                 <h3 className="text-sm font-semibold">ED Symptoms</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border rounded-xl shadow-sm bg-[#ecfdf5]">
                     <div className="space-y-2">
-                        <Label htmlFor="erectionChallenges">Erection Challenges?</Label>
+                        <Label htmlFor="erectionChallenges">Erection Challenges  in the past 6 months?</Label>
                         <Select
                             value={formData.erectionChallenges || ""}
                             onValueChange={(value) => handleSelectChange('erectionChallenges', value)}
@@ -875,7 +875,7 @@ export default function EDQuestionnaireForm({ params }) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="erectionSustaining">Erection Sustaining?</Label>
+                        <Label htmlFor="erectionSustaining">Erection Sustaining in the past 6 months?</Label>
                         <Select
                             value={formData.erectionSustaining || ""}
                             onValueChange={(value) => handleSelectChange('erectionSustaining', value)}
@@ -900,8 +900,8 @@ export default function EDQuestionnaireForm({ params }) {
                                 <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="yes">Yes</SelectItem>
-                                <SelectItem value="no">No</SelectItem>
+                                <SelectItem value="Sudden Change">Sudden Change</SelectItem>
+                                <SelectItem value="Gradually Worsen">Gradually Worsen</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

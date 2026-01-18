@@ -106,7 +106,7 @@ const formSchema = z.object({
         required_error: "This field is required",
         invalid_type_error: "Please select an option"
     }),
-    erectionChange: z.enum(['yes', 'no'], {
+    erectionChange: z.enum(['Sudden Change', 'Gradually Worsen'], {
         required_error: "This field is required",
         invalid_type_error: "Please select an option"
     }),
@@ -1508,11 +1508,11 @@ export default function EDQuestionnaireForm() {
                                     Did you notice a sudden change in erectile function, or did it gradually worsen? <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="flex gap-2 justify-center flex-col items-center">
-                                    {['yes', 'no'].map((option, index) => (
+                                    {['Sudden Change', 'Gradually Worsen'].map((option, index) => (
                                         <label
                                             key={index}
                                             htmlFor={`change-${index}`}
-                                            className={`flex items-center w-[100px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionChange') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
+                                            className={`flex items-center w-[160px] justify-center px-4 py-2 border border-blue-400 rounded-3xl cursor-pointer hover:bg-secondary hover:text-white transition-all duration-150 ${watch('erectionChange') === option ? 'bg-secondary text-white' : 'bg-white text-secondary'}`}
                                         >
                                             <input
                                                 type="radio"
@@ -1521,7 +1521,7 @@ export default function EDQuestionnaireForm() {
                                                 className="hidden"
                                                 {...register('erectionChange')}
                                             />
-                                            <span>{option === 'yes' ? 'Yes' : 'No'}</span>
+                                            <span>{option}</span>
                                         </label>
                                     ))}
                                 </div>
