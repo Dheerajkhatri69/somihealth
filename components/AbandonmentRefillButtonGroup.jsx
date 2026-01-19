@@ -12,17 +12,17 @@ export default function AbandonmentRefillButtonGroup() {
         { label: "Weight Loss", path: "/dashboard/followup/abandonment" },
         {
             label: "Longevity",
-            path: "/dashboard/followup/abandonment/longevity",
+            path: "/dashboard/followup/longevityRefillabAndonment",
             unseenapi: "/api/longevity-refill-abandonment/seen-count"
         },
         {
             label: "Erectile Dysfunction",
-            path: "/dashboard/followup/abandonment/ed",
+            path: "/dashboard/followup/edRefillabAndonment",
             unseenapi: "/api/ed-refill-abandonment/seen-count"
         },
         {
             label: "Skin and Hair",
-            path: "/dashboard/followup/abandonment/skinhair",
+            path: "/dashboard/followup/skinhairRefillabAndonment",
             unseenapi: "/api/skinhair-refill-abandonment/seen-count"
         },
     ], []);
