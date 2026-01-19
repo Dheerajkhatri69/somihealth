@@ -4,6 +4,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +22,7 @@ import Image from "next/image";
 import LoginReview from "@/components/LoginReview";
 
 export default function LoginPage() {
+    const router = useRouter();
     const [show, setShow] = useState(false);
     const [loading, setLoading] = useState(false);
     const [uiLoading, setUiLoading] = useState(true);
@@ -53,9 +56,20 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
         setError("");
+
         try {
-            // TODO: your sign-in logic here
-            // await signIn(...)
+            const result = await signIn("patient-credentials", {
+                email: form.email,
+                password: form.password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError(result.error);
+            } else if (result?.ok) {
+                // Successfully logged in
+                router.push("/patientDashboard");
+            }
         } catch (err) {
             setError("Unable to sign in. Please check your credentials.");
         } finally {

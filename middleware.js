@@ -22,42 +22,60 @@ const routeRoleMap = {
   "/dashboard/footerUI": ["A"],
   "/dashboard/contactForms": ["A"],
   "/dashboard/aboutUI": ["A"],
+  "/dashboard/auto-users": ["A"],
 };
 
 export default withAuth(
   function middleware(req) {
-    // read both possible casings from your JWT
     const token = req.nextauth.token || {};
     const accountType = token.accountType ?? token.accounttype;
+    const role = token.role;
 
     const url = req.nextUrl.pathname;
-    const normalizedUrl = url.split("?")[0].replace(/\/$/, ""); // strip trailing slash
+    const normalizedUrl = url.split("?")[0].replace(/\/$/, "");
 
-    // 1) exact match first
-    let matchedRoute = routeRoleMap[normalizedUrl] ? normalizedUrl : undefined;
-
-    // 2) else pick LONGEST matching parent (/dashboard/foo/bar -> /dashboard/foo beats /dashboard)
-    if (!matchedRoute) {
-      const candidates = Object.keys(routeRoleMap).filter(
-        (route) => route !== "/" && normalizedUrl.startsWith(route + "/")
-      );
-      if (candidates.length) {
-        candidates.sort((a, b) => b.length - a.length);
-        matchedRoute = candidates[0];
+    // Patient Dashboard Protection
+    if (normalizedUrl.startsWith("/patientDashboard")) {
+      // Only allow patients
+      if (role !== "patient" && accountType !== "P") {
+        return NextResponse.redirect(new URL("/login", req.url));
       }
+      return NextResponse.next();
     }
 
-    // 3) enforce allowed roles for matched route
-    if (matchedRoute) {
-      const allowedRoles = routeRoleMap[matchedRoute];
-      if (!allowedRoles.includes(accountType)) {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
+    // Admin Dashboard Protection
+    if (normalizedUrl.startsWith("/dashboard")) {
+      // Redirect patients trying to access admin dashboard
+      if (role === "patient" || accountType === "P") {
+        return NextResponse.redirect(new URL("/patientDashboard", req.url));
       }
-    }
 
-    // 4) optionally block unknown account types
-    if (!["A", "C", "T"].includes(accountType)) {
-      return NextResponse.redirect(new URL("/", req.url));
+      // 1) exact match first
+      let matchedRoute = routeRoleMap[normalizedUrl] ? normalizedUrl : undefined;
+
+      // 2) else pick LONGEST matching parent
+      if (!matchedRoute) {
+        const candidates = Object.keys(routeRoleMap).filter(
+          (route) => route !== "/" && normalizedUrl.startsWith(route + "/")
+        );
+        if (candidates.length) {
+          candidates.sort((a, b) => b.length - a.length);
+          matchedRoute = candidates[0];
+        }
+      }
+
+      // 3) enforce allowed roles for matched route
+      if (matchedRoute) {
+        const allowedRoles = routeRoleMap[matchedRoute];
+        if (!allowedRoles.includes(accountType)) {
+          return NextResponse.redirect(new URL("/dashboard", req.url));
+        }
+      }
+
+      // 4) block unknown admin account types
+      if (!["A", "C", "T"].includes(accountType)) {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
     }
 
     return NextResponse.next();
@@ -70,5 +88,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*"],
+  matcher: ["/dashboard", "/dashboard/:path*", "/patientDashboard", "/patientDashboard/:path*"],
 };

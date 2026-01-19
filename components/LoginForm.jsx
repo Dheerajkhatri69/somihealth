@@ -48,7 +48,7 @@ export default function LoginForm() {
   async function onSubmit(values) {
     setIsLoading(true);
     try {
-      const res = await signIn('credentials', {
+      const res = await signIn('admin-credentials', {
         id: values.id,
         password: values.password,
         redirect: false,
