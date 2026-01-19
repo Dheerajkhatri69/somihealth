@@ -2,30 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 export default function ButtonGroup() {
     const pathname = usePathname();
 
     // Buttons with unseen API support
-    const buttons = [
-        { label: "Weight Loss", path: "/dashboard/questionnaire" },
-        {
-            label: "Longevity",
-            path: "/dashboard/questionnaire/longevity",
-            unseenapi: "/api/longevity-questionnaire/unseen"
-        },
-        {
-            label: "Erectile Dysfunction",
-            path: "/dashboard/questionnaire/ed",
-            unseenapi: "/api/ed-questionnaire/unseen"
-        },
-        {
-            label: "Skin and Hair",
-            path: "/dashboard/questionnaire/skinhair",
-            unseenapi: "/api/skinhair-questionnaire/unseen"
-        },
-    ];
+    const buttons = useMemo(() => [
+        { label: "Weight Loss", path: "/dashboard", unseenapi: "/api/weightloss/seen-count" },
+        { label: "Longevity", path: "/dashboard/longevity", unseenapi: "/api/longevity/seen-count" },
+        { label: "Erectile Dysfunction", path: "/dashboard/ed", unseenapi: "/api/ed/seen-count" },
+        { label: "Skin and Hair", path: "/dashboard/skinhair", unseenapi: "/api/skinhair/seen-count" },
+    ], []);
     // Fetch unseen counts for each button
     const [unseenCounts, setUnseenCounts] = useState({});
 
@@ -54,7 +42,7 @@ export default function ButtonGroup() {
         // Refresh unseen counts every 30 seconds
         const interval = setInterval(fetchCounts, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [buttons]);
 
     const baseStyle =
         "relative px-4 py-2 rounded-xl text-sm font-medium transition-all border";

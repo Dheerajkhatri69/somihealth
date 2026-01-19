@@ -180,7 +180,7 @@ export default function PatientRegistrationForm() {
             }),
         }).catch((err) => console.error("Failed to update abandoned:", err));
 
-    }, [currentSegment, userSessionId]); // Remove the individual watch dependencies
+    }, [currentSegment, userSessionId, watch]); // Add watch to dependencies
 
     const onSubmit = async (data) => {
         const isValid = await trigger();

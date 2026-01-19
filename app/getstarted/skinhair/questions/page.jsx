@@ -76,12 +76,12 @@ export default function SkinHairBasicInfoForm() {
     const phone = watch("phone");
     const email = watch("email");
 
-    const segments = [
+    const segments = React.useMemo(() => [
         { id: "treatmentChoose", name: "Choose Your Treatment" },
         { id: "personal", name: "Personal Information" },
         { id: "age", name: "Age Verification" },
         { id: "address", name: "Address Information" },
-    ];
+    ], []);
 
     const totalSegments = segments.length;
     const progress = Math.round((currentSegment / (totalSegments - 1)) * 100);
@@ -123,7 +123,7 @@ export default function SkinHairBasicInfoForm() {
             body: JSON.stringify(payload),
         }).catch(err => console.error("Abandonment update failed:", err));
 
-    }, [currentSegment, firstName, lastName, phone, email, userSessionId]);
+    }, [currentSegment, firstName, lastName, phone, email, userSessionId, segments]);
 
     const handleNext = async () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });

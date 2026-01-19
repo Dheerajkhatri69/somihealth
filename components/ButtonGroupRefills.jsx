@@ -2,30 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 export default function ButtonGroupRefills() {
     const pathname = usePathname();
 
     // Buttons with unseen API support
-    const buttons = [
-        { label: "Weight Loss", path: "/dashboard/refills" },
-        {
-            label: "Longevity",
-            path: "/dashboard/refills/longevity",
-            unseenapi: "/api/longevity-refill-questionnaire/unseen"
-        },
-        {
-            label: "Erectile Dysfunction",
-            path: "/dashboard/refills/ed",
-            unseenapi: "/api/ed-refill-questionnaire/unseen"
-        },
-        {
-            label: "Skin and Hair",
-            path: "/dashboard/refills/skinhair",
-            unseenapi: "/api/skinhair-refill-questionnaire/unseen"
-        },
-    ];
+    const buttons = useMemo(() => [
+        { label: "Weight Loss", path: "/dashboard/refills/weightloss", unseenapi: "/api/refills/seen-count" },
+        { label: "Longevity", path: "/dashboard/refills/longevity", unseenapi: "/api/longevity-refill/seen-count" },
+        { label: "Erectile Dysfunction", path: "/dashboard/refills/ed", unseenapi: "/api/ed-refill/seen-count" },
+        { label: "Skin and Hair", path: "/dashboard/refills/skinhair", unseenapi: "/api/skinhair-refill/seen-count" },
+    ], []);
     // Fetch unseen counts for each button
     const [unseenCounts, setUnseenCounts] = useState({});
 
@@ -54,7 +42,7 @@ export default function ButtonGroupRefills() {
         // Refresh unseen counts every 30 seconds
         const interval = setInterval(fetchCounts, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [buttons]);
 
     const baseStyle =
         "relative px-4 py-2 rounded-xl text-sm font-medium transition-all border";

@@ -15,7 +15,8 @@ import ProductDetails from "@/components/productDetails";
 import FeatureBanner from "@/components/FeatureBanner";
 
 export default function ProductPage({ params }) {
-  const { productType, product } = params;
+  const { slug, product } = params;
+  const productType = slug; // Map slug to productType for existing logic
   const { getProduct, isLoading, error } = useWebsiteData();
 
   const productData = getProduct(productType, product);

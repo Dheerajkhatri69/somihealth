@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 export default function AbandonmentButtonGroup() {
     const pathname = usePathname();
 
     // Buttons with unseen API support
-    const buttons = [
+    const buttons = useMemo(() => [
         { label: "Weight Loss", path: "/dashboard/abandonment" },
         {
             label: "Longevity",
@@ -25,7 +25,7 @@ export default function AbandonmentButtonGroup() {
             path: "/dashboard/abandonment/skinhair",
             unseenapi: "/api/skinhair-abandonment/seen-count"
         },
-    ];
+    ], []);
 
     // Fetch unseen counts for each button
     const [unseenCounts, setUnseenCounts] = useState({});
@@ -55,7 +55,7 @@ export default function AbandonmentButtonGroup() {
         // Refresh unseen counts every 30 seconds
         const interval = setInterval(fetchCounts, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [buttons]);
 
     const baseStyle =
         "relative px-4 py-2 rounded-xl text-sm font-medium transition-all border";
