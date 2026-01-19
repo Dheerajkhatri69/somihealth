@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectMongoDB } from "@/lib/mongodb";
 import EDQuestionnaire from "@/lib/model/edQuestionnaire";
+import { ensureUserCredential } from "@/lib/userCredentialService";
 
 export async function GET(req, { params }) {
     try {
@@ -28,6 +29,11 @@ export async function PUT(req, { params }) {
     try {
         const body = await req.json();
         await connectMongoDB();
+
+        // Create user credential if questionnaire is being set to false
+        if (body.questionnaire === false && body.email) {
+            await ensureUserCredential(body.email);
+        }
 
         // If questionnaire field is explicitly set in body, use it; otherwise set to false
         const updateData = { ...body };

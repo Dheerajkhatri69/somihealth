@@ -2,6 +2,7 @@ import { connectionSrt } from "@/lib/db";
 import { Patient } from "@/lib/model/patient";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+import { ensureUserCredential } from "@/lib/userCredentialService";
 
 // GET: Fetch all patients
 export async function GET() {
@@ -183,6 +184,11 @@ export async function PUT(request) {
 
         if (!body.authid) {
             throw new Error("authid is required for update");
+        }
+
+        // Create user credential if questionnaire is being set to false
+        if (body.questionnaire === false && body.email) {
+            await ensureUserCredential(body.email);
         }
 
         const updatedPatient = await Patient.findOneAndUpdate(

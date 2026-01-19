@@ -25,6 +25,7 @@ import {
   TicketSlash,
   KeyRound,
   Columns3,
+  UserRoundCheck,
 } from "lucide-react"
 
 import {
@@ -83,6 +84,7 @@ const sidebarItems = [
     icon: AudioWaveform, allowedRoles: ["A"],
     highlight: ["/dashboard/followup/longevityRefillabAndonment", "/dashboard/followup/edRefillabAndonment", "/dashboard/followup/skinhairRefillabAndonment"]
   },
+  { title: "Patient Credentials", url: "/dashboard/auto-users", icon: UserRoundCheck, allowedRoles: ["A"] },
   { title: "Referrals", url: "/dashboard/referrals", icon: Settings2, allowedRoles: ["A"] },
   { title: "Email History", url: "/dashboard/emailhistorytable", icon: History, allowedRoles: ["A"] },
   {

@@ -9,20 +9,20 @@ export default function AbandonmentRefillButtonGroup() {
 
     // Buttons with unseen API support
     const buttons = useMemo(() => [
-        { label: "Weight Loss", path: "/dashboard/abandonment/refills/weightloss" },
+        { label: "Weight Loss", path: "/dashboard/followup/abandonment" },
         {
             label: "Longevity",
-            path: "/dashboard/abandonment/refills/longevity",
+            path: "/dashboard/followup/abandonment/longevity",
             unseenapi: "/api/longevity-refill-abandonment/seen-count"
         },
         {
             label: "Erectile Dysfunction",
-            path: "/dashboard/abandonment/refills/ed",
+            path: "/dashboard/followup/abandonment/ed",
             unseenapi: "/api/ed-refill-abandonment/seen-count"
         },
         {
             label: "Skin and Hair",
-            path: "/dashboard/abandonment/refills/skinhair",
+            path: "/dashboard/followup/abandonment/skinhair",
             unseenapi: "/api/skinhair-refill-abandonment/seen-count"
         },
     ], []);

@@ -9,10 +9,10 @@ export default function ButtonGroupRefills() {
 
     // Buttons with unseen API support
     const buttons = useMemo(() => [
-        { label: "Weight Loss", path: "/dashboard/refills/weightloss", unseenapi: "/api/refills/seen-count" },
-        { label: "Longevity", path: "/dashboard/refills/longevity", unseenapi: "/api/longevity-refill/seen-count" },
-        { label: "Erectile Dysfunction", path: "/dashboard/refills/ed", unseenapi: "/api/ed-refill/seen-count" },
-        { label: "Skin and Hair", path: "/dashboard/refills/skinhair", unseenapi: "/api/skinhair-refill/seen-count" },
+        { label: "Weight Loss", path: "/dashboard/refills"},
+        { label: "Longevity", path: "/dashboard/refills/longevity", unseenapi: "/api/longevity-refill-questionnaire/unseen" },
+        { label: "Erectile Dysfunction", path: "/dashboard/refills/ed", unseenapi: "/api/ed-refill-questionnaire/unseen" },
+        { label: "Skin and Hair", path: "/dashboard/refills/skinhair", unseenapi: "/api/skinhair-refill-questionnaire/unseen" },
     ], []);
     // Fetch unseen counts for each button
     const [unseenCounts, setUnseenCounts] = useState({});
