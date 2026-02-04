@@ -145,7 +145,7 @@ export default function Page({ params }) {
       setTimeout(() => scrollToSummary(), 100);
     }
   };
-
+  //ok done new change
 
   const handleCheckout = () => { if (summary.link) window.open(summary.link, '_blank'); };
   const handlePayPalCheckout = () => { if (summary.paypal) window.open(summary.paypal, '_blank'); };
