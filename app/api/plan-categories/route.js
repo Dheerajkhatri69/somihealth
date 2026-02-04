@@ -1,9 +1,13 @@
 // /app/api/plan-categories/route.js
 import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import mongoose from 'mongoose';
 import PricingLanding from '@/lib/model/pricingLanding';
-import PricingWeightLoss from '@/lib/model/pricingWeightLoss'; // Import Weight Loss schema
 import { connectionSrt } from '@/lib/db';
+
+// This route depends on request headers and live DB data; it must be dynamic.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function connectDB() {
     if (mongoose.connection.readyState === 0) {
@@ -26,7 +30,7 @@ function dedupeByIdName(arr) {
 }
 
 
-export async function GET() {
+export async function GET(request) {
     try {
         await connectDB();
 
@@ -47,14 +51,15 @@ export async function GET() {
             bannerBehindShow: o.bannerBehindShow ?? false,
         }));
 
-        // Pull from PricingWeightLoss.options (Weight Loss schema)
-        const weightLossDoc = await PricingWeightLoss.findOne({ 'config.isActive': true })
-            // If multiple active docs exist, return the most recently updated one
-            .sort({ updatedAt: -1, _id: -1 })
-            .lean()
-            .select({ options: 1 });
+        // Pull from /api/pricing-weightloss-content (extract result.options only)
+        const h = await headers();
+        const host = h.get('x-forwarded-host') || h.get('host');
+        const proto = h.get('x-forwarded-proto') || 'http';
+        const weightLossUrl = new URL('/api/pricing-weightloss-content', `${proto}://${host}`);
+        const weightLossResp = await fetch(weightLossUrl, { cache: 'no-store' });
+        const weightLossJson = weightLossResp.ok ? await weightLossResp.json() : null;
 
-        const weightLossCats = (weightLossDoc?.options || []).map(o => ({
+        const weightLossCats = (weightLossJson?.result?.options || []).map(o => ({
             idname: String(o.idname || '').toLowerCase(),
             title: o.title || o.idname || '',
             image: o.image || '',
