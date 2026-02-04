@@ -32,6 +32,8 @@ export async function GET() {
 
         // Pull from PricingLanding.options (if present)
         const landingDoc = await PricingLanding.findOne({ 'config.isActive': true })
+            // If multiple active docs exist, return the most recently updated one
+            .sort({ updatedAt: -1, _id: -1 })
             .lean()
             .select({ options: 1 });
 
@@ -47,6 +49,8 @@ export async function GET() {
 
         // Pull from PricingWeightLoss.options (Weight Loss schema)
         const weightLossDoc = await PricingWeightLoss.findOne({ 'config.isActive': true })
+            // If multiple active docs exist, return the most recently updated one
+            .sort({ updatedAt: -1, _id: -1 })
             .lean()
             .select({ options: 1 });
 
